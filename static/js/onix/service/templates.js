@@ -100,13 +100,9 @@ function(
 	 * Init - get all templates from the page.
 	 */
 	this.init = function() {
-		var all = document.querySelectorAll("script[type='text/template']");
-
-		if (all) {
-			Common.nodesForEach(all, function(item) {
-				this.add(item.id, item.innerHTML);
-			}, this);
-		}
+		Onix.element("script[type='text/template']").forEach(function(item) {
+			this.add(item.id, item.innerHTML);
+		}, this);
 	};
 	
 	/**
@@ -152,19 +148,18 @@ function(
 	 * @param  {Object|Function} scope
 	 */
 	this.bindTemplate = function(root, scope) {
-		var allElements = root.querySelectorAll("*[data-click], *[data-change], *[data-bind]");
+		var allElements = Onix.element("*[data-click], *[data-change], *[data-bind]", root);
 
-		if (allElements) {
-			var templScope = this;
+		if (allElements.len()) {
 			var newEls = {};
 
-			Common.nodesForEach(allElements, function(item) {
+			allElements.forEach(function(item) {
 				var dataClick = item.getAttribute("data-click");
 				var dataChange = item.getAttribute("data-change");
 				var dataBind = item.getAttribute("data-bind");
 
 				if (dataClick && this._parseFnName(dataClick) in scope) {
-					item.addEventListener("click", function(event) {
+					item.addEventListener("click", Common.bindWithoutScope(function(event, templScope) {
 						var value = this.getAttribute("data-click");
 						var fnName = templScope._parseFnName(value);
 						var args = templScope._parseArgs(value, {
@@ -173,11 +168,11 @@ function(
 						});
 
 						scope[fnName].apply(scope, args);
-					});
+					}, this));
 				}
 
 				if (dataChange && this._parseFnName(dataChange) in scope) {
-					item.addEventListener("change", function(event) {
+					item.addEventListener("change", Common.bindWithoutScope(function(event, templScope) {
 						var value = this.getAttribute("data-change");
 						var fnName = templScope._parseFnName(value);
 						var args = templScope._parseArgs(value, {
@@ -186,7 +181,7 @@ function(
 						});
 
 						scope[fnName].apply(scope, args);
-					});
+					}, this));
 				}
 
 				if (dataBind) {

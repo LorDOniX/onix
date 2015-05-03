@@ -1,13 +1,11 @@
 Onix.factory("Snippet", [
 	"Templates",
-	"DOM",
 function(
-	Templates,
-	DOM
+	Templates
 ) {
-	return {
-		// ------------------------ private ---------------------------------------
-		
+	// ------------------------ private ---------------------------------------
+	
+	var Snippet = {
 		/**
 		 * Get snippet config.
 		 * @return {Object}
@@ -129,6 +127,20 @@ function(
 		 */
 		getName: function() {
 			return this._name;
+		}
+	};
+
+	// --- public ----
+	
+	return {
+		/**
+		 * Create new snippet
+		 * @param  {Object|Function} a snippet data | dependicies
+		 * @param  {Object|Function} [b] snippet data | dependicies
+		 * @return {Page}
+		 */
+		create: function(a, b) {
+			return Common.create(Snippet, a, b);
 		}
 	};
 }]);

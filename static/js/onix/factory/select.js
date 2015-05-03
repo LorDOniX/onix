@@ -1,11 +1,9 @@
 Onix.factory("Select", [
-	"API",
-	"Events",
 	"Common",
+	"Events",
 function(
-	API,
-	Events,
-	Common
+	Common,
+	Events
 ) {
 	// ------------------------ private ---------------------------------------
 	
@@ -15,7 +13,7 @@ function(
 	 */
 	var Select = function(el) {
 		// extend our class
-		API.extend(this, Events);
+		Common.extend(this, Events);
 
 		this._CONST = {
 			CAPTION_SEL: ".dropdown-toggle",
@@ -36,7 +34,6 @@ function(
 	 */
 	Select.prototype._bind = function(el) {
 		var captionEl = el.querySelector(this._CONST.CAPTION_SEL);
-		var options = el.querySelectorAll(this._CONST.OPTIONS_SEL);
 		var con = this._CONST;
 
 		// click on the caption
@@ -47,8 +44,7 @@ function(
 
 			var removeAllOpened = function() {
 				// remove all
-				var all = document.querySelectorAll(con.OPEN_DROPDOWN_SEL);
-				Common.nodesForEach(all, function(item) {
+				Onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
 					item.classList.remove("open");
 				});
 			};
@@ -70,9 +66,8 @@ function(
 			}
 		});
 
-		// options
-		Common.nodesForEach(options, function(option) {
-			option.addEventListener("click", API.bindWithoutScope(function(e, scope) {
+		Onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
+			option.addEventListener("click", Common.bindWithoutScope(function(e, scope) {
 				e.stopPropagation();
 
 				if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
@@ -89,7 +84,7 @@ function(
 					scope.trigger("change", value);
 				}
 			}, this));
-		}.bind(this));
+		}, this);
 	};
 
 	// ------------------------ public ----------------------------------------

@@ -1,25 +1,25 @@
 Onix.factory("HomePage", [
-	"API",
 	"Page",
 	"HomeResource",
 function(
-	API,
 	Page,
 	HomeResource
 ) {
-	return API.inherit(Page, {
+	return Page.create(["Events"], {
 		// ------------------------ private ---------------------------------------
 		
 		_afterInit: function() {
-			console.log("Yeah! Application is working :)");
-
 			HomeResource.get().then(function(data) {
-				console.log("Resource data");
 				console.log(data);
 			});
-		}
+		},
 
 		// ------------------------ public ----------------------------------------
+		
+		test: function() {
+			console.log("btn click");
+			console.log(arguments);
+		}
 
 	});
 }]);

@@ -3,9 +3,8 @@ Onix.run([
 function(
 	Router
 ) {
+	// application routes
 	Router
 		.route("/", "HomePage")
 		.otherwise("HomePage");
-
-	console.log("App run");
 }]);

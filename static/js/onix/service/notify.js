@@ -1,4 +1,8 @@
-Onix.service("Notify", ["Promise", function(Promise) {
+Onix.service("Notify", [
+	"Promise",
+function(
+	Promise
+) {
 	// ------------------------ private ----------------------------------------
 	
 	/**

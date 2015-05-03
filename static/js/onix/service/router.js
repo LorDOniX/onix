@@ -1,9 +1,20 @@
 Onix.service("Router", [
 	"$location",
-function($location) {
+function(
+	$location
+) {
 	// ------------------------ private ---------------------------------------
 	
+	/**
+	 * All routes
+	 * @type {Array}
+	 */
 	this._routes = [];
+
+	/**
+	 * Otherwise route
+	 * @type {String}
+	 */
 	this._otherwise = null;
 
 	// ------------------------ public ----------------------------------------
@@ -14,6 +25,12 @@ function($location) {
 	this.init = function() {
 	};
 
+	/**
+	 * Add route to router.
+	 * @param  {String} url 
+	 * @param  {String} page
+	 * @return {Himself}
+	 */
 	this.route = function(url, page) {
 		this._routes.push({
 			url: url,
@@ -23,6 +40,11 @@ function($location) {
 		return this;
 	};
 
+	/**
+	 * Otherwise
+	 * @param  {String} page
+	 * @return {Himself}
+	 */
 	this.otherwise = function(page) {
 		this._otherwise = page;
 

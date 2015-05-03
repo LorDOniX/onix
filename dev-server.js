@@ -6,7 +6,7 @@ var lessMiddleware = require('less-middleware');
 var MAIN_PATH = "static";
 
 // less
-app.use(lessMiddleware(path.join(__dirname, MAIN_PATH + '/static')), {}, {}, {
+app.use(lessMiddleware(path.join(__dirname, MAIN_PATH)), {}, {}, {
 	sourceMap: true
 });
 

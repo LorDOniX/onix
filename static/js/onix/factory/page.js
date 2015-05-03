@@ -1,15 +1,15 @@
 Onix.factory("Page", [
 	"DOM",
 	"Templates",
-	"CONFIG",
+	"Common",
 function(
 	DOM,
 	Templates,
-	CONFIG
+	Common
 ) {
-	return {
-		// ------------------------ private ---------------------------------------
-		
+	// ------------------------ private ---------------------------------------
+	
+	var Page = {
 		/**
 		 * Set config.
 		 * @param {Object} config
@@ -26,7 +26,7 @@ function(
 			this._els = {};
 
 			// each page contanins only one detail div
-			var rootEl = DOM.get(CONFIG.DETAIL_SEL);
+			var rootEl = DOM.get(Onix.config("DETAIL_SEL"));
 
 			if (config.els) {
 				this._els = DOM.get(config.els, rootEl);
@@ -81,6 +81,20 @@ function(
 			Object.keys(newEls).forEach(function(key) {
 				this._els[key] = newEls[key];
 			}, this);
+		}
+	};
+
+	// --- public ----
+	
+	return {
+		/**
+		 * Create new page
+		 * @param  {Object|Function} a page data | dependicies
+		 * @param  {Object|Function} [b] page data | dependicies
+		 * @return {Page}
+		 */
+		create: function(a, b) {
+			return Common.create(Page, a, b);
 		}
 	};
 }]);

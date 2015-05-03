@@ -1,9 +1,7 @@
 Onix.service("Http", [
 	"Promise",
-	"API",
 function(
-	Promise,
-	API
+	Promise
 ) {
 	// ------------------------ private ---------------------------------------
 	

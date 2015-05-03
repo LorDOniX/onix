@@ -9,6 +9,12 @@ Onix = (function() {
 		_objects: {},
 
 		/**
+		 * Onix configuration
+		 * @type {Object}
+		 */
+		_config: {},
+
+		/**
 		 * All run functions
 		 * @type {Array}
 		 */
@@ -28,7 +34,9 @@ Onix = (function() {
 		 */
 		_init: function() {
 			document.addEventListener("DOMContentLoaded", function() {
-				this._run();
+				var di = this._di(this._run);
+
+				di.fn.apply(this, di.args);
 			}.bind(this));
 		},
 
@@ -86,34 +94,52 @@ Onix = (function() {
 		/**
 		 * Application run.
 		 */
-		_run: function() {
-			var config = this.getObject("CONFIG");
+		_run: [
+			"i18n",
+			"Templates",
+			"Loader",
+			"Router",
+			"MyQuery",
+		function(
+			i18n,
+			Templates,
+			Loader,
+			Router,
+			MyQuery
+		) {
+			// binds
+			this.element = function(value, parent) {
+				return new MyQuery.get(value, parent);
+			};
 
-			var i18n = this.getObject("i18n");
-			window._ = i18n._.bind(i18n);
+			// inits
+			Loader.init();
+			Router.init();
 
-			var templates = this.getObject("Templates");
-			templates.init();
-
-			var loader = this.getObject("Loader");
-			loader.init();
-
-			var router = this.getObject("Router");
-			router.init();
-			
-			i18n.setLanguage(config.LOCALIZATION.LANG);
-			i18n.loadLanguage(config.LOCALIZATION.LANG, config.LOCALIZATION.PATH).done(function() {
+			var afterRun = function() {
 				// run runs array
 				this._runs.forEach(function(item) {
 					var di = this._di(item);
 
 					new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)));
 				}.bind(this));
+
+				// templates init
+				Templates.init();
 				
 				// router go
-				router.go();
-			}.bind(this));
-		},
+				Router.go();
+			}.bind(this);
+			
+			if (this.config("LOCALIZATION").LANG && this.config("LOCALIZATION").PATH) {
+				window._ = i18n._.bind(i18n);
+				i18n.setLanguage(this.config("LOCALIZATION").LANG);
+				i18n.loadLanguage(this.config("LOCALIZATION").LANG, this.config("LOCALIZATION").PATH).done(afterRun);
+			}
+			else {
+				afterRun();
+			}
+		}],
 
 		// ------------------------ public ----------------------------------------
 
@@ -150,6 +176,22 @@ Onix = (function() {
 		 */
 		constant: function(name, obj) {
 			this._objects[name] = obj;
+		},
+
+		/**
+		 * Get/Set configuration
+		 * @param  {String|Object} param
+		 * @return  {Object}
+		 */
+		config: function(param) {
+			if (typeof param === "string") {
+				// get
+				return this._config[param] || {};
+			}
+			else {
+				// set
+				this.getObject("Common").extend(this._config, param);
+			}
 		},
 
 		/**
