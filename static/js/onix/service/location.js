@@ -63,4 +63,13 @@ Onix.service("$location", function() {
 			return output;
 		}
 	};
+
+	/**
+	 * Get current location
+	 * @return {String}
+	 */
+	this.get = function() {
+		return window.location.pathname;
+	};
+	
 });
