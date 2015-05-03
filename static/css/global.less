@@ -1,0 +1,49 @@
+.center {
+	text-align: center;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.align-middle {
+	vertical-align: middle !important;
+}
+
+.float-right {
+	float: right;
+}
+
+.float-left {
+	float: left;
+}
+
+.loader {
+	width: 0%;
+	height: 3px;
+	background: #C01;
+	.box-shadow(1px 1px #ccc);
+	position: fixed;
+	left: 0;
+	top: 0;
+	.transition(width 2s);
+	opacity: 0;
+	z-index: 10;
+
+	&.start {
+		opacity: 1;
+		width: 75%;
+	}
+
+	&.end {
+		width: 100%;
+		opacity: 1;
+		.transition(width 0.1s);
+	}
+
+	&.hide {
+		width: 100%;
+		.transition(opacity 0.3s);
+		opacity: 0;
+	}
+}
