@@ -1,8 +1,9 @@
-var express  = require('express');
+var express = require('express');
 var path = require('path');
-var app      = express();
-var port  	 = process.env.PORT || 8000;
+var app = express();
+var port = process.env.PORT || 8001;
 var lessMiddleware = require('less-middleware');
+
 var MAIN_PATH = "static";
 
 // less
@@ -19,8 +20,8 @@ app.use("/templates", express.static(path.join(__dirname, MAIN_PATH + '/template
 // test api
 app.get("/api/home/", function(req, res) {
 	res.json({
-	    name: "test API item",
-	    value: 42
+		name: "test API item",
+		value: 42
 	});
 });
 

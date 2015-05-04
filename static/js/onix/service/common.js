@@ -113,7 +113,7 @@ function(
 		args.push(mainObj);
 
 		// data override
-		args.push(b);
+		args.push(b || a);
 
 		return this.merge.apply(this, args);
 	};

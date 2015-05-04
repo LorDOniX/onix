@@ -76,7 +76,7 @@ function(
 
 	/**
 	 * Create new XHR request.
-	 * @param  {Object} config { url, method, getData, postData }
+	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
 	 * @return {Promise}
 	 */
 	this.createRequest = function(config) {
@@ -124,7 +124,14 @@ function(
 		};
 
 		try {
-			// pouze pri akcich
+			// add headers
+			var headers = config.headers;
+			if (headers && Array.isArray(headers)) {
+				headers.forEach(function(header) {
+					request.setRequestHeader(header.type, header.value);
+				});
+			}
+
 			if (method == this.METHOD.GET) {
 				request.setRequestHeader('Accept', 'application/json');
 			}

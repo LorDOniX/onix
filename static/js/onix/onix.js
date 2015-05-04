@@ -189,8 +189,10 @@ Onix = (function() {
 				return this._config[param] || {};
 			}
 			else {
-				// set
-				this.getObject("Common").extend(this._config, param);
+				// set - update config object
+				Object.keys(param).forEach(function(key) {
+					this._config[key] = param[key];
+				}.bind(this));
 			}
 		},
 

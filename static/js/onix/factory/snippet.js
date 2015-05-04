@@ -1,7 +1,9 @@
 Onix.factory("Snippet", [
 	"Templates",
+	"Common",
 function(
-	Templates
+	Templates,
+	Common
 ) {
 	// ------------------------ private ---------------------------------------
 	
