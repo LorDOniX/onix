@@ -3,6 +3,13 @@ Onix = (function() {
 		// ------------------------ private ---------------------------------------
 		
 		/**
+		 * Framework info.
+		 * @type {String}
+		 */
+		_VERSION: "1.0.0",
+		_DATE: "4. 5. 2015",
+
+		/**
 		 * All factories, constants...
 		 * @type {Object}
 		 */
