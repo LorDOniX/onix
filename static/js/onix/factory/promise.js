@@ -125,5 +125,15 @@ Onix.factory("Promise", function() {
 		return this;
 	};
 
-	return Promise;
+	// --- public ----
+
+	return {
+		/**
+		 * Deferable object of the promise.
+		 * @return {Promise}
+		 */
+		defer: function() {
+			return new Promise();
+		}
+	}
 });

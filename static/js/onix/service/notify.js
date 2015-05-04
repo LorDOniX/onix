@@ -72,7 +72,7 @@ function(
 	 * @return {Promise}
 	 */
 	Notify.prototype.hide = function() {
-		var promise = new Promise();
+		var promise = Promise.defer();
 
 		setTimeout(function() {
 			this.reset();

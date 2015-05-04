@@ -6,7 +6,7 @@ Onix = (function() {
 		 * Framework info.
 		 * @type {String}
 		 */
-		_VERSION: "1.0.0",
+		_VERSION: "1.0.1",
 		_DATE: "4. 5. 2015",
 
 		/**
@@ -132,10 +132,10 @@ Onix = (function() {
 				}.bind(this));
 
 				// templates init
-				Templates.init();
-				
-				// router go
-				Router.go();
+				Templates.init().done(function() {
+					// router go
+					Router.go();
+				});
 			}.bind(this);
 			
 			if (this.config("LOCALIZATION").LANG && this.config("LOCALIZATION").PATH) {

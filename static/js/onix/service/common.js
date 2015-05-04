@@ -77,7 +77,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.confirm = function(txt) {
-		var promise = new Promise();
+		var promise = Promise.defer();
 
 		if (confirm(txt)) {
 			promise.resolve();
@@ -232,6 +232,18 @@ function(
 		}
 		else {
 			return hexColor;
+		}
+	};
+
+	/**
+	 * If EXPR then function
+	 * @param  {Boolean} expr  test if (EXPR)
+	 * @param  {Function} fn
+	 * @param  {Function} scope
+	 */
+	this.ift = function(expr, th, scope) {
+		if (expr) {
+			th.apply(scope || th, [expr]);
 		}
 	};
 }]);

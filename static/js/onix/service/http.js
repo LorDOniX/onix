@@ -80,7 +80,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.createRequest = function(config) {
-		var promise = new Promise();
+		var promise = Promise.defer();
 		var request = new XMLHttpRequest();
 
 		config = config || {};

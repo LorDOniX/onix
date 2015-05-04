@@ -1,7 +1,9 @@
 Onix.run([
 	"Router",
+	"Templates",
 function(
-	Router
+	Router,
+	Templates
 ) {
 	// application routes
 	Router
@@ -13,4 +15,7 @@ function(
 			}
 		})
 		.otherwise("HomePage");
+
+	// preload templates
+	Templates.preload("mujTempl", "/js/home/test-templ.html");
 }]);

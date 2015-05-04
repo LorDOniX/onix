@@ -17,6 +17,15 @@ Onix.config({
 	},
 
 	/**
+	 * Template delimiter
+	 * @type {Object}
+	 */
+	TMPL_DELIMITER: {
+		LEFT: "{{",
+		RIGHT: "}}"
+	},
+
+	/**
 	 * Detail page selector
 	 * @type {String}
 	 */

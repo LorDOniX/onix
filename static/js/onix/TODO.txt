@@ -1,1 +1,3 @@
-- test šablon
+TODO
+----
+- promise all

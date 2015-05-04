@@ -1,9 +1,19 @@
 Onix.service("Templates", [
 	"Common",
+	"Promise",
+	"Http",
 function(
-	Common
+	Common,
+	Promise,
+	Http
 ) {
 	// ------------------------ private ---------------------------------------
+	
+	/**
+	 * Array with templates for preload before applications starts.
+	 * @type {Array}
+	 */
+	this._preloads = [];
 	
 	/**
 	 * Template cache.
@@ -100,9 +110,28 @@ function(
 	 * Init - get all templates from the page.
 	 */
 	this.init = function() {
+		var promise = Promise.defer();
+
 		Onix.element("script[type='text/template']").forEach(function(item) {
 			this.add(item.id, item.innerHTML);
 		}, this);
+
+		if (this._preloads.length) {
+			// todo
+			var all = [];
+
+			this._preloads.forEach(function(item) {
+				all.push(this.load(item.key, item.path));
+			}, this);
+
+			console.log(all);
+			// todo
+		}
+		else {
+			promise.resolve();
+		}
+
+		return promise;
 	};
 	
 	/**
@@ -122,10 +151,11 @@ function(
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
+		var cnf = Onix.config("TMPL_DELIMITER");
 
 		if (data) {
 			Object.keys(data).forEach(function(key) {
-				tmpl = tmpl.replace(new RegExp("{" + key + "}", "g"), data[key]);
+				tmpl = tmpl.replace(new RegExp(cnf.LEFT + "[ ]*" + key + "[ ]*" + cnf.RIGHT, "g"), data[key]);
 			});
 		}
 
@@ -193,5 +223,39 @@ function(
 				scope.addEls(newEls);
 			}
 		}
+	};
+
+	/**
+	 * Add template for preload.
+	 * @param  {String} key 
+	 * @param  {String} path
+	 */
+	this.preload = function(key, path) {
+		this._preloads.push({
+			key: key,
+			path: path
+		});
+	};
+
+	/**
+	 * Load template from the path.
+	 * @param  {String} key
+	 * @param  {String} path
+	 * @return {Promise}
+	 */
+	this.load = function(key, path) {
+		var promise = Promise.defer();
+
+		Http.createRequest({
+			url: path
+		}).then(function(data) {
+			this.add(key, data.data);
+
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.reject();
+		});
+
+		return promise;
 	};
 }]);

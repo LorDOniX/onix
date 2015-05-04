@@ -78,7 +78,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.loadLanguage = function(lang, url) {
-		var promise = new Promise();
+		var promise = Promise.defer();
 
 		Http.createRequest({
 			url: url
