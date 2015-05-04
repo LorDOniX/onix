@@ -789,10 +789,11 @@ Onix.factory("MyQuery", function() {
 		 /**
 		 * Main cover function.
 		 * @param  {String|NodeElement|Array} value
+		 * @param {NodeElement} [parent]
 		 * @return {MyQuery}
 		 */
-		get: function(value) {
-			return new MyQuery(value);
+		get: function(value, parent) {
+			return new MyQuery(value, parent);
 		}
 	};
 });
