@@ -6,7 +6,7 @@ Onix = (function() {
 		 * Framework info.
 		 * @type {String}
 		 */
-		_VERSION: "1.0.0",
+		_VERSION: "1.0.1",
 		_DATE: "4. 5. 2015",
 
 		/**
@@ -132,10 +132,10 @@ Onix = (function() {
 				}.bind(this));
 
 				// templates init
-				Templates.init();
-				
-				// router go
-				Router.go();
+				Templates.init().done(function() {
+					// router go
+					Router.go();
+				});
 			}.bind(this);
 			
 			if (this.config("LOCALIZATION").LANG && this.config("LOCALIZATION").PATH) {
@@ -236,6 +236,15 @@ Onix.config({
 	 */
 	URLS: {
 		HOME: "/api/home/"
+	},
+
+	/**
+	 * Template delimiter
+	 * @type {Object}
+	 */
+	TMPL_DELIMITER: {
+		LEFT: "{{",
+		RIGHT: "}}"
 	},
 
 	/**
@@ -353,7 +362,7 @@ Onix.factory("Promise", function() {
 	 */
 	Promise.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
-			if ((fnItem.isError && isError) || (!fnItem.isError && !isError)) {
+			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
 			}
 		}, this);
@@ -450,7 +459,62 @@ Onix.factory("Promise", function() {
 		return this;
 	};
 
-	return Promise;
+	/**
+	 * Finally for promise
+	 * @param  {Function}   cb
+	 * @return {Promise}
+	 */
+	Promise.prototype["finally"] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			"finally": true
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
+	// --- public ----
+
+	return {
+		/**
+		 * Resolve all promises in the array
+		 * @param {Array} promises
+		 * @return {Promise}
+		 */
+		all: function(promises) {
+			var promise = new Promise();
+
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+
+					if (count == 0) {
+						promise.resolve();
+					}
+				};
+
+				promises.forEach(function(item) {
+					item["finally"](test);
+				});
+			}
+			else {
+				promise.resolve();
+			}
+
+			return promise;
+		},
+
+		/**
+		 * Deferable object of the promise.
+		 * @return {Promise}
+		 */
+		defer: function() {
+			return new Promise();
+		}
+	}
 });
 Onix.factory("MyQuery", function() {
 	// ------------------------ private ---------------------------------------
@@ -1145,7 +1209,7 @@ function(
 	 * @return {Promise}
 	 */
 	Notify.prototype.hide = function() {
-		var promise = new Promise();
+		var promise = Promise.defer();
 
 		setTimeout(function() {
 			this.reset();
@@ -1246,7 +1310,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.confirm = function(txt) {
-		var promise = new Promise();
+		var promise = Promise.defer();
 
 		if (confirm(txt)) {
 			promise.resolve();
@@ -1403,6 +1467,18 @@ function(
 			return hexColor;
 		}
 	};
+
+	/**
+	 * If EXPR then function
+	 * @param  {Boolean} expr  test if (EXPR)
+	 * @param  {Function} fn
+	 * @param  {Function} scope
+	 */
+	this.ift = function(expr, th, scope) {
+		if (expr) {
+			th.apply(scope || th, [expr]);
+		}
+	};
 }]);
 Onix.service("Loader", [
 	"DOM",
@@ -1459,10 +1535,20 @@ function(
 }]);
 Onix.service("Templates", [
 	"Common",
+	"Promise",
+	"Http",
 function(
-	Common
+	Common,
+	Promise,
+	Http
 ) {
 	// ------------------------ private ---------------------------------------
+	
+	/**
+	 * Array with templates for preload before applications starts.
+	 * @type {Array}
+	 */
+	this._preloads = [];
 	
 	/**
 	 * Template cache.
@@ -1559,9 +1645,28 @@ function(
 	 * Init - get all templates from the page.
 	 */
 	this.init = function() {
+		var promise = Promise.defer();
+
 		Onix.element("script[type='text/template']").forEach(function(item) {
 			this.add(item.id, item.innerHTML);
 		}, this);
+
+		if (this._preloads.length) {
+			var all = [];
+
+			this._preloads.forEach(function(item) {
+				all.push(this.load(item.key, item.path));
+			}, this);
+
+			Promise.all(all)["finally"](function() {
+				promise.resolve();
+			});
+		}
+		else {
+			promise.resolve();
+		}
+
+		return promise;
 	};
 	
 	/**
@@ -1581,10 +1686,11 @@ function(
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
+		var cnf = Onix.config("TMPL_DELIMITER");
 
 		if (data) {
 			Object.keys(data).forEach(function(key) {
-				tmpl = tmpl.replace(new RegExp("{" + key + "}", "g"), data[key]);
+				tmpl = tmpl.replace(new RegExp(cnf.LEFT + "[ ]*" + key + "[ ]*" + cnf.RIGHT, "g"), data[key]);
 			});
 		}
 
@@ -1652,6 +1758,40 @@ function(
 				scope.addEls(newEls);
 			}
 		}
+	};
+
+	/**
+	 * Add template for preload.
+	 * @param  {String} key 
+	 * @param  {String} path
+	 */
+	this.preload = function(key, path) {
+		this._preloads.push({
+			key: key,
+			path: path
+		});
+	};
+
+	/**
+	 * Load template from the path.
+	 * @param  {String} key
+	 * @param  {String} path
+	 * @return {Promise}
+	 */
+	this.load = function(key, path) {
+		var promise = Promise.defer();
+
+		Http.createRequest({
+			url: path
+		}).then(function(data) {
+			this.add(key, data.data);
+
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.reject();
+		});
+
+		return promise;
 	};
 }]);
 Onix.service("Http", [
@@ -1736,7 +1876,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.createRequest = function(config) {
-		var promise = new Promise();
+		var promise = Promise.defer();
 		var request = new XMLHttpRequest();
 
 		config = config || {};
@@ -1892,7 +2032,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.loadLanguage = function(lang, url) {
-		var promise = new Promise();
+		var promise = Promise.defer();
 
 		Http.createRequest({
 			url: url
