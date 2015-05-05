@@ -117,15 +117,15 @@ function(
 		}, this);
 
 		if (this._preloads.length) {
-			// todo
 			var all = [];
 
 			this._preloads.forEach(function(item) {
 				all.push(this.load(item.key, item.path));
 			}, this);
 
-			console.log(all);
-			// todo
+			Promise.all(all)["finally"](function() {
+				promise.resolve();
+			});
 		}
 		else {
 			promise.resolve();

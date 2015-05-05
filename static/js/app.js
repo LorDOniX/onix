@@ -17,5 +17,5 @@ function(
 		.otherwise("HomePage");
 
 	// preload templates
-	Templates.preload("mujTempl", "/js/home/test-templ.html");
+	Templates.preload("testTempl", "/js/home/test-templ.html");
 }]);

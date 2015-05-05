@@ -17,14 +17,11 @@ function(
 				console.log(data);
 			});
 
-			var KEY = "testTempl";
+			var el = Onix.element(".placeholder").html(Templates.compile("testTempl", {
+				name: "Name from HP"
+			}));
 
-			Templates.load(KEY, "/js/home/test-templ.html").done(function() {
-				var el = Onix.element(".placeholder").html(Templates.compile(KEY, {
-					name: "Name from HP"
-				}));
-				Templates.bindTemplate(el.getEl(), this);
-			}.bind(this));
+			Templates.bindTemplate(el.getEl(), this);
 		},
 
 		// ------------------------ public ----------------------------------------

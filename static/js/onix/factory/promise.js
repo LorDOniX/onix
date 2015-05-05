@@ -28,7 +28,7 @@ Onix.factory("Promise", function() {
 	 */
 	Promise.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
-			if ((fnItem.isError && isError) || (!fnItem.isError && !isError)) {
+			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
 			}
 		}, this);
@@ -125,9 +125,54 @@ Onix.factory("Promise", function() {
 		return this;
 	};
 
+	/**
+	 * Finally for promise
+	 * @param  {Function}   cb
+	 * @return {Promise}
+	 */
+	Promise.prototype["finally"] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			"finally": true
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
 	// --- public ----
 
 	return {
+		/**
+		 * Resolve all promises in the array
+		 * @param {Array} promises
+		 * @return {Promise}
+		 */
+		all: function(promises) {
+			var promise = new Promise();
+
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+
+					if (count == 0) {
+						promise.resolve();
+					}
+				};
+
+				promises.forEach(function(item) {
+					item["finally"](test);
+				});
+			}
+			else {
+				promise.resolve();
+			}
+
+			return promise;
+		},
+
 		/**
 		 * Deferable object of the promise.
 		 * @return {Promise}
