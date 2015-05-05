@@ -6,8 +6,8 @@ Onix = (function() {
 		 * Framework info.
 		 * @type {String}
 		 */
-		_VERSION: "1.0.1",
-		_DATE: "4. 5. 2015",
+		_VERSION: "1.1.0",
+		_DATE: "5. 5. 2015",
 
 		/**
 		 * All factories, constants...
