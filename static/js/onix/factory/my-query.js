@@ -31,9 +31,14 @@ Onix.factory("MyQuery", function() {
 	 * @param  {Function} scope
 	 */
 	MyQuery.prototype._operation = function(cb, scope) {
-		for (var i = 0; i < this._els.length; i++) {
-			cb.apply(scope || cb, [this._els[i], i]);
+		// NodeList -> Array
+		if (!Array.isArray(this._els)) {
+			this._els = Array.prototype.slice.call(this._els);
 		}
+
+		this._els.forEach(function(item, ind) {
+			cb.apply(scope || cb, [item, ind]);
+		});
 	};
 
 	/**

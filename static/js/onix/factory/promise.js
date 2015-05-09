@@ -33,6 +33,7 @@ Onix.factory("Promise", function() {
 			}
 		}, this);
 		
+		// clear array
 		this._funcs.length = 0;
 		this._state = isError ? this._E_STATES.REJECTED : this._E_STATES.RESOLVED;
 	};

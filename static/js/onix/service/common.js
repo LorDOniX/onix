@@ -174,9 +174,9 @@ function(
 		cb = cb || function() {};
 		
 		if (nodes) {
-			for (var i = 0; i < nodes.length; i++) {
-				cb.apply(scope || cb, [nodes[i], i]);
-			}
+			Array.prototype.slice.call(nodes).forEach(function(item, ind) {
+				cb.apply(scope || cb, [item, ind]);
+			});
 		}
 	};
 
