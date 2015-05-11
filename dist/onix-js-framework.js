@@ -321,135 +321,6 @@ Onix.config({
 	 */
 	DETAIL_SEL: ".detail"
 });
-/**
- * @namespace Events
- * @description DI: Common; Returns interface _Events;
- */
-Onix.factory("Events", [
-	"Common",
-function(
-	Common
-) {
-	/**
- 	 * @interface _Events
- 	 * @description Parent: Events;
- 	 */
-	return {
-		/**
-		 * All events. { name: name, event: function, scope, [once] }
-		 * 
-		 * @private
-		 * @type {Array}
-		 * @memberof _Events
-		 */
-		_allEvents: [],
-
-		/**
-		 * Get all events by his name.
-		 * 
-		 * @private
-		 * @param  {String} name 
-		 * @return {Array}
-		 * @memberof _Events
-		 */
-		_getEvents: function (name) {
-			var events = [];
-
-			this._allEvents.forEach(function(item, ind) {
-				if (name == item.name) {
-					events.push({
-						item: item,
-						pos: ind
-					});
-				}
-			});
-
-			return events;
-		},
-
-		/**
-		 * Add new event to the stack.
-		 * 
-		 * @public
-		 * @param  {String}   name 
-		 * @param  {Function} fn   
-		 * @param  {Object|Function}   scope
-		 * @memberof _Events
-		 */
-		on: function (name, fn, scope) {
-			this._allEvents.push({ 
-				name: name,
-				fn: fn,
-				scope: scope
-			});
-		},
-
-		/**
-		 * Remove event from the stack.
-		 * 
-		 * @public
-		 * @param  {String}   name 
-		 * @param  {Function} [fn]
-		 * @memberof _Events
-		 */
-		off: function (name, fn) {
-			var events = this._getEvents(name);
-
-			Common.reverseForEach(events, function(item) {
-				if (!fn || fn && item.fn == fn) {
-					this._allEvents.splice(item.pos, 1);
-				}
-			}, this);
-		},
-
-		/**
-		 * Add one time event to the stack.
-		 * 
-		 * @public
-		 * @param  {String}   name 
-		 * @param  {Function} [fn]
-		 * @param  {Object|Function}   scope
-		 * @memberof _Events
-		 */
-		once: function (name, fn, scope) {
-			this._allEvents.push({ 
-				name: name,
-				fn: fn,
-				scope: scope,
-				once: true
-			});
-		},
-
-		/**
-		 * Trigger event with arguments 0..n
-		 * 
-		 * @public
-		 * @param  {String} name
-		 * @memberof _Events
-		 */
-		trigger: function (name) {
-			var events = this._getEvents(name);
-			var args = arguments;
-			var onceArray = [];
-
-			events.forEach(function(event) {
-				var newArgs = Array.prototype.slice.call(args, 0);
-				newArgs.shift();
-
-				var item = event.item;
-
-				item.fn.apply(item.scope || this, newArgs);
-				if (item.once) {
-					onceArray.push(event.pos);
-				}
-			}, this);
-
-			Common.reverseForEach(onceArray, function(pos) {
-				this._allEvents.splice(pos, 1);
-			}, this);
-		}
-	};
-}]);
 Onix.factory("Promise", function() {
 	/**
 	 * @class _Promise
@@ -1817,6 +1688,135 @@ function(
 	};
 }]);
 /**
+ * @namespace Events
+ * @description DI: Common; Returns interface _Events;
+ */
+Onix.factory("Events", [
+	"Common",
+function(
+	Common
+) {
+	/**
+ 	 * @interface _Events
+ 	 * @description Parent: Events;
+ 	 */
+	return {
+		/**
+		 * All events. { name: name, event: function, scope, [once] }
+		 * 
+		 * @private
+		 * @type {Array}
+		 * @memberof _Events
+		 */
+		_allEvents: [],
+
+		/**
+		 * Get all events by his name.
+		 * 
+		 * @private
+		 * @param  {String} name 
+		 * @return {Array}
+		 * @memberof _Events
+		 */
+		_getEvents: function (name) {
+			var events = [];
+
+			this._allEvents.forEach(function(item, ind) {
+				if (name == item.name) {
+					events.push({
+						item: item,
+						pos: ind
+					});
+				}
+			});
+
+			return events;
+		},
+
+		/**
+		 * Add new event to the stack.
+		 * 
+		 * @public
+		 * @param  {String}   name 
+		 * @param  {Function} fn   
+		 * @param  {Object|Function}   scope
+		 * @memberof _Events
+		 */
+		on: function (name, fn, scope) {
+			this._allEvents.push({ 
+				name: name,
+				fn: fn,
+				scope: scope
+			});
+		},
+
+		/**
+		 * Remove event from the stack.
+		 * 
+		 * @public
+		 * @param  {String}   name 
+		 * @param  {Function} [fn]
+		 * @memberof _Events
+		 */
+		off: function (name, fn) {
+			var events = this._getEvents(name);
+
+			Common.reverseForEach(events, function(item) {
+				if (!fn || fn && item.fn == fn) {
+					this._allEvents.splice(item.pos, 1);
+				}
+			}, this);
+		},
+
+		/**
+		 * Add one time event to the stack.
+		 * 
+		 * @public
+		 * @param  {String}   name 
+		 * @param  {Function} [fn]
+		 * @param  {Object|Function}   scope
+		 * @memberof _Events
+		 */
+		once: function (name, fn, scope) {
+			this._allEvents.push({ 
+				name: name,
+				fn: fn,
+				scope: scope,
+				once: true
+			});
+		},
+
+		/**
+		 * Trigger event with arguments 0..n
+		 * 
+		 * @public
+		 * @param  {String} name
+		 * @memberof _Events
+		 */
+		trigger: function (name) {
+			var events = this._getEvents(name);
+			var args = arguments;
+			var onceArray = [];
+
+			events.forEach(function(event) {
+				var newArgs = Array.prototype.slice.call(args, 0);
+				newArgs.shift();
+
+				var item = event.item;
+
+				item.fn.apply(item.scope || this, newArgs);
+				if (item.once) {
+					onceArray.push(event.pos);
+				}
+			}, this);
+
+			Common.reverseForEach(onceArray, function(pos) {
+				this._allEvents.splice(pos, 1);
+			}, this);
+		}
+	};
+}]);
+/**
  * @namespace Loader
  * @description DI: DOM;
  */
@@ -1879,6 +1879,290 @@ function(
 				this._el.classList.remove("hide");
 			}.bind(this), 350);
 		}.bind(this), 150);
+	};
+}]);
+/**
+ * @namespace Http
+ * @description DI: Promise;
+ */
+Onix.service("Http", [
+	"Promise",
+function(
+	Promise
+) {
+	/**
+	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
+	 * Prepare post data
+	 *
+	 * @private
+	 * @param  {Object|Array} data { name, value }
+	 * @return {FormData}
+	 * @memberof Http
+	 */
+	this._preparePostData = function(data) {
+		var formData = new FormData();
+
+		if (data) {
+			if (Array.isArray(data)) {
+				data.forEach(function(item) {
+					formData.append(item.name, item.value);
+				});
+			}
+			else {
+				Object.keys(data).forEach(function(key) {
+					formData.append(key, data[key]);
+				});
+			}
+		}
+
+		return formData;
+	};
+
+	/**
+	 * Update URL by get data.
+	 *
+	 * @private
+	 * @param  {String} url
+	 * @param  {Array} data { name, value }
+	 * @return {String}    
+	 * @memberof Http
+	 */
+	this._updateURL = function(url, data) {
+		if (data) {
+			var add = [];
+
+			if (Array.isArray(data)) {
+				data.forEach(function(item) {
+					add.push(item.name + "=" + encodeURIComponent(item.value));
+				});
+
+				url += (url.indexOf("?") == -1 ? "?" : "") + add.join("&");
+			}
+		}
+
+		return url;
+	};
+
+	/**
+	 * Request types
+	 *
+	 * @public
+	 * @const
+	 * @memberof Http
+	 */
+	this.POST_TYPES = {
+		JSON: 1,
+		FORM_DATA: 2
+	};
+
+	/**
+	 * Http methods.
+	 *
+	 * @public
+	 * @const
+	 * @memberof Http
+	 */
+	this.METHOD = {
+		POST: "POST",
+		GET: "GET",
+		DELETE: "DELETE",
+		PATCH: "PATCH"
+	};
+
+	/**
+	 * Create new XHR request.
+	 *
+	 * @public
+	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
+	 * @return {Promise}
+	 * @memberof Http
+	 */
+	this.createRequest = function(config) {
+		var promise = Promise.defer();
+		var request = new XMLHttpRequest();
+
+		config = config || {};
+
+		var method = config.method || this.METHOD.GET;
+		var url = config.url || "";
+
+		if (!url) {
+			promise.reject();
+			return promise;
+		}
+
+		url = this._updateURL(url, config.getData);
+
+		request.onerror = function () { promise.reject(); };
+		request.open(method, url, true);
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				var responseData = request.responseText || "";
+				var responseType = request.getResponseHeader("Content-Type");
+				var promiseData = null;
+
+				if (responseType == "application/json") {
+					promiseData = responseData.length ? JSON.parse(responseData) : {};
+				}
+				else {
+					promiseData = responseData;
+				}
+
+				// 200 ok
+				// 201 created
+				// 204 succesfully deleted
+				// 403 unautorized
+				promise[request.status >= 200 && request.status < 300 ? "resolve" : "reject"]({
+					status: request.status,
+					data: promiseData,
+					url: url,
+					method: method
+				});
+			}
+		};
+
+		try {
+			// add headers
+			var headers = config.headers;
+			if (headers && Array.isArray(headers)) {
+				headers.forEach(function(header) {
+					request.setRequestHeader(header.type, header.value);
+				});
+			}
+
+			if (method == this.METHOD.GET) {
+				request.setRequestHeader('Accept', 'application/json');
+			}
+
+			var type = config.postType || this.POST_TYPES.JSON;
+
+			if (config.postData && type == this.POST_TYPES.JSON) {
+				request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+				request.send(JSON.stringify(config.postData));
+			}
+			else if (config.postData && type == this.POST_TYPES.FORM_DATA) {
+				request.send(this._preparePostData(config.postData));
+			}
+			else {
+				request.send();
+			}
+		}
+		catch (err) {
+			promise.reject();
+		}
+
+		return promise;
+	};
+}]);
+/**
+ * @namespace i18n
+ * @description DI: Http, Promise;
+ */
+Onix.service("i18n", [
+	"Http",
+	"Promise",
+function(
+	Http,
+	Promise
+) {
+	/**
+	 * All langs data.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof i18n
+	 */
+	this._langs = {};
+
+	/**
+	 * Current language
+	 *
+	 * @private
+	 * @type {String}
+	 * @memberof i18n
+	 */
+	this._currentLang = "";
+
+	/**
+	 * Add new language
+	 *
+	 * @public
+	 * @param {String} lang Language key
+	 * @param {Object} data
+	 * @memberof i18n
+	 */
+	this.addLanguage = function(lang, data) {
+		this._langs[lang] = data;
+	};
+
+	/**
+	 * Set new language by his key.
+	 *
+	 * @public
+	 * @param {String} lang Language key
+	 * @memberof i18n
+	 */
+	this.setLanguage = function(lang) {
+		this._currentLang = lang;
+	};
+
+	/**
+	 * Get text function. Translate for the current language and the key.
+	 *
+	 * @public
+	 * @param  {String} key
+	 * @return {String}    
+	 */
+	this._ = function(key) {
+		key = key || "";
+		var lObj = this._langs[this._currentLang];
+		var translate = "";
+
+		if (lObj) {
+			var parts = key.split(".");
+			var len = parts.length;
+
+			parts.every(function(item, ind) {
+				if (item in lObj) {
+					lObj = lObj[item];
+
+					if (ind == len - 1) {
+						translate = lObj;
+						return false;
+					}
+				}
+				else return false;
+
+				// go on
+				return true;
+			});
+		}
+
+		return translate;
+	};
+
+	/**
+	 * Load language from the file.
+	 *
+	 * @public
+	 * @param  {String} lang Language key
+	 * @param  {String} url  Path to the file
+	 * @return {Promise}
+	 * @memberof i18n
+	 */
+	this.loadLanguage = function(lang, url) {
+		var promise = Promise.defer();
+
+		Http.createRequest({
+			url: url
+		}).then(function(data) {
+			this.addLanguage(lang, data.data);
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.resolve();
+		});
+
+		return promise;
 	};
 }]);
 /**
@@ -2173,290 +2457,6 @@ function(
 			promise.resolve();
 		}.bind(this), function(data) {
 			promise.reject();
-		});
-
-		return promise;
-	};
-}]);
-/**
- * @namespace Http
- * @description DI: Promise;
- */
-Onix.service("Http", [
-	"Promise",
-function(
-	Promise
-) {
-	/**
-	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
-	 * Prepare post data
-	 *
-	 * @private
-	 * @param  {Object|Array} data { name, value }
-	 * @return {FormData}
-	 * @memberof Http
-	 */
-	this._preparePostData = function(data) {
-		var formData = new FormData();
-
-		if (data) {
-			if (Array.isArray(data)) {
-				data.forEach(function(item) {
-					formData.append(item.name, item.value);
-				});
-			}
-			else {
-				Object.keys(data).forEach(function(key) {
-					formData.append(key, data[key]);
-				});
-			}
-		}
-
-		return formData;
-	};
-
-	/**
-	 * Update URL by get data.
-	 *
-	 * @private
-	 * @param  {String} url
-	 * @param  {Array} data { name, value }
-	 * @return {String}    
-	 * @memberof Http
-	 */
-	this._updateURL = function(url, data) {
-		if (data) {
-			var add = [];
-
-			if (Array.isArray(data)) {
-				data.forEach(function(item) {
-					add.push(item.name + "=" + encodeURIComponent(item.value));
-				});
-
-				url += (url.indexOf("?") == -1 ? "?" : "") + add.join("&");
-			}
-		}
-
-		return url;
-	};
-
-	/**
-	 * Request types
-	 *
-	 * @public
-	 * @const
-	 * @memberof Http
-	 */
-	this.POST_TYPES = {
-		JSON: 1,
-		FORM_DATA: 2
-	};
-
-	/**
-	 * Http methods.
-	 *
-	 * @public
-	 * @const
-	 * @memberof Http
-	 */
-	this.METHOD = {
-		POST: "POST",
-		GET: "GET",
-		DELETE: "DELETE",
-		PATCH: "PATCH"
-	};
-
-	/**
-	 * Create new XHR request.
-	 *
-	 * @public
-	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
-	 * @return {Promise}
-	 * @memberof Http
-	 */
-	this.createRequest = function(config) {
-		var promise = Promise.defer();
-		var request = new XMLHttpRequest();
-
-		config = config || {};
-
-		var method = config.method || this.METHOD.GET;
-		var url = config.url || "";
-
-		if (!url) {
-			promise.reject();
-			return promise;
-		}
-
-		url = this._updateURL(url, config.getData);
-
-		request.onerror = function () { promise.reject(); };
-		request.open(method, url, true);
-		request.onreadystatechange = function() {
-			if (request.readyState == 4) {
-				var responseData = request.responseText || "";
-				var responseType = request.getResponseHeader("Content-Type");
-				var promiseData = null;
-
-				if (responseType == "application/json") {
-					promiseData = responseData.length ? JSON.parse(responseData) : {};
-				}
-				else {
-					promiseData = responseData;
-				}
-
-				// 200 ok
-				// 201 created
-				// 204 succesfully deleted
-				// 403 unautorized
-				promise[request.status >= 200 && request.status < 300 ? "resolve" : "reject"]({
-					status: request.status,
-					data: promiseData,
-					url: url,
-					method: method
-				});
-			}
-		};
-
-		try {
-			// add headers
-			var headers = config.headers;
-			if (headers && Array.isArray(headers)) {
-				headers.forEach(function(header) {
-					request.setRequestHeader(header.type, header.value);
-				});
-			}
-
-			if (method == this.METHOD.GET) {
-				request.setRequestHeader('Accept', 'application/json');
-			}
-
-			var type = config.postType || this.POST_TYPES.JSON;
-
-			if (config.postData && type == this.POST_TYPES.JSON) {
-				request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-				request.send(JSON.stringify(config.postData));
-			}
-			else if (config.postData && type == this.POST_TYPES.FORM_DATA) {
-				request.send(this._preparePostData(config.postData));
-			}
-			else {
-				request.send();
-			}
-		}
-		catch (err) {
-			promise.reject();
-		}
-
-		return promise;
-	};
-}]);
-/**
- * @namespace i18n
- * @description DI: Http, Promise;
- */
-Onix.service("i18n", [
-	"Http",
-	"Promise",
-function(
-	Http,
-	Promise
-) {
-	/**
-	 * All langs data.
-	 *
-	 * @private
-	 * @type {Object}
-	 * @memberof i18n
-	 */
-	this._langs = {};
-
-	/**
-	 * Current language
-	 *
-	 * @private
-	 * @type {String}
-	 * @memberof i18n
-	 */
-	this._currentLang = "";
-
-	/**
-	 * Add new language
-	 *
-	 * @public
-	 * @param {String} lang Language key
-	 * @param {Object} data
-	 * @memberof i18n
-	 */
-	this.addLanguage = function(lang, data) {
-		this._langs[lang] = data;
-	};
-
-	/**
-	 * Set new language by his key.
-	 *
-	 * @public
-	 * @param {String} lang Language key
-	 * @memberof i18n
-	 */
-	this.setLanguage = function(lang) {
-		this._currentLang = lang;
-	};
-
-	/**
-	 * Get text function. Translate for the current language and the key.
-	 *
-	 * @public
-	 * @param  {String} key
-	 * @return {String}    
-	 */
-	this._ = function(key) {
-		key = key || "";
-		var lObj = this._langs[this._currentLang];
-		var translate = "";
-
-		if (lObj) {
-			var parts = key.split(".");
-			var len = parts.length;
-
-			parts.every(function(item, ind) {
-				if (item in lObj) {
-					lObj = lObj[item];
-
-					if (ind == len - 1) {
-						translate = lObj;
-						return false;
-					}
-				}
-				else return false;
-
-				// go on
-				return true;
-			});
-		}
-
-		return translate;
-	};
-
-	/**
-	 * Load language from the file.
-	 *
-	 * @public
-	 * @param  {String} lang Language key
-	 * @param  {String} url  Path to the file
-	 * @return {Promise}
-	 * @memberof i18n
-	 */
-	this.loadLanguage = function(lang, url) {
-		var promise = Promise.defer();
-
-		Http.createRequest({
-			url: url
-		}).then(function(data) {
-			this.addLanguage(lang, data.data);
-			promise.resolve();
-		}.bind(this), function(data) {
-			promise.resolve();
 		});
 
 		return promise;
