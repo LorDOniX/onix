@@ -50,19 +50,49 @@
 	<div class="detail">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-				<h3 class="panel-title">Panel title</h3>
+				<h3 class="panel-title" data-bind="title"></h3>
 			</div>
 			<div class="panel-body">
-				<span>Panel content</span>
-				<ul>
-					<li class="item">Val 1</li>
-					<li class="item">Val 2</li>
-					<li class="item">Val 3</li>
-				</ul>
-				<div class="placeholder"></div>
-				<div>
-					<button type="button" class="btn btn-success" data-click="test($element, $event)">Test</button>
-					<button type="button" class="btn btn-success" data-click="test2()">Test2</button>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="placeholder"></div>
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-md-4">
+						<button type="button" class="btn btn-success" data-click="test($element, $event)">Test</button>
+					</div>
+					<div class="col-md-4">
+						<button type="button" class="btn btn-success" data-click="test2()">Test2</button>
+					</div>
+					<div class="col-md-4">
+						<ul class="nav nav-pills">
+							<li class="dropdown" data-bind="dropdown">
+								<a href="javascript:void(0)" class="dropdown-toggle">
+									Dropdown title
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<li class="active">
+										<a href="javascript:void(0)" data-value="val1">
+											Value 1
+										</a>
+									</li>
+									<li>
+										<a href="javascript:void(0)" data-value="val2">
+											Value 2
+										</a>
+									</li>
+									<li>
+										<a href="javascript:void(0)" data-value="val3">
+											Value 3
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>

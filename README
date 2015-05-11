@@ -1,0 +1,24 @@
+README
+------
+
+1.) Documentation
+
+- please run doc/index.html
+
+2.) Server
+
+- sudo apt-get install nodejs npm grunt
+
+run:
+
+- ./dev-server.js
+
+- navigate to the browser on page:
+
+http://localhost:8001/
+
+3.) Building
+
+- grunt dist
+
+- navigate to dist/ folder

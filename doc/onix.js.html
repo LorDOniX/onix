@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: onix.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: onix.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @namespace Onix
+ */
+Onix = (function() {
+	var Onix = {
+		/**
+		 * Framework version.
+		 * 
+		 * @private
+		 * @type {String}
+		 * @memberof Onix
+		 */
+		_VERSION: "1.1.2",
+
+		/**
+		 * Framework date.
+		 * 
+		 * @private
+		 * @type {String}
+		 * @memberof Onix
+		 */
+		_DATE: "11. 5. 2015",
+
+		/**
+		 * All factories, constants...
+		 * 
+		 * @private
+		 * @type {Object}
+		 * @memberof Onix
+		 */
+		_objects: {},
+
+		/**
+		 * Onix configuration
+		 * 
+		 * @private
+		 * @type {Object}
+		 * @memberof Onix
+		 */
+		_config: {},
+
+		/**
+		 * All run functions
+		 * 
+		 * @private
+		 * @type {Array}
+		 * @memberof Onix
+		 */
+		_runs: [],
+
+		/**
+		 * App object types
+		 * 
+		 * @private
+		 * @type {Object}
+		 * @memberof Onix
+		 */
+		_TYPES: {
+			SERVICE: 1,
+			FACTORY: 2
+		},
+
+		/**
+		 * APP init - DOM load.
+		 * 
+		 * @private
+		 * @memberof Onix
+		 */
+		_init: function() {
+			document.addEventListener("DOMContentLoaded", function() {
+				var di = this._di(this._run);
+
+				di.fn.apply(this, di.args);
+			}.bind(this));
+		},
+
+		/**
+		 * Dependency injection.
+		 * 
+		 * @private
+		 * @param  {Array|Function} param
+		 * @return {Object}
+		 * @memberof Onix
+		 */
+		_di: function(param) {
+			var fn;
+			var args = [];
+
+			if (Array.isArray(param)) {
+				param.every(function(item) {
+					if (typeof item === "function") {
+						fn = item;
+						return false;
+					}
+					else {
+						args.push(this._objects[item]);
+					}
+
+					return true;
+				}, this);
+			}
+			else {
+				fn = param;
+			}
+
+			return {
+				fn: fn,
+				args: args
+			};
+		},
+
+		/**
+		 * Add new object to the database.
+		 * 
+		 * @private
+		 * @param {String} name
+		 * @param {Enum} type
+		 * @param {Array|Function} param
+		 * @memberof Onix
+		 */
+		_addObject: function(name, type, param) {
+			try {
+				var di = this._di(param);
+
+				this._objects[name] = type == this._TYPES.SERVICE 
+					? new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)))
+					: di.fn.apply(di.fn, di.args)
+			}
+			catch (err) {
+				console.error("Onix._addObject error " + err + " in " + name);
+			}
+		},
+
+		/**
+		 * Application run.
+		 * 
+		 * @private
+		 * @memberof Onix
+		 */
+		_run: [
+			"i18n",
+			"Templates",
+			"Loader",
+			"Router",
+			"MyQuery",
+		function(
+			i18n,
+			Templates,
+			Loader,
+			Router,
+			MyQuery
+		) {
+			// binds
+			this.element = function(value, parent) {
+				return new MyQuery.get(value, parent);
+			};
+
+			// inits
+			Loader.init();
+			Router.init();
+
+			var afterRun = function() {
+				// run runs array
+				this._runs.forEach(function(item) {
+					var di = this._di(item);
+
+					new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)));
+				}.bind(this));
+
+				// templates init
+				Templates.init().done(function() {
+					// router go
+					Router.go();
+				});
+			}.bind(this);
+			
+			if (this.config("LOCALIZATION").LANG &amp;&amp; this.config("LOCALIZATION").PATH) {
+				window._ = i18n._.bind(i18n);
+				i18n.setLanguage(this.config("LOCALIZATION").LANG);
+				i18n.loadLanguage(this.config("LOCALIZATION").LANG, this.config("LOCALIZATION").PATH).done(afterRun);
+			}
+			else {
+				afterRun();
+			}
+		}],
+
+		/**
+		 * Add a new service
+		 * 
+		 * @public
+		 * @param  {String} name
+		 * @param  {Array|Function} param With DI
+		 * @memberof Onix
+		 */
+		service: function(name, param) {
+			this._addObject(name, this._TYPES.SERVICE, param);
+		},
+
+		/**
+		 * Add a new factory
+		 * 
+		 * @public
+		 * @param  {String} name
+		 * @param  {Array|Function} param With DI
+		 * @memberof Onix
+		 */
+		factory: function(name, param) {
+			this._addObject(name, this._TYPES.FACTORY, param);
+		},
+
+		/**
+		 * Add a new run
+		 * 
+		 * @public
+		 * @param  {Array|Function} param With DI
+		 * @memberof Onix
+		 */
+		run: function(param) {
+			this._runs.push(param);
+		},
+
+		/**
+		 * Add new constant
+		 * 
+		 * @public
+		 * @param  {String} name
+		 * @param  {Object} param
+		 * @memberof Onix
+		 */
+		constant: function(name, obj) {
+			this._objects[name] = obj;
+		},
+
+		/**
+		 * Get/Set configuration
+		 * 
+		 * @public
+		 * @param  {String|Object} param
+		 * @return  {Object}
+		 * @memberof Onix
+		 */
+		config: function(param) {
+			if (typeof param === "string") {
+				// get
+				return this._config[param] || {};
+			}
+			else {
+				// set - update config object
+				Object.keys(param).forEach(function(key) {
+					this._config[key] = param[key];
+				}.bind(this));
+			}
+		},
+
+		/**
+		 * Get object by name
+		 * 
+		 * @public
+		 * @param  {String} name
+		 * @return {Function|Object}
+		 * @memberof Onix
+		 */
+		getObject: function(name) {
+			name = name || "";
+
+			return this._objects[name];
+		}
+	};
+
+	// init app
+	Onix._init();
+
+	return Onix;
+})();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="-_MyQuery.html">_MyQuery</a></li><li><a href="-_Notify.html">_Notify</a></li><li><a href="-_Promise.html">_Promise</a></li><li><a href="-_Select.html">_Select</a></li></ul><h3>Namespaces</h3><ul><li><a href="$location.html">$location</a></li><li><a href="Common.html">Common</a></li><li><a href="CONFIG.html">CONFIG</a></li><li><a href="DOM.html">DOM</a></li><li><a href="Events.html">Events</a></li><li><a href="Http.html">Http</a></li><li><a href="i18n.html">i18n</a></li><li><a href="Loader.html">Loader</a></li><li><a href="MyQuery.html">MyQuery</a></li><li><a href="Notify.html">Notify</a></li><li><a href="Onix.html">Onix</a></li><li><a href="Page.html">Page</a></li><li><a href="Promise.html">Promise</a></li><li><a href="Router.html">Router</a></li><li><a href="Select.html">Select</a></li><li><a href="Snippet.html">Snippet</a></li><li><a href="Templates.html">Templates</a></li></ul><h3>Interfaces</h3><ul><li><a href="-_Events.html">_Events</a></li><li><a href="-_Page.html">_Page</a></li><li><a href="-_Snippet.html">_Snippet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_">_</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Mon May 11 2015 15:54:08 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,15 +1,20 @@
+/**
+ * @namespace Notify
+ * @description DI: Promise;
+ */
 Onix.service("Notify", [
 	"Promise",
 function(
 	Promise
 ) {
-	// ------------------------ private ----------------------------------------
-	
 	/**
 	 * Notification object
+	 *
+	 * @class _Notify
+	 * @description Parent: Notify;
 	 * @param {NodeElement} el
 	 */
-	var Notify = function(el) {
+	var _Notify = function(el) {
 		this._el = el;
 
 		this._HIDE_TIMEOUT = 1500; // [ms]
@@ -25,8 +30,11 @@ function(
 
 	/**
 	 * Reset classess
+	 *
+	 * @public
+	 * @memberof _Notify
 	 */
-	Notify.prototype.reset = function() {
+	_Notify.prototype.reset = function() {
 		Object.keys(this._options).forEach(function(key) {
 			this._el.classList.remove(this._options[key]);
 		}.bind(this));
@@ -36,9 +44,12 @@ function(
 
 	/**
 	 * Show OK state
+	 * 
+	 * @public
 	 * @param  {String} txt
+	 * @memberof _Notify
 	 */
-	Notify.prototype.ok = function(txt) {
+	_Notify.prototype.ok = function(txt) {
 		this._el.classList.add(this._options["ok"]);
 		this._el.innerHTML = txt;
 
@@ -47,9 +58,12 @@ function(
 
 	/**
 	 * Show ERROR state
+	 * 
+	 * @public
 	 * @param  {String} txt      
+	 * @memberof _Notify
 	 */
-	Notify.prototype.error = function(txt) {
+	_Notify.prototype.error = function(txt) {
 		this._el.classList.add(this._options["error"]);
 		this._el.innerHTML = txt;
 
@@ -58,9 +72,12 @@ function(
 
 	/**
 	 * Show INFO state
+	 *
+	 * @public
 	 * @param  {String} txt      
+	 * @memberof _Notify
 	 */
-	Notify.prototype.info = function(txt) {
+	_Notify.prototype.info = function(txt) {
 		this._el.classList.add(this._options["info"]);
 		this._el.innerHTML = txt;
 
@@ -69,9 +86,12 @@ function(
 
 	/**
 	 * Timeout hide.
+	 *
+	 * @public
 	 * @return {Promise}
+	 * @memberof _Notify
 	 */
-	Notify.prototype.hide = function() {
+	_Notify.prototype.hide = function() {
 		var promise = Promise.defer();
 
 		setTimeout(function() {
@@ -83,14 +103,15 @@ function(
 		return promise;
 	};
 
-	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Main public access to the notify obj.
+	 *
+	 * @public
 	 * @param  {NodeElement} el
-	 * @return {Notify}
+	 * @return {_Notify}
+	 * @memberof Notify
 	 */
 	this.get = function(el) {
-		return new Notify(el);
+		return new _Notify(el);
 	};
 }]);

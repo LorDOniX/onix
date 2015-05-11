@@ -1,13 +1,13 @@
 Onix.factory("MyQuery", function() {
-	// ------------------------ private ---------------------------------------
-	
 	/**
-	 * Cover function
+	 * Parent: MyQuery; Cover function
+	 * 
+	 * @class _MyQuery
 	 * @param {String|NodeElement|Array} value
 	 * @param {NodeElement} [parent]
 	 * @return {Himself}
 	 */
-	var MyQuery = function(value, parent) {
+	var _MyQuery = function(value, parent) {
 		this._els = [];
 		parent = parent || document;
 
@@ -27,10 +27,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Operation on elements
+	 * 
+	 * @private
 	 * @param  {Function} cb
 	 * @param  {Function} scope
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype._operation = function(cb, scope) {
+	_MyQuery.prototype._operation = function(cb, scope) {
 		// NodeList -> Array
 		if (!Array.isArray(this._els)) {
 			this._els = Array.prototype.slice.call(this._els);
@@ -43,10 +46,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Set or get all - cover function.
+	 * 
+	 * @private
 	 * @param  {String} newValue
 	 * @param  {String} attr
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype._setGetAll = function(newValue, attr) {
+	_MyQuery.prototype._setGetAll = function(newValue, attr) {
 		if (newValue) {
 			this._operation(function(item) {
 				item[attr] = newValue;
@@ -75,10 +81,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get original element.
+	 * 
+	 * @public
 	 * @param  {Number} [ind]
 	 * @return {NodeElement|Null}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.getEl = function(ind) {
+	_MyQuery.prototype.getEl = function(ind) {
 		ind = ind || 0;
 
 		if (ind > this._els.length) {
@@ -91,11 +100,14 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get or set attribute
+	 * 
+	 * @public
 	 * @param  {String} name 
 	 * @param  {String} [newValue]
 	 * @return {Himself|String|Array}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.attr = function(name, newValue) {
+	_MyQuery.prototype.attr = function(name, newValue) {
 		if (newValue) {
 			this._operation(function(item) {
 				item.setAttribute(name, newValue);
@@ -124,18 +136,24 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get or set src
+	 * 
+	 * @public
 	 * @param  {String} [newValue]
 	 * @return {Himself|String}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.src = function(newValue) {
+	_MyQuery.prototype.src = function(newValue) {
 		return this._setGetAll(newValue, "src");
 	};
 
 	/**
 	 * Hide element
+	 * 
+	 * @public
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.hide = function() {
+	_MyQuery.prototype.hide = function() {
 		this._operation(function(item) {
 			item.style.display = "none";
 		});
@@ -145,10 +163,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Show element
+	 * 
+	 * @public
 	 * @param  {String} [displayStyle]
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.show = function(displayStyle) {
+	_MyQuery.prototype.show = function(displayStyle) {
 		this._operation(function(item) {
 			item.style.display = displayStyle || "block";
 		});
@@ -158,29 +179,38 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get or set value
+	 * 
+	 * @public
 	 * @param  {String} [newValue]
 	 * @return {Himself|String}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.val = function(newValue) {
+	_MyQuery.prototype.val = function(newValue) {
 		return this._setGetAll(newValue, "value");
 	};
 
 	/**
 	 * Get or set HTML
+	 * 
+	 * @public
 	 * @param  {String} [newValue]
 	 * @return {Himself|String}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.html = function(newValue) {
+	_MyQuery.prototype.html = function(newValue) {
 		return this._setGetAll(newValue, "innerHTML");
 	};
 
 	/**
 	 * Append another element to this one
 	 * TODO: cannot use on n elements
+	 * 
+	 * @public
 	 * @param  {NodeElement} child
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.append = function(child) {
+	_MyQuery.prototype.append = function(child) {
 		this._operation(function(item) {
 			item.appendChild(child);
 		});
@@ -190,10 +220,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Add css class
+	 * 
+	 * @public
 	 * @param  {String} className
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.addClass = function(className) {
+	_MyQuery.prototype.addClass = function(className) {
 		this._operation(function(item) {
 			item.classList.add(className);
 		});
@@ -203,10 +236,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Remove css class
+	 * 
+	 * @public
 	 * @param  {String} className
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.removeClass = function(className) {
+	_MyQuery.prototype.removeClass = function(className) {
 		this._operation(function(item) {
 			item.classList.remove(className);
 		});
@@ -216,10 +252,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Toggle css class
+	 * 
+	 * @public
 	 * @param  {String} className
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.toggleClass = function(className) {
+	_MyQuery.prototype.toggleClass = function(className) {
 		this._operation(function(item) {
 			item.classList.toggle(className);
 		});
@@ -229,9 +268,12 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get width
+	 * 
+	 * @public
 	 * @return {Number}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.width = function() {
+	_MyQuery.prototype.width = function() {
 		var width = 0;
 
 		this._operation(function(item) {
@@ -243,9 +285,12 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get height
+	 * 
+	 * @public
 	 * @return {Number}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.height = function() {
+	_MyQuery.prototype.height = function() {
 		var height = 0;
 
 		this._operation(function(item) {
@@ -257,11 +302,14 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Click event
+	 * 
+	 * @public
 	 * @param  {Function} cb
 	 * @param  {Function} scope
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.click = function(cb, scope) {
+	_MyQuery.prototype.click = function(cb, scope) {
 		this._operation(function(item) {
 			item.addEventListener("click", function(event) {
 				cb.apply(scope || cb, [event, item]);
@@ -273,11 +321,14 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Change event
+	 * 
+	 * @public
 	 * @param  {Function} cb
 	 * @param  {Function} scope
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.change = function(cb, scope) {
+	_MyQuery.prototype.change = function(cb, scope) {
 		this._operation(function(item) {
 			item.addEventListener("change", function(event) {
 				cb.apply(scope || cb, [event, item]);
@@ -289,11 +340,14 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Foreach
+	 * 
+	 * @public
 	 * @param  {Function} cb
 	 * @param  {Function} scope
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.forEach = function(cb, scope) {
+	_MyQuery.prototype.forEach = function(cb, scope) {
 		this._operation(function(item, ind) {
 			cb.apply(scope || cb, [item, ind]);
 		});
@@ -303,9 +357,12 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Remove element
+	 * 
+	 * @public
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.remove = function() {
+	_MyQuery.prototype.remove = function() {
 		this._operation(function(item) {
 			item.parentNode.removeChild(item);
 		});
@@ -315,10 +372,13 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Prepend element
+	 * 
+	 * @public
 	 * @param  {NodeElement} child
 	 * @return {Himself}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.prepend = function(child) {
+	_MyQuery.prototype.prepend = function(child) {
 		this._operation(function(item) {
 			item.parentNode.insertBefore(child, item);
 		});
@@ -328,23 +388,30 @@ Onix.factory("MyQuery", function() {
 
 	/**
 	 * Get all elements length
+	 * 
+	 * @public
 	 * @return {Number}
+	 * @memberof _MyQuery
 	 */
-	MyQuery.prototype.len = function() {
+	_MyQuery.prototype.len = function() {
 		return this._els.length;
 	};
 
-	// ------------------------ public ---------------------------------------
-
+	/**
+ 	 * @namespace MyQuery
+ 	 */
 	return {
 		 /**
 		 * Main cover function.
+		 * 
+		 * @public
 		 * @param  {String|NodeElement|Array} value
 		 * @param {NodeElement} [parent]
-		 * @return {MyQuery}
+		 * @return {_MyQuery}
+		 * @memberof MyQuery
 		 */
 		get: function(value, parent) {
-			return new MyQuery(value, parent);
+			return new _MyQuery(value, parent);
 		}
 	};
 });

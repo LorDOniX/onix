@@ -1,3 +1,7 @@
+/**
+ * @namespace Templates
+ * @description DI: Common, Promise, Http;
+ */
 Onix.service("Templates", [
 	"Common",
 	"Promise",
@@ -7,23 +11,30 @@ function(
 	Promise,
 	Http
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * Array with templates for preload before applications starts.
+	 *
+	 * @private
 	 * @type {Array}
+	 * @memberof Templates
 	 */
 	this._preloads = [];
 	
 	/**
 	 * Template cache.
+	 *
+	 * @private
 	 * @type {Object}
+	 * @memberof Templates
 	 */
 	this._cache = {};
 
 	/**
 	 * Regular expressions
+	 *
+	 * @private
 	 * @type {Object}
+	 * @memberof Templates
 	 */
 	this._RE = {
 		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
@@ -35,8 +46,11 @@ function(
 
 	/**
 	 * Parse a function name from the string.
+	 *
+	 * @private
 	 * @param  {String} value
 	 * @return {String}      
+	 * @memberof Templates
 	 */
 	this._parseFnName = function(value) {
 		value = value || "";
@@ -46,9 +60,12 @@ function(
 
 	/**
 	 * Parse arguments from the string -> makes array from them
+	 *
+	 * @private
 	 * @param  {String} value
 	 * @param  {Object} config { event, element... }
 	 * @return {Array}
+	 * @memberof Templates
 	 */
 	this._parseArgs = function(value, config) {
 		argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
@@ -104,10 +121,11 @@ function(
 		return args;
 	};
 
-	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Init - get all templates from the page.
+	 *
+	 * @public
+	 * @memberof Templates
 	 */
 	this.init = function() {
 		var promise = Promise.defer();
@@ -136,8 +154,11 @@ function(
 	
 	/**
 	 * Add new item to the cachce
+	 *
+	 * @public
 	 * @param {String} key 
 	 * @param {String} data
+	 * @memberof Templates
 	 */
 	this.add = function(key, data) {
 		this._cache[key] = data;
@@ -145,9 +166,12 @@ function(
 
 	/**
 	 * Compile one template - replaces all ocurances of {} by model
+	 *
+	 * @public
 	 * @param  {String} key  Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
+	 * @memberof Templates
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
@@ -164,8 +188,11 @@ function(
 
 	/**
 	 * Get template from the cache
+	 *
+	 * @public
 	 * @param  {String} key Template key/name
 	 * @return {String}
+	 * @memberof Templates
 	 */
 	this.get = function(key) {
 		return this._cache[key] || "";
@@ -174,8 +201,11 @@ function(
 	/**
 	 * Bind all elements in the root element.
 	 * Supports: click, change, bind
+	 *
+	 * @public
 	 * @param  {NodeElement} root
 	 * @param  {Object|Function} scope
+	 * @memberof Templates
 	 */
 	this.bindTemplate = function(root, scope) {
 		var allElements = Onix.element("*[data-click], *[data-change], *[data-bind]", root);
@@ -227,8 +257,11 @@ function(
 
 	/**
 	 * Add template for preload.
+	 *
+	 * @public
 	 * @param  {String} key 
 	 * @param  {String} path
+	 * @memberof Templates
 	 */
 	this.preload = function(key, path) {
 		this._preloads.push({
@@ -239,9 +272,12 @@ function(
 
 	/**
 	 * Load template from the path.
+	 *
+	 * @public
 	 * @param  {String} key
 	 * @param  {String} path
 	 * @return {Promise}
+	 * @memberof Templates
 	 */
 	this.load = function(key, path) {
 		var promise = Promise.defer();

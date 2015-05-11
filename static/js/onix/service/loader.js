@@ -1,12 +1,17 @@
+/**
+ * @namespace Loader
+ * @description DI: DOM;
+ */
 Onix.service("Loader", [
 	"DOM",
 function(
 	DOM
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * Create Loader.
+	 *
+	 * @private
+	 * @memberof Loader
 	 */
 	this._create = function() {
 		this._el = DOM.create({
@@ -17,11 +22,12 @@ function(
 		// insert into the body on first position
 		document.body.insertBefore(this._el, document.body.firstChild);
 	};
-
-	// ------------------------ public ----------------------------------------
 	
 	/**
 	 * Loader init.
+	 *
+	 * @public
+	 * @memberof Loader
 	 */
 	this.init = function() {
 		this._create();
@@ -29,6 +35,9 @@ function(
 
 	/**
 	 * Start loader.
+	 *
+	 * @public
+	 * @memberof Loader
 	 */
 	this.start = function() {
 		this._el.classList.add("start");
@@ -36,6 +45,9 @@ function(
 
 	/**
 	 * End loader.
+	 *
+	 * @public
+	 * @memberof Loader
 	 */
 	this.end = function() {
 		this._el.classList.remove("start");

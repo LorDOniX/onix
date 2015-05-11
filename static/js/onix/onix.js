@@ -1,35 +1,59 @@
+/**
+ * @namespace Onix
+ */
 Onix = (function() {
 	var Onix = {
-		// ------------------------ private ---------------------------------------
-		
 		/**
-		 * Framework info.
+		 * Framework version.
+		 * 
+		 * @private
 		 * @type {String}
+		 * @memberof Onix
 		 */
-		_VERSION: "1.1.1",
-		_DATE: "9. 5. 2015",
+		_VERSION: "1.1.2",
+
+		/**
+		 * Framework date.
+		 * 
+		 * @private
+		 * @type {String}
+		 * @memberof Onix
+		 */
+		_DATE: "11. 5. 2015",
 
 		/**
 		 * All factories, constants...
+		 * 
+		 * @private
 		 * @type {Object}
+		 * @memberof Onix
 		 */
 		_objects: {},
 
 		/**
 		 * Onix configuration
+		 * 
+		 * @private
 		 * @type {Object}
+		 * @memberof Onix
 		 */
 		_config: {},
 
 		/**
 		 * All run functions
+		 * 
+		 * @private
 		 * @type {Array}
+		 * @memberof Onix
 		 */
 		_runs: [],
 
 		/**
 		 * App object types
+		 * 
+		 * @private
 		 * @type {Object}
+		 * @memberof Onix
 		 */
 		_TYPES: {
 			SERVICE: 1,
@@ -38,6 +62,9 @@ Onix = (function() {
 
 		/**
 		 * APP init - DOM load.
+		 * 
+		 * @private
+		 * @memberof Onix
 		 */
 		_init: function() {
 			document.addEventListener("DOMContentLoaded", function() {
@@ -49,8 +76,11 @@ Onix = (function() {
 
 		/**
 		 * Dependency injection.
+		 * 
+		 * @private
 		 * @param  {Array|Function} param
-		 * @return {Object}      
+		 * @return {Object}
+		 * @memberof Onix
 		 */
 		_di: function(param) {
 			var fn;
@@ -81,9 +111,12 @@ Onix = (function() {
 
 		/**
 		 * Add new object to the database.
+		 * 
+		 * @private
 		 * @param {String} name
 		 * @param {Enum} type
 		 * @param {Array|Function} param
+		 * @memberof Onix
 		 */
 		_addObject: function(name, type, param) {
 			try {
@@ -100,6 +133,9 @@ Onix = (function() {
 
 		/**
 		 * Application run.
+		 * 
+		 * @private
+		 * @memberof Onix
 		 */
 		_run: [
 			"i18n",
@@ -148,12 +184,13 @@ Onix = (function() {
 			}
 		}],
 
-		// ------------------------ public ----------------------------------------
-
 		/**
 		 * Add a new service
+		 * 
+		 * @public
 		 * @param  {String} name
 		 * @param  {Array|Function} param With DI
+		 * @memberof Onix
 		 */
 		service: function(name, param) {
 			this._addObject(name, this._TYPES.SERVICE, param);
@@ -161,8 +198,11 @@ Onix = (function() {
 
 		/**
 		 * Add a new factory
+		 * 
+		 * @public
 		 * @param  {String} name
 		 * @param  {Array|Function} param With DI
+		 * @memberof Onix
 		 */
 		factory: function(name, param) {
 			this._addObject(name, this._TYPES.FACTORY, param);
@@ -170,7 +210,10 @@ Onix = (function() {
 
 		/**
 		 * Add a new run
+		 * 
+		 * @public
 		 * @param  {Array|Function} param With DI
+		 * @memberof Onix
 		 */
 		run: function(param) {
 			this._runs.push(param);
@@ -178,8 +221,11 @@ Onix = (function() {
 
 		/**
 		 * Add new constant
+		 * 
+		 * @public
 		 * @param  {String} name
 		 * @param  {Object} param
+		 * @memberof Onix
 		 */
 		constant: function(name, obj) {
 			this._objects[name] = obj;
@@ -187,8 +233,11 @@ Onix = (function() {
 
 		/**
 		 * Get/Set configuration
+		 * 
+		 * @public
 		 * @param  {String|Object} param
 		 * @return  {Object}
+		 * @memberof Onix
 		 */
 		config: function(param) {
 			if (typeof param === "string") {
@@ -205,8 +254,11 @@ Onix = (function() {
 
 		/**
 		 * Get object by name
+		 * 
+		 * @public
 		 * @param  {String} name
 		 * @return {Function|Object}
+		 * @memberof Onix
 		 */
 		getObject: function(name) {
 			name = name || "";

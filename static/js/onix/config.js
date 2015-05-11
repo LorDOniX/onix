@@ -1,7 +1,14 @@
+/**
+ * Main framework configuration
+ * @namespace CONFIG
+ */
 Onix.config({
 	/**
 	 * Localization
+	 *
+	 * @public
 	 * @type {Object}
+	 * @memberof CONFIG
 	 */
 	LOCALIZATION: {
 		LANG: "cs",
@@ -10,7 +17,10 @@ Onix.config({
 
 	/**
 	 * Resource urls
+	 *
+	 * @public
 	 * @type {Object}
+	 * @memberof CONFIG
 	 */
 	URLS: {
 		HOME: "/api/home/"
@@ -18,7 +28,10 @@ Onix.config({
 
 	/**
 	 * Template delimiter
+	 *
+	 * @public
 	 * @type {Object}
+	 * @memberof CONFIG
 	 */
 	TMPL_DELIMITER: {
 		LEFT: "{{",
@@ -27,7 +40,10 @@ Onix.config({
 
 	/**
 	 * Detail page selector
+	 *
+	 * @public
 	 * @type {String}
+	 * @memberof CONFIG
 	 */
 	DETAIL_SEL: ".detail"
 });

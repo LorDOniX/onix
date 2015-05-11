@@ -1,21 +1,33 @@
+/**
+ * @namespace Events
+ * @description DI: Common; Returns interface _Events;
+ */
 Onix.factory("Events", [
 	"Common",
 function(
 	Common
 ) {
+	/**
+ 	 * @interface _Events
+ 	 * @description Parent: Events;
+ 	 */
 	return {
-		// ------------------------ private ---------------------------------------
-		
 		/**
 		 * All events. { name: name, event: function, scope, [once] }
+		 * 
+		 * @private
 		 * @type {Array}
+		 * @memberof _Events
 		 */
 		_allEvents: [],
 
 		/**
 		 * Get all events by his name.
+		 * 
+		 * @private
 		 * @param  {String} name 
-		 * @return {Array}      
+		 * @return {Array}
+		 * @memberof _Events
 		 */
 		_getEvents: function (name) {
 			var events = [];
@@ -32,13 +44,14 @@ function(
 			return events;
 		},
 
-		// ------------------------ public ----------------------------------------
-		
 		/**
 		 * Add new event to the stack.
+		 * 
+		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} fn   
 		 * @param  {Object|Function}   scope
+		 * @memberof _Events
 		 */
 		on: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -50,8 +63,11 @@ function(
 
 		/**
 		 * Remove event from the stack.
+		 * 
+		 * @public
 		 * @param  {String}   name 
-		 * @param  {Function} [fn]  
+		 * @param  {Function} [fn]
+		 * @memberof _Events
 		 */
 		off: function (name, fn) {
 			var events = this._getEvents(name);
@@ -65,9 +81,12 @@ function(
 
 		/**
 		 * Add one time event to the stack.
+		 * 
+		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
 		 * @param  {Object|Function}   scope
+		 * @memberof _Events
 		 */
 		once: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -80,7 +99,10 @@ function(
 
 		/**
 		 * Trigger event with arguments 0..n
+		 * 
+		 * @public
 		 * @param  {String} name
+		 * @memberof _Events
 		 */
 		trigger: function (name) {
 			var events = this._getEvents(name);

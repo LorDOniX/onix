@@ -1,15 +1,20 @@
+/**
+ * @namespace Http
+ * @description DI: Promise;
+ */
 Onix.service("Http", [
 	"Promise",
 function(
 	Promise
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
 	 * Prepare post data
+	 *
+	 * @private
 	 * @param  {Object|Array} data { name, value }
 	 * @return {FormData}
+	 * @memberof Http
 	 */
 	this._preparePostData = function(data) {
 		var formData = new FormData();
@@ -32,9 +37,12 @@ function(
 
 	/**
 	 * Update URL by get data.
+	 *
+	 * @private
 	 * @param  {String} url
 	 * @param  {Array} data { name, value }
 	 * @return {String}    
+	 * @memberof Http
 	 */
 	this._updateURL = function(url, data) {
 		if (data) {
@@ -52,11 +60,12 @@ function(
 		return url;
 	};
 
-	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Request types
-	 * @type {Object}
+	 *
+	 * @public
+	 * @const
+	 * @memberof Http
 	 */
 	this.POST_TYPES = {
 		JSON: 1,
@@ -65,7 +74,10 @@ function(
 
 	/**
 	 * Http methods.
-	 * @type {Object}
+	 *
+	 * @public
+	 * @const
+	 * @memberof Http
 	 */
 	this.METHOD = {
 		POST: "POST",
@@ -76,8 +88,11 @@ function(
 
 	/**
 	 * Create new XHR request.
+	 *
+	 * @public
 	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
 	 * @return {Promise}
+	 * @memberof Http
 	 */
 	this.createRequest = function(config) {
 		var promise = Promise.defer();

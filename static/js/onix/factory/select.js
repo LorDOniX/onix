@@ -1,3 +1,7 @@
+/**
+ * @namespace Select
+ * @description DI: Common, Events; Returns class _Select;
+ */
 Onix.factory("Select", [
 	"Common",
 	"Events",
@@ -5,13 +9,14 @@ function(
 	Common,
 	Events
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * Main class
+	 *
+	 * @class _Select
+	 * @description Parent: Select;
 	 * @param {NodeElement} el Where element has class "dropdown"
 	 */
-	var Select = function(el) {
+	var _Select = function(el) {
 		// extend our class
 		Common.extend(this, Events);
 
@@ -30,9 +35,12 @@ function(
 
 	/**
 	 * Bind clicks on the select.
+	 *
+	 * @private
 	 * @param {NodeElement} el Where element has class "dropdown"
+	 * @memberof _Select
 	 */
-	Select.prototype._bind = function(el) {
+	_Select.prototype._bind = function(el) {
 		var captionEl = el.querySelector(this._CONST.CAPTION_SEL);
 		var con = this._CONST;
 
@@ -87,7 +95,5 @@ function(
 		}, this);
 	};
 
-	// ------------------------ public ----------------------------------------
-
-	return Select;
+	return _Select;
 }]);

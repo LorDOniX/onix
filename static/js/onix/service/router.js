@@ -1,36 +1,48 @@
+/**
+ * @namespace Router
+ * @description DI: $location;
+ */
 Onix.service("Router", [
 	"$location",
 function(
 	$location
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * All routes
+	 *
+	 * @private
 	 * @type {Array}
+	 * @memberof Router
 	 */
 	this._routes = [];
 
 	/**
 	 * Otherwise route
+	 *
+	 * @private
 	 * @type {Object}
+	 * @memberof Router
 	 */
 	this._otherwise = null;
 
-	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Router init.
+	 *
+	 * @public
+	 * @memberof Router
 	 */
 	this.init = function() {
 	};
 
 	/**
 	 * Add route to router.
+	 *
+	 * @public
 	 * @param  {String} url 
 	 * @param  {String} page
 	 * @param  {Function} [fn]
 	 * @return {Himself}
+	 * @memberof Router
 	 */
 	this.route = function(url, page, fn) {
 		this._routes.push({
@@ -44,9 +56,12 @@ function(
 
 	/**
 	 * Otherwise
+	 *
+	 * @public
 	 * @param  {String} page
 	 * @param  {Function} [fn]
 	 * @return {Himself}
+	 * @memberof Router
 	 */
 	this.otherwise = function(page, fn) {
 		this._otherwise = {
@@ -59,6 +74,9 @@ function(
 
 	/**
 	 * Router GO.
+	 *
+	 * @public
+	 * @memberof Router
 	 */
 	this.go = function() {
 		var path = $location.get();

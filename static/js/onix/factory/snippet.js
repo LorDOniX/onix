@@ -5,12 +5,17 @@ function(
 	Templates,
 	Common
 ) {
-	// ------------------------ private ---------------------------------------
-	
-	var Snippet = {
+	/**
+	 * @interface _Snippet
+	 * @description Parent: Snippet;
+	 */
+	var _Snippet = {
 		/**
 		 * Get snippet config.
+		 *
+		 * @private
 		 * @return {Object}
+		 * @memberof _Snippet
 		 */
 		_getConfig: function() {
 			return this._config;
@@ -18,8 +23,11 @@ function(
 
 		/**
 		 * Get snippet element.
+		 *
+		 * @private
 		 * @param  {String} name
 		 * @return {NodeElement}
+		 * @memberof _Snippet
 		 */
 		_getEl: function(name) {
 			return this._els[name];
@@ -27,7 +35,10 @@ function(
 
 		/**
 		 * Get snippet parent.
+		 *
+		 * @private
 		 * @return {NodeElement}
+		 * @memberof _Snippet
 		 */
 		_getParent: function() {
 			return this._parent;
@@ -35,7 +46,10 @@ function(
 
 		/**
 		 * Abstract method.
+		 *
+		 * @private
 		 * @param  {Object} config
+		 * @memberof _Snippet
 		 */
 		_create: function(config) {
 			return null;
@@ -43,40 +57,56 @@ function(
 
 		/**
 		 * Set snippet name.
+		 *
+		 * @private
 		 * @param {String} name
+		 * @memberof _Snippet
 		 */
 		_setName: function(name) {
 			this._name = name;
 		},
 
 		/**
-		 * Abstract method.
+		 * Setup
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
 		 */
 		_setup: function() {
 
 		},
 
 		/**
-		 * Abstract method.
+		 * Active
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
 		 */
 		_activate: function() {
 
 		},
 
 		/**
-		 * Abstract method.
+		 * Deactivate
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
 		 */
 		_deactivate: function() {
 
 		},
 
-		// ------------------------ public ----------------------------------------
-		
 		/**
 		 * Init snippet
+		 *
+		 * @public
 		 * @param  {Object} config
 		 * @param  {Object} parent parent page
 		 * @return {NodeElement} root el
+		 * @memberof _Snippet
 		 */
 		init: function(config, parent) {
 			this._config = config || {};
@@ -90,7 +120,10 @@ function(
 
 		/**
 		 * Add new els to this._els; this function can be called from Templates
+		 *
+		 * @public
 		 * @param {Object} newEls { key, value - node element}
+		 * @memberof _Snippet
 		 */
 		addEls: function(newEls) {
 			newEls = newEls || {};
@@ -102,6 +135,9 @@ function(
 
 		/**
 		 * Setup snippet - is called after init. Runs _setup()
+		 *
+		 * @public
+		 * @memberof _Snippet
 		 */
 		setup: function() {
 			Templates.bindTemplate(this._root, this);
@@ -111,6 +147,9 @@ function(
 
 		/**
 		 * Activate snippet - run _activate()
+		 *
+		 * @public
+		 * @memberof _Snippet
 		 */
 		activate: function() {
 			this._activate();
@@ -118,6 +157,9 @@ function(
 
 		/**
 		 * Deactivate snippet - run _deactivate()
+		 *
+		 * @public
+		 * @memberof _Snippet
 		 */
 		deactivate: function() {
 			this._deactivate();
@@ -125,24 +167,32 @@ function(
 
 		/**
 		 * Get snippet name.
+		 *
+		 * @public
 		 * @return {String}
+		 * @memberof _Snippet
 		 */
 		getName: function() {
 			return this._name;
 		}
 	};
 
-	// --- public ----
-	
+	/**
+ 	 * @namespace Snippet
+ 	 * @description DI: Templates, Common;
+ 	 */
 	return {
 		/**
-		 * Create new snippet
+		 * Create a new snippet
+		 *
+		 * @public
 		 * @param  {Object|Function} a snippet data | dependicies
 		 * @param  {Object|Function} [b] snippet data | dependicies
-		 * @return {Page}
+		 * @return {_Snippet}
+		 * @memberof Snippet
 		 */
 		create: function(a, b) {
-			return Common.create(Snippet, a, b);
+			return Common.create(_Snippet, a, b);
 		}
 	};
 }]);

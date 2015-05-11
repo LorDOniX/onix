@@ -1,8 +1,14 @@
+/**
+ * @namespace $location
+ */
 Onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
 	
 	/**
 	 * Page refresh.
+	 *
+	 * @public
+	 * @memberof $location
 	 */
 	this.refresh = function() {
 		window.location.reload();
@@ -10,8 +16,11 @@ Onix.service("$location", function() {
 
 	/**
 	 * Create a new search url.
+	 * 
+	 * @public
 	 * @param  {Object} obj
-	 * @return {String}    
+	 * @return {String}
+	 * @memberof $location
 	 */
 	this.createSearchURL = function(obj) {
 		var newURL = [];
@@ -33,8 +42,11 @@ Onix.service("$location", function() {
 
 	/**
 	 * Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url
+	 *
+	 * @public
 	 * @param  {Object} [obj]
 	 * @return {Null|Object}
+	 * @memberof $location
 	 */
 	this.search = function(obj) {
 		if (obj) {
@@ -66,7 +78,10 @@ Onix.service("$location", function() {
 
 	/**
 	 * Get current location
+	 *
+	 * @public
 	 * @return {String}
+	 * @memberof $location
 	 */
 	this.get = function() {
 		return window.location.pathname;

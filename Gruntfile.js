@@ -50,6 +50,14 @@ module.exports = function(grunt) {
 					'dist/onix-js-framework.min.js': ['dist/onix-js-framework.js']
 				}
 			}
+		},
+		jsdoc : {
+			dist : {
+				src: ['static/js/onix/*.js', 'static/js/onix/*/*.js'],
+					options: {
+					destination: 'doc'
+				}
+			}
 		}
 	});
 
@@ -58,8 +66,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-jsdoc');
 
 	// Default task.
 	grunt.registerTask('default', ['less:userweb', 'watch:userweb']);
-	grunt.registerTask('dist', ['concat', 'uglify']);
+	grunt.registerTask('dist', ['concat', 'uglify', 'jsdoc']);
 };

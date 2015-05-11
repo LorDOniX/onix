@@ -1,3 +1,7 @@
+/**
+ * @namespace i18n
+ * @description DI: Http, Promise;
+ */
 Onix.service("i18n", [
 	"Http",
 	"Promise",
@@ -5,26 +9,31 @@ function(
 	Http,
 	Promise
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * All langs data.
+	 *
+	 * @private
 	 * @type {Object}
+	 * @memberof i18n
 	 */
 	this._langs = {};
 
 	/**
 	 * Current language
+	 *
+	 * @private
 	 * @type {String}
+	 * @memberof i18n
 	 */
 	this._currentLang = "";
 
-	// ------------------------ public ----------------------------------------
-
 	/**
 	 * Add new language
+	 *
+	 * @public
 	 * @param {String} lang Language key
 	 * @param {Object} data
+	 * @memberof i18n
 	 */
 	this.addLanguage = function(lang, data) {
 		this._langs[lang] = data;
@@ -32,7 +41,10 @@ function(
 
 	/**
 	 * Set new language by his key.
+	 *
+	 * @public
 	 * @param {String} lang Language key
+	 * @memberof i18n
 	 */
 	this.setLanguage = function(lang) {
 		this._currentLang = lang;
@@ -40,6 +52,8 @@ function(
 
 	/**
 	 * Get text function. Translate for the current language and the key.
+	 *
+	 * @public
 	 * @param  {String} key
 	 * @return {String}    
 	 */
@@ -73,9 +87,12 @@ function(
 
 	/**
 	 * Load language from the file.
+	 *
+	 * @public
 	 * @param  {String} lang Language key
 	 * @param  {String} url  Path to the file
 	 * @return {Promise}
+	 * @memberof i18n
 	 */
 	this.loadLanguage = function(lang, url) {
 		var promise = Promise.defer();

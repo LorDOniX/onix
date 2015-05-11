@@ -1,10 +1,13 @@
 Onix.factory("Promise", function() {
-	// ------------------------ private ---------------------------------------
-	
-	var Promise = function() {
+	/**
+	 * @class _Promise
+	 * @description Parent: Promise;
+	 */
+	var _Promise = function() {
 		/**
 		 * Promise states
-		 * @type {Object}
+		 * @const
+		 * @memberof _Promise
 		 */
 		this._E_STATES = {
 			IDLE: 0,
@@ -24,9 +27,12 @@ Onix.factory("Promise", function() {
 
 	/**
 	 * Resolve all functions
+	 *
+	 * @private
 	 * @param  {Boolean} isError
+	 * @memberof _Promise
 	 */
-	Promise.prototype._resolveFuncs = function(isError) {
+	_Promise.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
 			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
@@ -40,41 +46,51 @@ Onix.factory("Promise", function() {
 
 	/**
 	 * Is promise already finished?
+	 *
+	 * @private
 	 * @return {Boolean}
+	 * @memberof _Promise
 	 */
-	Promise.prototype._isAlreadyFinished = function() {
+	_Promise.prototype._isAlreadyFinished = function() {
 		if (this._state != this._E_STATES.IDLE) {
 			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
 		}
 	};
 
-	// ------------------------ public ----------------------------------------
-
 	/**
 	 * Resolve promise using obj.
+	 *
+	 * @public
 	 * @param  {Object} obj
+	 * @memberof _Promise
 	 */
-	Promise.prototype.resolve = function(obj) {
+	_Promise.prototype.resolve = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(false);
 	};
 
 	/**
 	 * Reject promise using obj.
+	 *
+	 * @public
 	 * @param  {Object} obj
+	 * @memberof _Promise
 	 */
-	Promise.prototype.reject = function(obj) {
+	_Promise.prototype.reject = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(true);
 	};
 
 	/**
 	 * After promise resolve/reject call then (okFn, errorFn)
+	 *
+	 * @public
 	 * @param {Function} [cbOk]
 	 * @param {Function} [cbError]
-	 * @return {Promise}
+	 * @return {_Promise}
+	 * @memberof _Promise
 	 */
-	Promise.prototype.then = function(cbOk, cbError) {
+	_Promise.prototype.then = function(cbOk, cbError) {
 		if (cbOk && typeof cbOk === "function") {
 			this._funcs.push({
 				fn: cbOk,
@@ -96,10 +112,13 @@ Onix.factory("Promise", function() {
 
 	/**
 	 * After promise resolve call then cbOk
+	 *
+	 * @public
 	 * @param  {Function}   cbOk
-	 * @return {Promise}
+	 * @return {_Promise}
+	 * @memberof _Promise
 	 */
-	Promise.prototype.done = function(cbOk) {
+	_Promise.prototype.done = function(cbOk) {
 		this._funcs.push({
 			fn: cbOk,
 			isError: false
@@ -112,10 +131,13 @@ Onix.factory("Promise", function() {
 
 	/**
 	 * After promise reject call then cbError
+	 *
+	 * @public
 	 * @param  {Function}   cbError
-	 * @return {Promise}
+	 * @return {_Promise}
+	 * @memberof _Promise
 	 */
-	Promise.prototype.error = function(cbError) {
+	_Promise.prototype.error = function(cbError) {
 		this._funcs.push({
 			fn: cbError,
 			isError: true
@@ -128,10 +150,14 @@ Onix.factory("Promise", function() {
 
 	/**
 	 * Finally for promise
+	 *
+	 * @function finally
+	 * @public
 	 * @param  {Function}   cb
-	 * @return {Promise}
+	 * @return {_Promise}
+	 * @memberof _Promise
 	 */
-	Promise.prototype["finally"] = function(cb) {
+	_Promise.prototype["finally"] = function(cb) {
 		this._funcs.push({
 			fn: cb,
 			"finally": true
@@ -142,16 +168,20 @@ Onix.factory("Promise", function() {
 		return this;
 	};
 
-	// --- public ----
-
+	/**
+ 	 * @namespace Promise
+ 	 */
 	return {
 		/**
 		 * Resolve all promises in the array
+		 *
+		 * @public
 		 * @param {Array} promises
-		 * @return {Promise}
+		 * @return {_Promise}
+		 * @memberof Promise
 		 */
 		all: function(promises) {
-			var promise = new Promise();
+			var promise = new _Promise();
 
 			if (Array.isArray(promises)) {
 				var count = promises.length;
@@ -176,10 +206,13 @@ Onix.factory("Promise", function() {
 
 		/**
 		 * Deferable object of the promise.
-		 * @return {Promise}
+		 *
+		 * @public
+		 * @return {_Promise}
+		 * @memberof Promise
 		 */
 		defer: function() {
-			return new Promise();
+			return new _Promise();
 		}
 	}
 });

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: factory/snippet.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: factory/snippet.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>Onix.factory("Snippet", [
+	"Templates",
+	"Common",
+function(
+	Templates,
+	Common
+) {
+	/**
+	 * @interface _Snippet
+	 * @description Parent: Snippet;
+	 */
+	var _Snippet = {
+		/**
+		 * Get snippet config.
+		 *
+		 * @private
+		 * @return {Object}
+		 * @memberof _Snippet
+		 */
+		_getConfig: function() {
+			return this._config;
+		},
+
+		/**
+		 * Get snippet element.
+		 *
+		 * @private
+		 * @param  {String} name
+		 * @return {NodeElement}
+		 * @memberof _Snippet
+		 */
+		_getEl: function(name) {
+			return this._els[name];
+		},
+
+		/**
+		 * Get snippet parent.
+		 *
+		 * @private
+		 * @return {NodeElement}
+		 * @memberof _Snippet
+		 */
+		_getParent: function() {
+			return this._parent;
+		},
+
+		/**
+		 * Abstract method.
+		 *
+		 * @private
+		 * @param  {Object} config
+		 * @memberof _Snippet
+		 */
+		_create: function(config) {
+			return null;
+		},
+
+		/**
+		 * Set snippet name.
+		 *
+		 * @private
+		 * @param {String} name
+		 * @memberof _Snippet
+		 */
+		_setName: function(name) {
+			this._name = name;
+		},
+
+		/**
+		 * Setup
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
+		 */
+		_setup: function() {
+
+		},
+
+		/**
+		 * Active
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
+		 */
+		_activate: function() {
+
+		},
+
+		/**
+		 * Deactivate
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
+		 */
+		_deactivate: function() {
+
+		},
+
+		/**
+		 * Init snippet
+		 *
+		 * @public
+		 * @param  {Object} config
+		 * @param  {Object} parent parent page
+		 * @return {NodeElement} root el
+		 * @memberof _Snippet
+		 */
+		init: function(config, parent) {
+			this._config = config || {};
+			this._parent = parent;
+			this._els = {};
+			this._name = "";
+			this._root = this._create(config);
+
+			return this._root;
+		},
+
+		/**
+		 * Add new els to this._els; this function can be called from Templates
+		 *
+		 * @public
+		 * @param {Object} newEls { key, value - node element}
+		 * @memberof _Snippet
+		 */
+		addEls: function(newEls) {
+			newEls = newEls || {};
+
+			Object.keys(newEls).forEach(function(key) {
+				this._els[key] = newEls[key];
+			}, this);
+		},
+
+		/**
+		 * Setup snippet - is called after init. Runs _setup()
+		 *
+		 * @public
+		 * @memberof _Snippet
+		 */
+		setup: function() {
+			Templates.bindTemplate(this._root, this);
+			
+			this._setup();
+		},
+
+		/**
+		 * Activate snippet - run _activate()
+		 *
+		 * @public
+		 * @memberof _Snippet
+		 */
+		activate: function() {
+			this._activate();
+		},
+
+		/**
+		 * Deactivate snippet - run _deactivate()
+		 *
+		 * @public
+		 * @memberof _Snippet
+		 */
+		deactivate: function() {
+			this._deactivate();
+		},
+
+		/**
+		 * Get snippet name.
+		 *
+		 * @public
+		 * @return {String}
+		 * @memberof _Snippet
+		 */
+		getName: function() {
+			return this._name;
+		}
+	};
+
+	/**
+ 	 * @namespace Snippet
+ 	 * @description DI: Templates, Common;
+ 	 */
+	return {
+		/**
+		 * Create a new snippet
+		 *
+		 * @public
+		 * @param  {Object|Function} a snippet data | dependicies
+		 * @param  {Object|Function} [b] snippet data | dependicies
+		 * @return {_Snippet}
+		 * @memberof Snippet
+		 */
+		create: function(a, b) {
+			return Common.create(_Snippet, a, b);
+		}
+	};
+}]);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="-_MyQuery.html">_MyQuery</a></li><li><a href="-_Notify.html">_Notify</a></li><li><a href="-_Promise.html">_Promise</a></li><li><a href="-_Select.html">_Select</a></li></ul><h3>Namespaces</h3><ul><li><a href="$location.html">$location</a></li><li><a href="Common.html">Common</a></li><li><a href="CONFIG.html">CONFIG</a></li><li><a href="DOM.html">DOM</a></li><li><a href="Events.html">Events</a></li><li><a href="Http.html">Http</a></li><li><a href="i18n.html">i18n</a></li><li><a href="Loader.html">Loader</a></li><li><a href="MyQuery.html">MyQuery</a></li><li><a href="Notify.html">Notify</a></li><li><a href="Onix.html">Onix</a></li><li><a href="Page.html">Page</a></li><li><a href="Promise.html">Promise</a></li><li><a href="Router.html">Router</a></li><li><a href="Select.html">Select</a></li><li><a href="Snippet.html">Snippet</a></li><li><a href="Templates.html">Templates</a></li></ul><h3>Interfaces</h3><ul><li><a href="-_Events.html">_Events</a></li><li><a href="-_Page.html">_Page</a></li><li><a href="-_Snippet.html">_Snippet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_">_</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Mon May 11 2015 15:54:08 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

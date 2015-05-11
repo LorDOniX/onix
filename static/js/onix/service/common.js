@@ -1,14 +1,19 @@
+/**
+ * @namespace Common
+ * @description DI: Promise;
+ */
 Onix.service("Common", [
 	"Promise",
 function(
 	Promise
 ) {
-	// ------------------------ private ---------------------------------------
-	
 	/**
 	 * Object copy, from source to dest
+	 *
+	 * @private
 	 * @param  {Object} dest
 	 * @param  {Object} source
+	 * @memberof Common
 	 */
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
@@ -44,12 +49,13 @@ function(
 		}.bind(this));
 	};
 
-	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Get cookie by her name
+	 *
+	 * @public
 	 * @param  {String} name
 	 * @return {String}     
+	 * @memberof Common
 	 */
 	this.getCookie = function(name) {
 		var cookieValue = null;
@@ -73,8 +79,11 @@ function(
 
 	/**
 	 * Confirm window.
+	 *
+	 * @public
 	 * @param  {String} txt
 	 * @return {Promise}
+	 * @memberof Common
 	 */
 	this.confirm = function(txt) {
 		var promise = Promise.defer();
@@ -91,10 +100,13 @@ function(
 
 	/**
 	 * Create one object from arguments
+	 *
+	 * @public
 	 * @param  {Object|Function} mainObj
 	 * @param  {Object|Function|Array} a data | dependicies
 	 * @param  {Object|Function} [b] data | dependicies
 	 * @return {Object}
+	 * @memberof Common
 	 */
 	this.create = function(mainObj, a, b) {
 		var args = [];
@@ -120,7 +132,10 @@ function(
 
 	/**
 	 * Merge X objects into the single one.
+	 *
+	 * @public
 	 * @return {Object}
+	 * @memberof Common
 	 */
 	this.merge = function() {
 		var count = arguments.length;
@@ -139,8 +154,11 @@ function(
 
 	/**
 	 * Extend one object by other; from source to dest.
+	 *
+	 * @public
 	 * @param  {Object} dest
 	 * @param  {Object} source
+	 * @memberof Common
 	 */
 	this.extend = function(dest, source) {
 		dest = dest || {};
@@ -151,8 +169,11 @@ function(
 
 	/**
 	 * Bind function arguments without scope
+	 *
+	 * @public
 	 * @param  {Function} cb
 	 * @return {Function}
+	 * @memberof Common
 	 */
 	this.bindWithoutScope = function(cb) {
 		var bindArgs = Array.prototype.slice.call(arguments, 1);
@@ -166,9 +187,12 @@ function(
 	
 	/**
 	 * Missing for each for Node array.
+	 *
+	 * @public
 	 * @param  {NodeArray} nodes
 	 * @param  {Function} cb
 	 * @param  {Object|Function}   scope
+	 * @memberof Common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
 		cb = cb || function() {};
@@ -182,9 +206,12 @@ function(
 
 	/**
 	 * Reverse for each
+	 *
+	 * @public
 	 * @param  {Array} arr 
 	 * @param {Function} cb
 	 * @param {Function} scope
+	 * @memberof Common
 	 */
 	this.reverseForEach = function (arr, cb, scope) {
 		arr = arr || [];
@@ -197,8 +224,11 @@ function(
 
 	/**
 	 * HEX value to DEC
+	 *
+	 * @public
 	 * @param  {String} hex
 	 * @return {Number}    
+	 * @memberof Common
 	 */
 	this.hxToDe = function(hex) {
 		hex = hex.toLowerCase();
@@ -223,8 +253,11 @@ function(
 
 	/**
 	 * HEX value to RGB
+	 *
+	 * @public
 	 * @param  {String} hexColor
 	 * @return {Object}         
+	 * @memberof Common
 	 */
 	this.hexToRGB = function(hexColor) {
 		if (hexColor[0] == "#") {
@@ -252,9 +285,12 @@ function(
 
 	/**
 	 * If EXPR then function
+	 *
+	 * @public
 	 * @param  {Boolean} expr  test if (EXPR)
 	 * @param  {Function} fn
 	 * @param  {Function} scope
+	 * @memberof Common
 	 */
 	this.ift = function(expr, th, scope) {
 		if (expr) {

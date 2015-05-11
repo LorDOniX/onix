@@ -1,6 +1,7 @@
+/**
+ * @namespace DOM
+ */
 Onix.service("DOM", function() {
-	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Create DOM from the configuration.
 	 * config: {
@@ -13,9 +14,12 @@ Onix.service("DOM", function() {
 	 * 	multiple...
 	 * }
 	 * exported - to this object will be exported all marked elements (_exported attr.)
+	 *
+	 * @public
 	 * @param  {Object} config
 	 * @param  {Object} [exported]
 	 * @return {NodeElement}
+	 * @memberof DOM
 	 */
 	this.create = function(config, exported) {
 		var el = document.createElement(config.el);
@@ -70,9 +74,12 @@ Onix.service("DOM", function() {
 
 	/**
 	 * Get element from the document.
+	 *
+	 * @public
 	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
 	 * @param  {NodeElement} parent
 	 * @return {NodeElement}
+	 * @memberof DOM
 	 */
 	this.get = function(els, parent) {
 		var output;
