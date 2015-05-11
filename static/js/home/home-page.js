@@ -22,6 +22,18 @@ function(
 			}));
 
 			Templates.bindTemplate(el.getEl(), this);
+
+			this.once("onceEvent", function() {
+				console.log("onceEvent");
+			});
+
+			this.on("aaa", function() {
+				console.log("aaa event");
+			});
+
+			this.once("onceEvent", function() {
+				console.log("onceEvent2");
+			});
 		},
 
 		// ------------------------ public ----------------------------------------
@@ -30,6 +42,10 @@ function(
 			console.log("btn click");
 			console.log(arguments);
 			console.log(Templates);
+			
+			this.trigger("onceEvent");
+			this.trigger("aaa");
+			this.off("aaa");
 		},
 
 		test2: function() {

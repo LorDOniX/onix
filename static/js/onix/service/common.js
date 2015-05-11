@@ -181,6 +181,21 @@ function(
 	};
 
 	/**
+	 * Reverse for each
+	 * @param  {Array} arr 
+	 * @param {Function} cb
+	 * @param {Function} scope
+	 */
+	this.reverseForEach = function (arr, cb, scope) {
+		arr = arr || [];
+		cb = cb || function() {};
+
+		for (var i = arr.length - 1; i >= 0; i--) {
+			cb.apply(scope || this, [arr[i], i]);
+		}
+	};
+
+	/**
 	 * HEX value to DEC
 	 * @param  {String} hex
 	 * @return {Number}    
