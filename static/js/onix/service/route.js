@@ -100,7 +100,9 @@ function(
 		if (config) {
 			if (typeof config.controller === "string") {
 				var param = onix.getObject(config.controller);
-				onix.DI(param).run();
+				onix.DI(param, {
+					$scope: { a: 5 }
+				}).run();
 			}
 			else if (Array.isArray(config.controller)) {
 				onix.DI(config.controller).run();

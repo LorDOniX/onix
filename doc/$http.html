@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Global</title>
+    <title>JSDoc: Namespace: $http</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">Namespace: $http</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        
+        $http
         </h2>
         
     
@@ -38,6 +38,8 @@
 <article>
     <div class="container-overview">
     
+        
+            <div class="description">DI: $q;</div>
         
 
         
@@ -69,6 +71,11 @@
 
     
 
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_http.js.html">service/http.js</a>, <a href="service_http.js.html#line1">line 1</a>
+    </li></ul></dd>
     
 
     
@@ -94,6 +101,134 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id=".this.METHOD"><span class="type-signature">(static, constant) </span>this.METHOD<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Http methods.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_http.js.html">service/http.js</a>, <a href="service_http.js.html#line82">line 82</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".this.POST_TYPES"><span class="type-signature">(static, constant) </span>this.POST_TYPES<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Request types
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_http.js.html">service/http.js</a>, <a href="service_http.js.html#line70">line 70</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -103,14 +238,15 @@
 
     
 
-    <h4 class="name" id="_"><span class="type-signature"></span>_<span class="signature">(key)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id=".this._preparePostData"><span class="type-signature">(private, static) </span>this._preparePostData<span class="signature">(data)</span><span class="type-signature"> &rarr; {FormData}</span></h4>
 
     
 
 
 
 <div class="description">
-    Get text function. Translate for the current language and the key.
+    https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
+Prepare post data
 </div>
 
 
@@ -146,13 +282,16 @@
 
         <tr>
             
-                <td class="name"><code>key</code></td>
+                <td class="name"><code>data</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
 
 
             
@@ -162,7 +301,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">{ name, value }</td>
         </tr>
 
     
@@ -203,7 +342,179 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line60">line 60</a>
+        <a href="service_http.js.html">service/http.js</a>, <a href="service_http.js.html#line19">line 19</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">FormData</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".this._updateURL"><span class="type-signature">(private, static) </span>this._updateURL<span class="signature">(url, data)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Update URL by get data.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">{ name, value }</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_http.js.html">service/http.js</a>, <a href="service_http.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -252,14 +563,14 @@
 
     
 
-    <h4 class="name" id="newRun"><span class="type-signature"></span>newRun<span class="signature">(scope<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id=".this.createRequest"><span class="type-signature">(static) </span>this.createRequest<span class="signature">(config)</span><span class="type-signature"> &rarr; {<a href="$q.html">$q</a>}</span></h4>
 
     
 
 
 
 <div class="description">
-    Run new binded function - with the new
+    Create new XHR request.
 </div>
 
 
@@ -283,8 +594,6 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -297,15 +606,12 @@
 
         <tr>
             
-                <td class="name"><code>scope</code></td>
+                <td class="name"><code>config</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
-|
-
 <span class="param-type">Object</span>
 
 
@@ -313,20 +619,10 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"></td>
+            <td class="description last">{ url, method, [getData], [postData], [headers {type, value}] }</td>
         </tr>
 
     
@@ -367,7 +663,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="onix.js.html">onix.js</a>, <a href="onix.js.html#line410">line 410</a>
+        <a href="service_http.js.html">service/http.js</a>, <a href="service_http.js.html#line97">line 97</a>
     </li></ul></dd>
     
 
@@ -401,171 +697,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="run"><span class="type-signature"></span>run<span class="signature">(scope<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
-    
-
-
-
-<div class="description">
-    Run new binded function
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>scope</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-|
-
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="onix.js.html">onix.js</a>, <a href="onix.js.html#line401">line 401</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
+<span class="param-type"><a href="$q.html">$q</a></span>
 
 
     </dd>

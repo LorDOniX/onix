@@ -27,13 +27,13 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @namespace Common
- * @description DI: Promise;
+ * @namespace $common
+ * @description DI: $q;
  */
-Onix.service("Common", [
-	"Promise",
+onix.service("$common", [
+	"$q",
 function(
-	Promise
+	$q
 ) {
 	/**
 	 * Object copy, from source to dest
@@ -41,7 +41,7 @@ function(
 	 * @private
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
@@ -83,7 +83,7 @@ function(
 	 * @public
 	 * @param  {String} name
 	 * @return {String}     
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.getCookie = function(name) {
 		var cookieValue = null;
@@ -110,11 +110,11 @@ function(
 	 *
 	 * @public
 	 * @param  {String} txt
-	 * @return {Promise}
-	 * @memberof Common
+	 * @return {$q}
+	 * @memberof $common
 	 */
 	this.confirm = function(txt) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
 		if (confirm(txt)) {
 			promise.resolve();
@@ -134,7 +134,7 @@ function(
 	 * @param  {Object|Function|Array} a data | dependicies
 	 * @param  {Object|Function} [b] data | dependicies
 	 * @return {Object}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.create = function(mainObj, a, b) {
 		var args = [];
@@ -145,7 +145,7 @@ function(
 
 			// arguments
 			a.forEach(function(item) {
-				args.push(Onix.getObject(item));
+				args.push(onix.getObject(item));
 			});
 		}
 
@@ -163,7 +163,7 @@ function(
 	 *
 	 * @public
 	 * @return {Object}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.merge = function() {
 		var count = arguments.length;
@@ -186,7 +186,7 @@ function(
 	 * @public
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.extend = function(dest, source) {
 		dest = dest || {};
@@ -201,7 +201,7 @@ function(
 	 * @public
 	 * @param  {Function} cb
 	 * @return {Function}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.bindWithoutScope = function(cb) {
 		var bindArgs = Array.prototype.slice.call(arguments, 1);
@@ -220,7 +220,7 @@ function(
 	 * @param  {NodeArray} nodes
 	 * @param  {Function} cb
 	 * @param  {Object|Function}   scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
 		cb = cb || function() {};
@@ -239,7 +239,7 @@ function(
 	 * @param  {Array} arr 
 	 * @param {Function} cb
 	 * @param {Function} scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.reverseForEach = function (arr, cb, scope) {
 		arr = arr || [];
@@ -256,7 +256,7 @@ function(
 	 * @public
 	 * @param  {String} hex
 	 * @return {Number}    
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.hxToDe = function(hex) {
 		hex = hex.toLowerCase();
@@ -285,7 +285,7 @@ function(
 	 * @public
 	 * @param  {String} hexColor
 	 * @return {Object}         
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.hexToRGB = function(hexColor) {
 		if (hexColor[0] == "#") {
@@ -318,7 +318,7 @@ function(
 	 * @param  {Boolean} expr  test if (EXPR)
 	 * @param  {Function} fn
 	 * @param  {Function} scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.ift = function(expr, th, scope) {
 		if (expr) {
@@ -336,13 +336,13 @@ function(
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="-_MyQuery.html">_MyQuery</a></li><li><a href="-_Notify.html">_Notify</a></li><li><a href="-_Promise.html">_Promise</a></li><li><a href="-_Select.html">_Select</a></li></ul><h3>Namespaces</h3><ul><li><a href="$location.html">$location</a></li><li><a href="Common.html">Common</a></li><li><a href="CONFIG.html">CONFIG</a></li><li><a href="DOM.html">DOM</a></li><li><a href="Events.html">Events</a></li><li><a href="Http.html">Http</a></li><li><a href="i18n.html">i18n</a></li><li><a href="Loader.html">Loader</a></li><li><a href="MyQuery.html">MyQuery</a></li><li><a href="Notify.html">Notify</a></li><li><a href="Onix.html">Onix</a></li><li><a href="Page.html">Page</a></li><li><a href="Promise.html">Promise</a></li><li><a href="Router.html">Router</a></li><li><a href="Select.html">Select</a></li><li><a href="Snippet.html">Snippet</a></li><li><a href="Templates.html">Templates</a></li></ul><h3>Interfaces</h3><ul><li><a href="-_Events.html">_Events</a></li><li><a href="-_Page.html">_Page</a></li><li><a href="-_Snippet.html">_Snippet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_">_</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="$select.html">$select</a></li></ul><h3>Namespaces</h3><ul><li><a href="$common.html">$common</a></li><li><a href="$dom.html">$dom</a></li><li><a href="$http.html">$http</a></li><li><a href="$i18n.html">$i18n</a></li><li><a href="$loader.html">$loader</a></li><li><a href="$location.html">$location</a></li><li><a href="$myQuery.html">$myQuery</a></li><li><a href="$notify.html">$notify</a></li><li><a href="$page.html">$page</a></li><li><a href="$q.html">$q</a></li><li><a href="$route.html">$route</a></li><li><a href="$snippet.html">$snippet</a></li><li><a href="$template.html">$template</a></li><li><a href="CONFIG.html">CONFIG</a></li><li><a href="onix.html">onix</a></li></ul><h3>Interfaces</h3><ul><li><a href="$event.html">$event</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_">_</a></li><li><a href="global.html#newRun">newRun</a></li><li><a href="global.html#run">run</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Mon May 11 2015 16:06:31 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Tue May 12 2015 15:01:37 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

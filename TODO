@@ -6,3 +6,9 @@ TODO
 - page == controller
 - snippet == directive
 - $routeParams
+- $injector == onix.getObject
+
+- idea:
+
+- nechat nějaké věci z angularu, rozložení atd.
+- shadow dom - veškeré změny se budou postupně aplikovat ve formě patche na dom

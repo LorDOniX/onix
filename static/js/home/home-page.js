@@ -5,14 +5,18 @@ testApp.controller("HomePage", [
 	"$loader",
 	"$select",
 	"HomeResource",
+	"$scope",
 function(
 	$page,
 	$common,
 	$template,
 	$loader,
 	$select,
-	HomeResource
+	HomeResource,
+	$scope
 ) {
+	console.log($scope);
+	
 	var HomePage = $page.create(["$event"], {
 		// ------------------------ private ---------------------------------------
 		

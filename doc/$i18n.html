@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Global</title>
+    <title>JSDoc: Namespace: $i18n</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">Namespace: $i18n</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        
+        $i18n
         </h2>
         
     
@@ -38,6 +38,8 @@
 <article>
     <div class="container-overview">
     
+        
+            <div class="description">DI: $http, $q;</div>
         
 
         
@@ -69,6 +71,11 @@
 
     
 
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line1">line 1</a>
+    </li></ul></dd>
     
 
     
@@ -94,6 +101,154 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id=".this._currentLang"><span class="type-signature">(private, static) </span>this._currentLang<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Current language
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".this._langs"><span class="type-signature">(private, static) </span>this._langs<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    All langs data.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line19">line 19</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -103,14 +258,14 @@
 
     
 
-    <h4 class="name" id="_"><span class="type-signature"></span>_<span class="signature">(key)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id=".this.addLanguage"><span class="type-signature">(static) </span>this.addLanguage<span class="signature">(lang, data)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Get text function. Translate for the current language and the key.
+    Add new language
 </div>
 
 
@@ -146,7 +301,7 @@
 
         <tr>
             
-                <td class="name"><code>key</code></td>
+                <td class="name"><code>lang</code></td>
             
 
             <td class="type">
@@ -162,6 +317,29 @@
 
             
 
+            <td class="description last">Language key</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
             <td class="description last"></td>
         </tr>
 
@@ -203,7 +381,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line60">line 60</a>
+        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line38">line 38</a>
     </li></ul></dd>
     
 
@@ -226,107 +404,97 @@
 
 
 
-<h5>Returns:</h5>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".this.loadLanguage"><span class="type-signature">(static) </span>this.loadLanguage<span class="signature">(lang, url)</span><span class="type-signature"> &rarr; {<a href="$q.html">$q</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Load language from the file.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
 
         
 
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
         
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lang</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">String</span>
 
 
-    </dd>
-</dl>
+            
+            </td>
 
-    
-
-
-
-        
             
 
-    
+            
 
-    <h4 class="name" id="newRun"><span class="type-signature"></span>newRun<span class="signature">(scope<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+            <td class="description last">Language key</td>
+        </tr>
 
-    
-
-
-
-<div class="description">
-    Run new binded function - with the new
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>scope</code></td>
+                <td class="name"><code>url</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
-|
-
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"></td>
+            <td class="description last">Path to the file</td>
         </tr>
 
     
@@ -367,7 +535,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="onix.js.html">onix.js</a>, <a href="onix.js.html#line410">line 410</a>
+        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line97">line 97</a>
     </li></ul></dd>
     
 
@@ -401,7 +569,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type"><a href="$q.html">$q</a></span>
 
 
     </dd>
@@ -416,14 +584,14 @@
 
     
 
-    <h4 class="name" id="run"><span class="type-signature"></span>run<span class="signature">(scope<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id=".this.setLanguage"><span class="type-signature">(static) </span>this.setLanguage<span class="signature">(lang)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Run new binded function
+    Set new language by his key.
 </div>
 
 
@@ -447,8 +615,6 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -461,36 +627,23 @@
 
         <tr>
             
-                <td class="name"><code>scope</code></td>
+                <td class="name"><code>lang</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
-|
-
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"></td>
+            <td class="description last">Language key</td>
         </tr>
 
     
@@ -531,7 +684,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="onix.js.html">onix.js</a>, <a href="onix.js.html#line401">line 401</a>
+        <a href="service_i18n.js.html">service/i18n.js</a>, <a href="service_i18n.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -554,24 +707,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 

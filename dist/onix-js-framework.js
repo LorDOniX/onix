@@ -1,88 +1,377 @@
-/**
- * @namespace Onix
- */
-Onix = (function() {
-	var Onix = {
+onix = (function() {
+	/**
+	 * Module/app types
+	 * @const
+	 */
+	var TYPES = {
+		SERVICE: 1,
+		FACTORY: 2,
+		CONSTANT: 3,
+		RUN: 4,
+		CONFIG: 5,
+		CONTROLLER: 6
+	};
+
+	/**
+	 * $$module item
+	 * @class
+	 * 
+	 */
+	var $$module = function() {
+		this._allObj = [];
+	};
+
+	/**
+	 * Add a new service
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.service = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.SERVICE
+		});
+	};
+
+	/**
+	 * Add a new factory
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.factory = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.FACTORY
+		});
+	};
+
+	/**
+	 * Add a new controller
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.controller = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.CONTROLLER
+		});
+	};
+
+	/**
+	 * Add new constant
+	 * 
+	 * @public
+	 * @param  {String} name
+	 * @param  {Object} param
+	 * @memberof onix
+	 */
+	$$module.prototype.constant = function(name, obj) {
+		this._allObj.push({
+			name: name,
+			param: obj,
+			type: TYPES.CONSTANT
+		});
+	};
+
+	/**
+	 * Add a new run
+	 * 
+	 * @public
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.run = function(param) {
+		this._allObj.push({
+			param: param,
+			type: TYPES.RUN
+		});
+	};
+
+	/**
+	 * Add a new run
+	 * 
+	 * @public
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.config = function(param) {
+		this._allObj.push({
+			param: param,
+			type: TYPES.CONFIG
+		});
+	};
+
+	/**
+	 * @namespace onix
+	 */
+	var onix = {
 		/**
-		 * Framework version.
-		 * 
+		 * All objects
+		 *
 		 * @private
-		 * @type {String}
-		 * @memberof Onix
+		 * @type {Array}
+		 * @memberof onix
 		 */
-		_VERSION: "1.1.2",
+		_allObj: [],
 
 		/**
-		 * Framework date.
-		 * 
-		 * @private
-		 * @type {String}
-		 * @memberof Onix
-		 */
-		_DATE: "11. 5. 2015",
-
-		/**
-		 * All factories, constants...
-		 * 
+		 * All processed objects
+		 *
 		 * @private
 		 * @type {Object}
-		 * @memberof Onix
+		 * @memberof onix
 		 */
 		_objects: {},
 
 		/**
-		 * Onix configuration
-		 * 
+		 * All modules
+		 *
 		 * @private
 		 * @type {Object}
-		 * @memberof Onix
+		 * @memberof onix
 		 */
-		_config: {},
+		_modules: {},
 
 		/**
-		 * All run functions
-		 * 
+		 * Config name
+		 *
 		 * @private
-		 * @type {Array}
-		 * @memberof Onix
+		 * @const
+		 * @memberof onix
 		 */
-		_runs: [],
+		_CONFIG_NAME: "$config",
 
 		/**
-		 * App object types
-		 * 
+		 * Init function
+		 *
 		 * @private
-		 * @type {Object}
-		 * @memberof Onix
+		 * @memberof onix
 		 */
-		_TYPES: {
-			SERVICE: 1,
-			FACTORY: 2
+		_init: function() {
+			// pred DOM loadem
+			this._objects[this._CONFIG_NAME] = {};
+
+			document.addEventListener("DOMContentLoaded", this._domLoad.bind(this));
 		},
 
 		/**
-		 * APP init - DOM load.
-		 * 
+		 * Event - Dom LOAD
+		 *
 		 * @private
-		 * @memberof Onix
+		 * @memberof onix
 		 */
-		_init: function() {
-			document.addEventListener("DOMContentLoaded", function() {
-				var di = this._di(this._run);
+		_domLoad: function() {
+			// process all inner items
+			this._allObj.forEach(function(item) {
+				// only 2 types
+				switch (item.type) {
+					case TYPES.SERVICE:
+						this._objects[item.name] = this.DI(item.param).newRun();
+						break;
 
-				di.fn.apply(this, di.args);
+					case TYPES.FACTORY:
+						this._objects[item.name] = this.DI(item.param).run();
+						break;
+				}
+			}, this);
+
+			// delete them
+			this._allObj.length = 0;
+
+			var configs = [];
+			var runs = [];
+
+			// process all modules
+			Object.keys(this._modules).forEach(function(moduleName) {
+				var module = this._modules[moduleName].module;
+
+				module._allObj.forEach(function(moduleItem) {
+					// modules have more types
+					switch (moduleItem.type) {
+						case TYPES.SERVICE:
+							this._objects[moduleItem.name] = this.DI(moduleItem.param).newRun();
+							break;
+
+						case TYPES.FACTORY:
+							this._objects[moduleItem.name] = this.DI(moduleItem.param).run();
+							break;
+
+						case TYPES.CONSTANT:
+						case TYPES.CONTROLLER:
+							this._objects[moduleItem.name] = moduleItem.param;
+							break;
+
+						case TYPES.RUN:
+							runs.push(moduleItem);
+							break;
+
+						case TYPES.CONFIG:
+							configs.push(moduleItem);
+							break;
+					}
+				}, this);
+			}, this);
+
+			// onix main run
+			this.DI(this._run).run(this);
+
+			// run all configs
+			configs.forEach(function(config) {
+				this.DI(config.param).run();
+			}, this);
+
+			// run all runs
+			runs.forEach(function(run) {
+				this.DI(run.param).run();
+			}, this);
+		},
+
+		/**
+		 * Main access point in the framework
+		 *
+		 * @private
+		 * @memberof onix
+		 */
+		_run: [
+			"$i18n",
+			"$template",
+			"$loader",
+			"$route",
+			"$myQuery",
+			"$common",
+		function(
+			$i18n,
+			$template,
+			$loader,
+			$route,
+			$myQuery,
+			$common
+		) {
+			// binds
+			this.element = function(value, parent) {
+				return new $myQuery.get(value, parent);
+			};
+
+			// inits
+			$loader.init();
+			$route.init();
+			$template.init();
+
+			// language
+			window._ = $i18n._.bind($i18n);
+
+			$common.ift(this._objects[this._CONFIG_NAME].LOCALIZATION.LANG, function(langKey) {
+				$i18n.setLanguage(langKey);
+			});
+		}],
+
+		/**
+		 * Add config to the onix application.
+		 *
+		 * @public
+		 * @param  {Object} obj
+		 * @memberof onix
+		 */
+		config: function(obj) {
+			Object.keys(obj).forEach(function(key) {
+				this._objects[this._CONFIG_NAME][key] = obj[key];
 			}.bind(this));
 		},
 
 		/**
-		 * Dependency injection.
-		 * 
-		 * @private
-		 * @param  {Array|Function} param
-		 * @return {Object}
-		 * @memberof Onix
+		 * Add service to the application.
+		 *
+		 * @public
+		 * @param  {String} name 
+		 * @param  {Function|Array} param
+		 * @memberof onix
 		 */
-		_di: function(param) {
+		service: function(name, param) {
+			this._allObj.push({
+				name: name,
+				param: param,
+				type: TYPES.SERVICE
+			});
+		},
+
+		/**
+		 * Add factory to the application.
+		 *
+		 * @public
+		 * @param  {String} name 
+		 * @param  {Function|Array} param
+		 * @memberof onix
+		 */
+		factory: function(name, param) {
+			this._allObj.push({
+				name: name,
+				param: param,
+				type: TYPES.FACTORY
+			});
+		},
+
+		/**
+		 * Add module to the application.
+		 *
+		 * @public
+		 * @param  {String} name 
+		 * @param  {Array} [dependencies] todo
+		 * @return {$$module}
+		 * @memberof onix
+		 */
+		module: function(name, dependencies) {
+			var module = new $$module();
+
+			this._modules[name] = {
+				module: module,
+				dependencies: dependencies
+			};
+
+			return module;
+		},
+
+		/**
+		 * Get object
+		 *
+		 * @public
+		 * @param  {String} name
+		 * @return {Function|Object} 
+		 * @memberof onix
+		 */
+		getObject: function(name) {
+			name = name || "";
+
+			return this._objects[name];
+		},
+
+		/**
+		 * Empty function
+		 */
+		noop: function() {
+
+		},
+
+		/**
+		 * Dependency injection
+		 *
+		 * @private
+		 * @param  {Function|Array} param
+		 * @return {Object}
+		 * @memberof onix
+		 */
+		DI: function(param) {
 			var fn;
 			var args = [];
 
@@ -104,179 +393,37 @@ Onix = (function() {
 			}
 
 			return {
-				fn: fn,
-				args: args
+				/**
+				 * Run new binded function
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				run: function(scope) {
+					return fn.apply(scope || fn, args);
+				},
+
+				/**
+				 * Run new binded function - with the new
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				newRun: function(scope) {
+					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+				}
 			};
 		},
-
-		/**
-		 * Add new object to the database.
-		 * 
-		 * @private
-		 * @param {String} name
-		 * @param {Enum} type
-		 * @param {Array|Function} param
-		 * @memberof Onix
-		 */
-		_addObject: function(name, type, param) {
-			try {
-				var di = this._di(param);
-
-				this._objects[name] = type == this._TYPES.SERVICE 
-					? new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)))
-					: di.fn.apply(di.fn, di.args)
-			}
-			catch (err) {
-				console.error("Onix._addObject error " + err + " in " + name);
-			}
-		},
-
-		/**
-		 * Application run.
-		 * 
-		 * @private
-		 * @memberof Onix
-		 */
-		_run: [
-			"i18n",
-			"Templates",
-			"Loader",
-			"Router",
-			"MyQuery",
-		function(
-			i18n,
-			Templates,
-			Loader,
-			Router,
-			MyQuery
-		) {
-			// binds
-			this.element = function(value, parent) {
-				return new MyQuery.get(value, parent);
-			};
-
-			// inits
-			Loader.init();
-			Router.init();
-
-			var afterRun = function() {
-				// run runs array
-				this._runs.forEach(function(item) {
-					var di = this._di(item);
-
-					new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)));
-				}.bind(this));
-
-				// templates init
-				Templates.init().done(function() {
-					// router go
-					Router.go();
-				});
-			}.bind(this);
-			
-			if (this.config("LOCALIZATION").LANG && this.config("LOCALIZATION").PATH) {
-				window._ = i18n._.bind(i18n);
-				i18n.setLanguage(this.config("LOCALIZATION").LANG);
-				i18n.loadLanguage(this.config("LOCALIZATION").LANG, this.config("LOCALIZATION").PATH).done(afterRun);
-			}
-			else {
-				afterRun();
-			}
-		}],
-
-		/**
-		 * Add a new service
-		 * 
-		 * @public
-		 * @param  {String} name
-		 * @param  {Array|Function} param With DI
-		 * @memberof Onix
-		 */
-		service: function(name, param) {
-			this._addObject(name, this._TYPES.SERVICE, param);
-		},
-
-		/**
-		 * Add a new factory
-		 * 
-		 * @public
-		 * @param  {String} name
-		 * @param  {Array|Function} param With DI
-		 * @memberof Onix
-		 */
-		factory: function(name, param) {
-			this._addObject(name, this._TYPES.FACTORY, param);
-		},
-
-		/**
-		 * Add a new run
-		 * 
-		 * @public
-		 * @param  {Array|Function} param With DI
-		 * @memberof Onix
-		 */
-		run: function(param) {
-			this._runs.push(param);
-		},
-
-		/**
-		 * Add new constant
-		 * 
-		 * @public
-		 * @param  {String} name
-		 * @param  {Object} param
-		 * @memberof Onix
-		 */
-		constant: function(name, obj) {
-			this._objects[name] = obj;
-		},
-
-		/**
-		 * Get/Set configuration
-		 * 
-		 * @public
-		 * @param  {String|Object} param
-		 * @return  {Object}
-		 * @memberof Onix
-		 */
-		config: function(param) {
-			if (typeof param === "string") {
-				// get
-				return this._config[param] || {};
-			}
-			else {
-				// set - update config object
-				Object.keys(param).forEach(function(key) {
-					this._config[key] = param[key];
-				}.bind(this));
-			}
-		},
-
-		/**
-		 * Get object by name
-		 * 
-		 * @public
-		 * @param  {String} name
-		 * @return {Function|Object}
-		 * @memberof Onix
-		 */
-		getObject: function(name) {
-			name = name || "";
-
-			return this._objects[name];
-		}
 	};
 
 	// init app
-	Onix._init();
+	onix._init();
 
-	return Onix;
+	return onix;
 })();
 /**
  * Main framework configuration
  * @namespace CONFIG
  */
-Onix.config({
+onix.config({
 	/**
 	 * Localization
 	 *
@@ -321,16 +468,15 @@ Onix.config({
 	 */
 	DETAIL_SEL: ".detail"
 });
-Onix.factory("Promise", function() {
+onix.factory("$$promise", function() {
 	/**
-	 * @class _Promise
-	 * @description Parent: Promise;
+	 * @class $$promise
 	 */
-	var _Promise = function() {
+	var $$promise = function() {
 		/**
 		 * Promise states
 		 * @const
-		 * @memberof _Promise
+		 * @memberof $$promise
 		 */
 		this._E_STATES = {
 			IDLE: 0,
@@ -353,9 +499,9 @@ Onix.factory("Promise", function() {
 	 *
 	 * @private
 	 * @param  {Boolean} isError
-	 * @memberof _Promise
+	 * @memberof $$promise
 	 */
-	_Promise.prototype._resolveFuncs = function(isError) {
+	$$promise.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
 			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
@@ -372,9 +518,9 @@ Onix.factory("Promise", function() {
 	 *
 	 * @private
 	 * @return {Boolean}
-	 * @memberof _Promise
+	 * @memberof $$promise
 	 */
-	_Promise.prototype._isAlreadyFinished = function() {
+	$$promise.prototype._isAlreadyFinished = function() {
 		if (this._state != this._E_STATES.IDLE) {
 			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
 		}
@@ -385,9 +531,9 @@ Onix.factory("Promise", function() {
 	 *
 	 * @public
 	 * @param  {Object} obj
-	 * @memberof _Promise
+	 * @memberof $$promise
 	 */
-	_Promise.prototype.resolve = function(obj) {
+	$$promise.prototype.resolve = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(false);
 	};
@@ -397,9 +543,9 @@ Onix.factory("Promise", function() {
 	 *
 	 * @public
 	 * @param  {Object} obj
-	 * @memberof _Promise
+	 * @memberof $$promise
 	 */
-	_Promise.prototype.reject = function(obj) {
+	$$promise.prototype.reject = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(true);
 	};
@@ -410,10 +556,10 @@ Onix.factory("Promise", function() {
 	 * @public
 	 * @param {Function} [cbOk]
 	 * @param {Function} [cbError]
-	 * @return {_Promise}
-	 * @memberof _Promise
+	 * @return {$$promise}
+	 * @memberof $$promise
 	 */
-	_Promise.prototype.then = function(cbOk, cbError) {
+	$$promise.prototype.then = function(cbOk, cbError) {
 		if (cbOk && typeof cbOk === "function") {
 			this._funcs.push({
 				fn: cbOk,
@@ -438,10 +584,10 @@ Onix.factory("Promise", function() {
 	 *
 	 * @public
 	 * @param  {Function}   cbOk
-	 * @return {_Promise}
-	 * @memberof _Promise
+	 * @return {$$promise}
+	 * @memberof $$promise
 	 */
-	_Promise.prototype.done = function(cbOk) {
+	$$promise.prototype.done = function(cbOk) {
 		this._funcs.push({
 			fn: cbOk,
 			isError: false
@@ -457,10 +603,10 @@ Onix.factory("Promise", function() {
 	 *
 	 * @public
 	 * @param  {Function}   cbError
-	 * @return {_Promise}
-	 * @memberof _Promise
+	 * @return {$$promise}
+	 * @memberof $$promise
 	 */
-	_Promise.prototype.error = function(cbError) {
+	$$promise.prototype.error = function(cbError) {
 		this._funcs.push({
 			fn: cbError,
 			isError: true
@@ -477,10 +623,10 @@ Onix.factory("Promise", function() {
 	 * @function finally
 	 * @public
 	 * @param  {Function}   cb
-	 * @return {_Promise}
-	 * @memberof _Promise
+	 * @return {$$promise}
+	 * @memberof $$promise
 	 */
-	_Promise.prototype["finally"] = function(cb) {
+	$$promise.prototype["finally"] = function(cb) {
 		this._funcs.push({
 			fn: cb,
 			"finally": true
@@ -491,8 +637,16 @@ Onix.factory("Promise", function() {
 		return this;
 	};
 
+	return $$promise;
+});
+onix.factory("$q", [
+	"$$promise",
+function(
+	$$promise
+) {
 	/**
- 	 * @namespace Promise
+ 	 * @namespace $q
+ 	 * @description: DI $$promise;
  	 */
 	return {
 		/**
@@ -500,11 +654,11 @@ Onix.factory("Promise", function() {
 		 *
 		 * @public
 		 * @param {Array} promises
-		 * @return {_Promise}
-		 * @memberof Promise
+		 * @return {$$promise}
+		 * @memberof $q
 		 */
 		all: function(promises) {
-			var promise = new _Promise();
+			var promise = new $$promise();
 
 			if (Array.isArray(promises)) {
 				var count = promises.length;
@@ -531,24 +685,24 @@ Onix.factory("Promise", function() {
 		 * Deferable object of the promise.
 		 *
 		 * @public
-		 * @return {_Promise}
-		 * @memberof Promise
+		 * @return {$$promise}
+		 * @memberof $q
 		 */
 		defer: function() {
-			return new _Promise();
+			return new $$promise();
 		}
-	}
-});
-Onix.factory("MyQuery", function() {
+	};
+}]);
+onix.factory("$$myQuery", function() {
 	/**
-	 * Parent: MyQuery; Cover function
+	 * Cover function
 	 * 
-	 * @class _MyQuery
+	 * @class $$myQuery
 	 * @param {String|NodeElement|Array} value
 	 * @param {NodeElement} [parent]
 	 * @return {Himself}
 	 */
-	var _MyQuery = function(value, parent) {
+	var $$myQuery = function(value, parent) {
 		this._els = [];
 		parent = parent || document;
 
@@ -572,9 +726,9 @@ Onix.factory("MyQuery", function() {
 	 * @private
 	 * @param  {Function} cb
 	 * @param  {Function} scope
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype._operation = function(cb, scope) {
+	$$myQuery.prototype._operation = function(cb, scope) {
 		// NodeList -> Array
 		if (!Array.isArray(this._els)) {
 			this._els = Array.prototype.slice.call(this._els);
@@ -591,9 +745,9 @@ Onix.factory("MyQuery", function() {
 	 * @private
 	 * @param  {String} newValue
 	 * @param  {String} attr
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype._setGetAll = function(newValue, attr) {
+	$$myQuery.prototype._setGetAll = function(newValue, attr) {
 		if (newValue) {
 			this._operation(function(item) {
 				item[attr] = newValue;
@@ -626,9 +780,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {Number} [ind]
 	 * @return {NodeElement|Null}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.getEl = function(ind) {
+	$$myQuery.prototype.getEl = function(ind) {
 		ind = ind || 0;
 
 		if (ind > this._els.length) {
@@ -646,9 +800,9 @@ Onix.factory("MyQuery", function() {
 	 * @param  {String} name 
 	 * @param  {String} [newValue]
 	 * @return {Himself|String|Array}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.attr = function(name, newValue) {
+	$$myQuery.prototype.attr = function(name, newValue) {
 		if (newValue) {
 			this._operation(function(item) {
 				item.setAttribute(name, newValue);
@@ -681,9 +835,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} [newValue]
 	 * @return {Himself|String}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.src = function(newValue) {
+	$$myQuery.prototype.src = function(newValue) {
 		return this._setGetAll(newValue, "src");
 	};
 
@@ -692,9 +846,9 @@ Onix.factory("MyQuery", function() {
 	 * 
 	 * @public
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.hide = function() {
+	$$myQuery.prototype.hide = function() {
 		this._operation(function(item) {
 			item.style.display = "none";
 		});
@@ -708,9 +862,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} [displayStyle]
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.show = function(displayStyle) {
+	$$myQuery.prototype.show = function(displayStyle) {
 		this._operation(function(item) {
 			item.style.display = displayStyle || "block";
 		});
@@ -724,9 +878,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} [newValue]
 	 * @return {Himself|String}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.val = function(newValue) {
+	$$myQuery.prototype.val = function(newValue) {
 		return this._setGetAll(newValue, "value");
 	};
 
@@ -736,9 +890,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} [newValue]
 	 * @return {Himself|String}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.html = function(newValue) {
+	$$myQuery.prototype.html = function(newValue) {
 		return this._setGetAll(newValue, "innerHTML");
 	};
 
@@ -749,9 +903,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {NodeElement} child
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.append = function(child) {
+	$$myQuery.prototype.append = function(child) {
 		this._operation(function(item) {
 			item.appendChild(child);
 		});
@@ -765,9 +919,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} className
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.addClass = function(className) {
+	$$myQuery.prototype.addClass = function(className) {
 		this._operation(function(item) {
 			item.classList.add(className);
 		});
@@ -781,9 +935,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} className
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.removeClass = function(className) {
+	$$myQuery.prototype.removeClass = function(className) {
 		this._operation(function(item) {
 			item.classList.remove(className);
 		});
@@ -797,9 +951,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {String} className
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.toggleClass = function(className) {
+	$$myQuery.prototype.toggleClass = function(className) {
 		this._operation(function(item) {
 			item.classList.toggle(className);
 		});
@@ -812,9 +966,9 @@ Onix.factory("MyQuery", function() {
 	 * 
 	 * @public
 	 * @return {Number}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.width = function() {
+	$$myQuery.prototype.width = function() {
 		var width = 0;
 
 		this._operation(function(item) {
@@ -829,9 +983,9 @@ Onix.factory("MyQuery", function() {
 	 * 
 	 * @public
 	 * @return {Number}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.height = function() {
+	$$myQuery.prototype.height = function() {
 		var height = 0;
 
 		this._operation(function(item) {
@@ -848,9 +1002,9 @@ Onix.factory("MyQuery", function() {
 	 * @param  {Function} cb
 	 * @param  {Function} scope
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.click = function(cb, scope) {
+	$$myQuery.prototype.click = function(cb, scope) {
 		this._operation(function(item) {
 			item.addEventListener("click", function(event) {
 				cb.apply(scope || cb, [event, item]);
@@ -867,9 +1021,9 @@ Onix.factory("MyQuery", function() {
 	 * @param  {Function} cb
 	 * @param  {Function} scope
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.change = function(cb, scope) {
+	$$myQuery.prototype.change = function(cb, scope) {
 		this._operation(function(item) {
 			item.addEventListener("change", function(event) {
 				cb.apply(scope || cb, [event, item]);
@@ -886,9 +1040,9 @@ Onix.factory("MyQuery", function() {
 	 * @param  {Function} cb
 	 * @param  {Function} scope
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.forEach = function(cb, scope) {
+	$$myQuery.prototype.forEach = function(cb, scope) {
 		this._operation(function(item, ind) {
 			cb.apply(scope || cb, [item, ind]);
 		});
@@ -901,9 +1055,9 @@ Onix.factory("MyQuery", function() {
 	 * 
 	 * @public
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.remove = function() {
+	$$myQuery.prototype.remove = function() {
 		this._operation(function(item) {
 			item.parentNode.removeChild(item);
 		});
@@ -917,9 +1071,9 @@ Onix.factory("MyQuery", function() {
 	 * @public
 	 * @param  {NodeElement} child
 	 * @return {Himself}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.prepend = function(child) {
+	$$myQuery.prototype.prepend = function(child) {
 		this._operation(function(item) {
 			item.parentNode.insertBefore(child, item);
 		});
@@ -932,14 +1086,21 @@ Onix.factory("MyQuery", function() {
 	 * 
 	 * @public
 	 * @return {Number}
-	 * @memberof _MyQuery
+	 * @memberof $$myQuery
 	 */
-	_MyQuery.prototype.len = function() {
+	$$myQuery.prototype.len = function() {
 		return this._els.length;
 	};
 
+	return $$myQuery;
+});
+onix.factory("$myQuery", [
+	"$$myQuery",
+function(
+	$$myQuery
+) {
 	/**
- 	 * @namespace MyQuery
+ 	 * @namespace $myQuery
  	 */
 	return {
 		 /**
@@ -948,20 +1109,20 @@ Onix.factory("MyQuery", function() {
 		 * @public
 		 * @param  {String|NodeElement|Array} value
 		 * @param {NodeElement} [parent]
-		 * @return {_MyQuery}
-		 * @memberof MyQuery
+		 * @return {$$myQuery}
+		 * @memberof $myQuery
 		 */
 		get: function(value, parent) {
-			return new _MyQuery(value, parent);
+			return new $$myQuery(value, parent);
 		}
 	};
-});
+}]);
 /**
- * @namespace DOM
+ * @namespace $dom
  */
-Onix.service("DOM", function() {
+onix.service("$dom", function() {
 	/**
-	 * Create DOM from the configuration.
+	 * Create $dom from the configuration.
 	 * config: {
 	 * 	el string: element name
 	 * 	attrs json: attributes
@@ -977,7 +1138,7 @@ Onix.service("DOM", function() {
 	 * @param  {Object} config
 	 * @param  {Object} [exported]
 	 * @return {NodeElement}
-	 * @memberof DOM
+	 * @memberof $dom
 	 */
 	this.create = function(config, exported) {
 		var el = document.createElement(config.el);
@@ -1037,7 +1198,7 @@ Onix.service("DOM", function() {
 	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
 	 * @param  {NodeElement} parent
 	 * @return {NodeElement}
-	 * @memberof DOM
+	 * @memberof $dom
 	 */
 	this.get = function(els, parent) {
 		var output;
@@ -1069,7 +1230,7 @@ Onix.service("DOM", function() {
 /**
  * @namespace $location
  */
-Onix.service("$location", function() {
+onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
 	
 	/**
@@ -1157,10 +1318,10 @@ Onix.service("$location", function() {
 	
 });
 /**
- * @namespace Router
+ * @namespace $route
  * @description DI: $location;
  */
-Onix.service("Router", [
+onix.service("$route", [
 	"$location",
 function(
 	$location
@@ -1170,7 +1331,7 @@ function(
 	 *
 	 * @private
 	 * @type {Array}
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this._routes = [];
 
@@ -1179,15 +1340,15 @@ function(
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this._otherwise = null;
 
 	/**
-	 * Router init.
+	 * $route init.
 	 *
 	 * @public
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this.init = function() {
 	};
@@ -1197,16 +1358,14 @@ function(
 	 *
 	 * @public
 	 * @param  {String} url 
-	 * @param  {String} page
-	 * @param  {Function} [fn]
+	 * @param  {Object} config
 	 * @return {Himself}
-	 * @memberof Router
+	 * @memberof $route
 	 */
-	this.route = function(url, page, fn) {
+	this.when = function(url, config) {
 		this._routes.push({
 			url: url,
-			page: page,
-			fn: fn
+			config: config
 		});
 
 		return this;
@@ -1217,35 +1376,33 @@ function(
 	 *
 	 * @public
 	 * @param  {String} page
-	 * @param  {Function} [fn]
+	 * @param  {Object} config
 	 * @return {Himself}
-	 * @memberof Router
+	 * @memberof $route
 	 */
-	this.otherwise = function(page, fn) {
+	this.otherwise = function(config) {
 		this._otherwise = {
-			page: page,
-			fn: fn
+			config: config
 		};
 
 		return this;
 	};
 
 	/**
-	 * Router GO.
+	 * $route GO.
 	 *
 	 * @public
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this.go = function() {
 		var path = $location.get();
 		var find = false;
-		var page = "";
+		var config = null;
 		var data = {};
 
 		this._routes.every(function(item) {
 			if (path.match(new RegExp(item.url))) {
-				page = item.page;
-				data = item.fn();
+				config = item.config;
 				find = true;
 				
 				return false;
@@ -1256,37 +1413,36 @@ function(
 		});
 
 		if (!find && this._otherwise) {
-			page = this._otherwise.page;
-			data = this._otherwise.fn();
+			config = this._otherwise.config;
 		}
 
-		if (page) {
-			var pageObj = Onix.getObject(page);
-
-			if (pageObj) {
-				pageObj._setConfig(data);
-				pageObj._init();
+		if (config) {
+			if (typeof config.controller === "string") {
+				var param = onix.getObject(config.controller);
+				onix.DI(param).run();
+			}
+			else if (Array.isArray(config.controller)) {
+				onix.DI(config.controller).run();
+			}
+			else if (typeof config.controller === "function") {
+				config.controller.apply(config.controller, []);
 			}
 		}
 	};
 }]);
-/**
- * @namespace Notify
- * @description DI: Promise;
- */
-Onix.service("Notify", [
-	"Promise",
+onix.factory("$$notify", [
+	"$q",
 function(
-	Promise
+	$q
 ) {
 	/**
 	 * Notification object
 	 *
-	 * @class _Notify
+	 * @class $$notify
 	 * @description Parent: Notify;
 	 * @param {NodeElement} el
 	 */
-	var _Notify = function(el) {
+	var $$notify = function(el) {
 		this._el = el;
 
 		this._HIDE_TIMEOUT = 1500; // [ms]
@@ -1304,9 +1460,9 @@ function(
 	 * Reset classess
 	 *
 	 * @public
-	 * @memberof _Notify
+	 * @memberof $$notify
 	 */
-	_Notify.prototype.reset = function() {
+	$$notify.prototype.reset = function() {
 		Object.keys(this._options).forEach(function(key) {
 			this._el.classList.remove(this._options[key]);
 		}.bind(this));
@@ -1319,9 +1475,9 @@ function(
 	 * 
 	 * @public
 	 * @param  {String} txt
-	 * @memberof _Notify
+	 * @memberof $$notify
 	 */
-	_Notify.prototype.ok = function(txt) {
+	$$notify.prototype.ok = function(txt) {
 		this._el.classList.add(this._options["ok"]);
 		this._el.innerHTML = txt;
 
@@ -1333,9 +1489,9 @@ function(
 	 * 
 	 * @public
 	 * @param  {String} txt      
-	 * @memberof _Notify
+	 * @memberof $$notify
 	 */
-	_Notify.prototype.error = function(txt) {
+	$$notify.prototype.error = function(txt) {
 		this._el.classList.add(this._options["error"]);
 		this._el.innerHTML = txt;
 
@@ -1347,9 +1503,9 @@ function(
 	 *
 	 * @public
 	 * @param  {String} txt      
-	 * @memberof _Notify
+	 * @memberof $$notify
 	 */
-	_Notify.prototype.info = function(txt) {
+	$$notify.prototype.info = function(txt) {
 		this._el.classList.add(this._options["info"]);
 		this._el.innerHTML = txt;
 
@@ -1360,11 +1516,11 @@ function(
 	 * Timeout hide.
 	 *
 	 * @public
-	 * @return {Promise}
-	 * @memberof _Notify
+	 * @return {$q}
+	 * @memberof $$notify
 	 */
-	_Notify.prototype.hide = function() {
-		var promise = Promise.defer();
+	$$notify.prototype.hide = function() {
+		var promise = $q.defer();
 
 		setTimeout(function() {
 			this.reset();
@@ -1375,26 +1531,37 @@ function(
 		return promise;
 	};
 
+	return $$notify;
+}]);
+/**
+ * @namespace $notify
+ * @description DI: $$notify;
+ */
+onix.service("$notify", [
+	"$$notify",
+function(
+	$$notify
+) {
 	/**
 	 * Main public access to the notify obj.
 	 *
 	 * @public
 	 * @param  {NodeElement} el
-	 * @return {_Notify}
-	 * @memberof Notify
+	 * @return {$$notify}
+	 * @memberof $notify
 	 */
 	this.get = function(el) {
-		return new _Notify(el);
+		return new $$notify(el);
 	};
 }]);
 /**
- * @namespace Common
- * @description DI: Promise;
+ * @namespace $common
+ * @description DI: $q;
  */
-Onix.service("Common", [
-	"Promise",
+onix.service("$common", [
+	"$q",
 function(
-	Promise
+	$q
 ) {
 	/**
 	 * Object copy, from source to dest
@@ -1402,7 +1569,7 @@ function(
 	 * @private
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
@@ -1444,7 +1611,7 @@ function(
 	 * @public
 	 * @param  {String} name
 	 * @return {String}     
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.getCookie = function(name) {
 		var cookieValue = null;
@@ -1471,11 +1638,11 @@ function(
 	 *
 	 * @public
 	 * @param  {String} txt
-	 * @return {Promise}
-	 * @memberof Common
+	 * @return {$q}
+	 * @memberof $common
 	 */
 	this.confirm = function(txt) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
 		if (confirm(txt)) {
 			promise.resolve();
@@ -1495,7 +1662,7 @@ function(
 	 * @param  {Object|Function|Array} a data | dependicies
 	 * @param  {Object|Function} [b] data | dependicies
 	 * @return {Object}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.create = function(mainObj, a, b) {
 		var args = [];
@@ -1506,7 +1673,7 @@ function(
 
 			// arguments
 			a.forEach(function(item) {
-				args.push(Onix.getObject(item));
+				args.push(onix.getObject(item));
 			});
 		}
 
@@ -1524,7 +1691,7 @@ function(
 	 *
 	 * @public
 	 * @return {Object}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.merge = function() {
 		var count = arguments.length;
@@ -1547,7 +1714,7 @@ function(
 	 * @public
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.extend = function(dest, source) {
 		dest = dest || {};
@@ -1562,7 +1729,7 @@ function(
 	 * @public
 	 * @param  {Function} cb
 	 * @return {Function}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.bindWithoutScope = function(cb) {
 		var bindArgs = Array.prototype.slice.call(arguments, 1);
@@ -1581,7 +1748,7 @@ function(
 	 * @param  {NodeArray} nodes
 	 * @param  {Function} cb
 	 * @param  {Object|Function}   scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
 		cb = cb || function() {};
@@ -1600,7 +1767,7 @@ function(
 	 * @param  {Array} arr 
 	 * @param {Function} cb
 	 * @param {Function} scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.reverseForEach = function (arr, cb, scope) {
 		arr = arr || [];
@@ -1617,7 +1784,7 @@ function(
 	 * @public
 	 * @param  {String} hex
 	 * @return {Number}    
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.hxToDe = function(hex) {
 		hex = hex.toLowerCase();
@@ -1646,7 +1813,7 @@ function(
 	 * @public
 	 * @param  {String} hexColor
 	 * @return {Object}         
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.hexToRGB = function(hexColor) {
 		if (hexColor[0] == "#") {
@@ -1679,7 +1846,7 @@ function(
 	 * @param  {Boolean} expr  test if (EXPR)
 	 * @param  {Function} fn
 	 * @param  {Function} scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.ift = function(expr, th, scope) {
 		if (expr) {
@@ -1687,18 +1854,14 @@ function(
 		}
 	};
 }]);
-/**
- * @namespace Events
- * @description DI: Common; Returns interface _Events;
- */
-Onix.factory("Events", [
-	"Common",
+onix.factory("$event", [
+	"$common",
 function(
-	Common
+	$common
 ) {
 	/**
- 	 * @interface _Events
- 	 * @description Parent: Events;
+ 	 * @interface $event
+ 	 * @description DI: Common;
  	 */
 	return {
 		/**
@@ -1706,7 +1869,7 @@ function(
 		 * 
 		 * @private
 		 * @type {Array}
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		_allEvents: [],
 
@@ -1716,7 +1879,7 @@ function(
 		 * @private
 		 * @param  {String} name 
 		 * @return {Array}
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		_getEvents: function (name) {
 			var events = [];
@@ -1740,7 +1903,7 @@ function(
 		 * @param  {String}   name 
 		 * @param  {Function} fn   
 		 * @param  {Object|Function}   scope
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		on: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -1756,12 +1919,12 @@ function(
 		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		off: function (name, fn) {
 			var events = this._getEvents(name);
 
-			Common.reverseForEach(events, function(item) {
+			$common.reverseForEach(events, function(item) {
 				if (!fn || fn && item.fn == fn) {
 					this._allEvents.splice(item.pos, 1);
 				}
@@ -1775,7 +1938,7 @@ function(
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
 		 * @param  {Object|Function}   scope
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		once: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -1791,7 +1954,7 @@ function(
 		 * 
 		 * @public
 		 * @param  {String} name
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		trigger: function (name) {
 			var events = this._getEvents(name);
@@ -1810,29 +1973,29 @@ function(
 				}
 			}, this);
 
-			Common.reverseForEach(onceArray, function(pos) {
+			$common.reverseForEach(onceArray, function(pos) {
 				this._allEvents.splice(pos, 1);
 			}, this);
 		}
 	};
 }]);
 /**
- * @namespace Loader
- * @description DI: DOM;
+ * @namespace $loader
+ * @description DI: $dom;
  */
-Onix.service("Loader", [
-	"DOM",
+onix.service("$loader", [
+	"$dom",
 function(
-	DOM
+	$dom
 ) {
 	/**
-	 * Create Loader.
+	 * Create $loader.
 	 *
 	 * @private
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this._create = function() {
-		this._el = DOM.create({
+		this._el = $dom.create({
 			el: "div",
 			"class": "loader"
 		});
@@ -1842,10 +2005,10 @@ function(
 	};
 	
 	/**
-	 * Loader init.
+	 * $loader init.
 	 *
 	 * @public
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this.init = function() {
 		this._create();
@@ -1855,7 +2018,7 @@ function(
 	 * Start loader.
 	 *
 	 * @public
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this.start = function() {
 		this._el.classList.add("start");
@@ -1865,7 +2028,7 @@ function(
 	 * End loader.
 	 *
 	 * @public
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this.end = function() {
 		this._el.classList.remove("start");
@@ -1882,13 +2045,13 @@ function(
 	};
 }]);
 /**
- * @namespace Http
- * @description DI: Promise;
+ * @namespace $http
+ * @description DI: $q;
  */
-Onix.service("Http", [
-	"Promise",
+onix.service("$http", [
+	"$q",
 function(
-	Promise
+	$q
 ) {
 	/**
 	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
@@ -1897,7 +2060,7 @@ function(
 	 * @private
 	 * @param  {Object|Array} data { name, value }
 	 * @return {FormData}
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this._preparePostData = function(data) {
 		var formData = new FormData();
@@ -1925,7 +2088,7 @@ function(
 	 * @param  {String} url
 	 * @param  {Array} data { name, value }
 	 * @return {String}    
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this._updateURL = function(url, data) {
 		if (data) {
@@ -1948,7 +2111,7 @@ function(
 	 *
 	 * @public
 	 * @const
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this.POST_TYPES = {
 		JSON: 1,
@@ -1960,7 +2123,7 @@ function(
 	 *
 	 * @public
 	 * @const
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this.METHOD = {
 		POST: "POST",
@@ -1974,11 +2137,11 @@ function(
 	 *
 	 * @public
 	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
-	 * @return {Promise}
-	 * @memberof Http
+	 * @return {$q}
+	 * @memberof $http
 	 */
 	this.createRequest = function(config) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 		var request = new XMLHttpRequest();
 
 		config = config || {};
@@ -2055,22 +2218,22 @@ function(
 	};
 }]);
 /**
- * @namespace i18n
- * @description DI: Http, Promise;
+ * @namespace $i18n
+ * @description DI: $http, $q;
  */
-Onix.service("i18n", [
-	"Http",
-	"Promise",
+onix.service("$i18n", [
+	"$http",
+	"$q",
 function(
-	Http,
-	Promise
+	$http,
+	$q
 ) {
 	/**
 	 * All langs data.
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this._langs = {};
 
@@ -2079,7 +2242,7 @@ function(
 	 *
 	 * @private
 	 * @type {String}
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this._currentLang = "";
 
@@ -2089,7 +2252,7 @@ function(
 	 * @public
 	 * @param {String} lang Language key
 	 * @param {Object} data
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this.addLanguage = function(lang, data) {
 		this._langs[lang] = data;
@@ -2100,7 +2263,7 @@ function(
 	 *
 	 * @public
 	 * @param {String} lang Language key
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this.setLanguage = function(lang) {
 		this._currentLang = lang;
@@ -2147,13 +2310,13 @@ function(
 	 * @public
 	 * @param  {String} lang Language key
 	 * @param  {String} url  Path to the file
-	 * @return {Promise}
-	 * @memberof i18n
+	 * @return {$q}
+	 * @memberof $i18n
 	 */
 	this.loadLanguage = function(lang, url) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
-		Http.createRequest({
+		$http.createRequest({
 			url: url
 		}).then(function(data) {
 			this.addLanguage(lang, data.data);
@@ -2166,33 +2329,26 @@ function(
 	};
 }]);
 /**
- * @namespace Templates
- * @description DI: Common, Promise, Http;
+ * @namespace $template
+ * @description DI: $common, $q, $http;
  */
-Onix.service("Templates", [
-	"Common",
-	"Promise",
-	"Http",
+onix.service("$template", [
+	"$common",
+	"$q",
+	"$http",
+	"$config",
 function(
-	Common,
-	Promise,
-	Http
+	$common,
+	$q,
+	$http,
+	$config
 ) {
-	/**
-	 * Array with templates for preload before applications starts.
-	 *
-	 * @private
-	 * @type {Array}
-	 * @memberof Templates
-	 */
-	this._preloads = [];
-	
 	/**
 	 * Template cache.
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._cache = {};
 
@@ -2201,7 +2357,7 @@ function(
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._RE = {
 		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
@@ -2217,7 +2373,7 @@ function(
 	 * @private
 	 * @param  {String} value
 	 * @return {String}      
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._parseFnName = function(value) {
 		value = value || "";
@@ -2232,7 +2388,7 @@ function(
 	 * @param  {String} value
 	 * @param  {Object} config { event, element... }
 	 * @return {Array}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._parseArgs = function(value, config) {
 		argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
@@ -2292,31 +2448,12 @@ function(
 	 * Init - get all templates from the page.
 	 *
 	 * @public
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.init = function() {
-		var promise = Promise.defer();
-
-		Onix.element("script[type='text/template']").forEach(function(item) {
+		onix.element("script[type='text/template']").forEach(function(item) {
 			this.add(item.id, item.innerHTML);
 		}, this);
-
-		if (this._preloads.length) {
-			var all = [];
-
-			this._preloads.forEach(function(item) {
-				all.push(this.load(item.key, item.path));
-			}, this);
-
-			Promise.all(all)["finally"](function() {
-				promise.resolve();
-			});
-		}
-		else {
-			promise.resolve();
-		}
-
-		return promise;
 	};
 	
 	/**
@@ -2325,7 +2462,7 @@ function(
 	 * @public
 	 * @param {String} key 
 	 * @param {String} data
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.add = function(key, data) {
 		this._cache[key] = data;
@@ -2338,11 +2475,11 @@ function(
 	 * @param  {String} key  Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
-		var cnf = Onix.config("TMPL_DELIMITER");
+		var cnf = $config.TMPL_DELIMITER;
 
 		if (data) {
 			Object.keys(data).forEach(function(key) {
@@ -2359,7 +2496,7 @@ function(
 	 * @public
 	 * @param  {String} key Template key/name
 	 * @return {String}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.get = function(key) {
 		return this._cache[key] || "";
@@ -2372,10 +2509,10 @@ function(
 	 * @public
 	 * @param  {NodeElement} root
 	 * @param  {Object|Function} scope
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.bindTemplate = function(root, scope) {
-		var allElements = Onix.element("*[data-click], *[data-change], *[data-bind]", root);
+		var allElements = onix.element("*[data-click], *[data-change], *[data-bind]", root);
 
 		if (allElements.len()) {
 			var newEls = {};
@@ -2386,7 +2523,7 @@ function(
 				var dataBind = item.getAttribute("data-bind");
 
 				if (dataClick && this._parseFnName(dataClick) in scope) {
-					item.addEventListener("click", Common.bindWithoutScope(function(event, templScope) {
+					item.addEventListener("click", $common.bindWithoutScope(function(event, templScope) {
 						var value = this.getAttribute("data-click");
 						var fnName = templScope._parseFnName(value);
 						var args = templScope._parseArgs(value, {
@@ -2399,7 +2536,7 @@ function(
 				}
 
 				if (dataChange && this._parseFnName(dataChange) in scope) {
-					item.addEventListener("change", Common.bindWithoutScope(function(event, templScope) {
+					item.addEventListener("change", $common.bindWithoutScope(function(event, templScope) {
 						var value = this.getAttribute("data-change");
 						var fnName = templScope._parseFnName(value);
 						var args = templScope._parseArgs(value, {
@@ -2423,33 +2560,18 @@ function(
 	};
 
 	/**
-	 * Add template for preload.
-	 *
-	 * @public
-	 * @param  {String} key 
-	 * @param  {String} path
-	 * @memberof Templates
-	 */
-	this.preload = function(key, path) {
-		this._preloads.push({
-			key: key,
-			path: path
-		});
-	};
-
-	/**
 	 * Load template from the path.
 	 *
 	 * @public
 	 * @param  {String} key
 	 * @param  {String} path
-	 * @return {Promise}
-	 * @memberof Templates
+	 * @return {$q}
+	 * @memberof $template
 	 */
 	this.load = function(key, path) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
-		Http.createRequest({
+		$http.createRequest({
 			url: path
 		}).then(function(data) {
 			this.add(key, data.data);
@@ -2462,26 +2584,26 @@ function(
 		return promise;
 	};
 }]);
-Onix.factory("Page", [
-	"DOM",
-	"Templates",
-	"Common",
+onix.factory("$$page", [
+	"$dom",
+	"$template",
+	"$config",
 function(
-	DOM,
-	Templates,
-	Common
+	$dom,
+	$template,
+	$config
 ) {
 	/**
-	 * @interface _Page
-	 * @description Parent: Page;
+	 * @interface $$page
+	 * @description DI: $dom, $template, $config;
 	 */
-	var _Page = {
+	return {
 		/**
 		 * Set config.
 		 *
 		 * @private
 		 * @param {Object} config
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		_setConfig: function(config) {
 			this._config = config;
@@ -2491,20 +2613,20 @@ function(
 		 * Init page - called from App; runs _afterInit
 		 * 
 		 * @private
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		_init: function() {
 			var config = this._getConfig();
 			this._els = {};
 
 			// each page contanins only one detail div
-			var rootEl = DOM.get(Onix.config("DETAIL_SEL"));
+			var rootEl = $dom.get($config.DETAIL_SEL);
 
 			if (config.els) {
-				this._els = DOM.get(config.els, rootEl);
+				this._els = $dom.get(config.els, rootEl);
 			}
 
-			Templates.bindTemplate(rootEl, this);
+			$template.bindTemplate(rootEl, this);
 
 			this._afterInit();
 		},
@@ -2515,7 +2637,7 @@ function(
 		 * @private
 		 * @param  {String} name
 		 * @return {NodeElemetn}     
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		_getEl: function(name) {
 			return this._els[name];
@@ -2526,7 +2648,7 @@ function(
 		 *
 		 * @private
 		 * @return {Object}
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		_getConfig: function() {
 			return this._config || {};
@@ -2537,7 +2659,7 @@ function(
 		 *
 		 * @private
 		 * @return {Object}
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		_getPageData: function() {
 			return this._config && this._config.js_data ? this._config.js_data : {};
@@ -2548,18 +2670,18 @@ function(
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		_afterInit: function() {
 
 		},
 
 		/**
-		 * Add new els to this._els; this function can be called from Templates
+		 * Add new els to this._els; this function can be called from $template
 		 *
 		 * @public
 		 * @param {Object} newEls
-		 * @memberof _Page
+		 * @memberof $$page
 		 */
 		addEls: function(newEls) {
 			newEls = newEls || {};
@@ -2569,10 +2691,17 @@ function(
 			}, this);
 		}
 	};
-
+}]);
+onix.factory("$page", [
+	"$$page",
+	"$common",
+function(
+	$$page,
+	$common
+) {
 	/**
- 	 * @namespace Page
- 	 * @description DI: DOM, Templates, Common;
+ 	 * @namespace $page
+ 	 * @description DI: $$page, $common;
  	 */
 	return {
 		/**
@@ -2581,32 +2710,29 @@ function(
 		 * @public
 		 * @param  {Object|Function} a page data | dependicies
 		 * @param  {Object|Function} [b] page data | dependicies
-		 * @return {_Page}
-		 * @memberof Page
+		 * @return {$$page}
+		 * @memberof $page
 		 */
 		create: function(a, b) {
-			return Common.create(_Page, a, b);
+			return $common.create($$page, a, b);
 		}
 	};
 }]);
-Onix.factory("Snippet", [
-	"Templates",
-	"Common",
+onix.factory("$$snippet", [
+	"$templates",
 function(
-	Templates,
-	Common
+	$templates
 ) {
 	/**
-	 * @interface _Snippet
-	 * @description Parent: Snippet;
+	 * @interface $$snippet
 	 */
-	var _Snippet = {
+	return {
 		/**
 		 * Get snippet config.
 		 *
 		 * @private
 		 * @return {Object}
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_getConfig: function() {
 			return this._config;
@@ -2618,7 +2744,7 @@ function(
 		 * @private
 		 * @param  {String} name
 		 * @return {NodeElement}
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_getEl: function(name) {
 			return this._els[name];
@@ -2629,7 +2755,7 @@ function(
 		 *
 		 * @private
 		 * @return {NodeElement}
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_getParent: function() {
 			return this._parent;
@@ -2640,7 +2766,7 @@ function(
 		 *
 		 * @private
 		 * @param  {Object} config
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_create: function(config) {
 			return null;
@@ -2651,7 +2777,7 @@ function(
 		 *
 		 * @private
 		 * @param {String} name
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_setName: function(name) {
 			this._name = name;
@@ -2662,7 +2788,7 @@ function(
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_setup: function() {
 
@@ -2673,7 +2799,7 @@ function(
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_activate: function() {
 
@@ -2684,7 +2810,7 @@ function(
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		_deactivate: function() {
 
@@ -2697,7 +2823,7 @@ function(
 		 * @param  {Object} config
 		 * @param  {Object} parent parent page
 		 * @return {NodeElement} root el
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		init: function(config, parent) {
 			this._config = config || {};
@@ -2710,11 +2836,11 @@ function(
 		},
 
 		/**
-		 * Add new els to this._els; this function can be called from Templates
+		 * Add new els to this._els; this function can be called from $templates
 		 *
 		 * @public
 		 * @param {Object} newEls { key, value - node element}
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		addEls: function(newEls) {
 			newEls = newEls || {};
@@ -2728,10 +2854,10 @@ function(
 		 * Setup snippet - is called after init. Runs _setup()
 		 *
 		 * @public
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		setup: function() {
-			Templates.bindTemplate(this._root, this);
+			$templates.bindTemplate(this._root, this);
 			
 			this._setup();
 		},
@@ -2740,7 +2866,7 @@ function(
 		 * Activate snippet - run _activate()
 		 *
 		 * @public
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		activate: function() {
 			this._activate();
@@ -2750,7 +2876,7 @@ function(
 		 * Deactivate snippet - run _deactivate()
 		 *
 		 * @public
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		deactivate: function() {
 			this._deactivate();
@@ -2761,16 +2887,23 @@ function(
 		 *
 		 * @public
 		 * @return {String}
-		 * @memberof _Snippet
+		 * @memberof $$snippet
 		 */
 		getName: function() {
 			return this._name;
 		}
 	};
-
+}]);
+onix.factory("$snippet", [
+	"$$snippet",
+	"$common",
+function(
+	$$snippet,
+	$common
+) {
 	/**
- 	 * @namespace Snippet
- 	 * @description DI: Templates, Common;
+ 	 * @namespace $snippet
+ 	 * @description DI: $$snippet, $common;
  	 */
 	return {
 		/**
@@ -2779,35 +2912,35 @@ function(
 		 * @public
 		 * @param  {Object|Function} a snippet data | dependicies
 		 * @param  {Object|Function} [b] snippet data | dependicies
-		 * @return {_Snippet}
-		 * @memberof Snippet
+		 * @return {$$snippet}
+		 * @memberof $snippet
 		 */
 		create: function(a, b) {
-			return Common.create(_Snippet, a, b);
+			return $common.create($$snippet, a, b);
 		}
 	};
 }]);
 /**
- * @namespace Select
- * @description DI: Common, Events; Returns class _Select;
+ * @namespace $select
+ * @description DI: $common, $event;
  */
-Onix.factory("Select", [
-	"Common",
-	"Events",
+onix.factory("$select", [
+	"$common",
+	"$event",
 function(
-	Common,
-	Events
+	$common,
+	$event
 ) {
 	/**
 	 * Main class
 	 *
-	 * @class _Select
+	 * @class $select
 	 * @description Parent: Select;
 	 * @param {NodeElement} el Where element has class "dropdown"
 	 */
-	var _Select = function(el) {
+	var $select = function(el) {
 		// extend our class
-		Common.extend(this, Events);
+		$common.extend(this, $event);
 
 		this._CONST = {
 			CAPTION_SEL: ".dropdown-toggle",
@@ -2827,9 +2960,9 @@ function(
 	 *
 	 * @private
 	 * @param {NodeElement} el Where element has class "dropdown"
-	 * @memberof _Select
+	 * @memberof $select
 	 */
-	_Select.prototype._bind = function(el) {
+	$select.prototype._bind = function(el) {
 		var captionEl = el.querySelector(this._CONST.CAPTION_SEL);
 		var con = this._CONST;
 
@@ -2841,7 +2974,7 @@ function(
 
 			var removeAllOpened = function() {
 				// remove all
-				Onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+				onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
 					item.classList.remove("open");
 				});
 			};
@@ -2863,8 +2996,8 @@ function(
 			}
 		});
 
-		Onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
-			option.addEventListener("click", Common.bindWithoutScope(function(e, scope) {
+		onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
+			option.addEventListener("click", $common.bindWithoutScope(function(e, scope) {
 				e.stopPropagation();
 
 				if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
@@ -2884,5 +3017,5 @@ function(
 		}, this);
 	};
 
-	return _Select;
+	return $select;
 }]);

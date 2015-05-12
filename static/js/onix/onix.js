@@ -368,12 +368,15 @@ onix = (function() {
 		 *
 		 * @private
 		 * @param  {Function|Array} param
+		 * @param  {Object} [replace]
 		 * @return {Object}
 		 * @memberof onix
 		 */
-		DI: function(param) {
+		DI: function(param, replace) {
 			var fn;
 			var args = [];
+
+			replace = replace || {};
 
 			if (Array.isArray(param)) {
 				param.every(function(item) {
@@ -382,7 +385,7 @@ onix = (function() {
 						return false;
 					}
 					else {
-						args.push(this._objects[item]);
+						args.push(item in replace ? replace[item] : this._objects[item]);
 					}
 
 					return true;

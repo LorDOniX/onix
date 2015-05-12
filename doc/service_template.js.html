@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: service/template.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: service/template.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @namespace $template
+ * @description DI: $common, $q, $http;
+ */
+onix.service("$template", [
+	"$common",
+	"$q",
+	"$http",
+	"$config",
+function(
+	$common,
+	$q,
+	$http,
+	$config
+) {
+	/**
+	 * Template cache.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $template
+	 */
+	this._cache = {};
+
+	/**
+	 * Regular expressions
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $template
+	 */
+	this._RE = {
+		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
+		NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
+		STRINGS: /["'][^"']+["']/g,
+		JSONS: /[{][^}]+[}]/g,
+		ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+	};
+
+	/**
+	 * Parse a function name from the string.
+	 *
+	 * @private
+	 * @param  {String} value
+	 * @return {String}      
+	 * @memberof $template
+	 */
+	this._parseFnName = function(value) {
+		value = value || "";
+
+		return value.match(/[a-zA-Z0-9_]+/)[0];
+	};
+
+	/**
+	 * Parse arguments from the string -> makes array from them
+	 *
+	 * @private
+	 * @param  {String} value
+	 * @param  {Object} config { event, element... }
+	 * @return {Array}
+	 * @memberof $template
+	 */
+	this._parseArgs = function(value, config) {
+		argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
+
+		var args = [];
+		var matches = argsValue.match(this._RE.ALL);
+		
+		if (matches) {
+			var all = [];
+
+			matches.forEach(function(item) {
+				var value;
+
+				if (item.match(this._RE.STRINGS)) {
+					value = item.substr(1, item.length - 2)
+				}
+				else if (item.match(this._RE.NUMBERS)) {
+					value = parseFloat(item);
+				}
+				else if (item.match(this._RE.JSONS)) {
+					value = JSON.parse(item);
+				}
+				else if (item.match(this._RE.VARIABLE)) {
+					var variable = item.match(this._RE.VARIABLE)[0];
+
+					if (variable == "$event") {
+						value = config.event;
+					}
+					else if (variable == "$element") {
+						value = config.el;
+					}
+					else {
+						// todo - maybe eval with scope
+						value = null;
+					}
+				}
+
+				all.push({
+					value: value,
+					pos: argsValue.indexOf(item)
+				});
+			}, this);
+
+			if (all.length) {
+				all.sort(function(a, b) {
+					return a.pos - b.pos
+				}).forEach(function(item) {
+					args.push(item.value);
+				});
+			}
+		}
+
+		return args;
+	};
+
+	/**
+	 * Init - get all templates from the page.
+	 *
+	 * @public
+	 * @memberof $template
+	 */
+	this.init = function() {
+		onix.element("script[type='text/template']").forEach(function(item) {
+			this.add(item.id, item.innerHTML);
+		}, this);
+	};
+	
+	/**
+	 * Add new item to the cachce
+	 *
+	 * @public
+	 * @param {String} key 
+	 * @param {String} data
+	 * @memberof $template
+	 */
+	this.add = function(key, data) {
+		this._cache[key] = data;
+	};
+
+	/**
+	 * Compile one template - replaces all ocurances of {} by model
+	 *
+	 * @public
+	 * @param  {String} key  Template key/name
+	 * @param  {Object} data Model
+	 * @return {String}
+	 * @memberof $template
+	 */
+	this.compile = function(key, data) {
+		var tmpl = this.get(key);
+		var cnf = $config.TMPL_DELIMITER;
+
+		if (data) {
+			Object.keys(data).forEach(function(key) {
+				tmpl = tmpl.replace(new RegExp(cnf.LEFT + "[ ]*" + key + "[ ]*" + cnf.RIGHT, "g"), data[key]);
+			});
+		}
+
+		return tmpl;
+	};
+
+	/**
+	 * Get template from the cache
+	 *
+	 * @public
+	 * @param  {String} key Template key/name
+	 * @return {String}
+	 * @memberof $template
+	 */
+	this.get = function(key) {
+		return this._cache[key] || "";
+	};
+
+	/**
+	 * Bind all elements in the root element.
+	 * Supports: click, change, bind
+	 *
+	 * @public
+	 * @param  {NodeElement} root
+	 * @param  {Object|Function} scope
+	 * @memberof $template
+	 */
+	this.bindTemplate = function(root, scope) {
+		var allElements = onix.element("*[data-click], *[data-change], *[data-bind]", root);
+
+		if (allElements.len()) {
+			var newEls = {};
+
+			allElements.forEach(function(item) {
+				var dataClick = item.getAttribute("data-click");
+				var dataChange = item.getAttribute("data-change");
+				var dataBind = item.getAttribute("data-bind");
+
+				if (dataClick &amp;&amp; this._parseFnName(dataClick) in scope) {
+					item.addEventListener("click", $common.bindWithoutScope(function(event, templScope) {
+						var value = this.getAttribute("data-click");
+						var fnName = templScope._parseFnName(value);
+						var args = templScope._parseArgs(value, {
+							el: this,
+							event: event
+						});
+
+						scope[fnName].apply(scope, args);
+					}, this));
+				}
+
+				if (dataChange &amp;&amp; this._parseFnName(dataChange) in scope) {
+					item.addEventListener("change", $common.bindWithoutScope(function(event, templScope) {
+						var value = this.getAttribute("data-change");
+						var fnName = templScope._parseFnName(value);
+						var args = templScope._parseArgs(value, {
+							el: this,
+							event: event
+						});
+
+						scope[fnName].apply(scope, args);
+					}, this));
+				}
+
+				if (dataBind) {
+					newEls[dataBind] = item;
+				}
+			}, this);
+
+			if ("addEls" in scope &amp;&amp; typeof scope.addEls === "function") {
+				scope.addEls(newEls);
+			}
+		}
+	};
+
+	/**
+	 * Load template from the path.
+	 *
+	 * @public
+	 * @param  {String} key
+	 * @param  {String} path
+	 * @return {$q}
+	 * @memberof $template
+	 */
+	this.load = function(key, path) {
+		var promise = $q.defer();
+
+		$http.createRequest({
+			url: path
+		}).then(function(data) {
+			this.add(key, data.data);
+
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.reject();
+		});
+
+		return promise;
+	};
+}]);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="$select.html">$select</a></li></ul><h3>Namespaces</h3><ul><li><a href="$common.html">$common</a></li><li><a href="$dom.html">$dom</a></li><li><a href="$http.html">$http</a></li><li><a href="$i18n.html">$i18n</a></li><li><a href="$loader.html">$loader</a></li><li><a href="$location.html">$location</a></li><li><a href="$myQuery.html">$myQuery</a></li><li><a href="$notify.html">$notify</a></li><li><a href="$page.html">$page</a></li><li><a href="$q.html">$q</a></li><li><a href="$route.html">$route</a></li><li><a href="$snippet.html">$snippet</a></li><li><a href="$template.html">$template</a></li><li><a href="CONFIG.html">CONFIG</a></li><li><a href="onix.html">onix</a></li></ul><h3>Interfaces</h3><ul><li><a href="$event.html">$event</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_">_</a></li><li><a href="global.html#newRun">newRun</a></li><li><a href="global.html#run">run</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Tue May 12 2015 15:01:37 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

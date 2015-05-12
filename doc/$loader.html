@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: $location</title>
+    <title>JSDoc: Namespace: $loader</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Namespace: $location</h1>
+    <h1 class="page-title">Namespace: $loader</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        $location
+        $loader
         </h2>
         
     
@@ -38,6 +38,8 @@
 <article>
     <div class="container-overview">
     
+        
+            <div class="description">DI: $dom;</div>
         
 
         
@@ -72,7 +74,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_location.js.html">service/location.js</a>, <a href="service_location.js.html#line1">line 1</a>
+        <a href="service_loader.js.html">service/loader.js</a>, <a href="service_loader.js.html#line1">line 1</a>
     </li></ul></dd>
     
 
@@ -108,163 +110,14 @@
 
     
 
-    <h4 class="name" id=".this.createSearchURL"><span class="type-signature">(static) </span>this.createSearchURL<span class="signature">(obj)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id=".this._create"><span class="type-signature">(private, static) </span>this._create<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Create a new search url.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>obj</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_location.js.html">service/location.js</a>, <a href="service_location.js.html#line25">line 25</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".this.get"><span class="type-signature">(static) </span>this.get<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-
-    
-
-
-
-<div class="description">
-    Get current location
+    Create $loader.
 </div>
 
 
@@ -308,7 +161,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_location.js.html">service/location.js</a>, <a href="service_location.js.html#line86">line 86</a>
+        <a href="service_loader.js.html">service/loader.js</a>, <a href="service_loader.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -331,24 +184,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -357,14 +192,14 @@
 
     
 
-    <h4 class="name" id=".this.refresh"><span class="type-signature">(static) </span>this.refresh<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".this.end"><span class="type-signature">(static) </span>this.end<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Page refresh.
+    End loader.
 </div>
 
 
@@ -408,7 +243,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_location.js.html">service/location.js</a>, <a href="service_location.js.html#line13">line 13</a>
+        <a href="service_loader.js.html">service/loader.js</a>, <a href="service_loader.js.html#line52">line 52</a>
     </li></ul></dd>
     
 
@@ -439,14 +274,14 @@
 
     
 
-    <h4 class="name" id=".this.search"><span class="type-signature">(static) </span>this.search<span class="signature">(obj<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Null|Object}</span></h4>
+    <h4 class="name" id=".this.init"><span class="type-signature">(static) </span>this.init<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url
+    $loader init.
 </div>
 
 
@@ -455,67 +290,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>obj</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -551,7 +325,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="service_location.js.html">service/location.js</a>, <a href="service_location.js.html#line51">line 51</a>
+        <a href="service_loader.js.html">service/loader.js</a>, <a href="service_loader.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -574,27 +348,88 @@
 
 
 
-<h5>Returns:</h5>
+
+
 
         
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Null</span>
-|
-
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
+            
 
     
+
+    <h4 class="name" id=".this.start"><span class="type-signature">(static) </span>this.start<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Start loader.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="service_loader.js.html">service/loader.js</a>, <a href="service_loader.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
