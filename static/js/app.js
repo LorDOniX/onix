@@ -5,35 +5,37 @@ testApp.config(function() {
 });
 
 testApp.run([
-	"Router",
-	"Templates",
-	"CONFIG",
-	"Promise",
-	"i18n",
+	"$route",
+	"$template",
+	"$config",
+	"$q",
+	"$i18n",
 function(
-	Router,
-	Templates,
-	CONFIG,
-	Promise,
-	i18n
+	$route,
+	$template,
+	$config,
+	$q,
+	$i18n
 ) {
 	// application routes
-	Router
-		.route("/", "HomePage", function() {
-			return {
-				PAGE_CONFIG: {
-					a: 5
-				}
+	$route
+		.when("/", {
+			controller: "HomePage",
+			templateUrl: "/js/home/test-templ.html",
+			data: {
+				a: 5
 			}
 		})
-		.otherwise("HomePage");
+		.otherwise({
+			controller: "HomePage"
+		});
 
 	// all dependencies before start
-	Promise.all([
-		Templates.load("testTempl", "/js/home/test-templ.html"),
-		i18n.loadLanguage(CONFIG.LOCALIZATION.LANG, CONFIG.LOCALIZATION.PATH)
+	$q.all([
+		$template.load("testTempl", "/js/home/test-templ.html"),
+		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
 	]).done(function() {
-		// router go
-		Router.go();
+		// route go
+		$route.go();
 	});
 }]);

@@ -1,9 +1,9 @@
 /**
- * @namespace DOM
+ * @namespace $dom
  */
-onix.service("DOM", function() {
+onix.service("$dom", function() {
 	/**
-	 * Create DOM from the configuration.
+	 * Create $dom from the configuration.
 	 * config: {
 	 * 	el string: element name
 	 * 	attrs json: attributes
@@ -19,7 +19,7 @@ onix.service("DOM", function() {
 	 * @param  {Object} config
 	 * @param  {Object} [exported]
 	 * @return {NodeElement}
-	 * @memberof DOM
+	 * @memberof $dom
 	 */
 	this.create = function(config, exported) {
 		var el = document.createElement(config.el);
@@ -79,7 +79,7 @@ onix.service("DOM", function() {
 	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
 	 * @param  {NodeElement} parent
 	 * @return {NodeElement}
-	 * @memberof DOM
+	 * @memberof $dom
 	 */
 	this.get = function(els, parent) {
 		var output;

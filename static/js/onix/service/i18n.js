@@ -1,20 +1,20 @@
 /**
- * @namespace i18n
- * @description DI: Http, Promise;
+ * @namespace $i18n
+ * @description DI: $http, $q;
  */
-onix.service("i18n", [
-	"Http",
-	"Promise",
+onix.service("$i18n", [
+	"$http",
+	"$q",
 function(
-	Http,
-	Promise
+	$http,
+	$q
 ) {
 	/**
 	 * All langs data.
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this._langs = {};
 
@@ -23,7 +23,7 @@ function(
 	 *
 	 * @private
 	 * @type {String}
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this._currentLang = "";
 
@@ -33,7 +33,7 @@ function(
 	 * @public
 	 * @param {String} lang Language key
 	 * @param {Object} data
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this.addLanguage = function(lang, data) {
 		this._langs[lang] = data;
@@ -44,7 +44,7 @@ function(
 	 *
 	 * @public
 	 * @param {String} lang Language key
-	 * @memberof i18n
+	 * @memberof $i18n
 	 */
 	this.setLanguage = function(lang) {
 		this._currentLang = lang;
@@ -91,13 +91,13 @@ function(
 	 * @public
 	 * @param  {String} lang Language key
 	 * @param  {String} url  Path to the file
-	 * @return {Promise}
-	 * @memberof i18n
+	 * @return {$q}
+	 * @memberof $i18n
 	 */
 	this.loadLanguage = function(lang, url) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
-		Http.createRequest({
+		$http.createRequest({
 			url: url
 		}).then(function(data) {
 			this.addLanguage(lang, data.data);

@@ -1,24 +1,24 @@
 /**
- * @namespace Templates
- * @description DI: Common, Promise, Http;
+ * @namespace $template
+ * @description DI: $common, $q, $http;
  */
-onix.service("Templates", [
-	"Common",
-	"Promise",
-	"Http",
-	"CONFIG",
+onix.service("$template", [
+	"$common",
+	"$q",
+	"$http",
+	"$config",
 function(
-	Common,
-	Promise,
-	Http,
-	CONFIG
+	$common,
+	$q,
+	$http,
+	$config
 ) {
 	/**
 	 * Template cache.
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._cache = {};
 
@@ -27,7 +27,7 @@ function(
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._RE = {
 		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
@@ -43,7 +43,7 @@ function(
 	 * @private
 	 * @param  {String} value
 	 * @return {String}      
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._parseFnName = function(value) {
 		value = value || "";
@@ -58,7 +58,7 @@ function(
 	 * @param  {String} value
 	 * @param  {Object} config { event, element... }
 	 * @return {Array}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this._parseArgs = function(value, config) {
 		argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
@@ -118,7 +118,7 @@ function(
 	 * Init - get all templates from the page.
 	 *
 	 * @public
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.init = function() {
 		onix.element("script[type='text/template']").forEach(function(item) {
@@ -132,7 +132,7 @@ function(
 	 * @public
 	 * @param {String} key 
 	 * @param {String} data
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.add = function(key, data) {
 		this._cache[key] = data;
@@ -145,11 +145,11 @@ function(
 	 * @param  {String} key  Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
-		var cnf = CONFIG.TMPL_DELIMITER;
+		var cnf = $config.TMPL_DELIMITER;
 
 		if (data) {
 			Object.keys(data).forEach(function(key) {
@@ -166,7 +166,7 @@ function(
 	 * @public
 	 * @param  {String} key Template key/name
 	 * @return {String}
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.get = function(key) {
 		return this._cache[key] || "";
@@ -179,7 +179,7 @@ function(
 	 * @public
 	 * @param  {NodeElement} root
 	 * @param  {Object|Function} scope
-	 * @memberof Templates
+	 * @memberof $template
 	 */
 	this.bindTemplate = function(root, scope) {
 		var allElements = onix.element("*[data-click], *[data-change], *[data-bind]", root);
@@ -193,7 +193,7 @@ function(
 				var dataBind = item.getAttribute("data-bind");
 
 				if (dataClick && this._parseFnName(dataClick) in scope) {
-					item.addEventListener("click", Common.bindWithoutScope(function(event, templScope) {
+					item.addEventListener("click", $common.bindWithoutScope(function(event, templScope) {
 						var value = this.getAttribute("data-click");
 						var fnName = templScope._parseFnName(value);
 						var args = templScope._parseArgs(value, {
@@ -206,7 +206,7 @@ function(
 				}
 
 				if (dataChange && this._parseFnName(dataChange) in scope) {
-					item.addEventListener("change", Common.bindWithoutScope(function(event, templScope) {
+					item.addEventListener("change", $common.bindWithoutScope(function(event, templScope) {
 						var value = this.getAttribute("data-change");
 						var fnName = templScope._parseFnName(value);
 						var args = templScope._parseArgs(value, {
@@ -235,13 +235,13 @@ function(
 	 * @public
 	 * @param  {String} key
 	 * @param  {String} path
-	 * @return {Promise}
-	 * @memberof Templates
+	 * @return {$q}
+	 * @memberof $template
 	 */
 	this.load = function(key, path) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
-		Http.createRequest({
+		$http.createRequest({
 			url: path
 		}).then(function(data) {
 			this.add(key, data.data);

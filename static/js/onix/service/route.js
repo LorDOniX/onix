@@ -1,8 +1,8 @@
 /**
- * @namespace Router
+ * @namespace $route
  * @description DI: $location;
  */
-onix.service("Router", [
+onix.service("$route", [
 	"$location",
 function(
 	$location
@@ -12,7 +12,7 @@ function(
 	 *
 	 * @private
 	 * @type {Array}
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this._routes = [];
 
@@ -21,15 +21,15 @@ function(
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this._otherwise = null;
 
 	/**
-	 * Router init.
+	 * $route init.
 	 *
 	 * @public
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this.init = function() {
 	};
@@ -39,16 +39,14 @@ function(
 	 *
 	 * @public
 	 * @param  {String} url 
-	 * @param  {String} page
-	 * @param  {Function} [fn]
+	 * @param  {Object} config
 	 * @return {Himself}
-	 * @memberof Router
+	 * @memberof $route
 	 */
-	this.route = function(url, page, fn) {
+	this.when = function(url, config) {
 		this._routes.push({
 			url: url,
-			page: page,
-			fn: fn
+			config: config
 		});
 
 		return this;
@@ -59,35 +57,33 @@ function(
 	 *
 	 * @public
 	 * @param  {String} page
-	 * @param  {Function} [fn]
+	 * @param  {Object} config
 	 * @return {Himself}
-	 * @memberof Router
+	 * @memberof $route
 	 */
-	this.otherwise = function(page, fn) {
+	this.otherwise = function(config) {
 		this._otherwise = {
-			page: page,
-			fn: fn
+			config: config
 		};
 
 		return this;
 	};
 
 	/**
-	 * Router GO.
+	 * $route GO.
 	 *
 	 * @public
-	 * @memberof Router
+	 * @memberof $route
 	 */
 	this.go = function() {
 		var path = $location.get();
 		var find = false;
-		var page = "";
+		var config = null;
 		var data = {};
 
 		this._routes.every(function(item) {
 			if (path.match(new RegExp(item.url))) {
-				page = item.page;
-				data = item.fn();
+				config = item.config;
 				find = true;
 				
 				return false;
@@ -98,16 +94,19 @@ function(
 		});
 
 		if (!find && this._otherwise) {
-			page = this._otherwise.page;
-			data = this._otherwise.fn();
+			config = this._otherwise.config;
 		}
 
-		if (page) {
-			var pageObj = onix.getObject(page);
-
-			if (pageObj) {
-				pageObj._setConfig(data);
-				pageObj._init();
+		if (config) {
+			if (typeof config.controller === "string") {
+				var param = onix.getObject(config.controller);
+				onix.DI(param).run();
+			}
+			else if (Array.isArray(config.controller)) {
+				onix.DI(config.controller).run();
+			}
+			else if (typeof config.controller === "function") {
+				config.controller.apply(config.controller, []);
 			}
 		}
 	};

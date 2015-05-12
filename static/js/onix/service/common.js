@@ -1,11 +1,11 @@
 /**
- * @namespace Common
- * @description DI: Promise;
+ * @namespace $common
+ * @description DI: $q;
  */
-onix.service("Common", [
-	"Promise",
+onix.service("$common", [
+	"$q",
 function(
-	Promise
+	$q
 ) {
 	/**
 	 * Object copy, from source to dest
@@ -13,7 +13,7 @@ function(
 	 * @private
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
@@ -55,7 +55,7 @@ function(
 	 * @public
 	 * @param  {String} name
 	 * @return {String}     
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.getCookie = function(name) {
 		var cookieValue = null;
@@ -82,11 +82,11 @@ function(
 	 *
 	 * @public
 	 * @param  {String} txt
-	 * @return {Promise}
-	 * @memberof Common
+	 * @return {$q}
+	 * @memberof $common
 	 */
 	this.confirm = function(txt) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 
 		if (confirm(txt)) {
 			promise.resolve();
@@ -106,7 +106,7 @@ function(
 	 * @param  {Object|Function|Array} a data | dependicies
 	 * @param  {Object|Function} [b] data | dependicies
 	 * @return {Object}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.create = function(mainObj, a, b) {
 		var args = [];
@@ -135,7 +135,7 @@ function(
 	 *
 	 * @public
 	 * @return {Object}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.merge = function() {
 		var count = arguments.length;
@@ -158,7 +158,7 @@ function(
 	 * @public
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.extend = function(dest, source) {
 		dest = dest || {};
@@ -173,7 +173,7 @@ function(
 	 * @public
 	 * @param  {Function} cb
 	 * @return {Function}
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.bindWithoutScope = function(cb) {
 		var bindArgs = Array.prototype.slice.call(arguments, 1);
@@ -192,7 +192,7 @@ function(
 	 * @param  {NodeArray} nodes
 	 * @param  {Function} cb
 	 * @param  {Object|Function}   scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
 		cb = cb || function() {};
@@ -211,7 +211,7 @@ function(
 	 * @param  {Array} arr 
 	 * @param {Function} cb
 	 * @param {Function} scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.reverseForEach = function (arr, cb, scope) {
 		arr = arr || [];
@@ -228,7 +228,7 @@ function(
 	 * @public
 	 * @param  {String} hex
 	 * @return {Number}    
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.hxToDe = function(hex) {
 		hex = hex.toLowerCase();
@@ -257,7 +257,7 @@ function(
 	 * @public
 	 * @param  {String} hexColor
 	 * @return {Object}         
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.hexToRGB = function(hexColor) {
 		if (hexColor[0] == "#") {
@@ -290,7 +290,7 @@ function(
 	 * @param  {Boolean} expr  test if (EXPR)
 	 * @param  {Function} fn
 	 * @param  {Function} scope
-	 * @memberof Common
+	 * @memberof $common
 	 */
 	this.ift = function(expr, th, scope) {
 		if (expr) {

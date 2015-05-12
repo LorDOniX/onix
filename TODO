@@ -1,4 +1,8 @@
 TODO
 ----
-- vlastní resource
+- own resource
 - provider?
+- $scope
+- page == controller
+- snippet == directive
+- $routeParams

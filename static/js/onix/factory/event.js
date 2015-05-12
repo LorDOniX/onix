@@ -1,15 +1,11 @@
-/**
- * @namespace Events
- * @description DI: Common; Returns interface _Events;
- */
-onix.factory("Events", [
-	"Common",
+onix.factory("$event", [
+	"$common",
 function(
-	Common
+	$common
 ) {
 	/**
- 	 * @interface _Events
- 	 * @description Parent: Events;
+ 	 * @interface $event
+ 	 * @description DI: Common;
  	 */
 	return {
 		/**
@@ -17,7 +13,7 @@ function(
 		 * 
 		 * @private
 		 * @type {Array}
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		_allEvents: [],
 
@@ -27,7 +23,7 @@ function(
 		 * @private
 		 * @param  {String} name 
 		 * @return {Array}
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		_getEvents: function (name) {
 			var events = [];
@@ -51,7 +47,7 @@ function(
 		 * @param  {String}   name 
 		 * @param  {Function} fn   
 		 * @param  {Object|Function}   scope
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		on: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -67,12 +63,12 @@ function(
 		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		off: function (name, fn) {
 			var events = this._getEvents(name);
 
-			Common.reverseForEach(events, function(item) {
+			$common.reverseForEach(events, function(item) {
 				if (!fn || fn && item.fn == fn) {
 					this._allEvents.splice(item.pos, 1);
 				}
@@ -86,7 +82,7 @@ function(
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
 		 * @param  {Object|Function}   scope
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		once: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -102,7 +98,7 @@ function(
 		 * 
 		 * @public
 		 * @param  {String} name
-		 * @memberof _Events
+		 * @memberof $event
 		 */
 		trigger: function (name) {
 			var events = this._getEvents(name);
@@ -121,7 +117,7 @@ function(
 				}
 			}, this);
 
-			Common.reverseForEach(onceArray, function(pos) {
+			$common.reverseForEach(onceArray, function(pos) {
 				this._allEvents.splice(pos, 1);
 			}, this);
 		}

@@ -1,11 +1,11 @@
 /**
- * @namespace Http
- * @description DI: Promise;
+ * @namespace $http
+ * @description DI: $q;
  */
-onix.service("Http", [
-	"Promise",
+onix.service("$http", [
+	"$q",
 function(
-	Promise
+	$q
 ) {
 	/**
 	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
@@ -14,7 +14,7 @@ function(
 	 * @private
 	 * @param  {Object|Array} data { name, value }
 	 * @return {FormData}
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this._preparePostData = function(data) {
 		var formData = new FormData();
@@ -42,7 +42,7 @@ function(
 	 * @param  {String} url
 	 * @param  {Array} data { name, value }
 	 * @return {String}    
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this._updateURL = function(url, data) {
 		if (data) {
@@ -65,7 +65,7 @@ function(
 	 *
 	 * @public
 	 * @const
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this.POST_TYPES = {
 		JSON: 1,
@@ -77,7 +77,7 @@ function(
 	 *
 	 * @public
 	 * @const
-	 * @memberof Http
+	 * @memberof $http
 	 */
 	this.METHOD = {
 		POST: "POST",
@@ -91,11 +91,11 @@ function(
 	 *
 	 * @public
 	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
-	 * @return {Promise}
-	 * @memberof Http
+	 * @return {$q}
+	 * @memberof $http
 	 */
 	this.createRequest = function(config) {
-		var promise = Promise.defer();
+		var promise = $q.defer();
 		var request = new XMLHttpRequest();
 
 		config = config || {};

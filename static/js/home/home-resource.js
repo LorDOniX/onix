@@ -1,9 +1,9 @@
 testApp.service("HomeResource", [
-	"Http",
-	"CONFIG",
+	"$http",
+	"$config",
 function(
-	Http,
-	CONFIG
+	$http,
+	$config
 ) {
 	// ------------------------ private ---------------------------------------
 	
@@ -11,7 +11,7 @@ function(
 	 * Base URL.
 	 * @type {String}
 	 */
-	this._baseURL = CONFIG.URLS.HOME;
+	this._baseURL = $config.URLS.HOME;
 
 	// ------------------------ public ----------------------------------------
 
@@ -20,7 +20,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.get = function() {
-		return Http.createRequest({
+		return $http.createRequest({
 			url: this._baseURL
 		});
 	};

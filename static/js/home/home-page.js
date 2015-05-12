@@ -1,19 +1,19 @@
-testApp.factory("HomePage", [
-	"Page",
+testApp.controller("HomePage", [
+	"$page",
+	"$common",
+	"$template",
+	"$loader",
+	"$select",
 	"HomeResource",
-	"Common",
-	"Templates",
-	"Loader",
-	"Select",
 function(
-	Page,
-	HomeResource,
-	Common,
-	Templates,
-	Loader,
-	Select
+	$page,
+	$common,
+	$template,
+	$loader,
+	$select,
+	HomeResource
 ) {
-	return Page.create(["Events"], {
+	var HomePage = $page.create(["$event"], {
 		// ------------------------ private ---------------------------------------
 		
 		_afterInit: function() {
@@ -25,7 +25,7 @@ function(
 			this._loadTemplate();
 
 			// dropdowns
-			var dropdown = new Select(this._getEl("dropdown"));
+			var dropdown = new $select(this._getEl("dropdown"));
 
 			dropdown.on("change", function(value) {
 				console.log("dropdown change - " + value);
@@ -59,11 +59,11 @@ function(
 		 * Compile against data object; bind to this page
 		 */
 		_loadTemplate: function() {
-			var el = onix.element(".placeholder").html(Templates.compile("testTempl", {
+			var el = onix.element(".placeholder").html($template.compile("testTempl", {
 				name: "Name from HP"
 			}));
 
-			Templates.bindTemplate(el.getEl(), this);
+			$template.bindTemplate(el.getEl(), this);
 		},
 
 		// ------------------------ public ----------------------------------------
@@ -78,7 +78,7 @@ function(
 			console.log(el, event);
 
 			// loader
-			Loader.start();
+			$loader.start();
 
 			// test for once events
 			this.trigger("onceEvent");
@@ -88,7 +88,7 @@ function(
 			this.off("anotherEvent");
 
 			setTimeout(function() {
-				Loader.end();
+				$loader.end();
 			}, 500);
 		},
 
@@ -96,7 +96,7 @@ function(
 		 * Another test button for testing purpose.
 		 */
 		test2: function() {
-			Common.ift(10*5+2, function(expr) {
+			$common.ift(10*5+2, function(expr) {
 				console.log(expr);
 			});
 		},
@@ -108,4 +108,6 @@ function(
 			console.log("tmplBtn click");
 		}
 	});
+
+	HomePage._init();
 }]);
