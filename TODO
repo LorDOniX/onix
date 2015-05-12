@@ -1,0 +1,8 @@
+- zakomponovat insertAdjacentHTML
+
+d1.insertAdjacentHTML('afterbegin', '<div id="two">two</div>');
+undefined
+d1
+<div>​<div id=​"two">​two​</div>​"one"</div>​
+
+- event.once
