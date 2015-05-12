@@ -1,7 +1,7 @@
 /**
  * @namespace DOM
  */
-Onix.service("DOM", function() {
+onix.service("DOM", function() {
 	/**
 	 * Create DOM from the configuration.
 	 * config: {

@@ -1,4 +1,4 @@
-Onix.factory("Page", [
+onix.factory("Page", [
 	"DOM",
 	"Templates",
 	"Common",

@@ -2,7 +2,7 @@
  * @namespace i18n
  * @description DI: Http, Promise;
  */
-Onix.service("i18n", [
+onix.service("i18n", [
 	"Http",
 	"Promise",
 function(

@@ -1,4 +1,4 @@
-Onix.factory("HomePage", [
+testApp.factory("HomePage", [
 	"Page",
 	"HomeResource",
 	"Common",

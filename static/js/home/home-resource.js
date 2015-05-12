@@ -1,4 +1,4 @@
-Onix.service("HomeResource", [
+testApp.service("HomeResource", [
 	"Http",
 function(
 	Http

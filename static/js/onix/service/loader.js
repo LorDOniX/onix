@@ -2,7 +2,7 @@
  * @namespace Loader
  * @description DI: DOM;
  */
-Onix.service("Loader", [
+onix.service("Loader", [
 	"DOM",
 function(
 	DOM

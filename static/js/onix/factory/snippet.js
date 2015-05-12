@@ -1,4 +1,4 @@
-Onix.factory("Snippet", [
+onix.factory("Snippet", [
 	"Templates",
 	"Common",
 function(

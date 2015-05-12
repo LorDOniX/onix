@@ -2,7 +2,7 @@
  * @namespace Templates
  * @description DI: Common, Promise, Http;
  */
-Onix.service("Templates", [
+onix.service("Templates", [
 	"Common",
 	"Promise",
 	"Http",

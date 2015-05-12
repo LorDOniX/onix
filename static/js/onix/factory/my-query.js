@@ -1,4 +1,4 @@
-Onix.factory("MyQuery", function() {
+onix.factory("MyQuery", function() {
 	/**
 	 * Parent: MyQuery; Cover function
 	 * 

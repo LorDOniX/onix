@@ -2,7 +2,7 @@
  * @namespace Notify
  * @description DI: Promise;
  */
-Onix.service("Notify", [
+onix.service("Notify", [
 	"Promise",
 function(
 	Promise

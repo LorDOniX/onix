@@ -2,7 +2,7 @@
  * @namespace Router
  * @description DI: $location;
  */
-Onix.service("Router", [
+onix.service("Router", [
 	"$location",
 function(
 	$location

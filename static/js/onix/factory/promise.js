@@ -1,4 +1,4 @@
-Onix.factory("Promise", function() {
+onix.factory("Promise", function() {
 	/**
 	 * @class _Promise
 	 * @description Parent: Promise;

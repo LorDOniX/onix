@@ -2,7 +2,7 @@
  * @namespace Select
  * @description DI: Common, Events; Returns class _Select;
  */
-Onix.factory("Select", [
+onix.factory("Select", [
 	"Common",
 	"Events",
 function(

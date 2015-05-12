@@ -2,7 +2,7 @@
  * @namespace Http
  * @description DI: Promise;
  */
-Onix.service("Http", [
+onix.service("Http", [
 	"Promise",
 function(
 	Promise

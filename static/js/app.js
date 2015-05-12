@@ -1,4 +1,10 @@
-Onix.run([
+testApp = onix.module("testApp", []);
+
+testApp.config(function() {
+	console.log("app config");
+});
+
+testApp.run([
 	"Router",
 	"Templates",
 function(

@@ -2,7 +2,7 @@
  * @namespace Common
  * @description DI: Promise;
  */
-Onix.service("Common", [
+onix.service("Common", [
 	"Promise",
 function(
 	Promise

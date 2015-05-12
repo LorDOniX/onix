@@ -2,7 +2,7 @@
  * @namespace Events
  * @description DI: Common; Returns interface _Events;
  */
-Onix.factory("Events", [
+onix.factory("Events", [
 	"Common",
 function(
 	Common

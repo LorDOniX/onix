@@ -1,7 +1,7 @@
 /**
  * @namespace $location
  */
-Onix.service("$location", function() {
+onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
 	
 	/**
