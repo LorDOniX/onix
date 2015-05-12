@@ -52,7 +52,7 @@ function(
 
 			var removeAllOpened = function() {
 				// remove all
-				Onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+				onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
 					item.classList.remove("open");
 				});
 			};
@@ -74,7 +74,7 @@ function(
 			}
 		});
 
-		Onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
+		onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
 			option.addEventListener("click", Common.bindWithoutScope(function(e, scope) {
 				e.stopPropagation();
 

@@ -6,20 +6,13 @@ onix.service("Templates", [
 	"Common",
 	"Promise",
 	"Http",
+	"CONFIG",
 function(
 	Common,
 	Promise,
-	Http
+	Http,
+	CONFIG
 ) {
-	/**
-	 * Array with templates for preload before applications starts.
-	 *
-	 * @private
-	 * @type {Array}
-	 * @memberof Templates
-	 */
-	this._preloads = [];
-	
 	/**
 	 * Template cache.
 	 *
@@ -128,28 +121,9 @@ function(
 	 * @memberof Templates
 	 */
 	this.init = function() {
-		var promise = Promise.defer();
-
-		Onix.element("script[type='text/template']").forEach(function(item) {
+		onix.element("script[type='text/template']").forEach(function(item) {
 			this.add(item.id, item.innerHTML);
 		}, this);
-
-		if (this._preloads.length) {
-			var all = [];
-
-			this._preloads.forEach(function(item) {
-				all.push(this.load(item.key, item.path));
-			}, this);
-
-			Promise.all(all)["finally"](function() {
-				promise.resolve();
-			});
-		}
-		else {
-			promise.resolve();
-		}
-
-		return promise;
 	};
 	
 	/**
@@ -175,7 +149,7 @@ function(
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
-		var cnf = Onix.config("TMPL_DELIMITER");
+		var cnf = CONFIG.TMPL_DELIMITER;
 
 		if (data) {
 			Object.keys(data).forEach(function(key) {
@@ -208,7 +182,7 @@ function(
 	 * @memberof Templates
 	 */
 	this.bindTemplate = function(root, scope) {
-		var allElements = Onix.element("*[data-click], *[data-change], *[data-bind]", root);
+		var allElements = onix.element("*[data-click], *[data-change], *[data-bind]", root);
 
 		if (allElements.len()) {
 			var newEls = {};
@@ -253,21 +227,6 @@ function(
 				scope.addEls(newEls);
 			}
 		}
-	};
-
-	/**
-	 * Add template for preload.
-	 *
-	 * @public
-	 * @param  {String} key 
-	 * @param  {String} path
-	 * @memberof Templates
-	 */
-	this.preload = function(key, path) {
-		this._preloads.push({
-			key: key,
-			path: path
-		});
 	};
 
 	/**

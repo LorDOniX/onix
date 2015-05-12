@@ -1,7 +1,9 @@
 testApp.service("HomeResource", [
 	"Http",
+	"CONFIG",
 function(
-	Http
+	Http,
+	CONFIG
 ) {
 	// ------------------------ private ---------------------------------------
 	
@@ -9,7 +11,7 @@ function(
 	 * Base URL.
 	 * @type {String}
 	 */
-	this._baseURL = Onix.config("URLS").HOME;
+	this._baseURL = CONFIG.URLS.HOME;
 
 	// ------------------------ public ----------------------------------------
 

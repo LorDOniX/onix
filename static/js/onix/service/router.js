@@ -103,7 +103,7 @@ function(
 		}
 
 		if (page) {
-			var pageObj = Onix.getObject(page);
+			var pageObj = onix.getObject(page);
 
 			if (pageObj) {
 				pageObj._setConfig(data);

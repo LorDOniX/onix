@@ -59,7 +59,7 @@ function(
 		 * Compile against data object; bind to this page
 		 */
 		_loadTemplate: function() {
-			var el = Onix.element(".placeholder").html(Templates.compile("testTempl", {
+			var el = onix.element(".placeholder").html(Templates.compile("testTempl", {
 				name: "Name from HP"
 			}));
 

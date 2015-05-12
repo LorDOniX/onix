@@ -2,10 +2,12 @@ onix.factory("Page", [
 	"DOM",
 	"Templates",
 	"Common",
+	"CONFIG",
 function(
 	DOM,
 	Templates,
-	Common
+	Common,
+	CONFIG
 ) {
 	/**
 	 * @interface _Page
@@ -34,7 +36,7 @@ function(
 			this._els = {};
 
 			// each page contanins only one detail div
-			var rootEl = DOM.get(Onix.config("DETAIL_SEL"));
+			var rootEl = DOM.get(CONFIG.DETAIL_SEL);
 
 			if (config.els) {
 				this._els = DOM.get(config.els, rootEl);

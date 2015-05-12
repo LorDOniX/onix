@@ -117,7 +117,7 @@ function(
 
 			// arguments
 			a.forEach(function(item) {
-				args.push(Onix.getObject(item));
+				args.push(onix.getObject(item));
 			});
 		}
 

@@ -7,9 +7,15 @@ testApp.config(function() {
 testApp.run([
 	"Router",
 	"Templates",
+	"CONFIG",
+	"Promise",
+	"i18n",
 function(
 	Router,
-	Templates
+	Templates,
+	CONFIG,
+	Promise,
+	i18n
 ) {
 	// application routes
 	Router
@@ -22,6 +28,12 @@ function(
 		})
 		.otherwise("HomePage");
 
-	// preload templates
-	Templates.preload("testTempl", "/js/home/test-templ.html");
+	// all dependencies before start
+	Promise.all([
+		Templates.load("testTempl", "/js/home/test-templ.html"),
+		i18n.loadLanguage(CONFIG.LOCALIZATION.LANG, CONFIG.LOCALIZATION.PATH)
+	]).done(function() {
+		// router go
+		Router.go();
+	});
 }]);
