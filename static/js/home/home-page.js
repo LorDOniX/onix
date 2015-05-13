@@ -6,6 +6,7 @@ testApp.controller("HomePage", [
 	"$select",
 	"HomeResource",
 	"$scope",
+	"$routeParams",
 function(
 	$page,
 	$common,
@@ -13,9 +14,11 @@ function(
 	$loader,
 	$select,
 	HomeResource,
-	$scope
+	$scope,
+	$routeParams
 ) {
 	console.log($scope);
+	console.log($routeParams);
 	
 	var HomePage = $page.create(["$event"], {
 		// ------------------------ private ---------------------------------------

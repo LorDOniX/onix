@@ -10,5 +10,44 @@ TODO
 
 - idea:
 
+- def. dom
+- namespace
 - nechat nějaké věci z angularu, rozložení atd.
 - shadow dom - veškeré změny se budou postupně aplikovat ve formě patche na dom
+
+vstupní html - text
+
+<div>
+	<span>{{ value }}</span>
+	<div data-repeat="prom" data-item="a">
+		<span>{{ a }}</span>
+	</div>
+</div>
+
+preprocesor - při poslední zmeně se vygeneruje shadow dom vůči scope
+- vygeneruje se pak cesta v domu pro querySelector, getElementById...
+
+$scope =
+value = "Aaa"
+prom = [1,2,3]
+
+<div>
+	<span>Aaa</span>
+	<div>
+		<span>1</span>
+	</div>
+	<div>
+		<span>2</span>
+	</div>
+	<div>
+		<span>3</span>
+	</div>
+</div>
+
+dom
+
+<div id="view">
+...
+
+porovná se můj shadow dom vůči domu na stránce
+

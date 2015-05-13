@@ -1,11 +1,15 @@
 /**
  * @namespace $route
- * @description DI: $location;
+ * @description DI: $location, $template;
  */
 onix.service("$route", [
+	"$routeParams",
 	"$location",
+	"$template",
 function(
-	$location
+	$routeParams,
+	$location,
+	$template
 ) {
 	/**
 	 * All routes
@@ -98,17 +102,31 @@ function(
 		}
 
 		if (config) {
-			if (typeof config.controller === "string") {
-				var param = onix.getObject(config.controller);
-				onix.DI(param, {
-					$scope: { a: 5 }
-				}).run();
+			var templateData = "";
+
+			Object.keys($routeParams).forEach(function(key) {
+				delete $routeParams[key];
+			});
+
+			Object.keys(config).forEach(function(key) {
+				switch (key) {
+					case "template":
+					case "templateUrl":
+					case "controller":
+						break;
+					default:
+						$routeParams[key] = config[key];
+				}
+			});
+
+			if (config.template) {
+				templateData = config.template;
+				onix.runController(config.controller);
 			}
-			else if (Array.isArray(config.controller)) {
-				onix.DI(config.controller).run();
-			}
-			else if (typeof config.controller === "function") {
-				config.controller.apply(config.controller, []);
+			else if (config.templateUrl) {
+				$template.load(config.templateUrl, config.templateUrl).done(function() {
+					onix.runController(config.controller);
+				});
 			}
 		}
 	};

@@ -178,11 +178,11 @@ onix = (function() {
 				// only 2 types
 				switch (item.type) {
 					case TYPES.SERVICE:
-						this._objects[item.name] = this.DI(item.param).newRun();
+						this._objects[item.name] = this._DI(item.param).newRun();
 						break;
 
 					case TYPES.FACTORY:
-						this._objects[item.name] = this.DI(item.param).run();
+						this._objects[item.name] = this._DI(item.param).run();
 						break;
 				}
 			}, this);
@@ -201,11 +201,11 @@ onix = (function() {
 					// modules have more types
 					switch (moduleItem.type) {
 						case TYPES.SERVICE:
-							this._objects[moduleItem.name] = this.DI(moduleItem.param).newRun();
+							this._objects[moduleItem.name] = this._DI(moduleItem.param).newRun();
 							break;
 
 						case TYPES.FACTORY:
-							this._objects[moduleItem.name] = this.DI(moduleItem.param).run();
+							this._objects[moduleItem.name] = this._DI(moduleItem.param).run();
 							break;
 
 						case TYPES.CONSTANT:
@@ -225,16 +225,16 @@ onix = (function() {
 			}, this);
 
 			// onix main run
-			this.DI(this._run).run(this);
+			this._DI(this._run).run(this);
 
 			// run all configs
 			configs.forEach(function(config) {
-				this.DI(config.param).run();
+				this._DI(config.param).run();
 			}, this);
 
 			// run all runs
 			runs.forEach(function(run) {
-				this.DI(run.param).run();
+				this._DI(run.param).run();
 			}, this);
 		},
 
@@ -276,6 +276,59 @@ onix = (function() {
 				$i18n.setLanguage(langKey);
 			});
 		}],
+
+		/**
+		 * Dependency injection
+		 *
+		 * @private
+		 * @param  {Function|Array} param
+		 * @param  {Object} [replace]
+		 * @return {Object}
+		 * @memberof onix
+		 */
+		_DI: function(param, replace) {
+			var fn;
+			var args = [];
+
+			replace = replace || {};
+
+			if (Array.isArray(param)) {
+				param.every(function(item) {
+					if (typeof item === "function") {
+						fn = item;
+						return false;
+					}
+					else {
+						args.push(item in replace ? replace[item] : this._objects[item]);
+					}
+
+					return true;
+				}, this);
+			}
+			else {
+				fn = param;
+			}
+
+			return {
+				/**
+				 * Run new binded function
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				run: function(scope) {
+					return fn.apply(scope || fn, args);
+				},
+
+				/**
+				 * Run new binded function - with the new
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				newRun: function(scope) {
+					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+				}
+			};
+		},
 
 		/**
 		 * Add config to the onix application.
@@ -364,57 +417,23 @@ onix = (function() {
 		},
 
 		/**
-		 * Dependency injection
-		 *
-		 * @private
-		 * @param  {Function|Array} param
-		 * @param  {Object} [replace]
-		 * @return {Object}
-		 * @memberof onix
+		 * Run controller
+		 * @param  {String|Array|Function} controller 
 		 */
-		DI: function(param, replace) {
-			var fn;
-			var args = [];
-
-			replace = replace || {};
-
-			if (Array.isArray(param)) {
-				param.every(function(item) {
-					if (typeof item === "function") {
-						fn = item;
-						return false;
-					}
-					else {
-						args.push(item in replace ? replace[item] : this._objects[item]);
-					}
-
-					return true;
-				}, this);
+		runController: function(controller) {
+			if (typeof controller === "string") {
+				var param = this.getObject(controller);
+				this._DI(param, {
+					$scope: { a: 5 } // $scope interpolation todo
+				}).run();
 			}
-			else {
-				fn = param;
+			else if (Array.isArray(controller)) {
+				this._DI(controller).run();
 			}
-
-			return {
-				/**
-				 * Run new binded function
-				 * @param  {Function|Object} [scope] 
-				 * @return {Object}
-				 */
-				run: function(scope) {
-					return fn.apply(scope || fn, args);
-				},
-
-				/**
-				 * Run new binded function - with the new
-				 * @param  {Function|Object} [scope] 
-				 * @return {Object}
-				 */
-				newRun: function(scope) {
-					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
-				}
-			};
-		},
+			else if (typeof controller === "function") {
+				controller.apply(config.controller, []);
+			}
+		}
 	};
 
 	// init app
