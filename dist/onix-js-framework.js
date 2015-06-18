@@ -10,7 +10,7 @@ Onix = (function() {
 		 * @type {String}
 		 * @memberof Onix
 		 */
-		_VERSION: "1.1.2",
+		_VERSION: "1.1.3",
 
 		/**
 		 * Framework date.
@@ -19,7 +19,7 @@ Onix = (function() {
 		 * @type {String}
 		 * @memberof Onix
 		 */
-		_DATE: "11. 5. 2015",
+		_DATE: "18. 6. 2015",
 
 		/**
 		 * All factories, constants...
@@ -2289,6 +2289,28 @@ function(
 	};
 
 	/**
+	 * Bind one single event to element.
+	 * @param  {NodeElement} el
+	 * @param  {String} eventName click, keydown...
+	 * @param  {String} data      data-x value
+	 * @param  {Function} scope
+	 */
+	this._bindEvent = function(el, eventName, data, scope) {
+		if (data && this._parseFnName(data) in scope) {
+			el.addEventListener(eventName, Common.bindWithoutScope(function(event, templScope) {
+				var value = this.getAttribute("data-" + eventName);
+				var fnName = templScope._parseFnName(value);
+				var args = templScope._parseArgs(value, {
+					el: this,
+					event: event
+				});
+
+				scope[fnName].apply(scope, args);
+			}, this));
+		}
+	};
+
+	/**
 	 * Init - get all templates from the page.
 	 *
 	 * @public
@@ -2375,41 +2397,17 @@ function(
 	 * @memberof Templates
 	 */
 	this.bindTemplate = function(root, scope) {
-		var allElements = Onix.element("*[data-click], *[data-change], *[data-bind]", root);
+		var allElements = Onix.element("*[data-click], *[data-change], *[data-keydown], *[data-bind]", root);
 
 		if (allElements.len()) {
 			var newEls = {};
 
 			allElements.forEach(function(item) {
-				var dataClick = item.getAttribute("data-click");
-				var dataChange = item.getAttribute("data-change");
+				this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
+				this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
+				this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
+
 				var dataBind = item.getAttribute("data-bind");
-
-				if (dataClick && this._parseFnName(dataClick) in scope) {
-					item.addEventListener("click", Common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-click");
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
-							el: this,
-							event: event
-						});
-
-						scope[fnName].apply(scope, args);
-					}, this));
-				}
-
-				if (dataChange && this._parseFnName(dataChange) in scope) {
-					item.addEventListener("change", Common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-change");
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
-							el: this,
-							event: event
-						});
-
-						scope[fnName].apply(scope, args);
-					}, this));
-				}
 
 				if (dataBind) {
 					newEls[dataBind] = item;

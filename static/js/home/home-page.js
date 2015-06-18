@@ -106,6 +106,11 @@ function(
 		 */
 		tmplBtn: function() {
 			console.log("tmplBtn click");
+		},
+
+		onkd: function() {
+			console.log("on key down");
+			console.log(arguments);
 		}
 	});
 }]);
