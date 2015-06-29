@@ -4,8 +4,10 @@
  */
 Onix.service("Notify", [
 	"Promise",
+	"Common",
 function(
-	Promise
+	Promise,
+	Common
 ) {
 	/**
 	 * Notification object
@@ -29,6 +31,23 @@ function(
 	};
 
 	/**
+	 * Set value to the notify element
+	 *
+	 * @private
+	 * @param  {String|NodeElement} txt
+	 * @memberof _Notify
+	 */
+	_Notify.prototype._setValue = function(txt) {
+		if (Common.isElement(txt)) {
+			this._el.innerHTML = "";
+			this._el.appendChild(txt);
+		}
+		else if (typeof txt === "string") {
+			this._el.innerHTML = txt;
+		}
+	};
+
+	/**
 	 * Reset classess
 	 *
 	 * @public
@@ -46,12 +65,13 @@ function(
 	 * Show OK state
 	 * 
 	 * @public
-	 * @param  {String} txt
+	 * @param  {String|NodeElement} txt
 	 * @memberof _Notify
 	 */
 	_Notify.prototype.ok = function(txt) {
 		this._el.classList.add(this._options["ok"]);
-		this._el.innerHTML = txt;
+
+		this._setValue(txt);
 
 		return this;
 	};
@@ -60,12 +80,13 @@ function(
 	 * Show ERROR state
 	 * 
 	 * @public
-	 * @param  {String} txt      
+	 * @param  {String|NodeElement} txt
 	 * @memberof _Notify
 	 */
 	_Notify.prototype.error = function(txt) {
 		this._el.classList.add(this._options["error"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};
@@ -74,12 +95,13 @@ function(
 	 * Show INFO state
 	 *
 	 * @public
-	 * @param  {String} txt      
+	 * @param  {String|NodeElement} txt
 	 * @memberof _Notify
 	 */
 	_Notify.prototype.info = function(txt) {
 		this._el.classList.add(this._options["info"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};

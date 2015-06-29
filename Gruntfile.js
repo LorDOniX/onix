@@ -27,9 +27,10 @@ module.exports = function(grunt) {
 					"static/js/onix/service/dom.js",
 					"static/js/onix/service/location.js",
 					"static/js/onix/service/router.js",
+					"static/js/onix/service/provide.js",
 
-					"static/js/onix/service/notify.js",
 					"static/js/onix/service/common.js",
+					"static/js/onix/service/notify.js",
 					"static/js/onix/factory/events.js",
 					"static/js/onix/service/loader.js",
 
@@ -42,12 +43,20 @@ module.exports = function(grunt) {
 					"static/js/onix/factory/select.js"
 				],
 				dest: 'dist/onix-js-framework.js',
+			},
+
+			distEnd: {
+				src: [
+					"dist/header.txt",
+					"dist/onix-js-framework-wh.min.js"
+				],
+				dest: 'dist/onix-js-framework.min.js',
 			}
 		},
 		uglify: {
 			dist: {
 				files: {
-					'dist/onix-js-framework.min.js': ['dist/onix-js-framework.js']
+					'dist/onix-js-framework-wh.min.js': ['dist/onix-js-framework.js']
 				}
 			}
 		},
@@ -70,5 +79,5 @@ module.exports = function(grunt) {
 
 	// Default task.
 	grunt.registerTask('default', ['less:userweb', 'watch:userweb']);
-	grunt.registerTask('dist', ['concat', 'uglify', 'jsdoc']);
+	grunt.registerTask('dist', ['concat:dist', 'uglify', 'concat:distEnd', 'jsdoc']);
 };

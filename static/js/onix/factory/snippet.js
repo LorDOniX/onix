@@ -100,6 +100,18 @@ function(
 		},
 
 		/**
+		 * Is snippet locked for change?
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof _Snippet
+		 * @return {Boolean}
+		 */
+		_isLocked: function() {
+			return false;
+		},
+
+		/**
 		 * Init snippet
 		 *
 		 * @public
@@ -174,6 +186,17 @@ function(
 		 */
 		getName: function() {
 			return this._name;
+		},
+
+		/**
+		 * Is snippet locked for change?
+		 *
+		 * @public
+		 * @memberof _Snippet
+		 * @return {Boolean}
+		 */
+		isLocked: function() {
+			return this._isLocked();
 		}
 	};
 

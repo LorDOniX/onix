@@ -297,4 +297,16 @@ function(
 			th.apply(scope || th, [expr]);
 		}
 	};
+
+	/**
+	 * Is value element?
+	 *
+	 * @public
+	 * @param  {Object} val
+	 * @memberof Common
+	 * @return {Boolean}
+	 */
+	this.isElement = function(val) {
+		return (val instanceof HTMLElement);
+	};
 }]);

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: service/provide.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,41 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: service/provide.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>Onix.service("Provide", function() {
+	/**
+ 	 * @namespace Provide
+ 	 */
+	return {
 
+		/**
+		 * Decorate existing object.
+		 *
+		 * @public
+		 * @param  {String} name Object name
+		 * @param  {Function} cb Callback function
+		 * @memberof Provide
+		 */
+		decorator: function(name, cb) {
+			var obj = Onix.getObject(name);
 
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
+			if (obj) {
+				Onix._objects[name] = cb(obj);
+			}
+		}
+	};
+});
+</code></pre>
+        </article>
+    </section>
 
 
 

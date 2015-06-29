@@ -10,7 +10,7 @@ Onix = (function() {
 		 * @type {String}
 		 * @memberof Onix
 		 */
-		_VERSION: "1.1.3",
+		_VERSION: "1.1.4",
 
 		/**
 		 * Framework date.
@@ -19,7 +19,7 @@ Onix = (function() {
 		 * @type {String}
 		 * @memberof Onix
 		 */
-		_DATE: "18. 6. 2015",
+		_DATE: "29. 6. 2015",
 
 		/**
 		 * All factories, constants...

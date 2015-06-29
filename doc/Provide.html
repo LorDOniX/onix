@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: CONFIG</title>
+    <title>JSDoc: Namespace: Provide</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Namespace: CONFIG</h1>
+    <h1 class="page-title">Namespace: Provide</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        CONFIG
+        Provide
         </h2>
         
     
@@ -38,8 +38,6 @@
 <article>
     <div class="container-overview">
     
-        
-            <div class="description">Main framework configuration</div>
         
 
         
@@ -74,7 +72,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line1">line 1</a>
+        <a href="service_provide.js.html">service/provide.js</a>, <a href="service_provide.js.html#line2">line 2</a>
     </li></ul></dd>
     
 
@@ -101,30 +99,104 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
+
+    
+        <h3 class="subsection-title">Methods</h3>
 
         
             
-<h4 class="name" id=".DETAIL_SEL"><span class="type-signature">(static) </span>DETAIL_SEL<span class="type-signature"> :String</span></h4>
 
+    
+
+    <h4 class="name" id=".decorator"><span class="type-signature">(static) </span>decorator<span class="signature">(name, cb)</span><span class="type-signature"></span></h4>
+
+    
 
 
 
 <div class="description">
-    Detail page selector
+    Decorate existing object.
 </div>
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
             
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">String</span>
 
 
-        </li>
-    </ul>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Object name</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cb</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Callback function</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
 
 
 
@@ -159,7 +231,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line48">line 48</a>
+        <a href="service_provide.js.html">service/provide.js</a>, <a href="service_provide.js.html#line15">line 15</a>
     </li></ul></dd>
     
 
@@ -175,72 +247,10 @@
 
 
 
-        
-            
-<h4 class="name" id=".LOCALIZATION"><span class="type-signature">(static) </span>LOCALIZATION<span class="type-signature"> :Object</span></h4>
 
 
 
 
-<div class="description">
-    Localization
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line13">line 13</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
 
 
 
@@ -248,152 +258,6 @@
 
 
         
-            
-<h4 class="name" id=".TMPL_DELIMITER"><span class="type-signature">(static) </span>TMPL_DELIMITER<span class="type-signature"> :Object</span></h4>
-
-
-
-
-<div class="description">
-    Template delimiter
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line36">line 36</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".URLS"><span class="type-signature">(static) </span>URLS<span class="type-signature"> :Object</span></h4>
-
-
-
-
-<div class="description">
-    Resource urls
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line25">line 25</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
-
     
 
     
