@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">onix.factory(&quot;$$promise&quot;, function() {
+<span id='$$promise'>	/**
+</span>	 * @class $$promise
+	 */
+	var $$promise = function() {
+<span id='$$promise-property-_E_STATES'>		/**
+</span>		 * Promise states
+		 * 
+		 * @const
+		 * @memberof $$promise
+		 */
+		this._E_STATES = {
+			IDLE: 0,
+			RESOLVED: 1,
+			REJECTED: 2
+		};
+
+		// current state
+		this._state = this._E_STATES.IDLE;
+
+		// all funcs
+		this._funcs = [];
+
+		// done data
+		this._finishData = null;
+	};
+
+<span id='$$promise-method-_resolveFuncs'>	/**
+</span>	 * Resolve all functions
+	 *
+	 * @private
+	 * @param  {Boolean} isError
+	 * @memberof $$promise
+	 */
+	$$promise.prototype._resolveFuncs = function(isError) {
+		this._funcs.forEach(function(fnItem) {
+			if (fnItem[&quot;finally&quot;] || (fnItem.isError &amp;&amp; isError) || (!fnItem.isError &amp;&amp; !isError)) {
+				(fnItem.fn)(this._finishData);
+			}
+		}, this);
+		
+		// clear array
+		this._funcs.length = 0;
+		this._state = isError ? this._E_STATES.REJECTED : this._E_STATES.RESOLVED;
+	};
+
+<span id='$$promise-method-_isAlreadyFinished'>	/**
+</span>	 * Is promise already finished?
+	 *
+	 * @private
+	 * @return {Boolean}
+	 * @memberof $$promise
+	 */
+	$$promise.prototype._isAlreadyFinished = function() {
+		if (this._state != this._E_STATES.IDLE) {
+			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
+		}
+	};
+
+<span id='$$promise-method-resolve'>	/**
+</span>	 * Resolve promise using obj.
+	 *
+	 * @public
+	 * @param  {Object} obj
+	 * @memberof $$promise
+	 */
+	$$promise.prototype.resolve = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(false);
+	};
+
+<span id='$$promise-method-reject'>	/**
+</span>	 * Reject promise using obj.
+	 *
+	 * @public
+	 * @param  {Object} obj
+	 * @memberof $$promise
+	 */
+	$$promise.prototype.reject = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(true);
+	};
+
+<span id='$$promise-method-then'>	/**
+</span>	 * After promise resolve/reject call then (okFn, errorFn)
+	 *
+	 * @public
+	 * @param {Function} [cbOk]
+	 * @param {Function} [cbError]
+	 * @return {$$promise}
+	 * @memberof $$promise
+	 */
+	$$promise.prototype.then = function(cbOk, cbError) {
+		if (cbOk &amp;&amp; typeof cbOk === &quot;function&quot;) {
+			this._funcs.push({
+				fn: cbOk,
+				isError: false
+			});
+		}
+
+		if (cbError &amp;&amp; typeof cbError === &quot;function&quot;) {
+			this._funcs.push({
+				fn: cbError,
+				isError: true
+			});
+		}
+
+		this._isAlreadyFinished();
+		
+		return this;
+	};
+
+<span id='$$promise-method-done'>	/**
+</span>	 * After promise resolve call then cbOk
+	 *
+	 * @public
+	 * @param  {Function}   cbOk
+	 * @return {$$promise}
+	 * @memberof $$promise
+	 */
+	$$promise.prototype.done = function(cbOk) {
+		this._funcs.push({
+			fn: cbOk,
+			isError: false
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
+<span id='$$promise-method-error'>	/**
+</span>	 * After promise reject call then cbError
+	 *
+	 * @public
+	 * @param  {Function}   cbError
+	 * @return {$$promise}
+	 * @memberof $$promise
+	 */
+	$$promise.prototype.error = function(cbError) {
+		this._funcs.push({
+			fn: cbError,
+			isError: true
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
+<span id='$$promise-method-prototype["finally"]'>	/**
+</span>	 * Finally for promise
+	 *
+	 * @function finally
+	 * @public
+	 * @param  {Function}   cb
+	 * @return {$$promise}
+	 * @memberof $$promise
+	 */
+	$$promise.prototype[&quot;finally&quot;] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			&quot;finally&quot;: true
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
+	return $$promise;
+});
+</pre>
+</body>
+</html>

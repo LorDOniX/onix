@@ -1,90 +1,341 @@
-/**
- * @namespace Onix
- */
-Onix = (function() {
-	var Onix = {
+onix = (function() {
+	/**
+	 * Module/app types
+	 * @const
+	 */
+	var TYPES = {
+		SERVICE: 1,
+		FACTORY: 2,
+		CONSTANT: 3,
+		RUN: 4,
+		CONFIG: 5,
+		CONTROLLER: 6,
+		DIRECTIVE: 7
+	};
+
+	/**
+	 * $$module item
+	 * @class $$module
+	 * 
+	 */
+	var $$module = function() {
+		this._allObj = [];
+	};
+
+	/**
+	 * Add a new service
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.service = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.SERVICE
+		});
+	};
+
+	/**
+	 * Add a new factory
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.factory = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.FACTORY
+		});
+	};
+
+	/**
+	 * Add a new controller
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.controller = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.CONTROLLER
+		});
+	};
+
+	/**
+	 * Add a new directive
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.directive = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.DIRECTIVE
+		});
+	};
+
+	/**
+	 * Add new constant
+	 * 
+	 * @public
+	 * @param  {String} name
+	 * @param  {Object} param
+	 * @memberof onix
+	 */
+	$$module.prototype.constant = function(name, obj) {
+		this._allObj.push({
+			name: name,
+			param: obj,
+			type: TYPES.CONSTANT
+		});
+	};
+
+	/**
+	 * Add a new run
+	 * 
+	 * @public
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.run = function(param) {
+		this._allObj.push({
+			param: param,
+			type: TYPES.RUN
+		});
+	};
+
+	/**
+	 * Add a new run
+	 * 
+	 * @public
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.config = function(param) {
+		this._allObj.push({
+			param: param,
+			type: TYPES.CONFIG
+		});
+	};
+
+	/**
+	 * Main framework object.
+	 * 
+	 * @class onix
+	 */
+	var onix = {
 		/**
-		 * Framework version.
-		 * 
+		 * All objects
+		 *
 		 * @private
-		 * @type {String}
-		 * @memberof Onix
+		 * @type {Array}
+		 * @memberof onix
 		 */
-		_VERSION: "1.1.4",
+		_allObj: [],
 
 		/**
-		 * Framework date.
-		 * 
-		 * @private
-		 * @type {String}
-		 * @memberof Onix
-		 */
-		_DATE: "29. 6. 2015",
-
-		/**
-		 * All factories, constants...
-		 * 
+		 * All processed objects
+		 *
 		 * @private
 		 * @type {Object}
-		 * @memberof Onix
+		 * @memberof onix
 		 */
 		_objects: {},
 
 		/**
-		 * Onix configuration
-		 * 
+		 * All modules
+		 *
 		 * @private
 		 * @type {Object}
-		 * @memberof Onix
+		 * @memberof onix
 		 */
-		_config: {},
+		_modules: {},
 
 		/**
-		 * All run functions
-		 * 
+		 * Config name
+		 *
 		 * @private
-		 * @type {Array}
-		 * @memberof Onix
+		 * @const
+		 * @memberof onix
 		 */
-		_runs: [],
+		_CONFIG_NAME: "$config",
 
 		/**
-		 * App object types
-		 * 
+		 * Init function
+		 *
 		 * @private
-		 * @type {Object}
-		 * @memberof Onix
-		 */
-		_TYPES: {
-			SERVICE: 1,
-			FACTORY: 2
-		},
-
-		/**
-		 * APP init - DOM load.
-		 * 
-		 * @private
-		 * @memberof Onix
+		 * @memberof onix
 		 */
 		_init: function() {
-			document.addEventListener("DOMContentLoaded", function() {
-				var di = this._di(this._run);
+			// pred DOM loadem
+			this._objects[this._CONFIG_NAME] = {};
 
-				di.fn.apply(this, di.args);
-			}.bind(this));
+			document.addEventListener("DOMContentLoaded", this._domLoad.bind(this));
 		},
 
 		/**
-		 * Dependency injection.
-		 * 
+		 * Event - Dom LOAD
+		 *
 		 * @private
-		 * @param  {Array|Function} param
-		 * @return {Object}
-		 * @memberof Onix
+		 * @memberof onix
 		 */
-		_di: function(param) {
+		_domLoad: function() {
+			// process all inner items
+			this._allObj.forEach(function(item) {
+				// only 2 types
+				switch (item.type) {
+					case TYPES.SERVICE:
+						this._objects[item.name] = this._DI(item.param).newRun();
+						break;
+
+					case TYPES.FACTORY:
+						this._objects[item.name] = this._DI(item.param).run();
+						break;
+				}
+			}, this);
+
+			// delete them
+			this._allObj.length = 0;
+
+			var configs = [];
+			var runs = [];
+			var $directive = this.getObject("$directive");
+
+			// process all modules
+			Object.keys(this._modules).forEach(function(moduleName) {
+				var module = this._modules[moduleName].module;
+
+				module._allObj.forEach(function(moduleItem) {
+					// modules have more types
+					switch (moduleItem.type) {
+						case TYPES.SERVICE:
+							this._objects[moduleItem.name] = this._DI(moduleItem.param).newRun();
+							break;
+
+						case TYPES.FACTORY:
+							this._objects[moduleItem.name] = this._DI(moduleItem.param).run();
+							break;
+
+						case TYPES.CONSTANT:
+						case TYPES.CONTROLLER:
+							this._objects[moduleItem.name] = moduleItem.param;
+							break;
+
+						case TYPES.DIRECTIVE:
+							var $scope = $directive.create(["$event"], {});
+
+							this._DI(moduleItem.param, {
+								$scope: $scope
+							}).run();
+
+							this._objects[moduleItem.name] = $scope;
+							break;
+
+						case TYPES.RUN:
+							runs.push(moduleItem);
+							break;
+
+						case TYPES.CONFIG:
+							configs.push(moduleItem);
+							break;
+					}
+				}, this);
+			}, this);
+
+			// onix main run
+			this._DI(this._run).run(this);
+
+			// run all configs
+			configs.forEach(function(config) {
+				this._DI(["$config", config.param]).run();
+			}, this);
+
+			var $q = this.getObject("$q");
+			var all = [];
+
+			// run all runs
+			runs.forEach(function(run) {
+				var runO = this._DI(run.param).run();
+
+				// returns a promise
+				if (runO && "_E_STATES" in runO) {
+					all.push(runO);
+				}
+			}, this);
+
+			var $route = this.getObject("$route");
+
+			$q.all(all)["finally"](function() {
+				// route go
+				$route.go();
+			});
+		},
+
+		/**
+		 * Main access point in the framework
+		 *
+		 * @private
+		 * @memberof onix
+		 */
+		_run: [
+			"$i18n",
+			"$template",
+			"$loader",
+			"$route",
+			"$myQuery",
+			"$common",
+		function(
+			$i18n,
+			$template,
+			$loader,
+			$route,
+			$myQuery,
+			$common
+		) {
+			// binds
+			this.element = function(value, parent) {
+				return new $myQuery.get(value, parent);
+			};
+
+			// inits
+			$loader.init();
+			$route.init();
+			$template.init();
+
+			// language
+			window._ = $i18n._.bind($i18n);
+
+			$common.ift(this._objects[this._CONFIG_NAME].LOCALIZATION.LANG, function(langKey) {
+				$i18n.setLanguage(langKey);
+			});
+		}],
+
+		/**
+		 * Dependency injection
+		 *
+		 * @private
+		 * @param  {Function|Array} param
+		 * @param  {Object} [replace]
+		 * @return {Object}
+		 * @memberof onix
+		 */
+		_DI: function(param, replace) {
 			var fn;
 			var args = [];
+
+			replace = replace || {};
 
 			if (Array.isArray(param)) {
 				param.every(function(item) {
@@ -93,7 +344,7 @@ Onix = (function() {
 						return false;
 					}
 					else {
-						args.push(this._objects[item]);
+						args.push(item in replace ? replace[item] : this._objects[item]);
 					}
 
 					return true;
@@ -104,171 +355,161 @@ Onix = (function() {
 			}
 
 			return {
-				fn: fn,
-				args: args
+				/**
+				 * Run new binded function
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				run: function(scope) {
+					return fn.apply(scope || fn, args);
+				},
+
+				/**
+				 * Run new binded function - with the new
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				newRun: function(scope) {
+					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+				}
 			};
 		},
 
 		/**
-		 * Add new object to the database.
-		 * 
-		 * @private
-		 * @param {String} name
-		 * @param {Enum} type
-		 * @param {Array|Function} param
-		 * @memberof Onix
-		 */
-		_addObject: function(name, type, param) {
-			try {
-				var di = this._di(param);
-
-				this._objects[name] = type == this._TYPES.SERVICE 
-					? new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)))
-					: di.fn.apply(di.fn, di.args)
-			}
-			catch (err) {
-				console.error("Onix._addObject error " + err + " in " + name);
-			}
-		},
-
-		/**
-		 * Application run.
-		 * 
-		 * @private
-		 * @memberof Onix
-		 */
-		_run: [
-			"i18n",
-			"Templates",
-			"Loader",
-			"Router",
-			"MyQuery",
-		function(
-			i18n,
-			Templates,
-			Loader,
-			Router,
-			MyQuery
-		) {
-			// binds
-			this.element = function(value, parent) {
-				return new MyQuery.get(value, parent);
-			};
-
-			// inits
-			Loader.init();
-			Router.init();
-
-			var afterRun = function() {
-				// run runs array
-				this._runs.forEach(function(item) {
-					var di = this._di(item);
-
-					new (Function.prototype.bind.apply(di.fn, [null].concat(di.args)));
-				}.bind(this));
-
-				// templates init
-				Templates.init().done(function() {
-					// router go
-					Router.go();
-				});
-			}.bind(this);
-			
-			if (this.config("LOCALIZATION").LANG && this.config("LOCALIZATION").PATH) {
-				window._ = i18n._.bind(i18n);
-				i18n.setLanguage(this.config("LOCALIZATION").LANG);
-				i18n.loadLanguage(this.config("LOCALIZATION").LANG, this.config("LOCALIZATION").PATH).done(afterRun);
-			}
-			else {
-				afterRun();
-			}
-		}],
-
-		/**
-		 * Add a new service
-		 * 
+		 * Add config to the onix application.
+		 *
 		 * @public
-		 * @param  {String} name
-		 * @param  {Array|Function} param With DI
-		 * @memberof Onix
+		 * @param  {Object} obj
+		 * @memberof onix
+		 */
+		config: function(obj) {
+			Object.keys(obj).forEach(function(key) {
+				this._objects[this._CONFIG_NAME][key] = obj[key];
+			}.bind(this));
+		},
+
+		/**
+		 * Add service to the application.
+		 *
+		 * @public
+		 * @param  {String} name 
+		 * @param  {Function|Array} param
+		 * @memberof onix
 		 */
 		service: function(name, param) {
-			this._addObject(name, this._TYPES.SERVICE, param);
+			this._allObj.push({
+				name: name,
+				param: param,
+				type: TYPES.SERVICE
+			});
 		},
 
 		/**
-		 * Add a new factory
-		 * 
+		 * Add factory to the application.
+		 *
 		 * @public
-		 * @param  {String} name
-		 * @param  {Array|Function} param With DI
-		 * @memberof Onix
+		 * @param  {String} name 
+		 * @param  {Function|Array} param
+		 * @memberof onix
 		 */
 		factory: function(name, param) {
-			this._addObject(name, this._TYPES.FACTORY, param);
+			this._allObj.push({
+				name: name,
+				param: param,
+				type: TYPES.FACTORY
+			});
 		},
 
 		/**
-		 * Add a new run
-		 * 
+		 * Add module to the application.
+		 *
 		 * @public
-		 * @param  {Array|Function} param With DI
-		 * @memberof Onix
+		 * @param  {String} name 
+		 * @param  {Array} [dependencies] todo
+		 * @return {$$module}
+		 * @memberof onix
 		 */
-		run: function(param) {
-			this._runs.push(param);
+		module: function(name, dependencies) {
+			var module = new $$module();
+
+			this._modules[name] = {
+				module: module,
+				dependencies: dependencies
+			};
+
+			return module;
 		},
 
 		/**
-		 * Add new constant
-		 * 
+		 * Get object
+		 *
 		 * @public
 		 * @param  {String} name
-		 * @param  {Object} param
-		 * @memberof Onix
-		 */
-		constant: function(name, obj) {
-			this._objects[name] = obj;
-		},
-
-		/**
-		 * Get/Set configuration
-		 * 
-		 * @public
-		 * @param  {String|Object} param
-		 * @return  {Object}
-		 * @memberof Onix
-		 */
-		config: function(param) {
-			if (typeof param === "string") {
-				// get
-				return this._config[param] || {};
-			}
-			else {
-				// set - update config object
-				Object.keys(param).forEach(function(key) {
-					this._config[key] = param[key];
-				}.bind(this));
-			}
-		},
-
-		/**
-		 * Get object by name
-		 * 
-		 * @public
-		 * @param  {String} name
-		 * @return {Function|Object}
-		 * @memberof Onix
+		 * @return {Function|Object} 
+		 * @memberof onix
 		 */
 		getObject: function(name) {
 			name = name || "";
 
 			return this._objects[name];
+		},
+
+		/**
+		 * Empty function
+		 *
+		 * @public
+		 * @memberof onix
+		 */
+		noop: function() {
+
+		},
+
+		/**
+		 * Run controller
+		 * 
+		 * @param  {String|Array|Function} controller 
+		 * @public
+		 * @memberof onix
+		 */
+		runController: function(controller) {
+			var $controller = this.getObject("$controller");
+			var $scope = $controller.create(["$event"], {});
+			var replaceObj = {
+				$scope: $scope
+			};
+
+			if (typeof controller === "string") {
+				var param = this.getObject(controller);
+
+				this._DI(param, replaceObj).run();
+			}
+			else if (Array.isArray(controller)) {
+				this._DI(controller, replaceObj).run();
+			}
+			else if (typeof controller === "function") {
+				controller.apply(config.controller, [$scope]);
+			}
+
+			$scope._init();
+		},
+
+		/**
+		 * Framework info.
+		 *
+		 * @public
+		 * @memberof onix
+		 */
+		info: function() {
+			console.log(
+				"Onix JS Framework\n" +
+				"Version: 2.0.0\n" +
+				"Date: 29. 6. 2015"
+			);
 		}
 	};
 
 	// init app
-	Onix._init();
+	onix._init();
 
-	return Onix;
+	return onix;
 })();

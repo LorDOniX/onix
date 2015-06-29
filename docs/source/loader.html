@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$loader'>/**
+</span> * @class $loader
+ * @description DI: $dom;
+ */
+onix.service(&quot;$loader&quot;, [
+	&quot;$dom&quot;,
+function(
+	$dom
+) {
+<span id='$loader-method-_create'>	/**
+</span>	 * Create $loader.
+	 *
+	 * @private
+	 * @memberof $loader
+	 */
+	this._create = function() {
+		this._el = $dom.create({
+			el: &quot;div&quot;,
+			&quot;class&quot;: &quot;loader&quot;
+		});
+
+		// insert into the body on first position
+		document.body.insertBefore(this._el, document.body.firstChild);
+	};
+	
+<span id='$loader-method-init'>	/**
+</span>	 * Loader init.
+	 *
+	 * @public
+	 * @memberof $loader
+	 */
+	this.init = function() {
+		this._create();
+	};
+
+<span id='$loader-method-start'>	/**
+</span>	 * Start loader.
+	 *
+	 * @public
+	 * @memberof $loader
+	 */
+	this.start = function() {
+		this._el.classList.add(&quot;start&quot;);
+	};
+
+<span id='$loader-method-end'>	/**
+</span>	 * End loader.
+	 *
+	 * @public
+	 * @memberof $loader
+	 */
+	this.end = function() {
+		this._el.classList.remove(&quot;start&quot;);
+		this._el.classList.add(&quot;end&quot;);
+
+		setTimeout(function() {
+			this._el.classList.remove(&quot;end&quot;);
+			this._el.classList.add(&quot;hide&quot;);
+
+			setTimeout(function() {
+				this._el.classList.remove(&quot;hide&quot;);
+			}.bind(this), 350);
+		}.bind(this), 150);
+	};
+}]);
+</pre>
+</body>
+</html>

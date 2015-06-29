@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$$controller'>/**
+</span> * @class $$controller
+ * @description DI: $dom, $template, $config;
+ */
+onix.factory(&quot;$$controller&quot;, [
+	&quot;$dom&quot;,
+	&quot;$template&quot;,
+	&quot;$config&quot;,
+function(
+	$dom,
+	$template,
+	$config
+) {
+	return {
+<span id='$$controller-method-_setConfig'>		/**
+</span>		 * Set config.
+		 *
+		 * @private
+		 * @param {Object} config
+		 * @memberof $$controller
+		 */
+		_setConfig: function(config) {
+			this._config = config;
+		},
+
+<span id='$$controller-method-_init'>		/**
+</span>		 * Init controller - called from App; runs _afterInit
+		 * 
+		 * @private
+		 * @memberof $$controller
+		 */
+		_init: function() {
+			var config = this._getConfig();
+			this._els = {};
+
+			// each controller contanins only one detail div
+			var rootEl = $dom.get($config.DETAIL_SEL);
+
+			if (config.els) {
+				this._els = $dom.get(config.els, rootEl);
+			}
+
+			$template.bindTemplate(rootEl, this);
+
+			this._afterInit();
+		},
+
+<span id='$$controller-method-_getEl'>		/**
+</span>		 * Get controller element by his name.
+		 *
+		 * @private
+		 * @param  {String} name
+		 * @return {NodeElemetn}     
+		 * @memberof $$controller
+		 */
+		_getEl: function(name) {
+			return this._els[name];
+		},
+
+<span id='$$controller-method-_getConfig'>		/**
+</span>		 * Get controller config.
+		 *
+		 * @private
+		 * @return {Object}
+		 * @memberof $$controller
+		 */
+		_getConfig: function() {
+			return this._config || {};
+		},
+
+<span id='$$controller-method-_getPageData'>		/**
+</span>		 * Get controller data object.
+		 *
+		 * @private
+		 * @return {Object}
+		 * @memberof $$controller
+		 */
+		_getPageData: function() {
+			return this._config &amp;&amp; this._config.js_data ? this._config.js_data : {};
+		},
+
+<span id='$$controller-method-_afterInit'>		/**
+</span>		 * After init
+		 *
+		 * @private
+		 * @abstract
+		 * @memberof $$controller
+		 */
+		_afterInit: function() {
+
+		},
+
+<span id='$$controller-method-addEls'>		/**
+</span>		 * Add new els to this._els; this function can be called from $template
+		 *
+		 * @public
+		 * @param {Object} newEls
+		 * @memberof $$controller
+		 */
+		addEls: function(newEls) {
+			newEls = newEls || {};
+
+			Object.keys(newEls).forEach(function(key) {
+				this._els[key] = newEls[key];
+			}, this);
+		}
+	};
+}]);
+</pre>
+</body>
+</html>

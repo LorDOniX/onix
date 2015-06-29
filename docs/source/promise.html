@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">onix.factory(&quot;$q&quot;, [
+	&quot;$$promise&quot;,
+function(
+	$$promise
+) {
+<span id='$q'>	/**
+</span> 	 * @class $q
+ 	 * @description DI: $$promise;
+ 	 */
+	return {
+<span id='$q-method-all'>		/**
+</span>		 * Resolve all promises in the array
+		 *
+		 * @public
+		 * @param {Array} promises
+		 * @return {$$promise}
+		 * @memberof $q
+		 */
+		all: function(promises) {
+			var promise = new $$promise();
+
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+
+					if (count == 0) {
+						promise.resolve();
+					}
+				};
+
+				promises.forEach(function(item) {
+					item[&quot;finally&quot;](test);
+				});
+			}
+			else {
+				promise.resolve();
+			}
+
+			return promise;
+		},
+
+<span id='$q-method-defer'>		/**
+</span>		 * Deferable object of the promise.
+		 *
+		 * @public
+		 * @return {$$promise}
+		 * @memberof $q
+		 */
+		defer: function() {
+			return new $$promise();
+		}
+	};
+}]);
+</pre>
+</body>
+</html>

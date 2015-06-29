@@ -1,21 +1,41 @@
-Onix.run([
-	"Router",
-	"Templates",
+testApp = onix.module("testApp", []);
+
+testApp.config(function(config) {
+	config.LOCALIZATION.LANG = "en";
+	config.LOCALIZATION.PATH = "/js/locale/en.json";
+});
+
+testApp.run([
+	"$route",
+	"$template",
+	"$config",
+	"$q",
+	"$i18n",
 function(
-	Router,
-	Templates
+	$route,
+	$template,
+	$config,
+	$q,
+	$i18n
 ) {
+	$i18n.setLanguage("en");
+
 	// application routes
-	Router
-		.route("/", "HomePage", function() {
-			return {
-				PAGE_CONFIG: {
-					a: 5
-				}
+	$route
+		.when("/", {
+			controller: "HomeCtrl",
+			templateUrl: "/js/home/test-templ.html",
+			data: {
+				a: 5
 			}
 		})
-		.otherwise("HomePage");
+		.otherwise({
+			controller: "HomeCtrl"
+		});
 
-	// preload templates
-	Templates.preload("testTempl", "/js/home/test-templ.html");
+	// all dependencies before start
+	return $q.all([
+		$template.load("testTempl", "/js/home/test-templ.html"),
+		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
+	]);
 }]);

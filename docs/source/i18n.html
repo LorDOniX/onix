@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$i18n'>/**
+</span> * @class $i18n
+ * @description DI: $http, $q;
+ */
+onix.service(&quot;$i18n&quot;, [
+	&quot;$http&quot;,
+	&quot;$q&quot;,
+function(
+	$http,
+	$q
+) {
+<span id='$i18n-property-_langs'>	/**
+</span>	 * All langs data.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $i18n
+	 */
+	this._langs = {};
+
+<span id='$i18n-property-_currentLang'>	/**
+</span>	 * Current language
+	 *
+	 * @private
+	 * @type {String}
+	 * @memberof $i18n
+	 */
+	this._currentLang = &quot;&quot;;
+
+<span id='$i18n-method-addLanguage'>	/**
+</span>	 * Add a new language
+	 *
+	 * @public
+	 * @param {String} lang Language key
+	 * @param {Object} data
+	 * @memberof $i18n
+	 */
+	this.addLanguage = function(lang, data) {
+		this._langs[lang] = data;
+	};
+
+<span id='$i18n-method-setLanguage'>	/**
+</span>	 * Set new language by his key.
+	 *
+	 * @public
+	 * @param {String} lang Language key
+	 * @memberof $i18n
+	 */
+	this.setLanguage = function(lang) {
+		this._currentLang = lang;
+	};
+
+<span id='$i18n-method-_'>	/**
+</span>	 * Get text function. Translate for the current language and the key.
+	 *
+	 * @public
+	 * @param  {String} key
+	 * @return {String}    
+	 * @memberof $i18n
+	 */
+	this._ = function(key) {
+		key = key || &quot;&quot;;
+		var lObj = this._langs[this._currentLang];
+		var translate = &quot;&quot;;
+
+		if (lObj) {
+			var parts = key.split(&quot;.&quot;);
+			var len = parts.length;
+
+			parts.every(function(item, ind) {
+				if (item in lObj) {
+					lObj = lObj[item];
+
+					if (ind == len - 1) {
+						translate = lObj;
+						return false;
+					}
+				}
+				else return false;
+
+				// go on
+				return true;
+			});
+		}
+
+		return translate;
+	};
+
+<span id='$i18n-method-loadLanguage'>	/**
+</span>	 * Load language from the file.
+	 *
+	 * @public
+	 * @param  {String} lang Language key
+	 * @param  {String} url  Path to the file
+	 * @return {$q}
+	 * @memberof $i18n
+	 */
+	this.loadLanguage = function(lang, url) {
+		var promise = $q.defer();
+
+		$http.createRequest({
+			url: url
+		}).then(function(data) {
+			this.addLanguage(lang, data.data);
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.resolve();
+		});
+
+		return promise;
+	};
+}]);
+</pre>
+</body>
+</html>

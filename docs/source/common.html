@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$common'>/**
+</span> * @class $common
+ * @description DI: $q;
+ */
+onix.service(&quot;$common&quot;, [
+	&quot;$q&quot;,
+function(
+	$q
+) {
+<span id='$common-method-_objCopy'>	/**
+</span>	 * Object copy, from source to dest
+	 *
+	 * @private
+	 * @param  {Object} dest
+	 * @param  {Object} source
+	 * @memberof $common
+	 */
+	this._objCopy = function(dest, source) {
+		Object.keys(source).forEach(function(prop) {
+			if (source.hasOwnProperty(prop)) {
+				var sourceVal = source[prop];
+				var sourceType = typeof sourceVal;
+
+				// array
+				if (Array.isArray(sourceVal)) {
+					// array - copy object to another array - keep referencings on array, objects
+					var newArray = [];
+
+					sourceVal.forEach(function(item) {
+						newArray.push(item);
+					});
+
+					dest[prop] = newArray;
+				}
+				// not null and object
+				else if (sourceVal &amp;&amp; sourceType === &quot;object&quot;) {
+					// recursive copy
+					if (!(prop in dest)) {
+						dest[prop] = {};
+ 					}
+
+					this._objCopy(dest[prop], sourceVal);
+				}
+				else {
+					// string, numbers, functions
+					dest[prop] = sourceVal;
+				}
+			}
+		}.bind(this));
+	};
+
+<span id='$common-method-getCookie'>	/**
+</span>	 * Get cookie by her name
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @return {String}     
+	 * @memberof $common
+	 */
+	this.getCookie = function(name) {
+		var cookieValue = null;
+
+		if (document.cookie &amp;&amp; document.cookie != &#39;&#39;) {
+			var cookies = document.cookie.split(&#39;;&#39;);
+
+			cookies.every(function(cookie) {
+				cookie = cookie.trim();
+
+				if (cookie.substring(0, name.length + 1) == (name + &#39;=&#39;)) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					return false;
+				}
+				else return true;
+			});
+		}
+
+		return cookieValue;
+	};
+
+<span id='$common-method-confirm'>	/**
+</span>	 * Confirm window.
+	 *
+	 * @public
+	 * @param  {String} txt
+	 * @return {$q}
+	 * @memberof $common
+	 */
+	this.confirm = function(txt) {
+		var promise = $q.defer();
+
+		if (confirm(txt)) {
+			promise.resolve();
+		}
+		else {
+			promise.reject();
+		}
+
+		return promise;
+	};
+
+<span id='$common-method-create'>	/**
+</span>	 * Create one object from arguments
+	 *
+	 * @public
+	 * @param  {Object|Function} mainObj
+	 * @param  {Object|Function|Array} a data | dependicies
+	 * @param  {Object|Function} [b] data | dependicies
+	 * @return {Object}
+	 * @memberof $common
+	 */
+	this.create = function(mainObj, a, b) {
+		var args = [];
+
+		if (a &amp;&amp; b &amp;&amp; Array.isArray(a)) {
+			// a == dependicies
+			// b == data
+
+			// arguments
+			a.forEach(function(item) {
+				args.push(onix.getObject(item));
+			});
+		}
+
+		// data
+		args.push(mainObj);
+
+		// data override
+		args.push(b || a);
+
+		return this.merge.apply(this, args);
+	};
+
+<span id='$common-method-merge'>	/**
+</span>	 * Merge X objects into the single one.
+	 *
+	 * @public
+	 * @return {Object}
+	 * @memberof $common
+	 */
+	this.merge = function() {
+		var count = arguments.length;
+		var dest = {};
+		
+		if (count &gt; 0) {
+			for (var i = 0; i &lt; count; i++) {
+				var source = arguments[i];
+
+				this._objCopy(dest, source);
+			}
+		}
+
+		return dest;
+	};
+
+<span id='$common-method-extend'>	/**
+</span>	 * Extend one object by other; from source to dest.
+	 *
+	 * @public
+	 * @param  {Object} dest
+	 * @param  {Object} source
+	 * @memberof $common
+	 */
+	this.extend = function(dest, source) {
+		dest = dest || {};
+		source = source || {};
+
+		this._objCopy(dest, source);
+	};
+
+<span id='$common-method-bindWithoutScope'>	/**
+</span>	 * Bind function arguments without scope
+	 *
+	 * @public
+	 * @param  {Function} cb
+	 * @return {Function}
+	 * @memberof $common
+	 */
+	this.bindWithoutScope = function(cb) {
+		var bindArgs = Array.prototype.slice.call(arguments, 1);
+
+		return function () {
+			var internalArgs = Array.prototype.slice.call(arguments, 0);
+			var args = Array.prototype.concat(internalArgs, bindArgs);
+			return cb.apply(this, args);
+		};
+	};
+	
+<span id='$common-method-nodesForEach'>	/**
+</span>	 * Missing for each for Node array.
+	 *
+	 * @public
+	 * @param  {NodeArray} nodes
+	 * @param  {Function} cb
+	 * @param  {Object|Function}   scope
+	 * @memberof $common
+	 */
+	this.nodesForEach = function(nodes, cb, scope) {
+		cb = cb || function() {};
+		
+		if (nodes) {
+			Array.prototype.slice.call(nodes).forEach(function(item, ind) {
+				cb.apply(scope || cb, [item, ind]);
+			});
+		}
+	};
+
+<span id='$common-method-reverseForEach'>	/**
+</span>	 * Reverse for each
+	 *
+	 * @public
+	 * @param  {Array} arr 
+	 * @param {Function} cb
+	 * @param {Function} scope
+	 * @memberof $common
+	 */
+	this.reverseForEach = function (arr, cb, scope) {
+		arr = arr || [];
+		cb = cb || function() {};
+
+		for (var i = arr.length - 1; i &gt;= 0; i--) {
+			cb.apply(scope || this, [arr[i], i]);
+		}
+	};
+
+<span id='$common-method-hxToDe'>	/**
+</span>	 * HEX value to DEC
+	 *
+	 * @public
+	 * @param  {String} hex
+	 * @return {Number}    
+	 * @memberof $common
+	 */
+	this.hxToDe = function(hex) {
+		hex = hex.toLowerCase();
+
+		switch (hex) {
+			case &quot;a&quot;:
+				return 10;
+			case &quot;b&quot;:
+				return 11;
+			case &quot;c&quot;:
+				return 12;
+			case &quot;d&quot;:
+				return 13;
+			case &quot;e&quot;:
+				return 14;
+			case &quot;f&quot;:
+				return 15;
+			default:
+				return parseInt(hex, 10);
+		}
+	};
+
+<span id='$common-method-hexToRGB'>	/**
+</span>	 * HEX value to RGB
+	 *
+	 * @public
+	 * @param  {String} hexColor
+	 * @return {Object}         
+	 * @memberof $common
+	 */
+	this.hexToRGB = function(hexColor) {
+		if (hexColor[0] == &quot;#&quot;) {
+			hexColor = hexColor.replace(&quot;#&quot;, &quot;&quot;);
+
+			if (hexColor.length == 3) {
+				return {
+					r: this.hxToDe(hexColor[0]) * 16 + this.hxToDe(hexColor[0]),
+					g: this.hxToDe(hexColor[1]) * 16 + this.hxToDe(hexColor[1]),
+					b: this.hxToDe(hexColor[2]) * 16 + this.hxToDe(hexColor[2])
+				};
+			}
+			else {
+				return {
+					r: this.hxToDe(hexColor[0]) * 16 + this.hxToDe(hexColor[1]),
+					g: this.hxToDe(hexColor[2]) * 16 + this.hxToDe(hexColor[3]),
+					b: this.hxToDe(hexColor[4]) * 16 + this.hxToDe(hexColor[5])
+				};
+			}
+		}
+		else {
+			return hexColor;
+		}
+	};
+
+<span id='$common-method-ift'>	/**
+</span>	 * If EXPR then function
+	 *
+	 * @public
+	 * @param  {Boolean} expr  test if (EXPR)
+	 * @param  {Function} fn
+	 * @param  {Function} scope
+	 * @memberof $common
+	 */
+	this.ift = function(expr, th, scope) {
+		if (expr) {
+			th.apply(scope || th, [expr]);
+		}
+	};
+
+<span id='$common-method-isElement'>	/**
+</span>	 * Is value element?
+	 *
+	 * @public
+	 * @param  {Object} val
+	 * @return {Boolean}
+	 * @memberof $common
+	 */
+	this.isElement = function(val) {
+		return (val instanceof HTMLElement);
+	};
+}]);
+</pre>
+</body>
+</html>

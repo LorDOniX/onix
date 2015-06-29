@@ -1,24 +1,20 @@
-/**
- * @namespace Select
- * @description DI: Common, Events; Returns class _Select;
- */
-Onix.factory("Select", [
-	"Common",
-	"Events",
+onix.factory("$select", [
+	"$common",
+	"$event",
 function(
-	Common,
-	Events
+	$common,
+	$event
 ) {
 	/**
-	 * Main class
+	 * Main class for select.
+	 * DI: $common, $event;
 	 *
-	 * @class _Select
-	 * @description Parent: Select;
+	 * @class $select
 	 * @param {NodeElement} el Where element has class "dropdown"
 	 */
-	var _Select = function(el) {
+	var $select = function(el) {
 		// extend our class
-		Common.extend(this, Events);
+		$common.extend(this, $event);
 
 		this._CONST = {
 			CAPTION_SEL: ".dropdown-toggle",
@@ -38,9 +34,9 @@ function(
 	 *
 	 * @private
 	 * @param {NodeElement} el Where element has class "dropdown"
-	 * @memberof _Select
+	 * @memberof $select
 	 */
-	_Select.prototype._bind = function(el) {
+	$select.prototype._bind = function(el) {
 		var captionEl = el.querySelector(this._CONST.CAPTION_SEL);
 		var con = this._CONST;
 
@@ -52,7 +48,7 @@ function(
 
 			var removeAllOpened = function() {
 				// remove all
-				Onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+				onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
 					item.classList.remove("open");
 				});
 			};
@@ -74,8 +70,8 @@ function(
 			}
 		});
 
-		Onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
-			option.addEventListener("click", Common.bindWithoutScope(function(e, scope) {
+		onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
+			option.addEventListener("click", $common.bindWithoutScope(function(e, scope) {
 				e.stopPropagation();
 
 				if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
@@ -95,5 +91,5 @@ function(
 		}, this);
 	};
 
-	return _Select;
+	return $select;
 }]);

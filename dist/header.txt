@@ -1,3 +1,0 @@
-/**
- * OnixJS framework; https://gitlab.com/LorDOniX/onix
- */

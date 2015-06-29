@@ -1,20 +1,20 @@
 /**
- * @namespace Loader
- * @description DI: DOM;
+ * @class $loader
+ * @description DI: $dom;
  */
-Onix.service("Loader", [
-	"DOM",
+onix.service("$loader", [
+	"$dom",
 function(
-	DOM
+	$dom
 ) {
 	/**
-	 * Create Loader.
+	 * Create $loader.
 	 *
 	 * @private
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this._create = function() {
-		this._el = DOM.create({
+		this._el = $dom.create({
 			el: "div",
 			"class": "loader"
 		});
@@ -27,7 +27,7 @@ function(
 	 * Loader init.
 	 *
 	 * @public
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this.init = function() {
 		this._create();
@@ -37,7 +37,7 @@ function(
 	 * Start loader.
 	 *
 	 * @public
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this.start = function() {
 		this._el.classList.add("start");
@@ -47,7 +47,7 @@ function(
 	 * End loader.
 	 *
 	 * @public
-	 * @memberof Loader
+	 * @memberof $loader
 	 */
 	this.end = function() {
 		this._el.classList.remove("start");

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$template'>/**
+</span> * @class $template
+ * @description DI: $common, $q, $http, $config;
+ */
+onix.service(&quot;$template&quot;, [
+	&quot;$common&quot;,
+	&quot;$q&quot;,
+	&quot;$http&quot;,
+	&quot;$config&quot;,
+function(
+	$common,
+	$q,
+	$http,
+	$config
+) {
+<span id='$template-property-_cache'>	/**
+</span>	 * Template cache.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $template
+	 */
+	this._cache = {};
+
+<span id='$template-property-_RE'>	/**
+</span>	 * Regular expressions
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $template
+	 */
+	this._RE = {
+		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
+		NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
+		STRINGS: /[&quot;&#39;][^&quot;&#39;]+[&quot;&#39;]/g,
+		JSONS: /[{][^}]+[}]/g,
+		ALL: /[-]?[0-9]+[.]?([0-9e]+)?|[&quot;&#39;][^&quot;&#39;]+[&quot;&#39;]|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+	};
+
+<span id='$template-method-_parseFnName'>	/**
+</span>	 * Parse a function name from the string.
+	 *
+	 * @private
+	 * @param  {String} value
+	 * @return {String}      
+	 * @memberof $template
+	 */
+	this._parseFnName = function(value) {
+		value = value || &quot;&quot;;
+
+		return value.match(/[a-zA-Z0-9_]+/)[0];
+	};
+
+<span id='$template-method-_parseArgs'>	/**
+</span>	 * Parse arguments from the string -&gt; makes array from them
+	 *
+	 * @private
+	 * @param  {String} value
+	 * @param  {Object} config { event, element... }
+	 * @return {Array}
+	 * @memberof $template
+	 */
+	this._parseArgs = function(value, config) {
+		argsValue = value ? value.replace(/^[^(]+./, &quot;&quot;).replace(/\).*$/, &quot;&quot;) : &quot;&quot;;
+
+		var args = [];
+		var matches = argsValue.match(this._RE.ALL);
+		
+		if (matches) {
+			var all = [];
+
+			matches.forEach(function(item) {
+				var value;
+
+				if (item.match(this._RE.STRINGS)) {
+					value = item.substr(1, item.length - 2)
+				}
+				else if (item.match(this._RE.NUMBERS)) {
+					value = parseFloat(item);
+				}
+				else if (item.match(this._RE.JSONS)) {
+					value = JSON.parse(item);
+				}
+				else if (item.match(this._RE.VARIABLE)) {
+					var variable = item.match(this._RE.VARIABLE)[0];
+
+					if (variable == &quot;$event&quot;) {
+						value = config.event;
+					}
+					else if (variable == &quot;$element&quot;) {
+						value = config.el;
+					}
+					else {
+						// todo - maybe eval with scope
+						value = null;
+					}
+				}
+
+				all.push({
+					value: value,
+					pos: argsValue.indexOf(item)
+				});
+			}, this);
+
+			if (all.length) {
+				all.sort(function(a, b) {
+					return a.pos - b.pos
+				}).forEach(function(item) {
+					args.push(item.value);
+				});
+			}
+		}
+
+		return args;
+	};
+
+<span id='$template-method-_bindEvent'>	/**
+</span>	 * Bind one single event to element.
+	 * 
+	 * @param  {NodeElement} el
+	 * @param  {String} eventName click, keydown...
+	 * @param  {String} data      data-x value
+	 * @param  {Function} scope
+	 * @memberof $template
+	 */
+	this._bindEvent = function(el, eventName, data, scope) {
+		if (data &amp;&amp; this._parseFnName(data) in scope) {
+			el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
+				var value = this.getAttribute(&quot;data-&quot; + eventName);
+				var fnName = templScope._parseFnName(value);
+				var args = templScope._parseArgs(value, {
+					el: this,
+					event: event
+				});
+
+				scope[fnName].apply(scope, args);
+			}, this));
+		}
+	};
+
+<span id='$template-method-init'>	/**
+</span>	 * Init - get all templates from the page.
+	 *
+	 * @public
+	 * @memberof $template
+	 */
+	this.init = function() {
+		onix.element(&quot;script[type=&#39;text/template&#39;]&quot;).forEach(function(item) {
+			this.add(item.id, item.innerHTML);
+		}, this);
+	};
+	
+<span id='$template-method-add'>	/**
+</span>	 * Add new item to the cachce
+	 *
+	 * @public
+	 * @param {String} key 
+	 * @param {String} data
+	 * @memberof $template
+	 */
+	this.add = function(key, data) {
+		this._cache[key] = data;
+	};
+
+<span id='$template-method-compile'>	/**
+</span>	 * Compile one template - replaces all ocurances of {} by model
+	 *
+	 * @public
+	 * @param  {String} key  Template key/name
+	 * @param  {Object} data Model
+	 * @return {String}
+	 * @memberof $template
+	 */
+	this.compile = function(key, data) {
+		var tmpl = this.get(key);
+		var cnf = $config.TMPL_DELIMITER;
+
+		if (data) {
+			Object.keys(data).forEach(function(key) {
+				tmpl = tmpl.replace(new RegExp(cnf.LEFT + &quot;[ ]*&quot; + key + &quot;[ ]*&quot; + cnf.RIGHT, &quot;g&quot;), data[key]);
+			});
+		}
+
+		return tmpl;
+	};
+
+<span id='$template-method-get'>	/**
+</span>	 * Get template from the cache
+	 *
+	 * @public
+	 * @param  {String} key Template key/name
+	 * @return {String}
+	 * @memberof $template
+	 */
+	this.get = function(key) {
+		return this._cache[key] || &quot;&quot;;
+	};
+
+<span id='$template-method-bindTemplate'>	/**
+</span>	 * Bind all elements in the root element.
+	 * Supports: click, change, bind
+	 *
+	 * @public
+	 * @param  {NodeElement} root
+	 * @param  {Object|Function} scope
+	 * @memberof $template
+	 */
+	this.bindTemplate = function(root, scope) {
+		var allElements = onix.element(&quot;*[data-click], *[data-change], *[data-bind]&quot;, root);
+
+		if (allElements.len()) {
+			var newEls = {};
+
+			allElements.forEach(function(item) {
+				this._bindEvent(item, &quot;click&quot;, item.getAttribute(&quot;data-click&quot;), scope);
+				this._bindEvent(item, &quot;change&quot;, item.getAttribute(&quot;data-change&quot;), scope);
+				this._bindEvent(item, &quot;keydown&quot;, item.getAttribute(&quot;data-keydown&quot;), scope);
+
+				var dataBind = item.getAttribute(&quot;data-bind&quot;);
+
+				if (dataBind) {
+					newEls[dataBind] = item;
+				}
+			}, this);
+
+			if (&quot;addEls&quot; in scope &amp;&amp; typeof scope.addEls === &quot;function&quot;) {
+				scope.addEls(newEls);
+			}
+		}
+	};
+
+<span id='$template-method-load'>	/**
+</span>	 * Load template from the path.
+	 *
+	 * @public
+	 * @param  {String} key
+	 * @param  {String} path
+	 * @return {$q}
+	 * @memberof $template
+	 */
+	this.load = function(key, path) {
+		var promise = $q.defer();
+
+		$http.createRequest({
+			url: path
+		}).then(function(data) {
+			this.add(key, data.data);
+
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.reject();
+		});
+
+		return promise;
+	};
+}]);
+</pre>
+</body>
+</html>

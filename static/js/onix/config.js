@@ -1,8 +1,8 @@
 /**
  * Main framework configuration
- * @namespace CONFIG
+ * @class CONFIG
  */
-Onix.config({
+onix.config({
 	/**
 	 * Localization
 	 *

@@ -1,7 +1,9 @@
-Onix.service("HomeResource", [
-	"Http",
+testApp.service("HomeResource", [
+	"$http",
+	"$config",
 function(
-	Http
+	$http,
+	$config
 ) {
 	// ------------------------ private ---------------------------------------
 	
@@ -9,7 +11,7 @@ function(
 	 * Base URL.
 	 * @type {String}
 	 */
-	this._baseURL = Onix.config("URLS").HOME;
+	this._baseURL = $config.URLS.HOME;
 
 	// ------------------------ public ----------------------------------------
 
@@ -18,7 +20,7 @@ function(
 	 * @return {Promise}
 	 */
 	this.get = function() {
-		return Http.createRequest({
+		return $http.createRequest({
 			url: this._baseURL
 		});
 	};

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CONFIG'>/**
+</span> * Main framework configuration
+ * @class CONFIG
+ */
+onix.config({
+<span id='CONFIG-property-LOCALIZATION'>	/**
+</span>	 * Localization
+	 *
+	 * @public
+	 * @type {Object}
+	 * @memberof CONFIG
+	 */
+	LOCALIZATION: {
+		LANG: &quot;cs&quot;,
+		PATH: &quot;/js/locale/cs.json&quot;
+	},
+
+<span id='CONFIG-property-URLS'>	/**
+</span>	 * Resource urls
+	 *
+	 * @public
+	 * @type {Object}
+	 * @memberof CONFIG
+	 */
+	URLS: {
+		HOME: &quot;/api/home/&quot;
+	},
+
+<span id='CONFIG-property-TMPL_DELIMITER'>	/**
+</span>	 * Template delimiter
+	 *
+	 * @public
+	 * @type {Object}
+	 * @memberof CONFIG
+	 */
+	TMPL_DELIMITER: {
+		LEFT: &quot;{{&quot;,
+		RIGHT: &quot;}}&quot;
+	},
+
+<span id='CONFIG-property-DETAIL_SEL'>	/**
+</span>	 * Detail page selector
+	 *
+	 * @public
+	 * @type {String}
+	 * @memberof CONFIG
+	 */
+	DETAIL_SEL: &quot;.detail&quot;
+});
+</pre>
+</body>
+</html>

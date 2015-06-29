@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">onix.factory(&quot;$$notify&quot;, [
+	&quot;$q&quot;,
+	&quot;$common&quot;,
+function(
+	$q,
+	$common
+) {
+<span id='$$notify'>	/**
+</span>	 * Notification object
+	 * DI: $q; $common;
+	 *
+	 * @class $$notify
+	 * @param {NodeElement} el
+	 */
+	var $$notify = function(el) {
+		this._el = el;
+
+		this._HIDE_TIMEOUT = 1500; // [ms]
+
+		this._options = {
+			&quot;ok&quot;: &quot;alert-success&quot;,
+			&quot;error&quot;: &quot;alert-danger&quot;,
+			&quot;info&quot;: &quot;alert-info&quot;
+		};
+
+		return this;
+	};
+
+<span id='$$notify-method-_setValue'>	/**
+</span>	 * Set value to the notify element
+	 *
+	 * @private
+	 * @param  {String|NodeElement} txt
+	 * @memberof $$notify
+	 */
+	$$notify.prototype._setValue = function(txt) {
+		if ($common.isElement(txt)) {
+			this._el.innerHTML = &quot;&quot;;
+			this._el.appendChild(txt);
+		}
+		else if (typeof txt === &quot;string&quot;) {
+			this._el.innerHTML = txt;
+		}
+	};
+
+<span id='$$notify-method-reset'>	/**
+</span>	 * Reset classess
+	 *
+	 * @public
+	 * @memberof $$notify
+	 */
+	$$notify.prototype.reset = function() {
+		Object.keys(this._options).forEach(function(key) {
+			this._el.classList.remove(this._options[key]);
+		}.bind(this));
+
+		return this;
+	};
+
+<span id='$$notify-method-ok'>	/**
+</span>	 * Show OK state
+	 * 
+	 * @public
+	 * @param  {String|NodeElement} txt
+	 * @memberof $$notify
+	 */
+	$$notify.prototype.ok = function(txt) {
+		this._el.classList.add(this._options[&quot;ok&quot;]);
+		
+		this._setValue(txt);
+
+		return this;
+	};
+
+<span id='$$notify-method-error'>	/**
+</span>	 * Show ERROR state
+	 * 
+	 * @public
+	 * @param  {String|NodeElement} txt
+	 * @memberof $$notify
+	 */
+	$$notify.prototype.error = function(txt) {
+		this._el.classList.add(this._options[&quot;error&quot;]);
+		
+		this._setValue(txt);
+
+		return this;
+	};
+
+<span id='$$notify-method-info'>	/**
+</span>	 * Show INFO state
+	 *
+	 * @public
+	 * @param  {String|NodeElement} txt
+	 * @memberof $$notify
+	 */
+	$$notify.prototype.info = function(txt) {
+		this._el.classList.add(this._options[&quot;info&quot;]);
+		
+		this._setValue(txt);
+
+		return this;
+	};
+
+<span id='$$notify-method-hide'>	/**
+</span>	 * Timeout hide.
+	 *
+	 * @public
+	 * @return {$q}
+	 * @memberof $$notify
+	 */
+	$$notify.prototype.hide = function() {
+		var promise = $q.defer();
+
+		setTimeout(function() {
+			this.reset();
+			
+			promise.resolve();
+		}.bind(this), this._HIDE_TIMEOUT);
+
+		return promise;
+	};
+
+	return $$notify;
+}]);
+</pre>
+</body>
+</html>

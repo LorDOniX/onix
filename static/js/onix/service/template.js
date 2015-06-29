@@ -1,0 +1,256 @@
+/**
+ * @class $template
+ * @description DI: $common, $q, $http, $config;
+ */
+onix.service("$template", [
+	"$common",
+	"$q",
+	"$http",
+	"$config",
+function(
+	$common,
+	$q,
+	$http,
+	$config
+) {
+	/**
+	 * Template cache.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $template
+	 */
+	this._cache = {};
+
+	/**
+	 * Regular expressions
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $template
+	 */
+	this._RE = {
+		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
+		NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
+		STRINGS: /["'][^"']+["']/g,
+		JSONS: /[{][^}]+[}]/g,
+		ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+	};
+
+	/**
+	 * Parse a function name from the string.
+	 *
+	 * @private
+	 * @param  {String} value
+	 * @return {String}      
+	 * @memberof $template
+	 */
+	this._parseFnName = function(value) {
+		value = value || "";
+
+		return value.match(/[a-zA-Z0-9_]+/)[0];
+	};
+
+	/**
+	 * Parse arguments from the string -> makes array from them
+	 *
+	 * @private
+	 * @param  {String} value
+	 * @param  {Object} config { event, element... }
+	 * @return {Array}
+	 * @memberof $template
+	 */
+	this._parseArgs = function(value, config) {
+		argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
+
+		var args = [];
+		var matches = argsValue.match(this._RE.ALL);
+		
+		if (matches) {
+			var all = [];
+
+			matches.forEach(function(item) {
+				var value;
+
+				if (item.match(this._RE.STRINGS)) {
+					value = item.substr(1, item.length - 2)
+				}
+				else if (item.match(this._RE.NUMBERS)) {
+					value = parseFloat(item);
+				}
+				else if (item.match(this._RE.JSONS)) {
+					value = JSON.parse(item);
+				}
+				else if (item.match(this._RE.VARIABLE)) {
+					var variable = item.match(this._RE.VARIABLE)[0];
+
+					if (variable == "$event") {
+						value = config.event;
+					}
+					else if (variable == "$element") {
+						value = config.el;
+					}
+					else {
+						// todo - maybe eval with scope
+						value = null;
+					}
+				}
+
+				all.push({
+					value: value,
+					pos: argsValue.indexOf(item)
+				});
+			}, this);
+
+			if (all.length) {
+				all.sort(function(a, b) {
+					return a.pos - b.pos
+				}).forEach(function(item) {
+					args.push(item.value);
+				});
+			}
+		}
+
+		return args;
+	};
+
+	/**
+	 * Bind one single event to element.
+	 * 
+	 * @param  {NodeElement} el
+	 * @param  {String} eventName click, keydown...
+	 * @param  {String} data      data-x value
+	 * @param  {Function} scope
+	 * @memberof $template
+	 */
+	this._bindEvent = function(el, eventName, data, scope) {
+		if (data && this._parseFnName(data) in scope) {
+			el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
+				var value = this.getAttribute("data-" + eventName);
+				var fnName = templScope._parseFnName(value);
+				var args = templScope._parseArgs(value, {
+					el: this,
+					event: event
+				});
+
+				scope[fnName].apply(scope, args);
+			}, this));
+		}
+	};
+
+	/**
+	 * Init - get all templates from the page.
+	 *
+	 * @public
+	 * @memberof $template
+	 */
+	this.init = function() {
+		onix.element("script[type='text/template']").forEach(function(item) {
+			this.add(item.id, item.innerHTML);
+		}, this);
+	};
+	
+	/**
+	 * Add new item to the cachce
+	 *
+	 * @public
+	 * @param {String} key 
+	 * @param {String} data
+	 * @memberof $template
+	 */
+	this.add = function(key, data) {
+		this._cache[key] = data;
+	};
+
+	/**
+	 * Compile one template - replaces all ocurances of {} by model
+	 *
+	 * @public
+	 * @param  {String} key  Template key/name
+	 * @param  {Object} data Model
+	 * @return {String}
+	 * @memberof $template
+	 */
+	this.compile = function(key, data) {
+		var tmpl = this.get(key);
+		var cnf = $config.TMPL_DELIMITER;
+
+		if (data) {
+			Object.keys(data).forEach(function(key) {
+				tmpl = tmpl.replace(new RegExp(cnf.LEFT + "[ ]*" + key + "[ ]*" + cnf.RIGHT, "g"), data[key]);
+			});
+		}
+
+		return tmpl;
+	};
+
+	/**
+	 * Get template from the cache
+	 *
+	 * @public
+	 * @param  {String} key Template key/name
+	 * @return {String}
+	 * @memberof $template
+	 */
+	this.get = function(key) {
+		return this._cache[key] || "";
+	};
+
+	/**
+	 * Bind all elements in the root element.
+	 * Supports: click, change, bind
+	 *
+	 * @public
+	 * @param  {NodeElement} root
+	 * @param  {Object|Function} scope
+	 * @memberof $template
+	 */
+	this.bindTemplate = function(root, scope) {
+		var allElements = onix.element("*[data-click], *[data-change], *[data-bind]", root);
+
+		if (allElements.len()) {
+			var newEls = {};
+
+			allElements.forEach(function(item) {
+				this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
+				this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
+				this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
+
+				var dataBind = item.getAttribute("data-bind");
+
+				if (dataBind) {
+					newEls[dataBind] = item;
+				}
+			}, this);
+
+			if ("addEls" in scope && typeof scope.addEls === "function") {
+				scope.addEls(newEls);
+			}
+		}
+	};
+
+	/**
+	 * Load template from the path.
+	 *
+	 * @public
+	 * @param  {String} key
+	 * @param  {String} path
+	 * @return {$q}
+	 * @memberof $template
+	 */
+	this.load = function(key, path) {
+		var promise = $q.defer();
+
+		$http.createRequest({
+			url: path
+		}).then(function(data) {
+			this.add(key, data.data);
+
+			promise.resolve();
+		}.bind(this), function(data) {
+			promise.reject();
+		});
+
+		return promise;
+	};
+}]);

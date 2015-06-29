@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$location'>/**
+</span> * @class $location
+ */
+onix.service(&quot;$location&quot;, function() {
+	// ------------------------ public ----------------------------------------
+	
+<span id='$location-method-refresh'>	/**
+</span>	 * Page refresh.
+	 *
+	 * @public
+	 * @memberof $location
+	 */
+	this.refresh = function() {
+		window.location.reload();
+	};
+
+<span id='$location-method-createSearchURL'>	/**
+</span>	 * Create a new search url.
+	 * 
+	 * @public
+	 * @param  {Object} obj
+	 * @return {String}
+	 * @memberof $location
+	 */
+	this.createSearchURL = function(obj) {
+		var newURL = [];
+
+		if (obj) {
+			// write
+			var newURL = [];
+
+			Object.keys(obj).forEach(function(key) {
+				newURL.push(key + &quot;=&quot; + encodeURIComponent(obj[key]));
+			});
+		}
+
+		if (newURL.length) {
+			return &quot;?&quot; + newURL.join(&quot;&amp;&quot;);
+		}
+		else return &quot;&quot;;
+	};
+
+<span id='$location-method-search'>	/**
+</span>	 * Get or set new url search. obj -&gt; set new url from obj; !obj -&gt; create obj from search part of url
+	 *
+	 * @public
+	 * @param  {Object} [obj]
+	 * @return {Null|Object}
+	 * @memberof $location
+	 */
+	this.search = function(obj) {
+		if (obj) {
+			// write
+			var newURL = this.createSearchURL(obj);
+
+			if (newURL) {
+				window.location.search = newURL;
+			}
+		}
+		else {
+			// read
+			var data = location.search;
+			var output = {};
+
+			if (data) {
+				data = data.replace(&quot;?&quot;, &quot;&quot;);
+
+				data.split(&quot;&amp;&quot;).forEach(function(item) {
+					var parts = item.split(&quot;=&quot;);
+					
+					output[parts[0]] = decodeURIComponent(parts[1]);
+				});
+			}
+
+			return output;
+		}
+	};
+
+<span id='$location-method-get'>	/**
+</span>	 * Get current location
+	 *
+	 * @public
+	 * @return {String}
+	 * @memberof $location
+	 */
+	this.get = function() {
+		return window.location.pathname;
+	};
+	
+});
+</pre>
+</body>
+</html>
