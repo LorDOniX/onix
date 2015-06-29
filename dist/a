@@ -205,7 +205,7 @@ onix = (function() {
 			// delete them
 			this._allObj.length = 0;
 
-			var configs = [];
+			var runs = [];
 			var $directive = this.getObject("$directive");
 
 			// process all modules
@@ -492,7 +492,6 @@ onix = (function() {
 			if (controllerData) {
 				$scope._setConfig(controllerData);
 			}
-
 			$scope._init();
 		},
 

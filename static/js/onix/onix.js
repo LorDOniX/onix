@@ -8,9 +8,8 @@ onix = (function() {
 		FACTORY: 2,
 		CONSTANT: 3,
 		RUN: 4,
-		CONFIG: 5,
-		CONTROLLER: 6,
-		DIRECTIVE: 7
+		CONTROLLER: 5,
+		DIRECTIVE: 6
 	};
 
 	/**
@@ -117,17 +116,14 @@ onix = (function() {
 	};
 
 	/**
-	 * Add a new run
+	 * Add a new config
 	 * 
 	 * @public
-	 * @param  {Array|Function} param With DI
+	 * @param  {Object} obj
 	 * @memberof $$module
 	 */
-	$$module.prototype.config = function(param) {
-		this._allObj.push({
-			param: param,
-			type: TYPES.CONFIG
-		});
+	$$module.prototype.config = function(obj) {
+		onix.config(obj);
 	};
 
 	/**
@@ -210,7 +206,6 @@ onix = (function() {
 			this._allObj.length = 0;
 
 			var configs = [];
-			var runs = [];
 			var $directive = this.getObject("$directive");
 
 			// process all modules
@@ -246,21 +241,12 @@ onix = (function() {
 						case TYPES.RUN:
 							runs.push(moduleItem);
 							break;
-
-						case TYPES.CONFIG:
-							configs.push(moduleItem);
-							break;
 					}
 				}, this);
 			}, this);
 
 			// onix main run
 			this._DI(this._run).run(this);
-
-			// run all configs
-			configs.forEach(function(config) {
-				this._DI(["$config", config.param]).run();
-			}, this);
 
 			var $q = this.getObject("$q");
 			var all = [];
@@ -277,10 +263,16 @@ onix = (function() {
 
 			var $route = this.getObject("$route");
 
-			$q.all(all)["finally"](function() {
+			if (all.length) {
+				$q.all(all)["finally"](function() {
+					// route go
+					$route.go();
+				});
+			}
+			else {
 				// route go
 				$route.go();
-			});
+			}
 		},
 
 		/**
@@ -376,16 +368,22 @@ onix = (function() {
 		},
 
 		/**
-		 * Add config to the onix application.
+		 * Read/add config to the onix application.
 		 *
 		 * @public
-		 * @param  {Object} obj
+		 * @param  {Object|String} obj
 		 * @memberof onix
 		 */
 		config: function(obj) {
-			Object.keys(obj).forEach(function(key) {
-				this._objects[this._CONFIG_NAME][key] = obj[key];
-			}.bind(this));
+			if (typeof obj === "string") {
+				// obj is key
+				return this._objects[this._CONFIG_NAME][obj];
+			}
+			else if (typeof obj === "object") {
+				Object.keys(obj).forEach(function(key) {
+					this._objects[this._CONFIG_NAME][key] = obj[key];
+				}.bind(this));
+			}
 		},
 
 		/**
@@ -468,10 +466,11 @@ onix = (function() {
 		 * Run controller
 		 * 
 		 * @param  {String|Array|Function} controller 
+		 * @param  {Object} [controllerData] 
 		 * @public
 		 * @memberof onix
 		 */
-		runController: function(controller) {
+		runController: function(controller, controllerData) {
 			var $controller = this.getObject("$controller");
 			var $scope = $controller.create(["$event"], {});
 			var replaceObj = {
@@ -488,6 +487,10 @@ onix = (function() {
 			}
 			else if (typeof controller === "function") {
 				controller.apply(config.controller, [$scope]);
+			}
+
+			if (controllerData) {
+				$scope._setConfig(controllerData);
 			}
 
 			$scope._init();

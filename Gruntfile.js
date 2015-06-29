@@ -33,9 +33,9 @@ module.exports = function(grunt) {
 					"static/js/onix/service/location.js",
 					"static/js/onix/service/provide.js",
 
+					"static/js/onix/service/common.js",
 					"static/js/onix/factory/_notify.js",
 					"static/js/onix/service/notify.js",
-					"static/js/onix/service/common.js",
 					"static/js/onix/factory/event.js",
 					"static/js/onix/service/loader.js",
 

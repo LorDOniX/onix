@@ -102,12 +102,14 @@ function(
 		}
 
 		if (config) {
+			// todo - clear all routeParams - never set
 			Object.keys($routeParams).forEach(function(key) {
 				delete $routeParams[key];
 			});
 
 			var templateUrl = null;
 			var contr = null;
+			var contrData = {};
 
 			Object.keys(config).forEach(function(key) {
 				var value = config[key];
@@ -122,20 +124,20 @@ function(
 						break;
 
 					default:
-						$routeParams[key] = config[key];
+						contrData[key] = value;
 				}
 			});
 
 			if (templateUrl) {
 				$template.load(config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
-						onix.runController(contr);
+						onix.runController(contr, contrData);
 					}
 				});
 			}
 			else {
 				if (contr) {
-					onix.runController(contr);
+					onix.runController(contr, contrData);
 				}
 			}
 		}
