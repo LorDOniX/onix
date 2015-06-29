@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
 		concat: {
 			options: {
-				separator: ''
+				separator: ';'
 			},
 			dist: {
 				src: [
@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 					"static/js/onix/factory/select.js"
 				],
 
-				dest: 'tmp/onix-js-framework.js',
+				dest: 'dist/onix-js-framework.js',
 			},
 
 			distEnd: {
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
 		uglify: {
 			dist: {
 				files: {
-					'tmp/onix-js-framework.min.js': ['tmp/onix-js-framework.js']
+					'tmp/onix-js-framework.min.js': ['dist/onix-js-framework.js']
 				}
 			}
 		},

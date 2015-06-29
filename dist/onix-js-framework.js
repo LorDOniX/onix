@@ -9,12 +9,13 @@ onix = (function() {
 		CONSTANT: 3,
 		RUN: 4,
 		CONFIG: 5,
-		CONTROLLER: 6
+		CONTROLLER: 6,
+		DIRECTIVE: 7
 	};
 
 	/**
 	 * $$module item
-	 * @class
+	 * @class $$module
 	 * 
 	 */
 	var $$module = function() {
@@ -70,6 +71,22 @@ onix = (function() {
 	};
 
 	/**
+	 * Add a new directive
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.directive = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.DIRECTIVE
+		});
+	};
+
+	/**
 	 * Add new constant
 	 * 
 	 * @public
@@ -114,7 +131,9 @@ onix = (function() {
 	};
 
 	/**
-	 * @namespace onix
+	 * Main framework object.
+	 * 
+	 * @class onix
 	 */
 	var onix = {
 		/**
@@ -178,11 +197,11 @@ onix = (function() {
 				// only 2 types
 				switch (item.type) {
 					case TYPES.SERVICE:
-						this._objects[item.name] = this.DI(item.param).newRun();
+						this._objects[item.name] = this._DI(item.param).newRun();
 						break;
 
 					case TYPES.FACTORY:
-						this._objects[item.name] = this.DI(item.param).run();
+						this._objects[item.name] = this._DI(item.param).run();
 						break;
 				}
 			}, this);
@@ -192,6 +211,7 @@ onix = (function() {
 
 			var configs = [];
 			var runs = [];
+			var $directive = this.getObject("$directive");
 
 			// process all modules
 			Object.keys(this._modules).forEach(function(moduleName) {
@@ -201,16 +221,26 @@ onix = (function() {
 					// modules have more types
 					switch (moduleItem.type) {
 						case TYPES.SERVICE:
-							this._objects[moduleItem.name] = this.DI(moduleItem.param).newRun();
+							this._objects[moduleItem.name] = this._DI(moduleItem.param).newRun();
 							break;
 
 						case TYPES.FACTORY:
-							this._objects[moduleItem.name] = this.DI(moduleItem.param).run();
+							this._objects[moduleItem.name] = this._DI(moduleItem.param).run();
 							break;
 
 						case TYPES.CONSTANT:
 						case TYPES.CONTROLLER:
 							this._objects[moduleItem.name] = moduleItem.param;
+							break;
+
+						case TYPES.DIRECTIVE:
+							var $scope = $directive.create(["$event"], {});
+
+							this._DI(moduleItem.param, {
+								$scope: $scope
+							}).run();
+
+							this._objects[moduleItem.name] = $scope;
 							break;
 
 						case TYPES.RUN:
@@ -225,17 +255,32 @@ onix = (function() {
 			}, this);
 
 			// onix main run
-			this.DI(this._run).run(this);
+			this._DI(this._run).run(this);
 
 			// run all configs
 			configs.forEach(function(config) {
-				this.DI(config.param).run();
+				this._DI(["$config", config.param]).run();
 			}, this);
+
+			var $q = this.getObject("$q");
+			var all = [];
 
 			// run all runs
 			runs.forEach(function(run) {
-				this.DI(run.param).run();
+				var runO = this._DI(run.param).run();
+
+				// returns a promise
+				if (runO && "_E_STATES" in runO) {
+					all.push(runO);
+				}
 			}, this);
+
+			var $route = this.getObject("$route");
+
+			$q.all(all)["finally"](function() {
+				// route go
+				$route.go();
+			});
 		},
 
 		/**
@@ -276,6 +321,59 @@ onix = (function() {
 				$i18n.setLanguage(langKey);
 			});
 		}],
+
+		/**
+		 * Dependency injection
+		 *
+		 * @private
+		 * @param  {Function|Array} param
+		 * @param  {Object} [replace]
+		 * @return {Object}
+		 * @memberof onix
+		 */
+		_DI: function(param, replace) {
+			var fn;
+			var args = [];
+
+			replace = replace || {};
+
+			if (Array.isArray(param)) {
+				param.every(function(item) {
+					if (typeof item === "function") {
+						fn = item;
+						return false;
+					}
+					else {
+						args.push(item in replace ? replace[item] : this._objects[item]);
+					}
+
+					return true;
+				}, this);
+			}
+			else {
+				fn = param;
+			}
+
+			return {
+				/**
+				 * Run new binded function
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				run: function(scope) {
+					return fn.apply(scope || fn, args);
+				},
+
+				/**
+				 * Run new binded function - with the new
+				 * @param  {Function|Object} [scope] 
+				 * @return {Object}
+				 */
+				newRun: function(scope) {
+					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+				}
+			};
+		},
 
 		/**
 		 * Add config to the onix application.
@@ -358,60 +456,56 @@ onix = (function() {
 
 		/**
 		 * Empty function
+		 *
+		 * @public
+		 * @memberof onix
 		 */
 		noop: function() {
 
 		},
 
 		/**
-		 * Dependency injection
-		 *
-		 * @private
-		 * @param  {Function|Array} param
-		 * @return {Object}
+		 * Run controller
+		 * 
+		 * @param  {String|Array|Function} controller 
+		 * @public
 		 * @memberof onix
 		 */
-		DI: function(param) {
-			var fn;
-			var args = [];
-
-			if (Array.isArray(param)) {
-				param.every(function(item) {
-					if (typeof item === "function") {
-						fn = item;
-						return false;
-					}
-					else {
-						args.push(this._objects[item]);
-					}
-
-					return true;
-				}, this);
-			}
-			else {
-				fn = param;
-			}
-
-			return {
-				/**
-				 * Run new binded function
-				 * @param  {Function|Object} [scope] 
-				 * @return {Object}
-				 */
-				run: function(scope) {
-					return fn.apply(scope || fn, args);
-				},
-
-				/**
-				 * Run new binded function - with the new
-				 * @param  {Function|Object} [scope] 
-				 * @return {Object}
-				 */
-				newRun: function(scope) {
-					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
-				}
+		runController: function(controller) {
+			var $controller = this.getObject("$controller");
+			var $scope = $controller.create(["$event"], {});
+			var replaceObj = {
+				$scope: $scope
 			};
+
+			if (typeof controller === "string") {
+				var param = this.getObject(controller);
+
+				this._DI(param, replaceObj).run();
+			}
+			else if (Array.isArray(controller)) {
+				this._DI(controller, replaceObj).run();
+			}
+			else if (typeof controller === "function") {
+				controller.apply(config.controller, [$scope]);
+			}
+
+			$scope._init();
 		},
+
+		/**
+		 * Framework info.
+		 *
+		 * @public
+		 * @memberof onix
+		 */
+		info: function() {
+			console.log(
+				"Onix JS Framework\n" +
+				"Version: 2.0.0\n" +
+				"Date: 29. 6. 2015"
+			);
+		}
 	};
 
 	// init app
@@ -419,9 +513,9 @@ onix = (function() {
 
 	return onix;
 })();
-/**
+;/**
  * Main framework configuration
- * @namespace CONFIG
+ * @class CONFIG
  */
 onix.config({
 	/**
@@ -468,13 +562,20 @@ onix.config({
 	 */
 	DETAIL_SEL: ".detail"
 });
-onix.factory("$$promise", function() {
+;/**
+ * @class $routeParams
+ */
+onix.service("$routeParams", function() {
+	return {};
+});
+;onix.factory("$$promise", function() {
 	/**
 	 * @class $$promise
 	 */
 	var $$promise = function() {
 		/**
 		 * Promise states
+		 * 
 		 * @const
 		 * @memberof $$promise
 		 */
@@ -639,14 +740,14 @@ onix.factory("$$promise", function() {
 
 	return $$promise;
 });
-onix.factory("$q", [
+;onix.factory("$q", [
 	"$$promise",
 function(
 	$$promise
 ) {
 	/**
- 	 * @namespace $q
- 	 * @description: DI $$promise;
+ 	 * @class $q
+ 	 * @description DI: $$promise;
  	 */
 	return {
 		/**
@@ -693,7 +794,7 @@ function(
 		}
 	};
 }]);
-onix.factory("$$myQuery", function() {
+;onix.factory("$$myQuery", function() {
 	/**
 	 * Cover function
 	 * 
@@ -1094,13 +1195,14 @@ onix.factory("$$myQuery", function() {
 
 	return $$myQuery;
 });
-onix.factory("$myQuery", [
+;onix.factory("$myQuery", [
 	"$$myQuery",
 function(
 	$$myQuery
 ) {
 	/**
- 	 * @namespace $myQuery
+ 	 * @class $myQuery
+ 	 * @description DI: $$myQuery;
  	 */
 	return {
 		 /**
@@ -1117,8 +1219,8 @@ function(
 		}
 	};
 }]);
-/**
- * @namespace $dom
+;/**
+ * @class $dom
  */
 onix.service("$dom", function() {
 	/**
@@ -1227,8 +1329,8 @@ onix.service("$dom", function() {
 		return output;
 	};
 });
-/**
- * @namespace $location
+;/**
+ * @class $location
  */
 onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
@@ -1317,129 +1419,39 @@ onix.service("$location", function() {
 	};
 	
 });
-/**
- * @namespace $route
- * @description DI: $location;
+;/**
+ * @class $provide
  */
-onix.service("$route", [
-	"$location",
-function(
-	$location
-) {
+onix.service("$provide", function() {
 	/**
-	 * All routes
-	 *
-	 * @private
-	 * @type {Array}
-	 * @memberof $route
-	 */
-	this._routes = [];
-
-	/**
-	 * Otherwise route
-	 *
-	 * @private
-	 * @type {Object}
-	 * @memberof $route
-	 */
-	this._otherwise = null;
-
-	/**
-	 * $route init.
+	 * Decorate existing object.
 	 *
 	 * @public
-	 * @memberof $route
+	 * @param  {String} name Object name
+	 * @param  {Function} cb Callback function
+	 * @memberof $provide
 	 */
-	this.init = function() {
-	};
+	this.decorator = function(name, cb) {
+		var obj = onix.getObject(name);
 
-	/**
-	 * Add route to router.
-	 *
-	 * @public
-	 * @param  {String} url 
-	 * @param  {Object} config
-	 * @return {Himself}
-	 * @memberof $route
-	 */
-	this.when = function(url, config) {
-		this._routes.push({
-			url: url,
-			config: config
-		});
-
-		return this;
-	};
-
-	/**
-	 * Otherwise
-	 *
-	 * @public
-	 * @param  {String} page
-	 * @param  {Object} config
-	 * @return {Himself}
-	 * @memberof $route
-	 */
-	this.otherwise = function(config) {
-		this._otherwise = {
-			config: config
-		};
-
-		return this;
-	};
-
-	/**
-	 * $route GO.
-	 *
-	 * @public
-	 * @memberof $route
-	 */
-	this.go = function() {
-		var path = $location.get();
-		var find = false;
-		var config = null;
-		var data = {};
-
-		this._routes.every(function(item) {
-			if (path.match(new RegExp(item.url))) {
-				config = item.config;
-				find = true;
-				
-				return false;
-			}
-			else {
-				return true;
-			}
-		});
-
-		if (!find && this._otherwise) {
-			config = this._otherwise.config;
-		}
-
-		if (config) {
-			if (typeof config.controller === "string") {
-				var param = onix.getObject(config.controller);
-				onix.DI(param).run();
-			}
-			else if (Array.isArray(config.controller)) {
-				onix.DI(config.controller).run();
-			}
-			else if (typeof config.controller === "function") {
-				config.controller.apply(config.controller, []);
-			}
+		if (obj) {
+			// todo - maybe public function?
+			onix._objects[name] = cb(obj);
 		}
 	};
-}]);
-onix.factory("$$notify", [
+});
+;onix.factory("$$notify", [
 	"$q",
+	"$common",
 function(
-	$q
+	$q,
+	$common
 ) {
 	/**
 	 * Notification object
+	 * DI: $q; $common;
 	 *
 	 * @class $$notify
-	 * @description Parent: Notify;
 	 * @param {NodeElement} el
 	 */
 	var $$notify = function(el) {
@@ -1454,6 +1466,23 @@ function(
 		};
 
 		return this;
+	};
+
+	/**
+	 * Set value to the notify element
+	 *
+	 * @private
+	 * @param  {String|NodeElement} txt
+	 * @memberof $$notify
+	 */
+	$$notify.prototype._setValue = function(txt) {
+		if ($common.isElement(txt)) {
+			this._el.innerHTML = "";
+			this._el.appendChild(txt);
+		}
+		else if (typeof txt === "string") {
+			this._el.innerHTML = txt;
+		}
 	};
 
 	/**
@@ -1474,12 +1503,13 @@ function(
 	 * Show OK state
 	 * 
 	 * @public
-	 * @param  {String} txt
+	 * @param  {String|NodeElement} txt
 	 * @memberof $$notify
 	 */
 	$$notify.prototype.ok = function(txt) {
 		this._el.classList.add(this._options["ok"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};
@@ -1488,12 +1518,13 @@ function(
 	 * Show ERROR state
 	 * 
 	 * @public
-	 * @param  {String} txt      
+	 * @param  {String|NodeElement} txt
 	 * @memberof $$notify
 	 */
 	$$notify.prototype.error = function(txt) {
 		this._el.classList.add(this._options["error"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};
@@ -1502,12 +1533,13 @@ function(
 	 * Show INFO state
 	 *
 	 * @public
-	 * @param  {String} txt      
+	 * @param  {String|NodeElement} txt
 	 * @memberof $$notify
 	 */
 	$$notify.prototype.info = function(txt) {
 		this._el.classList.add(this._options["info"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};
@@ -1528,21 +1560,13 @@ function(
 			promise.resolve();
 		}.bind(this), this._HIDE_TIMEOUT);
 
-		/**
-		 * Decorate existing object.
-		 *
-		 * @public
-		 * @param  {String} name Object name
-		 * @param  {Function} cb Callback function
-		 * @memberof Provide
-		 */
-		decorator: function(name, cb) {
-			var obj = Onix.getObject(name);
+		return promise;
+	};
 
 	return $$notify;
 }]);
-/**
- * @namespace $notify
+;/**
+ * @class $notify
  * @description DI: $$notify;
  */
 onix.service("$notify", [
@@ -1561,9 +1585,9 @@ function(
 	this.get = function(el) {
 		return new $$notify(el);
 	};
-});
-/**
- * @namespace $common
+}]);
+;/**
+ * @class $common
  * @description DI: $q;
  */
 onix.service("$common", [
@@ -1867,160 +1891,21 @@ function(
 	 *
 	 * @public
 	 * @param  {Object} val
-	 * @memberof Common
 	 * @return {Boolean}
+	 * @memberof $common
 	 */
 	this.isElement = function(val) {
 		return (val instanceof HTMLElement);
 	};
 }]);
-/**
- * @namespace Notify
- * @description DI: Promise;
- */
-Onix.service("Notify", [
-	"Promise",
-	"Common",
-function(
-	Promise,
-	Common
-) {
-	/**
-	 * Notification object
-	 *
-	 * @class _Notify
-	 * @description Parent: Notify;
-	 * @param {NodeElement} el
-	 */
-	var _Notify = function(el) {
-		this._el = el;
-
-		this._HIDE_TIMEOUT = 1500; // [ms]
-
-		this._options = {
-			"ok": "alert-success",
-			"error": "alert-danger",
-			"info": "alert-info"
-		};
-
-		return this;
-	};
-
-	/**
-	 * Set value to the notify element
-	 *
-	 * @private
-	 * @param  {String|NodeElement} txt
-	 * @memberof _Notify
-	 */
-	_Notify.prototype._setValue = function(txt) {
-		if (Common.isElement(txt)) {
-			this._el.innerHTML = "";
-			this._el.appendChild(txt);
-		}
-		else if (typeof txt === "string") {
-			this._el.innerHTML = txt;
-		}
-	};
-
-	/**
-	 * Reset classess
-	 *
-	 * @public
-	 * @memberof _Notify
-	 */
-	_Notify.prototype.reset = function() {
-		Object.keys(this._options).forEach(function(key) {
-			this._el.classList.remove(this._options[key]);
-		}.bind(this));
-
-		return this;
-	};
-
-	/**
-	 * Show OK state
-	 * 
-	 * @public
-	 * @param  {String|NodeElement} txt
-	 * @memberof _Notify
-	 */
-	_Notify.prototype.ok = function(txt) {
-		this._el.classList.add(this._options["ok"]);
-
-		this._setValue(txt);
-
-		return this;
-	};
-
-	/**
-	 * Show ERROR state
-	 * 
-	 * @public
-	 * @param  {String|NodeElement} txt
-	 * @memberof _Notify
-	 */
-	_Notify.prototype.error = function(txt) {
-		this._el.classList.add(this._options["error"]);
-		
-		this._setValue(txt);
-
-		return this;
-	};
-
-	/**
-	 * Show INFO state
-	 *
-	 * @public
-	 * @param  {String|NodeElement} txt
-	 * @memberof _Notify
-	 */
-	_Notify.prototype.info = function(txt) {
-		this._el.classList.add(this._options["info"]);
-		
-		this._setValue(txt);
-
-		return this;
-	};
-
-	/**
-	 * Timeout hide.
-	 *
-	 * @public
-	 * @return {Promise}
-	 * @memberof _Notify
-	 */
-	_Notify.prototype.hide = function() {
-		var promise = Promise.defer();
-
-		setTimeout(function() {
-			this.reset();
-			
-			promise.resolve();
-		}.bind(this), this._HIDE_TIMEOUT);
-
-		return promise;
-	};
-
-	/**
-	 * Main public access to the notify obj.
-	 *
-	 * @public
-	 * @param  {NodeElement} el
-	 * @return {_Notify}
-	 * @memberof Notify
-	 */
-	this.get = function(el) {
-		return new _Notify(el);
-	};
-}]);
-onix.factory("$event", [
+;onix.factory("$event", [
 	"$common",
 function(
 	$common
 ) {
 	/**
- 	 * @interface $event
- 	 * @description DI: Common;
+ 	 * @class $event
+ 	 * @description DI: $common;
  	 */
 	return {
 		/**
@@ -2138,8 +2023,8 @@ function(
 		}
 	};
 }]);
-/**
- * @namespace $loader
+;/**
+ * @class $loader
  * @description DI: $dom;
  */
 onix.service("$loader", [
@@ -2164,7 +2049,7 @@ function(
 	};
 	
 	/**
-	 * $loader init.
+	 * Loader init.
 	 *
 	 * @public
 	 * @memberof $loader
@@ -2203,8 +2088,8 @@ function(
 		}.bind(this), 150);
 	};
 }]);
-/**
- * @namespace $http
+;/**
+ * @class $http
  * @description DI: $q;
  */
 onix.service("$http", [
@@ -2376,8 +2261,8 @@ function(
 		return promise;
 	};
 }]);
-/**
- * @namespace $i18n
+;/**
+ * @class $i18n
  * @description DI: $http, $q;
  */
 onix.service("$i18n", [
@@ -2406,7 +2291,7 @@ function(
 	this._currentLang = "";
 
 	/**
-	 * Add new language
+	 * Add a new language
 	 *
 	 * @public
 	 * @param {String} lang Language key
@@ -2434,6 +2319,7 @@ function(
 	 * @public
 	 * @param  {String} key
 	 * @return {String}    
+	 * @memberof $i18n
 	 */
 	this._ = function(key) {
 		key = key || "";
@@ -2487,9 +2373,9 @@ function(
 		return promise;
 	};
 }]);
-/**
- * @namespace $template
- * @description DI: $common, $q, $http;
+;/**
+ * @class $template
+ * @description DI: $common, $q, $http, $config;
  */
 onix.service("$template", [
 	"$common",
@@ -2605,14 +2491,16 @@ function(
 
 	/**
 	 * Bind one single event to element.
+	 * 
 	 * @param  {NodeElement} el
 	 * @param  {String} eventName click, keydown...
 	 * @param  {String} data      data-x value
 	 * @param  {Function} scope
+	 * @memberof $template
 	 */
 	this._bindEvent = function(el, eventName, data, scope) {
 		if (data && this._parseFnName(data) in scope) {
-			el.addEventListener(eventName, Common.bindWithoutScope(function(event, templScope) {
+			el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
 				var value = this.getAttribute("data-" + eventName);
 				var fnName = templScope._parseFnName(value);
 				var args = templScope._parseArgs(value, {
@@ -2699,31 +2587,9 @@ function(
 			var newEls = {};
 
 			allElements.forEach(function(item) {
-				var dataClick = item.getAttribute("data-click");
-				var dataChange = item.getAttribute("data-change");
-				var dataBind = item.getAttribute("data-bind");
-
-				if (dataClick && this._parseFnName(dataClick) in scope) {
-					item.addEventListener("click", $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-click");
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
-							el: this,
-							event: event
-						});
-
-						scope[fnName].apply(scope, args);
-					}, this));
-				}
-
-				if (dataChange && this._parseFnName(dataChange) in scope) {
-					item.addEventListener("change", $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-change");
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
-							el: this,
-							event: event
-						});
+				this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
+				this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
+				this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
 
 				var dataBind = item.getAttribute("data-bind");
 
@@ -2763,7 +2629,154 @@ function(
 		return promise;
 	};
 }]);
-onix.factory("$$page", [
+;/**
+ * @class $route
+ * @description DI: $routeParams, $location, $template;
+ */
+onix.service("$route", [
+	"$routeParams",
+	"$location",
+	"$template",
+function(
+	$routeParams,
+	$location,
+	$template
+) {
+	/**
+	 * All routes
+	 *
+	 * @private
+	 * @type {Array}
+	 * @memberof $route
+	 */
+	this._routes = [];
+
+	/**
+	 * Otherwise route
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $route
+	 */
+	this._otherwise = null;
+
+	/**
+	 * Route init.
+	 *
+	 * @public
+	 * @memberof $route
+	 */
+	this.init = function() {
+	};
+
+	/**
+	 * Add route to the router.
+	 *
+	 * @public
+	 * @param  {String} url 
+	 * @param  {Object} config
+	 * @return {Himself}
+	 * @memberof $route
+	 */
+	this.when = function(url, config) {
+		this._routes.push({
+			url: url,
+			config: config
+		});
+
+		return this;
+	};
+
+	/**
+	 * Otherwise.
+	 *
+	 * @public
+	 * @param  {String} page
+	 * @param  {Object} config
+	 * @return {Himself}
+	 * @memberof $route
+	 */
+	this.otherwise = function(config) {
+		this._otherwise = {
+			config: config
+		};
+
+		return this;
+	};
+
+	/**
+	 * Route GO.
+	 *
+	 * @public
+	 * @memberof $route
+	 */
+	this.go = function() {
+		var path = $location.get();
+		var find = false;
+		var config = null;
+		var data = {};
+
+		this._routes.every(function(item) {
+			if (path.match(new RegExp(item.url))) {
+				config = item.config;
+				find = true;
+				
+				return false;
+			}
+			else {
+				return true;
+			}
+		});
+
+		if (!find && this._otherwise) {
+			config = this._otherwise.config;
+		}
+
+		if (config) {
+			Object.keys($routeParams).forEach(function(key) {
+				delete $routeParams[key];
+			});
+
+			var templateUrl = null;
+			var contr = null;
+
+			Object.keys(config).forEach(function(key) {
+				var value = config[key];
+
+				switch (key) {
+					case "templateUrl":
+						templateUrl = value;
+						break;
+						
+					case "controller":
+						contr = value;
+						break;
+
+					default:
+						$routeParams[key] = config[key];
+				}
+			});
+
+			if (templateUrl) {
+				$template.load(config.templateUrl, config.templateUrl).done(function() {
+					if (contr) {
+						onix.runController(contr);
+					}
+				});
+			}
+			else {
+				if (contr) {
+					onix.runController(contr);
+				}
+			}
+		}
+	};
+}]);
+;/**
+ * @class $$controller
+ * @description DI: $dom, $template, $config;
+ */
+onix.factory("$$controller", [
 	"$dom",
 	"$template",
 	"$config",
@@ -2772,33 +2785,29 @@ function(
 	$template,
 	$config
 ) {
-	/**
-	 * @interface $$page
-	 * @description DI: $dom, $template, $config;
-	 */
 	return {
 		/**
 		 * Set config.
 		 *
 		 * @private
 		 * @param {Object} config
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		_setConfig: function(config) {
 			this._config = config;
 		},
 
 		/**
-		 * Init page - called from App; runs _afterInit
+		 * Init controller - called from App; runs _afterInit
 		 * 
 		 * @private
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		_init: function() {
 			var config = this._getConfig();
 			this._els = {};
 
-			// each page contanins only one detail div
+			// each controller contanins only one detail div
 			var rootEl = $dom.get($config.DETAIL_SEL);
 
 			if (config.els) {
@@ -2811,34 +2820,34 @@ function(
 		},
 
 		/**
-		 * Get page element by his name.
+		 * Get controller element by his name.
 		 *
 		 * @private
 		 * @param  {String} name
 		 * @return {NodeElemetn}     
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		_getEl: function(name) {
 			return this._els[name];
 		},
 
 		/**
-		 * Get page config.
+		 * Get controller config.
 		 *
 		 * @private
 		 * @return {Object}
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		_getConfig: function() {
 			return this._config || {};
 		},
 
 		/**
-		 * Get page data object.
+		 * Get controller data object.
 		 *
 		 * @private
 		 * @return {Object}
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		_getPageData: function() {
 			return this._config && this._config.js_data ? this._config.js_data : {};
@@ -2849,7 +2858,7 @@ function(
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		_afterInit: function() {
 
@@ -2860,7 +2869,7 @@ function(
 		 *
 		 * @public
 		 * @param {Object} newEls
-		 * @memberof $$page
+		 * @memberof $$controller
 		 */
 		addEls: function(newEls) {
 			newEls = newEls || {};
@@ -2871,136 +2880,137 @@ function(
 		}
 	};
 }]);
-onix.factory("$page", [
-	"$$page",
+;onix.factory("$controller", [
+	"$$controller",
 	"$common",
 function(
-	$$page,
+	$$controller,
 	$common
 ) {
 	/**
- 	 * @namespace $page
- 	 * @description DI: $$page, $common;
+ 	 * @class $controller
+ 	 * @description DI: $$controller, $common;
  	 */
 	return {
 		/**
-		 * Create a new page
+		 * Create a new controller
 		 *
 		 * @public
-		 * @param  {Object|Function} a page data | dependicies
-		 * @param  {Object|Function} [b] page data | dependicies
-		 * @return {$$page}
-		 * @memberof $page
+		 * @param  {Object|Function} a controller data | dependicies
+		 * @param  {Object|Function} [b] controller data | dependicies
+		 * @return {$$controller}
+		 * @memberof $controller
 		 */
 		create: function(a, b) {
-			return $common.create($$page, a, b);
+			return $common.create($$controller, a, b);
 		}
 	};
 }]);
-onix.factory("$$snippet", [
-	"$templates",
+;/**
+ * @class $$directive
+ * @description DI: $template;
+ */
+onix.factory("$$directive", [
+	"$template",
 function(
-	$templates
+	$template
 ) {
-	/**
-	 * @interface $$snippet
-	 */
 	return {
 		/**
-		 * Get snippet config.
+		 * Get directive config.
 		 *
 		 * @private
 		 * @return {Object}
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_getConfig: function() {
 			return this._config;
 		},
 
 		/**
-		 * Get snippet element.
+		 * Get directive element.
 		 *
 		 * @private
 		 * @param  {String} name
 		 * @return {NodeElement}
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_getEl: function(name) {
 			return this._els[name];
 		},
 
 		/**
-		 * Get snippet parent.
+		 * Get directive parent.
 		 *
 		 * @private
 		 * @return {NodeElement}
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_getParent: function() {
 			return this._parent;
 		},
 
 		/**
-		 * Abstract method.
+		 * Abstract method. Create root element.
 		 *
 		 * @private
 		 * @param  {Object} config
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_create: function(config) {
 			return null;
 		},
 
 		/**
-		 * Set snippet name.
+		 * Set directive name.
 		 *
 		 * @private
 		 * @param {String} name
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_setName: function(name) {
 			this._name = name;
 		},
 
 		/**
-		 * Setup
+		 * Setup directive.
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_setup: function() {
 
 		},
 
 		/**
-		 * Active
+		 * Activete directive.
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_activate: function() {
 
 		},
 
 		/**
-		 * Deactivate
+		 * Deactivate directive.
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		_deactivate: function() {
 
 		},
 
 		/**
-		 * Is snippet locked for change?
+		 * Is directive locked for change?
 		 *
 		 * @private
 		 * @abstract
-		 * @memberof _Snippet
+		 * @memberof $$directive
 		 * @return {Boolean}
 		 */
 		_isLocked: function() {
@@ -3008,13 +3018,13 @@ function(
 		},
 
 		/**
-		 * Init snippet
+		 * Init directive
 		 *
 		 * @public
 		 * @param  {Object} config
 		 * @param  {Object} parent parent page
 		 * @return {NodeElement} root el
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		init: function(config, parent) {
 			this._config = config || {};
@@ -3027,11 +3037,11 @@ function(
 		},
 
 		/**
-		 * Add new els to this._els; this function can be called from $templates
+		 * Add new els to this._els; this function can be called from $template
 		 *
 		 * @public
 		 * @param {Object} newEls { key, value - node element}
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		addEls: function(newEls) {
 			newEls = newEls || {};
@@ -3042,91 +3052,87 @@ function(
 		},
 
 		/**
-		 * Setup snippet - is called after init. Runs _setup()
+		 * Setup directive - is called after init. Runs _setup()
 		 *
 		 * @public
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		setup: function() {
-			$templates.bindTemplate(this._root, this);
+			$template.bindTemplate(this._root, this);
 			
 			this._setup();
 		},
 
 		/**
-		 * Activate snippet - run _activate()
+		 * Activate directive - run _activate()
 		 *
 		 * @public
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		activate: function() {
 			this._activate();
 		},
 
 		/**
-		 * Deactivate snippet - run _deactivate()
+		 * Deactivate directive - run _deactivate()
 		 *
 		 * @public
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		deactivate: function() {
 			this._deactivate();
 		},
 
 		/**
-		 * Get snippet name.
+		 * Get directive name.
 		 *
 		 * @public
 		 * @return {String}
-		 * @memberof $$snippet
+		 * @memberof $$directive
 		 */
 		getName: function() {
 			return this._name;
 		},
 
 		/**
-		 * Is snippet locked for change?
+		 * Is directive locked for change?
 		 *
 		 * @public
-		 * @memberof _Snippet
 		 * @return {Boolean}
+		 * @memberof $$directive
 		 */
 		isLocked: function() {
 			return this._isLocked();
 		}
 	};
 }]);
-onix.factory("$snippet", [
-	"$$snippet",
+;onix.factory("$directive", [
+	"$$directive",
 	"$common",
 function(
-	$$snippet,
+	$$directive,
 	$common
 ) {
 	/**
- 	 * @namespace $snippet
- 	 * @description DI: $$snippet, $common;
+ 	 * @class $directive
+ 	 * @description DI: $$directive, $common;
  	 */
 	return {
 		/**
-		 * Create a new snippet
+		 * Create a new directive
 		 *
 		 * @public
-		 * @param  {Object|Function} a snippet data | dependicies
-		 * @param  {Object|Function} [b] snippet data | dependicies
-		 * @return {$$snippet}
-		 * @memberof $snippet
+		 * @param  {Object|Function} a directive data | dependicies
+		 * @param  {Object|Function} [b] directive data | dependicies
+		 * @return {$$directive}
+		 * @memberof $directive
 		 */
 		create: function(a, b) {
-			return $common.create($$snippet, a, b);
+			return $common.create($$directive, a, b);
 		}
 	};
 }]);
-/**
- * @namespace $select
- * @description DI: $common, $event;
- */
-onix.factory("$select", [
+;onix.factory("$select", [
 	"$common",
 	"$event",
 function(
@@ -3134,10 +3140,10 @@ function(
 	$event
 ) {
 	/**
-	 * Main class
+	 * Main class for select.
+	 * DI: $common, $event;
 	 *
 	 * @class $select
-	 * @description Parent: Select;
 	 * @param {NodeElement} el Where element has class "dropdown"
 	 */
 	var $select = function(el) {
