@@ -4,7 +4,8 @@ function(
 	$$myQuery
 ) {
 	/**
- 	 * @namespace $myQuery
+ 	 * @class $myQuery
+ 	 * @description DI: $$myQuery;
  	 */
 	return {
 		 /**

@@ -6,6 +6,7 @@ module.exports = function(grunt) {
 				tasks: ['less:userweb']
 			}
 		},
+		
 		less: {
 			userweb: {
 				files: {
@@ -13,6 +14,7 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+
 		concat: {
 			options: {
 				separator: ''
@@ -22,13 +24,13 @@ module.exports = function(grunt) {
 					"static/js/onix/onix.js",
 					"static/js/onix/config.js",
 
+					"static/js/onix/service/routeParams.js",
 					"static/js/onix/factory/_promise.js",
 					"static/js/onix/factory/promise.js",
 					"static/js/onix/factory/_my-query.js",
 					"static/js/onix/factory/my-query.js",
 					"static/js/onix/service/dom.js",
 					"static/js/onix/service/location.js",
-					"static/js/onix/service/route.js",
 					"static/js/onix/service/provide.js",
 
 					"static/js/onix/factory/_notify.js",
@@ -41,10 +43,11 @@ module.exports = function(grunt) {
 					"static/js/onix/service/i18n.js",
 
 					"static/js/onix/service/template.js",
-					"static/js/onix/factory/_page.js",
-					"static/js/onix/factory/page.js",
-					"static/js/onix/factory/_snippet.js",
-					"static/js/onix/factory/snippet.js",
+					"static/js/onix/service/route.js",
+					"static/js/onix/factory/_controller.js",
+					"static/js/onix/factory/controller.js",
+					"static/js/onix/factory/_directive.js",
+					"static/js/onix/factory/directive.js",
 					"static/js/onix/factory/select.js"
 				],
 				dest: 'tmp/onix-js-framework.js',
@@ -58,6 +61,7 @@ module.exports = function(grunt) {
 				dest: 'dist/onix-js-framework.min.js',
 			}
 		},
+
 		uglify: {
 			dist: {
 				files: {
@@ -65,11 +69,19 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		jsdoc : {
-			dist : {
+
+
+		jsduck: {
+			dist: {
 				src: ['static/js/onix/*.js', 'static/js/onix/*/*.js'],
-					options: {
-					destination: 'doc'
+
+				dest: 'docs',
+
+				// extra options
+				options: {
+					'builtin-classes': true,
+					'warnings': ['-no_doc', '-dup_member', '-link_ambiguous'],
+					'external': ['XMLHttpRequest']
 				}
 			}
 		}
@@ -80,9 +92,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-jsdoc');
+	grunt.loadNpmTasks('grunt-jsduck');
 
 	// Default task.
 	grunt.registerTask('default', ['less:userweb', 'watch:userweb']);
-	grunt.registerTask('dist', ['concat:dest', 'uglify', 'concat:distEnd', 'jsdoc']);
+	grunt.registerTask('dist', ['concat:dist', 'uglify', 'concat:distEnd', 'jsduck']);
 };

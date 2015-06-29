@@ -4,7 +4,7 @@ function(
 	$common
 ) {
 	/**
- 	 * @interface $event
+ 	 * @class $event
  	 * @description DI: $common;
  	 */
 	return {

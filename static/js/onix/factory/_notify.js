@@ -7,6 +7,7 @@ function(
 ) {
 	/**
 	 * Notification object
+	 * DI: $template;
 	 *
 	 * @class $$notify
 	 * @param {NodeElement} el

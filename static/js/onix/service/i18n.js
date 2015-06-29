@@ -1,5 +1,5 @@
 /**
- * @namespace $i18n
+ * @class $i18n
  * @description DI: $http, $q;
  */
 onix.service("$i18n", [
@@ -56,6 +56,7 @@ function(
 	 * @public
 	 * @param  {String} key
 	 * @return {String}    
+	 * @memberof $i18n
 	 */
 	this._ = function(key) {
 		key = key || "";

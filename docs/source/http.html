@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$http'>/**
+</span> * @class $http
+ * @description DI: $q;
+ */
+onix.service(&quot;$http&quot;, [
+	&quot;$q&quot;,
+function(
+	$q
+) {
+<span id='$http-method-_preparePostData'>	/**
+</span>	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
+	 * Prepare post data
+	 *
+	 * @private
+	 * @param  {Object|Array} data { name, value }
+	 * @return {FormData}
+	 * @memberof $http
+	 */
+	this._preparePostData = function(data) {
+		var formData = new FormData();
+
+		if (data) {
+			if (Array.isArray(data)) {
+				data.forEach(function(item) {
+					formData.append(item.name, item.value);
+				});
+			}
+			else {
+				Object.keys(data).forEach(function(key) {
+					formData.append(key, data[key]);
+				});
+			}
+		}
+
+		return formData;
+	};
+
+<span id='$http-method-_updateURL'>	/**
+</span>	 * Update URL by get data.
+	 *
+	 * @private
+	 * @param  {String} url
+	 * @param  {Array} data { name, value }
+	 * @return {String}    
+	 * @memberof $http
+	 */
+	this._updateURL = function(url, data) {
+		if (data) {
+			var add = [];
+
+			if (Array.isArray(data)) {
+				data.forEach(function(item) {
+					add.push(item.name + &quot;=&quot; + encodeURIComponent(item.value));
+				});
+
+				url += (url.indexOf(&quot;?&quot;) == -1 ? &quot;?&quot; : &quot;&quot;) + add.join(&quot;&amp;&quot;);
+			}
+		}
+
+		return url;
+	};
+
+<span id='this-POST_TYPES'>	/**
+</span>	 * Request types
+	 *
+	 * @public
+	 * @const
+	 * @memberof $http
+	 */
+	this.POST_TYPES = {
+<span id='this-POST_TYPES-property-JSON'>		JSON: 1,
+</span><span id='this-POST_TYPES-property-FORM_DATA'>		FORM_DATA: 2
+</span>	};
+
+<span id='this-METHOD'>	/**
+</span>	 * Http methods.
+	 *
+	 * @public
+	 * @const
+	 * @memberof $http
+	 */
+	this.METHOD = {
+<span id='this-METHOD-property-POST'>		POST: &quot;POST&quot;,
+</span><span id='this-METHOD-property-GET'>		GET: &quot;GET&quot;,
+</span><span id='this-METHOD-property-DELETE'>		DELETE: &quot;DELETE&quot;,
+</span><span id='this-METHOD-property-PATCH'>		PATCH: &quot;PATCH&quot;
+</span>	};
+
+<span id='this-METHOD-method-createRequest'>	/**
+</span>	 * Create new XHR request.
+	 *
+	 * @public
+	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
+	 * @return {$q}
+	 * @memberof $http
+	 */
+	this.createRequest = function(config) {
+		var promise = $q.defer();
+		var request = new XMLHttpRequest();
+
+		config = config || {};
+
+		var method = config.method || this.METHOD.GET;
+		var url = config.url || &quot;&quot;;
+
+		if (!url) {
+			promise.reject();
+			return promise;
+		}
+
+		url = this._updateURL(url, config.getData);
+
+		request.onerror = function () { promise.reject(); };
+		request.open(method, url, true);
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				var responseData = request.responseText || &quot;&quot;;
+				var responseType = request.getResponseHeader(&quot;Content-Type&quot;);
+				var promiseData = null;
+
+				if (responseType == &quot;application/json&quot;) {
+					promiseData = responseData.length ? JSON.parse(responseData) : {};
+				}
+				else {
+					promiseData = responseData;
+				}
+
+				// 200 ok
+				// 201 created
+				// 204 succesfully deleted
+				// 403 unautorized
+				promise[request.status &gt;= 200 &amp;&amp; request.status &lt; 300 ? &quot;resolve&quot; : &quot;reject&quot;]({
+					status: request.status,
+					data: promiseData,
+					url: url,
+					method: method
+				});
+			}
+		};
+
+		try {
+			// add headers
+			var headers = config.headers;
+			if (headers &amp;&amp; Array.isArray(headers)) {
+				headers.forEach(function(header) {
+					request.setRequestHeader(header.type, header.value);
+				});
+			}
+
+			if (method == this.METHOD.GET) {
+				request.setRequestHeader(&#39;Accept&#39;, &#39;application/json&#39;);
+			}
+
+			var type = config.postType || this.POST_TYPES.JSON;
+
+			if (config.postData &amp;&amp; type == this.POST_TYPES.JSON) {
+				request.setRequestHeader(&#39;Content-Type&#39;, &#39;application/json; charset=UTF-8&#39;);
+				request.send(JSON.stringify(config.postData));
+			}
+			else if (config.postData &amp;&amp; type == this.POST_TYPES.FORM_DATA) {
+				request.send(this._preparePostData(config.postData));
+			}
+			else {
+				request.send();
+			}
+		}
+		catch (err) {
+			promise.reject();
+		}
+
+		return promise;
+	};
+}]);
+</pre>
+</body>
+</html>

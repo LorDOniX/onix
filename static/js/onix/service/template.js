@@ -1,6 +1,6 @@
 /**
- * @namespace $template
- * @description DI: $common, $q, $http;
+ * @class $template
+ * @description DI: $common, $q, $http, $config;
  */
 onix.service("$template", [
 	"$common",

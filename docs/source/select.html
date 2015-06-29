@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">onix.factory(&quot;$select&quot;, [
+	&quot;$common&quot;,
+	&quot;$event&quot;,
+function(
+	$common,
+	$event
+) {
+<span id='$select'>	/**
+</span>	 * Main class
+	 * DI: $common, $event;
+	 *
+	 * @class $select
+	 * @param {NodeElement} el Where element has class &quot;dropdown&quot;
+	 */
+	var $select = function(el) {
+		// extend our class
+		$common.extend(this, $event);
+
+		this._CONST = {
+			CAPTION_SEL: &quot;.dropdown-toggle&quot;,
+			OPTIONS_SEL: &quot;.dropdown-menu a&quot;,
+			OPEN_DROPDOWN_SEL: &quot;.dropdown.open&quot;,
+			OPEN_CLASS: &quot;open&quot;,
+			ACTIVE_CLASS: &quot;active&quot;
+		};
+
+		this._el = el;
+
+		this._bind(el);
+	};
+
+<span id='$select-method-_bind'>	/**
+</span>	 * Bind clicks on the select.
+	 *
+	 * @private
+	 * @param {NodeElement} el Where element has class &quot;dropdown&quot;
+	 * @memberof $select
+	 */
+	$select.prototype._bind = function(el) {
+		var captionEl = el.querySelector(this._CONST.CAPTION_SEL);
+		var con = this._CONST;
+
+		// click on the caption
+		captionEl.addEventListener(&quot;click&quot;, function(e) {
+			e.stopPropagation();
+
+			var isOpen = el.classList.contains(con.OPEN_CLASS);
+
+			var removeAllOpened = function() {
+				// remove all
+				onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+					item.classList.remove(&quot;open&quot;);
+				});
+			};
+
+			removeAllOpened();
+
+			if (isOpen) {
+				// outside click
+				window.removeEventListener(&quot;click&quot;);
+			}
+			else {
+				// outside click
+				window.addEventListener(&quot;click&quot;, function(e) {
+					removeAllOpened();
+					window.removeEventListener(&quot;click&quot;);
+				});
+
+				el.classList.add(con.OPEN_CLASS);
+			}
+		});
+
+		onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
+			option.addEventListener(&quot;click&quot;, $common.bindWithoutScope(function(e, scope) {
+				e.stopPropagation();
+
+				if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
+					// remove previously selected
+					this.parentNode.parentNode.querySelector(&quot;.&quot; + con.ACTIVE_CLASS).classList.remove(con.ACTIVE_CLASS);
+
+					// add to the current
+					this.parentNode.classList.add(con.ACTIVE_CLASS);
+
+					el.classList.remove(con.OPEN_CLASS);
+
+					// trigger click
+					var value = this.getAttribute(&quot;data-value&quot;) || &quot;&quot;;
+					scope.trigger(&quot;change&quot;, value);
+				}
+			}, this));
+		}, this);
+	};
+
+	return $select;
+}]);
+</pre>
+</body>
+</html>

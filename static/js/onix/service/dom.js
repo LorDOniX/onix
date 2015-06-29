@@ -1,5 +1,5 @@
 /**
- * @namespace $dom
+ * @class $dom
  */
 onix.service("$dom", function() {
 	/**

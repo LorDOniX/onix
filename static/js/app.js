@@ -1,7 +1,8 @@
 testApp = onix.module("testApp", []);
 
-testApp.config(function() {
-	console.log("app config");
+testApp.config(function(config) {
+	config.LOCALIZATION.LANG = "en";
+	config.LOCALIZATION.PATH = "/js/locale/en.json";
 });
 
 testApp.run([
@@ -17,17 +18,19 @@ function(
 	$q,
 	$i18n
 ) {
+	$i18n.setLanguage("en");
+
 	// application routes
 	$route
 		.when("/", {
-			controller: "HomePage",
+			controller: "HomeCtrl",
 			templateUrl: "/js/home/test-templ.html",
 			data: {
 				a: 5
 			}
 		})
 		.otherwise({
-			controller: "HomePage"
+			controller: "HomeCtrl"
 		});
 
 	// all dependencies before start

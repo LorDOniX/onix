@@ -1,6 +1,6 @@
 /**
- * @namespace $route
- * @description DI: $location, $template;
+ * @class $route
+ * @description DI: $routeParams, $location, $template;
  */
 onix.service("$route", [
 	"$routeParams",

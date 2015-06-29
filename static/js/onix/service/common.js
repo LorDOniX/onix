@@ -1,5 +1,5 @@
 /**
- * @namespace $common
+ * @namespace $class
  * @description DI: $q;
  */
 onix.service("$common", [

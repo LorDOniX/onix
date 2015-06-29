@@ -1,5 +1,5 @@
 /**
- * @namespace $location
+ * @class $location
  */
 onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------

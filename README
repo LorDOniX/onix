@@ -2,7 +2,7 @@
 
 ## 1.) Documentation
 
-* please run doc/index.html
+* please run docs/index.html
 
 ## 2.) Server
 
@@ -22,7 +22,42 @@
 
 * navigate to dist/ folder
 
+# Application workflow
+
+## 1.)
+
+* create a module: testApp = onix.module("testApp", []);
+
+* you can change application config: testApp.config(function(config) { ... config ... });
+
+* entry point: testApp.run(); after execution of this function application starts $route
+
+* in run function you can define $route pages with their controller functions
+
+## 2.)
+
+* controller entry function is _init() - runs from $route
+
+* after this is functions, _afterInit() is executed - you can over ride it
+
+## 3.)
+
+* directive entry function is init() - you have to run this function manually
+
+* init() function needs _create() to be filled with DOM root element
+
+* after init(), setup() is need to bind all javascript to the view in directive
+
+* activate(), deactivate() are supported functions - runs them manually
+
 # CHANGELOG
+
+## 2.0.0
+
+29. 6. 2015
+
+* complete change to angular way
+* add shadow dom - it's in the development state; not ready for user and it is not included into the final js framework
 
 ## 1.1.4
 

@@ -1,5 +1,5 @@
 /**
- * @namespace $routeParams
+ * @class $routeParams
  */
 onix.service("$routeParams", function() {
 	return {};

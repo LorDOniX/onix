@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$route'>/**
+</span> * @class $route
+ * @description DI: $routeParams, $location, $template;
+ */
+onix.service(&quot;$route&quot;, [
+	&quot;$routeParams&quot;,
+	&quot;$location&quot;,
+	&quot;$template&quot;,
+function(
+	$routeParams,
+	$location,
+	$template
+) {
+<span id='$route-property-_routes'>	/**
+</span>	 * All routes
+	 *
+	 * @private
+	 * @type {Array}
+	 * @memberof $route
+	 */
+	this._routes = [];
+
+<span id='$route-property-_otherwise'>	/**
+</span>	 * Otherwise route
+	 *
+	 * @private
+	 * @type {Object}
+	 * @memberof $route
+	 */
+	this._otherwise = null;
+
+<span id='$route-method-init'>	/**
+</span>	 * $route init.
+	 *
+	 * @public
+	 * @memberof $route
+	 */
+	this.init = function() {
+	};
+
+<span id='$route-method-when'>	/**
+</span>	 * Add route to router.
+	 *
+	 * @public
+	 * @param  {String} url 
+	 * @param  {Object} config
+	 * @return {Himself}
+	 * @memberof $route
+	 */
+	this.when = function(url, config) {
+		this._routes.push({
+			url: url,
+			config: config
+		});
+
+		return this;
+	};
+
+<span id='$route-method-otherwise'>	/**
+</span>	 * Otherwise
+	 *
+	 * @public
+	 * @param  {String} page
+	 * @param  {Object} config
+	 * @return {Himself}
+	 * @memberof $route
+	 */
+	this.otherwise = function(config) {
+		this._otherwise = {
+			config: config
+		};
+
+		return this;
+	};
+
+<span id='$route-method-go'>	/**
+</span>	 * $route GO.
+	 *
+	 * @public
+	 * @memberof $route
+	 */
+	this.go = function() {
+		var path = $location.get();
+		var find = false;
+		var config = null;
+		var data = {};
+
+		this._routes.every(function(item) {
+			if (path.match(new RegExp(item.url))) {
+				config = item.config;
+				find = true;
+				
+				return false;
+			}
+			else {
+				return true;
+			}
+		});
+
+		if (!find &amp;&amp; this._otherwise) {
+			config = this._otherwise.config;
+		}
+
+		if (config) {
+			Object.keys($routeParams).forEach(function(key) {
+				delete $routeParams[key];
+			});
+
+			var templateUrl = null;
+			var contr = null;
+
+			Object.keys(config).forEach(function(key) {
+				var value = config[key];
+
+				switch (key) {
+					case &quot;templateUrl&quot;:
+						templateUrl = value;
+						break;
+						
+					case &quot;controller&quot;:
+						contr = value;
+						break;
+
+					default:
+						$routeParams[key] = config[key];
+				}
+			});
+
+			if (templateUrl) {
+				$template.load(config.templateUrl, config.templateUrl).done(function() {
+					if (contr) {
+						onix.runController(contr);
+					}
+				});
+			}
+			else {
+				if (contr) {
+					onix.runController(contr);
+				}
+			}
+		}
+	};
+}]);
+</pre>
+</body>
+</html>

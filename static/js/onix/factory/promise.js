@@ -4,8 +4,8 @@ function(
 	$$promise
 ) {
 	/**
- 	 * @namespace $q
- 	 * @description: DI $$promise;
+ 	 * @class $q
+ 	 * @description DI: $$promise;
  	 */
 	return {
 		/**

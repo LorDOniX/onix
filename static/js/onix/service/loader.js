@@ -1,5 +1,5 @@
 /**
- * @namespace $loader
+ * @class $loader
  * @description DI: $dom;
  */
 onix.service("$loader", [
@@ -24,7 +24,7 @@ function(
 	};
 	
 	/**
-	 * $loader init.
+	 * Loader init.
 	 *
 	 * @public
 	 * @memberof $loader

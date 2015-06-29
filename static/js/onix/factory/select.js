@@ -1,7 +1,3 @@
-/**
- * @namespace $select
- * @description DI: $common, $event;
- */
 onix.factory("$select", [
 	"$common",
 	"$event",
@@ -11,6 +7,7 @@ function(
 ) {
 	/**
 	 * Main class
+	 * DI: $common, $event;
 	 *
 	 * @class $select
 	 * @param {NodeElement} el Where element has class "dropdown"

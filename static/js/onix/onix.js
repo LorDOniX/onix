@@ -15,7 +15,7 @@ onix = (function() {
 
 	/**
 	 * $$module item
-	 * @class
+	 * @class $$module
 	 * 
 	 */
 	var $$module = function() {
@@ -131,7 +131,9 @@ onix = (function() {
 	};
 
 	/**
-	 * @namespace onix
+	 * Main framework object.
+	 * 
+	 * @class onix
 	 */
 	var onix = {
 		/**
@@ -209,7 +211,7 @@ onix = (function() {
 
 			var configs = [];
 			var runs = [];
-			var $snippet = this.getObject("$snippet");
+			var $directive = this.getObject("$directive");
 
 			// process all modules
 			Object.keys(this._modules).forEach(function(moduleName) {
@@ -232,7 +234,7 @@ onix = (function() {
 							break;
 
 						case TYPES.DIRECTIVE:
-							var $scope = $snippet.create(["$event"], {});
+							var $scope = $directive.create(["$event"], {});
 
 							this._DI(moduleItem.param, {
 								$scope: $scope
@@ -257,7 +259,7 @@ onix = (function() {
 
 			// run all configs
 			configs.forEach(function(config) {
-				this._DI(config.param).run();
+				this._DI(["$config", config.param]).run();
 			}, this);
 
 			var $q = this.getObject("$q");
@@ -454,6 +456,9 @@ onix = (function() {
 
 		/**
 		 * Empty function
+		 *
+		 * @public
+		 * @memberof onix
 		 */
 		noop: function() {
 
@@ -461,11 +466,14 @@ onix = (function() {
 
 		/**
 		 * Run controller
+		 * 
 		 * @param  {String|Array|Function} controller 
+		 * @public
+		 * @memberof onix
 		 */
 		runController: function(controller) {
-			var $page = this.getObject("$page");
-			var $scope = $page.create(["$event"], {});
+			var $controller = this.getObject("$controller");
+			var $scope = $controller.create(["$event"], {});
 			var replaceObj = {
 				$scope: $scope
 			};
@@ -483,6 +491,20 @@ onix = (function() {
 			}
 
 			$scope._init();
+		},
+
+		/**
+		 * Framework info.
+		 *
+		 * @public
+		 * @memberof onix
+		 */
+		info: function() {
+			console.log(
+				"Onix JS Framework\n" +
+				"Version: 2.0.0\n" +
+				"Date: 29. 6. 2015"
+			);
 		}
 	};
 

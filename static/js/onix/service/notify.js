@@ -1,5 +1,5 @@
 /**
- * @namespace $notify
+ * @class $notify
  * @description DI: $$notify;
  */
 onix.service("$notify", [

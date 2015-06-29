@@ -1,5 +1,5 @@
 /**
- * @namespace $http
+ * @class $http
  * @description DI: $q;
  */
 onix.service("$http", [
