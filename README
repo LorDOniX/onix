@@ -1,24 +1,50 @@
-README
-------
+# README
 
-1.) Documentation
+## 1.) Documentation
 
-- please run doc/index.html
+* please run doc/index.html
 
-2.) Server
+## 2.) Server
 
-- sudo apt-get install nodejs npm grunt
+* sudo apt-get install nodejs npm grunt
 
-run:
+### run:
 
-- ./dev-server.js
+* ./dev-server.js
 
-- navigate to the browser on page:
+* navigate to the browser on page:
 
-http://localhost:8001/
+* http://localhost:8001/
 
-3.) Building
+### 3.) Building
 
-- grunt dist
+* grunt dist
 
-- navigate to dist/ folder
+* navigate to dist/ folder
+
+# CHANGELOG
+
+## 1.1.4
+
+29. 6. 2015
+
+* Common.isElement function
+* notify support for element output
+* snippet isLocked function
+* new service Provide - decorator function
+
+## 1.1.3
+
+18. 6. 2015
+
+*add support for keydown data event
+
+## 1.1.2
+
+* once event
+## 1.1.1
+
+* promise refactor
+## 1.0.0
+
+* framework release

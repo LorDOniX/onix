@@ -9,7 +9,8 @@ onix = (function() {
 		CONSTANT: 3,
 		RUN: 4,
 		CONFIG: 5,
-		CONTROLLER: 6
+		CONTROLLER: 6,
+		DIRECTIVE: 7
 	};
 
 	/**
@@ -66,6 +67,22 @@ onix = (function() {
 			name: name,
 			param: param,
 			type: TYPES.CONTROLLER
+		});
+	};
+
+	/**
+	 * Add a new directive
+	 *
+	 * @public
+	 * @param  {String} name
+	 * @param  {Array|Function} param With DI
+	 * @memberof $$module
+	 */
+	$$module.prototype.directive = function(name, param) {
+		this._allObj.push({
+			name: name,
+			param: param,
+			type: TYPES.DIRECTIVE
 		});
 	};
 
@@ -192,6 +209,7 @@ onix = (function() {
 
 			var configs = [];
 			var runs = [];
+			var $snippet = this.getObject("$snippet");
 
 			// process all modules
 			Object.keys(this._modules).forEach(function(moduleName) {
@@ -213,6 +231,16 @@ onix = (function() {
 							this._objects[moduleItem.name] = moduleItem.param;
 							break;
 
+						case TYPES.DIRECTIVE:
+							var $scope = $snippet.create(["$event"], {});
+
+							this._DI(moduleItem.param, {
+								$scope: $scope
+							}).run();
+
+							this._objects[moduleItem.name] = $scope;
+							break;
+
 						case TYPES.RUN:
 							runs.push(moduleItem);
 							break;
@@ -232,10 +260,25 @@ onix = (function() {
 				this._DI(config.param).run();
 			}, this);
 
+			var $q = this.getObject("$q");
+			var all = [];
+
 			// run all runs
 			runs.forEach(function(run) {
-				this._DI(run.param).run();
+				var runO = this._DI(run.param).run();
+
+				// returns a promise
+				if (runO && "_E_STATES" in runO) {
+					all.push(runO);
+				}
 			}, this);
+
+			var $route = this.getObject("$route");
+
+			$q.all(all)["finally"](function() {
+				// route go
+				$route.go();
+			});
 		},
 
 		/**
@@ -421,23 +464,25 @@ onix = (function() {
 		 * @param  {String|Array|Function} controller 
 		 */
 		runController: function(controller) {
+			var $page = this.getObject("$page");
+			var $scope = $page.create(["$event"], {});
+			var replaceObj = {
+				$scope: $scope
+			};
+
 			if (typeof controller === "string") {
 				var param = this.getObject(controller);
-				var $page = this.getObject("$page");
-				var $scope = $page.create(["$event"], {});
 
-				this._DI(param, {
-					$scope: $scope
-				}).run();
-
-				$scope._init();
+				this._DI(param, replaceObj).run();
 			}
 			else if (Array.isArray(controller)) {
-				this._DI(controller).run();
+				this._DI(controller, replaceObj).run();
 			}
 			else if (typeof controller === "function") {
-				controller.apply(config.controller, []);
+				controller.apply(config.controller, [$scope]);
 			}
+
+			$scope._init();
 		}
 	};
 

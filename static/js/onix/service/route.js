@@ -106,23 +106,19 @@ function(
 				delete $routeParams[key];
 			});
 
+			var templateUrl = null;
 			var contr = null;
-			
-			var runContr = function(ctrl) {
-				if (ctrl) {
-					onix.runController(config.controller);
-				}
-			};
 
 			Object.keys(config).forEach(function(key) {
+				var value = config[key];
+
 				switch (key) {
 					case "templateUrl":
-						$template.load(config.templateUrl, config.templateUrl).done(function() {
-							
-						});
-
+						templateUrl = value;
+						break;
+						
 					case "controller":
-						contr = config[key];
+						contr = value;
 						break;
 
 					default:
@@ -130,12 +126,17 @@ function(
 				}
 			});
 
-			if (contr) {
-				
-				onix.runController(config.controller);
+			if (templateUrl) {
+				$template.load(config.templateUrl, config.templateUrl).done(function() {
+					if (contr) {
+						onix.runController(contr);
+					}
+				});
 			}
-			else if (config.templateUrl) {
-				
+			else {
+				if (contr) {
+					onix.runController(contr);
+				}
 			}
 		}
 	};

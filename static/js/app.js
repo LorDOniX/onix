@@ -31,11 +31,8 @@ function(
 		});
 
 	// all dependencies before start
-	$q.all([
+	return $q.all([
 		$template.load("testTempl", "/js/home/test-templ.html"),
 		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
-	]).done(function() {
-		// route go
-		$route.go();
-	});
+	]);
 }]);

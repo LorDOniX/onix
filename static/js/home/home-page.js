@@ -5,6 +5,7 @@ testApp.controller("HomePage", [
 	"$loader",
 	"$select",
 	"HomeResource",
+	"HomePageDir",
 	"$scope",
 	"$routeParams",
 function(
@@ -14,9 +15,13 @@ function(
 	$loader,
 	$select,
 	HomeResource,
+	HomePageDir,
 	$scope,
 	$routeParams
 ) {
+	console.log($routeParams);
+	HomePageDir.dirTest();
+	
 	// ------------------------ private ---------------------------------------
 	$scope._afterInit = function() {
 		// set title - using i18n get text _ function
@@ -80,7 +85,7 @@ function(
 	};
 
 	$scope._angularTest = function() {
-		var x={};
+		var x = {};
 
 		var bindWatcher = function(obj, cb) {
 			var key = "$watcher";
