@@ -5,7 +5,7 @@ function(
 ) {
 	/**
  	 * @interface $event
- 	 * @description DI: Common;
+ 	 * @description DI: $common;
  	 */
 	return {
 		/**

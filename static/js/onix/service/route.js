@@ -102,31 +102,40 @@ function(
 		}
 
 		if (config) {
-			var templateData = "";
-
 			Object.keys($routeParams).forEach(function(key) {
 				delete $routeParams[key];
 			});
 
+			var contr = null;
+			
+			var runContr = function(ctrl) {
+				if (ctrl) {
+					onix.runController(config.controller);
+				}
+			};
+
 			Object.keys(config).forEach(function(key) {
 				switch (key) {
-					case "template":
 					case "templateUrl":
+						$template.load(config.templateUrl, config.templateUrl).done(function() {
+							
+						});
+
 					case "controller":
+						contr = config[key];
 						break;
+
 					default:
 						$routeParams[key] = config[key];
 				}
 			});
 
-			if (config.template) {
-				templateData = config.template;
+			if (contr) {
+				
 				onix.runController(config.controller);
 			}
 			else if (config.templateUrl) {
-				$template.load(config.templateUrl, config.templateUrl).done(function() {
-					onix.runController(config.controller);
-				});
+				
 			}
 		}
 	};

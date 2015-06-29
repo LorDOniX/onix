@@ -1,13 +1,14 @@
 onix.factory("$$notify", [
 	"$q",
+	"$common",
 function(
-	$q
+	$q,
+	$common
 ) {
 	/**
 	 * Notification object
 	 *
 	 * @class $$notify
-	 * @description Parent: Notify;
 	 * @param {NodeElement} el
 	 */
 	var $$notify = function(el) {
@@ -22,6 +23,23 @@ function(
 		};
 
 		return this;
+	};
+
+	/**
+	 * Set value to the notify element
+	 *
+	 * @private
+	 * @param  {String|NodeElement} txt
+	 * @memberof $$notify
+	 */
+	$$notify.prototype._setValue = function(txt) {
+		if ($common.isElement(txt)) {
+			this._el.innerHTML = "";
+			this._el.appendChild(txt);
+		}
+		else if (typeof txt === "string") {
+			this._el.innerHTML = txt;
+		}
 	};
 
 	/**
@@ -42,12 +60,13 @@ function(
 	 * Show OK state
 	 * 
 	 * @public
-	 * @param  {String} txt
+	 * @param  {String|NodeElement} txt
 	 * @memberof $$notify
 	 */
 	$$notify.prototype.ok = function(txt) {
 		this._el.classList.add(this._options["ok"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};
@@ -56,12 +75,13 @@ function(
 	 * Show ERROR state
 	 * 
 	 * @public
-	 * @param  {String} txt      
+	 * @param  {String|NodeElement} txt
 	 * @memberof $$notify
 	 */
 	$$notify.prototype.error = function(txt) {
 		this._el.classList.add(this._options["error"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};
@@ -70,12 +90,13 @@ function(
 	 * Show INFO state
 	 *
 	 * @public
-	 * @param  {String} txt      
+	 * @param  {String|NodeElement} txt
 	 * @memberof $$notify
 	 */
 	$$notify.prototype.info = function(txt) {
 		this._el.classList.add(this._options["info"]);
-		this._el.innerHTML = txt;
+		
+		this._setValue(txt);
 
 		return this;
 	};

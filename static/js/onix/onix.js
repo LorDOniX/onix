@@ -423,9 +423,14 @@ onix = (function() {
 		runController: function(controller) {
 			if (typeof controller === "string") {
 				var param = this.getObject(controller);
+				var $page = this.getObject("$page");
+				var $scope = $page.create(["$event"], {});
+
 				this._DI(param, {
-					$scope: { a: 5 } // $scope interpolation todo
+					$scope: $scope
 				}).run();
+
+				$scope._init();
 			}
 			else if (Array.isArray(controller)) {
 				this._DI(controller).run();

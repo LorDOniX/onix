@@ -115,6 +115,30 @@ function(
 	};
 
 	/**
+	 * Bind one single event to element.
+	 * 
+	 * @param  {NodeElement} el
+	 * @param  {String} eventName click, keydown...
+	 * @param  {String} data      data-x value
+	 * @param  {Function} scope
+	 * @memberof $template
+	 */
+	this._bindEvent = function(el, eventName, data, scope) {
+		if (data && this._parseFnName(data) in scope) {
+			el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
+				var value = this.getAttribute("data-" + eventName);
+				var fnName = templScope._parseFnName(value);
+				var args = templScope._parseArgs(value, {
+					el: this,
+					event: event
+				});
+
+				scope[fnName].apply(scope, args);
+			}, this));
+		}
+	};
+
+	/**
 	 * Init - get all templates from the page.
 	 *
 	 * @public
@@ -188,35 +212,11 @@ function(
 			var newEls = {};
 
 			allElements.forEach(function(item) {
-				var dataClick = item.getAttribute("data-click");
-				var dataChange = item.getAttribute("data-change");
+				this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
+				this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
+				this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
+
 				var dataBind = item.getAttribute("data-bind");
-
-				if (dataClick && this._parseFnName(dataClick) in scope) {
-					item.addEventListener("click", $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-click");
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
-							el: this,
-							event: event
-						});
-
-						scope[fnName].apply(scope, args);
-					}, this));
-				}
-
-				if (dataChange && this._parseFnName(dataChange) in scope) {
-					item.addEventListener("change", $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-change");
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
-							el: this,
-							event: event
-						});
-
-						scope[fnName].apply(scope, args);
-					}, this));
-				}
 
 				if (dataBind) {
 					newEls[dataBind] = item;

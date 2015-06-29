@@ -13,7 +13,6 @@ function(
 	 * Main class
 	 *
 	 * @class $select
-	 * @description Parent: Select;
 	 * @param {NodeElement} el Where element has class "dropdown"
 	 */
 	var $select = function(el) {
