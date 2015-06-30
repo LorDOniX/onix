@@ -69,17 +69,6 @@ function(
 		},
 
 		/**
-		 * Get controller data object.
-		 *
-		 * @private
-		 * @return {Object}
-		 * @memberof $$controller
-		 */
-		_getPageData: function() {
-			return this._config && this._config.js_data ? this._config.js_data : {};
-		},
-
-		/**
 		 * After init
 		 *
 		 * @private

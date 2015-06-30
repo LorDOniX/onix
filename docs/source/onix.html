@@ -133,14 +133,20 @@
 	};
 
 <span id='$$module-method-config'>	/**
-</span>	 * Add a new config
+</span>	 * Read/add a config
 	 * 
 	 * @public
-	 * @param  {Object} obj
+	 * @param  {Object|String} obj
 	 * @memberof $$module
 	 */
 	$$module.prototype.config = function(obj) {
-		onix.config(obj);
+		// read/write ?
+		var o = onix.config(obj);
+
+		// if read -&gt; return output o
+		if (o) {
+			return o;
+		}
 	};
 
 <span id='onix'>	/**

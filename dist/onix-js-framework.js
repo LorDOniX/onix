@@ -116,14 +116,20 @@ onix = (function() {
 	};
 
 	/**
-	 * Add a new config
+	 * Read/add a config
 	 * 
 	 * @public
-	 * @param  {Object} obj
+	 * @param  {Object|String} obj
 	 * @memberof $$module
 	 */
 	$$module.prototype.config = function(obj) {
-		onix.config(obj);
+		// read/write ?
+		var o = onix.config(obj);
+
+		// if read -> return output o
+		if (o) {
+			return o;
+		}
 	};
 
 	/**
@@ -2845,17 +2851,6 @@ function(
 		 */
 		_getConfig: function() {
 			return this._config || {};
-		},
-
-		/**
-		 * Get controller data object.
-		 *
-		 * @private
-		 * @return {Object}
-		 * @memberof $$controller
-		 */
-		_getPageData: function() {
-			return this._config && this._config.js_data ? this._config.js_data : {};
 		},
 
 		/**
