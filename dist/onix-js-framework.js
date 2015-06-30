@@ -1816,8 +1816,7 @@ function(
 	 */
 	$$notify.prototype._setValue = function(txt) {
 		if ($common.isElement(txt)) {
-			this._el.innerHTML = "";
-			this._el.appendChild(txt);
+			onix.element(this._el).empty().append(txt);
 		}
 		else if (typeof txt === "string") {
 			this._el.innerHTML = txt;
