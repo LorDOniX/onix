@@ -1192,6 +1192,24 @@ function(
 	};
 
 	/**
+	 * Empty element - clear all its children.
+	 * Much faster than innerHTML = "".
+	 * 
+	 * @public
+	 * @return {Himself}
+	 * @memberof $$myQuery
+	 */
+	$$myQuery.prototype.empty = function() {
+		this._operation(function(item) {
+			while (item.firstChild) {
+				item.removeChild(item.firstChild);
+			}
+		});
+
+		return this;
+	};
+
+	/**
 	 * Get all elements length
 	 * 
 	 * @public

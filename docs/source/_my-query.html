@@ -403,6 +403,24 @@
 		return this;
 	};
 
+<span id='$$myQuery-method-empty'>	/**
+</span>	 * Empty element - clear all its children.
+	 * Much faster than innerHTML = &quot;&quot;.
+	 * 
+	 * @public
+	 * @return {Himself}
+	 * @memberof $$myQuery
+	 */
+	$$myQuery.prototype.empty = function() {
+		this._operation(function(item) {
+			while (item.firstChild) {
+				item.removeChild(item.firstChild);
+			}
+		});
+
+		return this;
+	};
+
 <span id='$$myQuery-method-len'>	/**
 </span>	 * Get all elements length
 	 * 
