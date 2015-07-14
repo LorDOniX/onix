@@ -1,35 +1,33 @@
-/**
- * @class $$controller
- * @description DI: $dom, $template, $config;
- */
-onix.factory("$$controller", [
+testApp.factory("Page", [
 	"$dom",
 	"$template",
 	"$config",
+	"$common",
+	"$event",
 function(
 	$dom,
 	$template,
-	$config
+	$config,
+	$common,
+	$event
 ) {
-	return {
+
+	// private Page obj
+	var Page = {
 		/**
 		 * Set config.
 		 *
-		 * @private
 		 * @param {Object} config
-		 * @memberof $$controller
 		 */
-		_setConfig: function(config) {
+		setConfig: function(config) {
 			this._config = config;
 		},
 
 		/**
 		 * Init controller - called from App; runs _afterInit
 		 * 
-		 * @private
-		 * @memberof $$controller
 		 */
-		_init: function() {
+		init: function() {
 			var config = this._getConfig();
 			this._els = {};
 
@@ -48,10 +46,8 @@ function(
 		/**
 		 * Get controller element by his name.
 		 *
-		 * @private
 		 * @param  {String} name
 		 * @return {NodeElemetn}     
-		 * @memberof $$controller
 		 */
 		_getEl: function(name) {
 			return this._els[name];
@@ -60,9 +56,7 @@ function(
 		/**
 		 * Get controller config.
 		 *
-		 * @private
 		 * @return {Object}
-		 * @memberof $$controller
 		 */
 		_getConfig: function() {
 			return this._config || {};
@@ -71,9 +65,7 @@ function(
 		/**
 		 * After init
 		 *
-		 * @private
 		 * @abstract
-		 * @memberof $$controller
 		 */
 		_afterInit: function() {
 
@@ -82,9 +74,7 @@ function(
 		/**
 		 * Add new els to this._els; this function can be called from $template
 		 *
-		 * @public
 		 * @param {Object} newEls
-		 * @memberof $$controller
 		 */
 		addEls: function(newEls) {
 			newEls = newEls || {};
@@ -94,4 +84,18 @@ function(
 			}, this);
 		}
 	};
+
+	// public
+	return {
+		/**
+		 * Create new page object from: Page and $event are merged together.
+		 * Priority from left to right.
+		 * 
+		 * @return {Page}
+		 */
+		create: function() {
+			return $common.create(Page, $event);
+		}
+	};
+
 }]);

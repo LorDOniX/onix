@@ -1,8 +1,19 @@
-testApp = onix.module("testApp", []);
+testApp = onix.module("testApp");
 
-testApp.config(function(config) {
-	config.LOCALIZATION.LANG = "en";
-	config.LOCALIZATION.PATH = "/js/locale/en.json";
+testApp.config({
+	// app localization
+	LOCALIZATION: {
+		LANG: "en",
+		PATH: "/js/locale/en.json"
+	},
+
+	// app resource URLs
+	URLS: {
+		HOME: "/api/home/"
+	},
+
+	// for Page - detail css selector
+	DETAIL_SEL: ".detail"
 });
 
 testApp.run([
@@ -11,26 +22,34 @@ testApp.run([
 	"$config",
 	"$q",
 	"$i18n",
+	"HomePage",
 function(
 	$route,
 	$template,
 	$config,
 	$q,
-	$i18n
+	$i18n,
+	HomePage
 ) {
 	$i18n.setLanguage("en");
 
 	// application routes
 	$route
 		.when("/", {
-			controller: "HomeCtrl",
+			controller: function() {
+				HomePage.setConfig({});
+				HomePage.init();
+			},
 			templateUrl: "/js/home/test-templ.html",
 			data: {
 				a: 5
 			}
 		})
 		.otherwise({
-			controller: "HomeCtrl"
+			controller: function() {
+				HomePage.setConfig({});
+				HomePage.init();
+			}
 		});
 
 	// all dependencies before start

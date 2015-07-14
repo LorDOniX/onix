@@ -4,29 +4,6 @@
  */
 onix.config({
 	/**
-	 * Localization
-	 *
-	 * @public
-	 * @type {Object}
-	 * @memberof CONFIG
-	 */
-	LOCALIZATION: {
-		LANG: "cs",
-		PATH: "/js/locale/cs.json"
-	},
-
-	/**
-	 * Resource urls
-	 *
-	 * @public
-	 * @type {Object}
-	 * @memberof CONFIG
-	 */
-	URLS: {
-		HOME: "/api/home/"
-	},
-
-	/**
 	 * Template delimiter
 	 *
 	 * @public
@@ -36,14 +13,5 @@ onix.config({
 	TMPL_DELIMITER: {
 		LEFT: "{{",
 		RIGHT: "}}"
-	},
-
-	/**
-	 * Detail page selector
-	 *
-	 * @public
-	 * @type {String}
-	 * @memberof CONFIG
-	 */
-	DETAIL_SEL: ".detail"
+	}
 });
