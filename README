@@ -52,6 +52,13 @@
 
 # CHANGELOG
 
+## 2.1.0
+
+15. 7. 2015
+
+* remove controller & directive
+* whole framework is in angular way, but is like dependency injection framework
+
 ## 2.0.0
 
 29. 6. 2015

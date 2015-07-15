@@ -406,16 +406,14 @@ onix = (function() {
 		 *
 		 * @public
 		 * @param  {String} name 
-		 * @param  {Array} [dependencies] todo
 		 * @return {$$module}
 		 * @memberof onix
 		 */
-		module: function(name, dependencies) {
+		module: function(name) {
 			var module = new $$module();
 
 			this._modules[name] = {
-				module: module,
-				dependencies: dependencies
+				module: module
 			};
 
 			return module;
@@ -465,8 +463,8 @@ onix = (function() {
 		info: function() {
 			console.log(
 				"Onix JS Framework\n" +
-				"Version: 2.0.0\n" +
-				"Date: 29. 6. 2015"
+				"Version: 2.1.0\n" +
+				"Date: 15. 7. 2015"
 			);
 		}
 	};
