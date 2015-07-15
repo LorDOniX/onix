@@ -223,7 +223,7 @@ function(
 	 * @memberof $template
 	 */
 	this.bindTemplate = function(root, scope) {
-		var allElements = onix.element(&quot;*[data-click], *[data-change], *[data-bind]&quot;, root);
+		var allElements = onix.element(&quot;*[data-click], *[data-change], *[data-bind], *[data-keydown]&quot;, root);
 
 		if (allElements.len()) {
 			var newEls = {};

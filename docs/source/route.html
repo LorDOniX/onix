@@ -23,10 +23,12 @@ onix.service(&quot;$route&quot;, [
 	&quot;$routeParams&quot;,
 	&quot;$location&quot;,
 	&quot;$template&quot;,
+	&quot;$inject&quot;,
 function(
 	$routeParams,
 	$location,
-	$template
+	$template,
+	$inject
 ) {
 <span id='$route-property-_routes'>	/**
 </span>	 * All routes
@@ -90,6 +92,26 @@ function(
 		return this;
 	};
 
+<span id='$route-method-_runController'>	/**
+</span>	 * Run controller from $route path
+	 *
+	 * @param  {String|Array|Function} contr
+	 * @param  {Object} [contrData] 
+	 */
+	this._runController = function(contr, contrData) {
+		if (typeof contr === &quot;string&quot;) {
+			var param = onix.getObject(contr);
+
+			$inject.bind(param, contrData)();
+		}
+		else if (Array.isArray(contr)) {
+			$inject.bind(contr, contrData)();
+		}
+		else if (typeof contr === &quot;function&quot;) {
+			contr.apply(contr, [contrData]);
+		}
+	};
+
 <span id='$route-method-go'>	/**
 </span>	 * Route GO.
 	 *
@@ -148,13 +170,13 @@ function(
 			if (templateUrl) {
 				$template.load(config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
-						onix.runController(contr, contrData);
+						this._runController(contr, contrData);
 					}
-				});
+				}.bind(this));
 			}
 			else {
 				if (contr) {
-					onix.runController(contr, contrData);
+					this._runController(contr, contrData);
 				}
 			}
 		}

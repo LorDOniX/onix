@@ -24,9 +24,7 @@
 		SERVICE: 1,
 		FACTORY: 2,
 		CONSTANT: 3,
-		RUN: 4,
-		CONTROLLER: 5,
-		DIRECTIVE: 6
+		RUN: 4
 	};
 
 <span id='$$module'>	/**
@@ -67,38 +65,6 @@
 			name: name,
 			param: param,
 			type: TYPES.FACTORY
-		});
-	};
-
-<span id='$$module-method-controller'>	/**
-</span>	 * Add a new controller
-	 *
-	 * @public
-	 * @param  {String} name
-	 * @param  {Array|Function} param With DI
-	 * @memberof $$module
-	 */
-	$$module.prototype.controller = function(name, param) {
-		this._allObj.push({
-			name: name,
-			param: param,
-			type: TYPES.CONTROLLER
-		});
-	};
-
-<span id='$$module-method-directive'>	/**
-</span>	 * Add a new directive
-	 *
-	 * @public
-	 * @param  {String} name
-	 * @param  {Array|Function} param With DI
-	 * @memberof $$module
-	 */
-	$$module.prototype.directive = function(name, param) {
-		this._allObj.push({
-			name: name,
-			param: param,
-			type: TYPES.DIRECTIVE
 		});
 	};
 
@@ -149,6 +115,74 @@
 		}
 	};
 
+<span id='$$module-method-getAllObjects'>	/**
+</span>	 * Get all objects in the module.
+	 * 
+	 * @public
+	 * @return {Object}
+	 * @memberof $$module
+	 */
+	$$module.prototype.getAllObjects = function() {
+		return this._allObj;
+	};
+
+<span id='$$inject'>	/**
+</span>	 * Dependency injection
+	 *
+	 * @class $$inject
+	 */
+	var $$inject = function(allObjects) {
+		this._objects = allObjects;
+	};
+
+<span id='$$inject-method-bind'>	/**
+</span>	 * Dependency injection bind
+	 *
+	 * @private
+	 * @param  {Function|Array} param
+	 * @param  {Object} [replace]
+	 * @return {Object}
+	 * @memberof $$inject
+	 */
+	$$inject.prototype.bind = function(param, replace) {
+		var fn;
+		var args = [];
+
+		replace = replace || {};
+
+		if (Array.isArray(param)) {
+			param.every(function(item) {
+				if (typeof item === &quot;function&quot;) {
+					fn = item;
+					return false;
+				}
+				else {
+					args.push(item in replace ? replace[item] : this._objects[item]);
+				}
+
+				return true;
+			}, this);
+		}
+		else {
+			fn = param;
+		}
+
+<span id='$$inject-method-'>		/**
+</span>		 * Run new binded function - with the new
+		 * @param  {Function|Object} [scope] 
+		 * @param  {Boolean} [callWithNew] 
+		 * @return {Function}
+		 */
+		return function(scope, callWithNew) {
+			if (callWithNew) {
+				return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+			}
+			else {
+				return fn.apply(scope || fn, args);
+			}
+		};
+	};
+
 <span id='onix'>	/**
 </span>	 * Main framework object.
 	 * 
@@ -191,6 +225,15 @@
 		 */
 		_CONFIG_NAME: &quot;$config&quot;,
 
+<span id='onix-property-_DI_NAME'>		/**
+</span>		 * DI name
+		 *
+		 * @private
+		 * @const
+		 * @memberof onix
+		 */
+		_DI_NAME: &quot;$inject&quot;,
+
 <span id='onix-method-_init'>		/**
 </span>		 * Init function
 		 *
@@ -211,16 +254,21 @@
 		 * @memberof onix
 		 */
 		_domLoad: function() {
+			// create DI
+			var $inject = new $$inject(this._objects);
+
+			this._objects[this._DI_NAME] = $inject;
+
 			// process all inner items
 			this._allObj.forEach(function(item) {
 				// only 2 types
 				switch (item.type) {
 					case TYPES.SERVICE:
-						this._objects[item.name] = this._DI(item.param).newRun();
+						this._objects[item.name] = $inject.bind(item.param)(null, true);
 						break;
 
 					case TYPES.FACTORY:
-						this._objects[item.name] = this._DI(item.param).run();
+						this._objects[item.name] = $inject.bind(item.param)();
 						break;
 				}
 			}, this);
@@ -229,36 +277,24 @@
 			this._allObj.length = 0;
 
 			var runs = [];
-			var $directive = this.getObject(&quot;$directive&quot;);
 
 			// process all modules
 			Object.keys(this._modules).forEach(function(moduleName) {
 				var module = this._modules[moduleName].module;
 
-				module._allObj.forEach(function(moduleItem) {
+				module.getAllObjects().forEach(function(moduleItem) {
 					// modules have more types
 					switch (moduleItem.type) {
 						case TYPES.SERVICE:
-							this._objects[moduleItem.name] = this._DI(moduleItem.param).newRun();
+							this._objects[moduleItem.name] = $inject.bind(moduleItem.param)(null, true);
 							break;
 
 						case TYPES.FACTORY:
-							this._objects[moduleItem.name] = this._DI(moduleItem.param).run();
+							this._objects[moduleItem.name] = $inject.bind(moduleItem.param)();
 							break;
 
 						case TYPES.CONSTANT:
-						case TYPES.CONTROLLER:
 							this._objects[moduleItem.name] = moduleItem.param;
-							break;
-
-						case TYPES.DIRECTIVE:
-							var $scope = $directive.create([&quot;$event&quot;], {});
-
-							this._DI(moduleItem.param, {
-								$scope: $scope
-							}).run();
-
-							this._objects[moduleItem.name] = $scope;
 							break;
 
 						case TYPES.RUN:
@@ -269,17 +305,18 @@
 			}, this);
 
 			// onix main run
-			this._DI(this._run).run(this);
+			$inject.bind(this._run)(this);
 
 			var $q = this.getObject(&quot;$q&quot;);
+			var _promise = this.getObject(&quot;$$promise&quot;);
 			var all = [];
 
 			// run all runs
 			runs.forEach(function(run) {
-				var runO = this._DI(run.param).run();
+				var runO = $inject.bind(run.param)();
 
 				// returns a promise
-				if (runO &amp;&amp; &quot;_E_STATES&quot; in runO) {
+				if (runO &amp;&amp; runO instanceof _promise) {
 					all.push(runO);
 				}
 			}, this);
@@ -310,14 +347,12 @@
 			&quot;$loader&quot;,
 			&quot;$route&quot;,
 			&quot;$myQuery&quot;,
-			&quot;$common&quot;,
 		function(
 			$i18n,
 			$template,
 			$loader,
 			$route,
-			$myQuery,
-			$common
+			$myQuery
 		) {
 			// binds
 			this.element = function(value, parent) {
@@ -331,64 +366,7 @@
 
 			// language
 			window._ = $i18n._.bind($i18n);
-
-			$common.ift(this._objects[this._CONFIG_NAME].LOCALIZATION.LANG, function(langKey) {
-				$i18n.setLanguage(langKey);
-			});
 		}],
-
-<span id='onix-method-_DI'>		/**
-</span>		 * Dependency injection
-		 *
-		 * @private
-		 * @param  {Function|Array} param
-		 * @param  {Object} [replace]
-		 * @return {Object}
-		 * @memberof onix
-		 */
-		_DI: function(param, replace) {
-			var fn;
-			var args = [];
-
-			replace = replace || {};
-
-			if (Array.isArray(param)) {
-				param.every(function(item) {
-					if (typeof item === &quot;function&quot;) {
-						fn = item;
-						return false;
-					}
-					else {
-						args.push(item in replace ? replace[item] : this._objects[item]);
-					}
-
-					return true;
-				}, this);
-			}
-			else {
-				fn = param;
-			}
-
-			return {
-<span id='onix-method-run'>				/**
-</span>				 * Run new binded function
-				 * @param  {Function|Object} [scope] 
-				 * @return {Object}
-				 */
-				run: function(scope) {
-					return fn.apply(scope || fn, args);
-				},
-
-<span id='onix-method-newRun'>				/**
-</span>				 * Run new binded function - with the new
-				 * @param  {Function|Object} [scope] 
-				 * @return {Object}
-				 */
-				newRun: function(scope) {
-					return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
-				}
-			};
-		},
 
 <span id='onix-method-config'>		/**
 </span>		 * Read/add config to the onix application.
@@ -446,16 +424,14 @@
 		 *
 		 * @public
 		 * @param  {String} name 
-		 * @param  {Array} [dependencies] todo
 		 * @return {$$module}
 		 * @memberof onix
 		 */
-		module: function(name, dependencies) {
+		module: function(name) {
 			var module = new $$module();
 
 			this._modules[name] = {
-				module: module,
-				dependencies: dependencies
+				module: module
 			};
 
 			return module;
@@ -475,6 +451,17 @@
 			return this._objects[name];
 		},
 
+<span id='onix-method-getAllObjects'>		/**
+</span>		 * Get all objects
+		 *
+		 * @public
+		 * @return {Object}
+		 * @memberof onix
+		 */
+		getAllObjects: function() {
+			return this._objects;
+		},
+
 <span id='onix-method-noop'>		/**
 </span>		 * Empty function
 		 *
@@ -483,40 +470,6 @@
 		 */
 		noop: function() {
 
-		},
-
-<span id='onix-method-runController'>		/**
-</span>		 * Run controller
-		 * 
-		 * @param  {String|Array|Function} controller 
-		 * @param  {Object} [controllerData] 
-		 * @public
-		 * @memberof onix
-		 */
-		runController: function(controller, controllerData) {
-			var $controller = this.getObject(&quot;$controller&quot;);
-			var $scope = $controller.create([&quot;$event&quot;], {});
-			var replaceObj = {
-				$scope: $scope
-			};
-
-			if (typeof controller === &quot;string&quot;) {
-				var param = this.getObject(controller);
-
-				this._DI(param, replaceObj).run();
-			}
-			else if (Array.isArray(controller)) {
-				this._DI(controller, replaceObj).run();
-			}
-			else if (typeof controller === &quot;function&quot;) {
-				controller.apply(config.controller, [$scope]);
-			}
-
-			if (controllerData) {
-				$scope._setConfig(controllerData);
-			}
-
-			$scope._init();
 		},
 
 <span id='onix-method-info'>		/**
@@ -528,8 +481,8 @@
 		info: function() {
 			console.log(
 				&quot;Onix JS Framework\n&quot; +
-				&quot;Version: 2.0.0\n&quot; +
-				&quot;Date: 29. 6. 2015&quot;
+				&quot;Version: 2.1.0\n&quot; +
+				&quot;Date: 15. 7. 2015&quot;
 			);
 		}
 	};

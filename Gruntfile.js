@@ -44,10 +44,6 @@ module.exports = function(grunt) {
 
 					"static/js/onix/service/template.js",
 					"static/js/onix/service/route.js",
-					"static/js/onix/factory/_controller.js",
-					"static/js/onix/factory/controller.js",
-					"static/js/onix/factory/_directive.js",
-					"static/js/onix/factory/directive.js",
 					"static/js/onix/factory/select.js"
 				],
 
