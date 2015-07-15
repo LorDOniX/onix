@@ -20,7 +20,7 @@ function(
 		},
 
 		/**
-		 * Get directive element.
+		 * Get snippet element.
 		 *
 		 * @param  {String} name
 		 * @return {NodeElement}
@@ -30,7 +30,7 @@ function(
 		},
 
 		/**
-		 * Get directive parent.
+		 * Get snippet parent.
 		 *
 		 * @return {NodeElement}
 		 */
@@ -48,7 +48,7 @@ function(
 		},
 
 		/**
-		 * Set directive name.
+		 * Set snippet name.
 		 *
 		 * @param {String} name
 		 */
@@ -57,7 +57,7 @@ function(
 		},
 
 		/**
-		 * Setup directive.
+		 * Setup snippet.
 		 *
 		 * @abstract
 		 */
@@ -66,7 +66,7 @@ function(
 		},
 
 		/**
-		 * Activete directive.
+		 * Activete snippet.
 		 *
 		 * @abstract
 		 */
@@ -75,7 +75,7 @@ function(
 		},
 
 		/**
-		 * Deactivate directive.
+		 * Deactivate snippet.
 		 *
 		 * @abstract
 		 */
@@ -84,7 +84,7 @@ function(
 		},
 
 		/**
-		 * Is directive locked for change?
+		 * Is snippet locked for change?
 		 *
 		 * @abstract
 		 * @return {Boolean}
@@ -94,7 +94,7 @@ function(
 		},
 
 		/**
-		 * Init directive
+		 * Init snippet
 		 *
 		 * @param  {Object} config
 		 * @param  {Object} parent parent page
@@ -124,7 +124,7 @@ function(
 		},
 
 		/**
-		 * Setup directive - is called after init. Runs _setup()
+		 * Setup snippet - is called after init. Runs _setup()
 		 */
 		setup: function() {
 			$template.bindTemplate(this._root, this);
@@ -133,21 +133,21 @@ function(
 		},
 
 		/**
-		 * Activate directive - run _activate()
+		 * Activate snippet - run _activate()
 		 */
 		activate: function() {
 			this._activate();
 		},
 
 		/**
-		 * Deactivate directive - run _deactivate()
+		 * Deactivate snippet - run _deactivate()
 		 */
 		deactivate: function() {
 			this._deactivate();
 		},
 
 		/**
-		 * Get directive name.
+		 * Get snippet name.
 		 *
 		 * @return {String}
 		 */
@@ -156,7 +156,7 @@ function(
 		},
 
 		/**
-		 * Is directive locked for change?
+		 * Is snippet locked for change?
 		 *
 		 * @return {Boolean}
 		 */

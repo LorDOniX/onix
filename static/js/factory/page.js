@@ -24,14 +24,14 @@ function(
 		},
 
 		/**
-		 * Init controller - called from App; runs _afterInit
+		 * Init page - called from App; runs _afterInit
 		 * 
 		 */
 		init: function() {
 			var config = this._getConfig();
 			this._els = {};
 
-			// each controller contanins only one detail div
+			// each page contanins only one detail div
 			var rootEl = $dom.get($config.DETAIL_SEL);
 
 			if (config.els) {
@@ -44,7 +44,7 @@ function(
 		},
 
 		/**
-		 * Get controller element by his name.
+		 * Get page element by his name.
 		 *
 		 * @param  {String} name
 		 * @return {NodeElemetn}     
@@ -54,7 +54,7 @@ function(
 		},
 
 		/**
-		 * Get controller config.
+		 * Get page config.
 		 *
 		 * @return {Object}
 		 */
