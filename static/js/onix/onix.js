@@ -291,6 +291,7 @@ onix = (function() {
 			$inject.bind(this._run)(this);
 
 			var $q = this.getObject("$q");
+			var _promise = this.getObject("$$promise");
 			var all = [];
 
 			// run all runs
@@ -298,7 +299,7 @@ onix = (function() {
 				var runO = $inject.bind(run.param)();
 
 				// returns a promise
-				if (runO && "_E_STATES" in runO) {
+				if (runO && runO instanceof _promise) {
 					all.push(runO);
 				}
 			}, this);
