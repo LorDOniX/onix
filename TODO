@@ -50,3 +50,20 @@ dom
 ...
 
 porovná se můj shadow dom vůči domu na stránce
+
+Polyfill:
+
+Array.isArray
+.forEach
+.every
+Object.keys
+po snippet
+
+init:
+document.addEventListener("DOMContentLoaded", this._domLoad.bind(this));
+pro IE8
+
+addEventListener
+classList
+XMLHttpRequest
+FormData
