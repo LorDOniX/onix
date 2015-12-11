@@ -21,6 +21,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: [
+					"static/js/onix/polyfills.js",
 					"static/js/onix/onix.js",
 					"static/js/onix/config.js",
 
