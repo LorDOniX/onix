@@ -53,8 +53,12 @@ function(
 		});
 
 	// all dependencies before start
-	return $q.all([
+	$q.all([
 		$template.load("testTempl", "/js/home/test-templ.html"),
 		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
-	]);
+	]).then(function() {
+		$route.go();
+	}, function() {
+		console.error("Error during app run");
+	});
 }]);

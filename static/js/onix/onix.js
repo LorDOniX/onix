@@ -158,7 +158,9 @@ onix = (function() {
 		 */
 		return function(scope, callWithNew) {
 			if (callWithNew) {
-				return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+				var obj = Object.create(fn.prototype);
+				fn.apply(obj, args);
+				return obj;
 			}
 			else {
 				return fn.apply(scope || fn, args);
@@ -290,32 +292,10 @@ onix = (function() {
 			// onix main run
 			$inject.bind(this._run)(this);
 
-			var $q = this.getObject("$q");
-			var _promise = this.getObject("$$promise");
-			var all = [];
-
 			// run all runs
 			runs.forEach(function(run) {
-				var runO = $inject.bind(run.param)();
-
-				// returns a promise
-				if (runO && runO instanceof _promise) {
-					all.push(runO);
-				}
-			}, this);
-
-			var $route = this.getObject("$route");
-
-			if (all.length) {
-				$q.all(all)["finally"](function() {
-					// route go
-					$route.go();
-				});
-			}
-			else {
-				// route go
-				$route.go();
-			}
+				$inject.bind(run.param)();
+			});
 		},
 
 		/**
@@ -464,8 +444,8 @@ onix = (function() {
 		info: function() {
 			console.log(
 				"Onix JS Framework\n" +
-				"Version: 2.1.0\n" +
-				"Date: 15. 7. 2015"
+				"Version: 2.1.1\n" +
+				"Date: 16. 12. 2015"
 			);
 		}
 	};

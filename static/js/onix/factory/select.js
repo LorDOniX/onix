@@ -53,18 +53,20 @@ function(
 				});
 			};
 
+			var clickFn = function(e) {
+				removeAllOpened();
+				window.removeEventListener("click", clickFn);
+			};
+
 			removeAllOpened();
 
 			if (isOpen) {
 				// outside click
-				window.removeEventListener("click");
+				window.removeEventListener("click", clickFn);
 			}
 			else {
 				// outside click
-				window.addEventListener("click", function(e) {
-					removeAllOpened();
-					window.removeEventListener("click");
-				});
+				window.addEventListener("click", clickFn);
 
 				el.classList.add(con.OPEN_CLASS);
 			}

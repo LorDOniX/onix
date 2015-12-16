@@ -1,3 +1,185 @@
+(function() {
+	Event = Event || window.Event;
+
+	Event.prototype.stopPropagation = Event.prototype.stopPropagation || function() {
+		this.cancelBubble = true;
+	};
+
+	Event.prototype.preventDefault = Event.prototype.preventDefault || function () {
+		this.returnValue = false;
+	};
+})();
+
+if(!Array.isArray) {
+	/**
+	 * Array.isArray dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+	 */
+	Array.isArray = function (vArg) {
+		return Object.prototype.toString.call(vArg) === "[object Array]";
+	};
+}
+
+if (!Array.prototype.forEach) { 
+	Array.prototype.forEach = function(cb, _this) {
+	    var len = this.length;
+	    for (var i=0;i<len;i++) { 
+			if (i in this) { cb.call(_this, this[i], i, this); }
+		}
+	}
+}
+
+if (!Array.prototype.every) { 
+	Array.prototype.every = function(cb, _this) {
+	    var len = this.length;
+	    for (var i=0;i<len;i++) {
+			if (i in this && !cb.call(_this, this[i], i, this)) { return false; }
+	    }
+	    return true;
+	}
+}
+
+if (!Array.prototype.indexOf) { 
+	Array.prototype.indexOf = function(item, from) {
+	    var len = this.length;
+	    var i = from || 0;
+	    if (i < 0) { i += len; }
+	    for (;i<len;i++) {
+			if (i in this && this[i] === item) { return i; }
+	    }
+	    return -1;
+	}
+}
+
+if (!("console" in window)) {
+	var emptyFn = function() {};
+
+	window.console = {};
+
+	["log", "warn", "error", "clear", "info"].forEach(function(name) {
+		window.console[name] = emptyFn;
+	});
+}
+
+if (!Object.keys) {
+	/**
+	 * Object.keys dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+	 */
+	Object.keys = (function () {
+		'use strict';
+
+		var hasOwnProperty = Object.prototype.hasOwnProperty,
+			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+			dontEnums = [
+				'toString',
+				'toLocaleString',
+				'valueOf',
+				'hasOwnProperty',
+				'isPrototypeOf',
+				'propertyIsEnumerable',
+				'constructor'
+			],
+			dontEnumsLength = dontEnums.length;
+
+		return function (obj) {
+			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+				throw new TypeError('Object.keys called on non-object');
+			}
+
+			var result = [], prop, i;
+
+			for (prop in obj) {
+				if (hasOwnProperty.call(obj, prop)) {
+					result.push(prop);
+				}
+			}
+
+			if (hasDontEnumBug) {
+				for (i = 0; i < dontEnumsLength; i++) {
+					if (hasOwnProperty.call(obj, dontEnums[i])) {
+						result.push(dontEnums[i]);
+					}
+				}
+			}
+			return result;
+		};
+	}());
+}
+
+(function() {
+  if(navigator.appVersion.indexOf('MSIE 8') > 0) {
+    var _slice = Array.prototype.slice;
+    Array.prototype.slice = function() {
+      if(this instanceof Array) {
+        return _slice.apply(this, arguments);
+      } else {
+        var result = [];
+        var start = (arguments.length >= 1) ? arguments[0] : 0;
+        var end = (arguments.length >= 2) ? arguments[1] : this.length;
+        for(var i=start; i<end; i++) {
+          result.push(this[i]);
+        }
+        return result;
+      }
+    };
+  }
+})();
+
+if (!Object.create) {
+	/**
+	 * Object.create dle ES5 - https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
+	 */
+	Object.create = function (o) {
+		if (arguments.length > 1) { throw new Error("Object.create polyfill only accepts the first parameter"); }
+		var tmp = function() {};
+		tmp.prototype = o;
+		return new tmp();
+	};
+}
+
+if (!Function.prototype.bind) {
+	/**
+	 * ES5 Function.prototype.bind
+	 * Vrací funkci zbindovanou do zadaného kontextu.
+	 * Zbylé volitelné parametry jsou předány volání vnitřní funkce.
+	 * @param {object} thisObj Nový kontext
+	 * @returns {function}
+	 */
+	Function.prototype.bind = function(thisObj) {
+		var fn = this;
+		var args = Array.prototype.slice.call(arguments, 1);
+		return function() {
+			return fn.apply(thisObj, args.concat(Array.prototype.slice.call(arguments)));
+		}
+	}
+};
+
+if (!("addEventListener" in document)) {
+	var w = Window.prototype;
+	var h = HTMLDocument.prototype;
+	var e = Element.prototype;
+
+	w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
+		if (eventName == "DOMContentLoaded") {
+			document.attachEvent("onreadystatechange", function() {
+				if (document.readyState === "complete") {
+					listener();
+				}
+			});
+		}
+		else {
+			var obj = this;
+
+			this.attachEvent("on" + eventName, function() {
+				return listener.apply(obj, arguments);
+			});
+		}
+	};
+
+	w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
+		return this.detachEvent("on" + eventName, listener);
+	};
+}
+
 if (!("classList" in document.documentElement) && window.Element) {
 	(function () {
 		var prototype = Array.prototype,
@@ -71,242 +253,3 @@ if (!("classList" in document.documentElement) && window.Element) {
 		});
 	})();
 }
-
-;(function() {
-	var testElement = document.createElement("_");
-
-	testElement.classList.add("c1", "c2");
-
-	if (!testElement.classList.contains("c2")) {
-		var createMethod = function(method) {
-			var original = DOMTokenList.prototype[method];
-
-			DOMTokenList.prototype[method] = function(token) {
-				var i, len = arguments.length;
-
-				for (i = 0; i < len; i++) {
-					token = arguments[i];
-					original.call(this, token);
-				}
-			};
-		};
-		createMethod("add");
-		createMethod("remove");
-	}
-
-	testElement.classList.toggle("c3", false);
-
-	if (testElement.classList.contains("c3")) {
-		var _toggle = DOMTokenList.prototype.toggle;
-
-		DOMTokenList.prototype.toggle = function(token, force) {
-			if (1 in arguments && !this.contains(token) === !force) {
-				return force;
-			} else {
-				return _toggle.call(this, token);
-			}
-		};
-	}
-
-	testElement = null;
-})();
-
-if (!Function.prototype.bind) {
-	/**
-	 * ES5 Function.prototype.bind
-	 * Vrací funkci zbindovanou do zadaného kontextu.
-	 * Zbylé volitelné parametry jsou předány volání vnitřní funkce.
-	 * @param {object} thisObj Nový kontext
-	 * @returns {function}
-	 */
-	Function.prototype.bind = function(thisObj) {
-		var fn = this;
-		var args = Array.prototype.slice.call(arguments, 1);
-		return function() {
-			return fn.apply(thisObj, args.concat(Array.prototype.slice.call(arguments)));
-		}
-	}
-};
-
-if (!Date.now) {
-	/**
-	 * aktuální timestamp dle ES5 - http://dailyjs.com/2010/01/07/ecmascript5-date/
-	 */
-	Date.now = function() { return +(new Date); }
-}
-
-if (!Object.keys) {
-	/**
-	 * Object.keys dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
-	 */
-	Object.keys = (function () {
-		'use strict';
-
-		var hasOwnProperty = Object.prototype.hasOwnProperty,
-			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
-			dontEnums = [
-				'toString',
-				'toLocaleString',
-				'valueOf',
-				'hasOwnProperty',
-				'isPrototypeOf',
-				'propertyIsEnumerable',
-				'constructor'
-			],
-			dontEnumsLength = dontEnums.length;
-
-		return function (obj) {
-			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
-				throw new TypeError('Object.keys called on non-object');
-			}
-
-			var result = [], prop, i;
-
-			for (prop in obj) {
-				if (hasOwnProperty.call(obj, prop)) {
-					result.push(prop);
-				}
-			}
-
-			if (hasDontEnumBug) {
-				for (i = 0; i < dontEnumsLength; i++) {
-					if (hasOwnProperty.call(obj, dontEnums[i])) {
-						result.push(dontEnums[i]);
-					}
-				}
-			}
-			return result;
-		};
-	}());
-}
-
-if(!Array.isArray) {
-	/**
-	 * Array.isArray dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
-	 */
-	Array.isArray = function (vArg) {
-		return Object.prototype.toString.call(vArg) === "[object Array]";
-	};
-}
-
-;(function() {
-	if (window.getSelection) { return; } /* supported */
-
-	document.addEventListener("readystatechange", function(e) {
-		if (document.readyState == "complete") { 
-			var event = new CustomEvent("DOMContentLoaded");
-			document.dispatchEvent(event);
-		}
-	});
-})();
-
-/** CustomEvent polyfill */
-;(function() {
-	if (!window.CustomEvent && document.createEventObject) { /* IE only */
-		window.CustomEvent = function(type, props) {
-			if (!arguments.length) { throw new Error("Not enough arguments"); }
-			var def = {
-				type: type,
-				bubbles: false,
-				cancelable: false,
-				detail: null
-			}
-			var event = document.createEventObject();
-			for (var p in def)   { event[p] = def[p];   }
-			for (var p in props) { event[p] = props[p]; }
-			return event;
-		}
-
-		return;
-	}
-
-	try {
-		new CustomEvent("test");
-	} catch (e) { /* ctor version not supported or no window.CustomEvent */
-		var CE = function (type, props) {
-			if (!arguments.length) { throw new Error("Not enough arguments"); }
-			var def = {
-				bubbles: false,
-				cancelable: false,
-				detail: null 
-			};
-			for (var p in props)   { def[p] = props[p];   }
-			var event = document.createEvent("CustomEvent");
-			event.initCustomEvent(type, def.bubbles, def.cancelable, def.detail);
-			return event;
-		};
-		
-		CE.prototype = (window.CustomEvent || window.Event).prototype;
-		window.CustomEvent = CE;
-	}
-})();
-
-if (!Array.prototype.forEach) { 
-	Array.prototype.forEach = function(cb, _this) {
-	    var len = this.length;
-	    for (var i=0;i<len;i++) { 
-			if (i in this) { cb.call(_this, this[i], i, this); }
-		}
-	}
-}
-
-if (!Array.forEach) { 
-	Array.forEach = function(obj, cb, _this) { Array.prototype.forEach.call(obj, cb, _this); }
-}
-
-if (!Array.prototype.every) { 
-	Array.prototype.every = function(cb, _this) {
-	    var len = this.length;
-	    for (var i=0;i<len;i++) {
-			if (i in this && !cb.call(_this, this[i], i, this)) { return false; }
-	    }
-	    return true;
-	}
-}
-
-if (!Array.every) { 
-	Array.every = function(obj, cb, _this) { return Array.prototype.every.call(obj, cb, _this); }
-}
-
-if (!Array.prototype.map) { 
-	Array.prototype.map = function(cb, _this) {
-		var len = this.length;
-		var res = new Array(len);
-		for (var i=0;i<len;i++) {
-			if (i in this) { res[i] = cb.call(_this, this[i], i, this); }
-		}
-		return res;
-	}
-}
-if (!Array.map) { 
-	Array.map = function(obj, cb, _this) { return Array.prototype.map.call(obj, cb, _this); }
-}
-
-!window.addEventListener && (function (WindowPrototype, DocumentPrototype, ElementPrototype, addEventListener, removeEventListener, dispatchEvent, registry) {
-	WindowPrototype[addEventListener] = DocumentPrototype[addEventListener] = ElementPrototype[addEventListener] = function (type, listener) {
-		var target = this;
-
-		registry.unshift([target, type, listener, function (event) {
-			event.currentTarget = target;
-			event.preventDefault = function () { event.returnValue = false };
-			event.stopPropagation = function () { event.cancelBubble = true };
-			event.target = event.srcElement || target;
-
-			listener.call(target, event);
-		}]);
-
-		this.attachEvent("on" + type, registry[0][3]);
-	};
-
-	WindowPrototype[removeEventListener] = DocumentPrototype[removeEventListener] = ElementPrototype[removeEventListener] = function (type, listener) {
-		for (var index = 0, register; register = registry[index]; ++index) {
-			if (register[0] == this && register[1] == type && register[2] == listener) {
-				return this.detachEvent("on" + type, registry.splice(index, 1)[0][3]);
-			}
-		}
-	};
-
-	WindowPrototype[dispatchEvent] = DocumentPrototype[dispatchEvent] = ElementPrototype[dispatchEvent] = function (eventObject) {
-		return this.fireEvent("on" + eventObject.type, eventObject);
-	};
-})(Window.prototype, HTMLDocument.prototype, Element.prototype, "addEventListener", "removeEventListener", "dispatchEvent", []);
