@@ -70,18 +70,20 @@ function(
 				});
 			};
 
+			var clickFn = function(e) {
+				removeAllOpened();
+				window.removeEventListener(&quot;click&quot;, clickFn);
+			};
+
 			removeAllOpened();
 
 			if (isOpen) {
 				// outside click
-				window.removeEventListener(&quot;click&quot;);
+				window.removeEventListener(&quot;click&quot;, clickFn);
 			}
 			else {
 				// outside click
-				window.addEventListener(&quot;click&quot;, function(e) {
-					removeAllOpened();
-					window.removeEventListener(&quot;click&quot;);
-				});
+				window.addEventListener(&quot;click&quot;, clickFn);
 
 				el.classList.add(con.OPEN_CLASS);
 			}

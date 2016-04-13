@@ -175,7 +175,9 @@
 		 */
 		return function(scope, callWithNew) {
 			if (callWithNew) {
-				return new (Function.prototype.bind.apply(scope || fn, [null].concat(args)))
+				var obj = Object.create(fn.prototype);
+				fn.apply(obj, args);
+				return obj;
 			}
 			else {
 				return fn.apply(scope || fn, args);
@@ -307,32 +309,10 @@
 			// onix main run
 			$inject.bind(this._run)(this);
 
-			var $q = this.getObject(&quot;$q&quot;);
-			var _promise = this.getObject(&quot;$$promise&quot;);
-			var all = [];
-
 			// run all runs
 			runs.forEach(function(run) {
-				var runO = $inject.bind(run.param)();
-
-				// returns a promise
-				if (runO &amp;&amp; runO instanceof _promise) {
-					all.push(runO);
-				}
-			}, this);
-
-			var $route = this.getObject(&quot;$route&quot;);
-
-			if (all.length) {
-				$q.all(all)[&quot;finally&quot;](function() {
-					// route go
-					$route.go();
-				});
-			}
-			else {
-				// route go
-				$route.go();
-			}
+				$inject.bind(run.param)();
+			});
 		},
 
 <span id='onix-property-_run'>		/**
@@ -481,8 +461,8 @@
 		info: function() {
 			console.log(
 				&quot;Onix JS Framework\n&quot; +
-				&quot;Version: 2.1.0\n&quot; +
-				&quot;Date: 15. 7. 2015&quot;
+				&quot;Version: 2.1.1\n&quot; +
+				&quot;Date: 16. 12. 2015&quot;
 			);
 		}
 	};

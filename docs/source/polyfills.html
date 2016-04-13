@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">(function() {
+	Event = Event || window.Event;
+
+	Event.prototype.stopPropagation = Event.prototype.stopPropagation || function() {
+		this.cancelBubble = true;
+	};
+
+	Event.prototype.preventDefault = Event.prototype.preventDefault || function () {
+		this.returnValue = false;
+	};
+})();
+
+if(!Array.isArray) {
+<span id='global-method-isArray'>	/**
+</span>	 * Array.isArray dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+	 */
+	Array.isArray = function (vArg) {
+		return Object.prototype.toString.call(vArg) === &quot;[object Array]&quot;;
+	};
+}
+
+if (!Array.prototype.forEach) { 
+	Array.prototype.forEach = function(cb, _this) {
+	    var len = this.length;
+	    for (var i=0;i&lt;len;i++) { 
+			if (i in this) { cb.call(_this, this[i], i, this); }
+		}
+	}
+}
+
+if (!Array.prototype.every) { 
+	Array.prototype.every = function(cb, _this) {
+	    var len = this.length;
+	    for (var i=0;i&lt;len;i++) {
+			if (i in this &amp;&amp; !cb.call(_this, this[i], i, this)) { return false; }
+	    }
+	    return true;
+	}
+}
+
+if (!Array.prototype.indexOf) { 
+	Array.prototype.indexOf = function(item, from) {
+	    var len = this.length;
+	    var i = from || 0;
+	    if (i &lt; 0) { i += len; }
+	    for (;i&lt;len;i++) {
+			if (i in this &amp;&amp; this[i] === item) { return i; }
+	    }
+	    return -1;
+	}
+}
+
+if (!(&quot;console&quot; in window)) {
+	var emptyFn = function() {};
+
+	window.console = {};
+
+	[&quot;log&quot;, &quot;warn&quot;, &quot;error&quot;, &quot;clear&quot;, &quot;info&quot;].forEach(function(name) {
+		window.console[name] = emptyFn;
+	});
+}
+
+if (!Object.keys) {
+<span id='global-property-keys'>	/**
+</span>	 * Object.keys dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+	 */
+	Object.keys = (function () {
+		&#39;use strict&#39;;
+
+		var hasOwnProperty = Object.prototype.hasOwnProperty,
+			hasDontEnumBug = !({toString: null}).propertyIsEnumerable(&#39;toString&#39;),
+			dontEnums = [
+				&#39;toString&#39;,
+				&#39;toLocaleString&#39;,
+				&#39;valueOf&#39;,
+				&#39;hasOwnProperty&#39;,
+				&#39;isPrototypeOf&#39;,
+				&#39;propertyIsEnumerable&#39;,
+				&#39;constructor&#39;
+			],
+			dontEnumsLength = dontEnums.length;
+
+		return function (obj) {
+			if (typeof obj !== &#39;object&#39; &amp;&amp; (typeof obj !== &#39;function&#39; || obj === null)) {
+				throw new TypeError(&#39;Object.keys called on non-object&#39;);
+			}
+
+			var result = [], prop, i;
+
+			for (prop in obj) {
+				if (hasOwnProperty.call(obj, prop)) {
+					result.push(prop);
+				}
+			}
+
+			if (hasDontEnumBug) {
+				for (i = 0; i &lt; dontEnumsLength; i++) {
+					if (hasOwnProperty.call(obj, dontEnums[i])) {
+						result.push(dontEnums[i]);
+					}
+				}
+			}
+			return result;
+		};
+	}());
+}
+
+(function() {
+  if(navigator.appVersion.indexOf(&#39;MSIE 8&#39;) &gt; 0) {
+    var _slice = Array.prototype.slice;
+    Array.prototype.slice = function() {
+      if(this instanceof Array) {
+        return _slice.apply(this, arguments);
+      } else {
+        var result = [];
+        var start = (arguments.length &gt;= 1) ? arguments[0] : 0;
+        var end = (arguments.length &gt;= 2) ? arguments[1] : this.length;
+        for(var i=start; i&lt;end; i++) {
+          result.push(this[i]);
+        }
+        return result;
+      }
+    };
+  }
+})();
+
+if (!Object.create) {
+<span id='global-method-create'>	/**
+</span>	 * Object.create dle ES5 - https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
+	 */
+	Object.create = function (o) {
+		if (arguments.length &gt; 1) { throw new Error(&quot;Object.create polyfill only accepts the first parameter&quot;); }
+		var tmp = function() {};
+		tmp.prototype = o;
+		return new tmp();
+	};
+}
+
+if (!Function.prototype.bind) {
+<span id='global-method-bind'>	/**
+</span>	 * ES5 Function.prototype.bind
+	 * Vrací funkci zbindovanou do zadaného kontextu.
+	 * Zbylé volitelné parametry jsou předány volání vnitřní funkce.
+	 * @param {object} thisObj Nový kontext
+	 * @returns {function}
+	 */
+	Function.prototype.bind = function(thisObj) {
+		var fn = this;
+		var args = Array.prototype.slice.call(arguments, 1);
+		return function() {
+			return fn.apply(thisObj, args.concat(Array.prototype.slice.call(arguments)));
+		}
+	}
+};
+
+if (!(&quot;addEventListener&quot; in document)) {
+	var w = Window.prototype;
+	var h = HTMLDocument.prototype;
+	var e = Element.prototype;
+
+	w[&quot;addEventListener&quot;] = h[&quot;addEventListener&quot;] = e[&quot;addEventListener&quot;] = function(eventName, listener) {
+		if (eventName == &quot;DOMContentLoaded&quot;) {
+			document.attachEvent(&quot;onreadystatechange&quot;, function() {
+				if (document.readyState === &quot;complete&quot;) {
+					listener();
+				}
+			});
+		}
+		else {
+			var obj = this;
+
+			this.attachEvent(&quot;on&quot; + eventName, function() {
+				return listener.apply(obj, arguments);
+			});
+		}
+	};
+
+	w[&quot;removeEventListener&quot;] = h[&quot;removeEventListener&quot;] = e[&quot;removeEventListener&quot;] = function(eventName, listener) {
+		return this.detachEvent(&quot;on&quot; + eventName, listener);
+	};
+}
+
+if (!(&quot;classList&quot; in document.documentElement) &amp;&amp; window.Element) {
+	(function () {
+		var prototype = Array.prototype,
+		indexOf = prototype.indexOf,
+		slice = prototype.slice,
+		push = prototype.push,
+		splice = prototype.splice,
+		join = prototype.join;
+
+		function DOMTokenList(elm) {
+			this._element = elm;
+			if (elm.className == this._classCache) { return; }
+			this._classCache = elm.className;
+			if (!this._classCache) { return; }
+
+			var classes = this._classCache.replace(/^\s+|\s+$/g,&#39;&#39;).split(/\s+/);
+			for (var i = 0; i &lt; classes.length; i++) {
+				push.call(this, classes[i]);
+			}
+		}
+		window.DOMTokenList = DOMTokenList;
+
+		function setToClassName(el, classes) {
+			el.className = classes.join(&quot; &quot;);
+		}
+
+		DOMTokenList.prototype = {
+			add: function(token) {
+				if (this.contains(token)) { return; }
+				push.call(this, token);
+				setToClassName(this._element, slice.call(this, 0));
+			},
+			contains: function(token) {
+				return (indexOf.call(this, token) != -1);
+			},
+			item: function(index) {
+				return this[index] || null;
+			},
+			remove: function(token) {
+				var i = indexOf.call(this, token);
+				if (i == -1) { return; }
+				splice.call(this, i, 1);
+				setToClassName(this._element, slice.call(this, 0));
+			},
+			toString: function() {
+				return join.call(this, &quot; &quot;);
+			},
+			toggle: function(token) {
+				if (indexOf.call(this, token) == -1) {
+					this.add(token);
+					return true;
+				} else {
+					this.remove(token);
+					return false;
+				}
+			}
+		};
+
+		function defineElementGetter (obj, prop, getter) {
+			if (Object.defineProperty) {
+				Object.defineProperty(obj, prop, {
+					get: getter
+				});
+			} else {
+				obj.__defineGetter__(prop, getter);
+			}
+		}
+
+		defineElementGetter(Element.prototype, &quot;classList&quot;, function() {
+			return new DOMTokenList(this);
+		});
+	})();
+}
+</pre>
+</body>
+</html>
