@@ -17,7 +17,6 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$template'>/**
 </span> * @class $template
- * @description DI: $common, $q, $http, $config;
  */
 onix.service(&quot;$template&quot;, [
 	&quot;$common&quot;,
@@ -33,18 +32,18 @@ function(
 <span id='$template-property-_cache'>	/**
 </span>	 * Template cache.
 	 *
-	 * @private
 	 * @type {Object}
-	 * @memberof $template
+	 * @member $template
+	 * @private
 	 */
 	this._cache = {};
 
 <span id='$template-property-_RE'>	/**
 </span>	 * Regular expressions
 	 *
-	 * @private
 	 * @type {Object}
-	 * @memberof $template
+	 * @member $template
+	 * @private
 	 */
 	this._RE = {
 		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
@@ -57,10 +56,10 @@ function(
 <span id='$template-method-_parseFnName'>	/**
 </span>	 * Parse a function name from the string.
 	 *
-	 * @private
 	 * @param  {String} value
-	 * @return {String}      
-	 * @memberof $template
+	 * @return {String}
+	 * @member $template
+	 * @private
 	 */
 	this._parseFnName = function(value) {
 		value = value || &quot;&quot;;
@@ -71,11 +70,11 @@ function(
 <span id='$template-method-_parseArgs'>	/**
 </span>	 * Parse arguments from the string -&gt; makes array from them
 	 *
-	 * @private
 	 * @param  {String} value
 	 * @param  {Object} config { event, element... }
 	 * @return {Array}
-	 * @memberof $template
+	 * @member $template
+	 * @private
 	 */
 	this._parseArgs = function(value, config) {
 		argsValue = value ? value.replace(/^[^(]+./, &quot;&quot;).replace(/\).*$/, &quot;&quot;) : &quot;&quot;;
@@ -134,11 +133,12 @@ function(
 <span id='$template-method-_bindEvent'>	/**
 </span>	 * Bind one single event to element.
 	 * 
-	 * @param  {NodeElement} el
+	 * @param  {HTMLElement} el
 	 * @param  {String} eventName click, keydown...
 	 * @param  {String} data      data-x value
 	 * @param  {Function} scope
-	 * @memberof $template
+	 * @member $template
+	 * @private
 	 */
 	this._bindEvent = function(el, eventName, data, scope) {
 		if (data &amp;&amp; this._parseFnName(data) in scope) {
@@ -158,8 +158,7 @@ function(
 <span id='$template-method-init'>	/**
 </span>	 * Init - get all templates from the page.
 	 *
-	 * @public
-	 * @memberof $template
+	 * @member $template
 	 */
 	this.init = function() {
 		onix.element(&quot;script[type=&#39;text/template&#39;]&quot;).forEach(function(item) {
@@ -170,10 +169,9 @@ function(
 <span id='$template-method-add'>	/**
 </span>	 * Add new item to the cachce
 	 *
-	 * @public
 	 * @param {String} key 
 	 * @param {String} data
-	 * @memberof $template
+	 * @member $template
 	 */
 	this.add = function(key, data) {
 		this._cache[key] = data;
@@ -182,11 +180,10 @@ function(
 <span id='$template-method-compile'>	/**
 </span>	 * Compile one template - replaces all ocurances of {} by model
 	 *
-	 * @public
 	 * @param  {String} key  Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
-	 * @memberof $template
+	 * @member $template
 	 */
 	this.compile = function(key, data) {
 		var tmpl = this.get(key);
@@ -204,10 +201,9 @@ function(
 <span id='$template-method-get'>	/**
 </span>	 * Get template from the cache
 	 *
-	 * @public
 	 * @param  {String} key Template key/name
 	 * @return {String}
-	 * @memberof $template
+	 * @member $template
 	 */
 	this.get = function(key) {
 		return this._cache[key] || &quot;&quot;;
@@ -217,10 +213,9 @@ function(
 </span>	 * Bind all elements in the root element.
 	 * Supports: click, change, bind
 	 *
-	 * @public
-	 * @param  {NodeElement} root
-	 * @param  {Object|Function} scope
-	 * @memberof $template
+	 * @param  {HTMLElement} root
+	 * @param  {(Object|Function)} scope
+	 * @member $template
 	 */
 	this.bindTemplate = function(root, scope) {
 		var allElements = onix.element(&quot;*[data-click], *[data-change], *[data-bind], *[data-keydown]&quot;, root);
@@ -249,11 +244,10 @@ function(
 <span id='$template-method-load'>	/**
 </span>	 * Load template from the path.
 	 *
-	 * @public
 	 * @param  {String} key
 	 * @param  {String} path
 	 * @return {$q}
-	 * @memberof $template
+	 * @member $template
 	 */
 	this.load = function(key, path) {
 		var promise = $q.defer();

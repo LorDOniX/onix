@@ -24,8 +24,7 @@ onix.service(&quot;$location&quot;, function() {
 <span id='$location-method-refresh'>	/**
 </span>	 * Page refresh.
 	 *
-	 * @public
-	 * @memberof $location
+	 * @member $location
 	 */
 	this.refresh = function() {
 		window.location.reload();
@@ -34,10 +33,9 @@ onix.service(&quot;$location&quot;, function() {
 <span id='$location-method-createSearchURL'>	/**
 </span>	 * Create a new search url.
 	 * 
-	 * @public
 	 * @param  {Object} obj
 	 * @return {String}
-	 * @memberof $location
+	 * @member $location
 	 */
 	this.createSearchURL = function(obj) {
 		var newURL = [];
@@ -60,10 +58,9 @@ onix.service(&quot;$location&quot;, function() {
 <span id='$location-method-search'>	/**
 </span>	 * Get or set new url search. obj -&gt; set new url from obj; !obj -&gt; create obj from search part of url
 	 *
-	 * @public
 	 * @param  {Object} [obj]
-	 * @return {Null|Object}
-	 * @memberof $location
+	 * @return {Object}
+	 * @member $location
 	 */
 	this.search = function(obj) {
 		if (obj) {
@@ -96,9 +93,8 @@ onix.service(&quot;$location&quot;, function() {
 <span id='$location-method-get'>	/**
 </span>	 * Get current location
 	 *
-	 * @public
 	 * @return {String}
-	 * @memberof $location
+	 * @member $location
 	 */
 	this.get = function() {
 		return window.location.pathname;

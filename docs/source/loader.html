@@ -17,7 +17,6 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$loader'>/**
 </span> * @class $loader
- * @description DI: $dom;
  */
 onix.service(&quot;$loader&quot;, [
 	&quot;$dom&quot;,
@@ -25,10 +24,10 @@ function(
 	$dom
 ) {
 <span id='$loader-method-_create'>	/**
-</span>	 * Create $loader.
+</span>	 * Create loader.
 	 *
 	 * @private
-	 * @memberof $loader
+	 * @member $loader
 	 */
 	this._create = function() {
 		this._el = $dom.create({
@@ -43,8 +42,7 @@ function(
 <span id='$loader-method-init'>	/**
 </span>	 * Loader init.
 	 *
-	 * @public
-	 * @memberof $loader
+	 * @member $loader
 	 */
 	this.init = function() {
 		this._create();
@@ -53,8 +51,7 @@ function(
 <span id='$loader-method-start'>	/**
 </span>	 * Start loader.
 	 *
-	 * @public
-	 * @memberof $loader
+	 * @member $loader
 	 */
 	this.start = function() {
 		this._el.classList.add(&quot;start&quot;);
@@ -63,8 +60,7 @@ function(
 <span id='$loader-method-end'>	/**
 </span>	 * End loader.
 	 *
-	 * @public
-	 * @memberof $loader
+	 * @member $loader
 	 */
 	this.end = function() {
 		this._el.classList.remove(&quot;start&quot;);

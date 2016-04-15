@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">(function() {
+
+	var debug = false;
+
+	var root = this;
+
+	var EXIF = function(obj) {
+		if (obj instanceof EXIF) return obj;
+		if (!(this instanceof EXIF)) return new EXIF(obj);
+		this.EXIFwrapped = obj;
+	};
+
+	if (typeof exports !== &#39;undefined&#39;) {
+		if (typeof module !== &#39;undefined&#39; &amp;&amp; module.exports) {
+			exports = module.exports = EXIF;
+		}
+		exports.EXIF = EXIF;
+	} else {
+		root.EXIF = EXIF;
+	}
+
+	var ExifTags = EXIF.Tags = {
+
+		// version tags
+		0x9000 : &quot;ExifVersion&quot;,             // EXIF version
+		0xA000 : &quot;FlashpixVersion&quot;,         // Flashpix format version
+
+		// colorspace tags
+		0xA001 : &quot;ColorSpace&quot;,              // Color space information tag
+
+		// image configuration
+		0xA002 : &quot;PixelXDimension&quot;,         // Valid width of meaningful image
+		0xA003 : &quot;PixelYDimension&quot;,         // Valid height of meaningful image
+		0x9101 : &quot;ComponentsConfiguration&quot;, // Information about channels
+		0x9102 : &quot;CompressedBitsPerPixel&quot;,  // Compressed bits per pixel
+
+		// user information
+		0x927C : &quot;MakerNote&quot;,               // Any desired information written by the manufacturer
+		0x9286 : &quot;UserComment&quot;,             // Comments by user
+
+		// related file
+		0xA004 : &quot;RelatedSoundFile&quot;,        // Name of related sound file
+
+		// date and time
+		0x9003 : &quot;DateTimeOriginal&quot;,        // Date and time when the original image was generated
+		0x9004 : &quot;DateTimeDigitized&quot;,       // Date and time when the image was stored digitally
+		0x9290 : &quot;SubsecTime&quot;,              // Fractions of seconds for DateTime
+		0x9291 : &quot;SubsecTimeOriginal&quot;,      // Fractions of seconds for DateTimeOriginal
+		0x9292 : &quot;SubsecTimeDigitized&quot;,     // Fractions of seconds for DateTimeDigitized
+
+		// picture-taking conditions
+		0x829A : &quot;ExposureTime&quot;,            // Exposure time (in seconds)
+		0x829D : &quot;FNumber&quot;,                 // F number
+		0x8822 : &quot;ExposureProgram&quot;,         // Exposure program
+		0x8824 : &quot;SpectralSensitivity&quot;,     // Spectral sensitivity
+		0x8827 : &quot;ISOSpeedRatings&quot;,         // ISO speed rating
+		0x8828 : &quot;OECF&quot;,                    // Optoelectric conversion factor
+		0x9201 : &quot;ShutterSpeedValue&quot;,       // Shutter speed
+		0x9202 : &quot;ApertureValue&quot;,           // Lens aperture
+		0x9203 : &quot;BrightnessValue&quot;,         // Value of brightness
+		0x9204 : &quot;ExposureBias&quot;,            // Exposure bias
+		0x9205 : &quot;MaxApertureValue&quot;,        // Smallest F number of lens
+		0x9206 : &quot;SubjectDistance&quot;,         // Distance to subject in meters
+		0x9207 : &quot;MeteringMode&quot;,            // Metering mode
+		0x9208 : &quot;LightSource&quot;,             // Kind of light source
+		0x9209 : &quot;Flash&quot;,                   // Flash status
+		0x9214 : &quot;SubjectArea&quot;,             // Location and area of main subject
+		0x920A : &quot;FocalLength&quot;,             // Focal length of the lens in mm
+		0xA20B : &quot;FlashEnergy&quot;,             // Strobe energy in BCPS
+		0xA20C : &quot;SpatialFrequencyResponse&quot;,    //
+		0xA20E : &quot;FocalPlaneXResolution&quot;,   // Number of pixels in width direction per FocalPlaneResolutionUnit
+		0xA20F : &quot;FocalPlaneYResolution&quot;,   // Number of pixels in height direction per FocalPlaneResolutionUnit
+		0xA210 : &quot;FocalPlaneResolutionUnit&quot;,    // Unit for measuring FocalPlaneXResolution and FocalPlaneYResolution
+		0xA214 : &quot;SubjectLocation&quot;,         // Location of subject in image
+		0xA215 : &quot;ExposureIndex&quot;,           // Exposure index selected on camera
+		0xA217 : &quot;SensingMethod&quot;,           // Image sensor type
+		0xA300 : &quot;FileSource&quot;,              // Image source (3 == DSC)
+		0xA301 : &quot;SceneType&quot;,               // Scene type (1 == directly photographed)
+		0xA302 : &quot;CFAPattern&quot;,              // Color filter array geometric pattern
+		0xA401 : &quot;CustomRendered&quot;,          // Special processing
+		0xA402 : &quot;ExposureMode&quot;,            // Exposure mode
+		0xA403 : &quot;WhiteBalance&quot;,            // 1 = auto white balance, 2 = manual
+		0xA404 : &quot;DigitalZoomRation&quot;,       // Digital zoom ratio
+		0xA405 : &quot;FocalLengthIn35mmFilm&quot;,   // Equivalent foacl length assuming 35mm film camera (in mm)
+		0xA406 : &quot;SceneCaptureType&quot;,        // Type of scene
+		0xA407 : &quot;GainControl&quot;,             // Degree of overall image gain adjustment
+		0xA408 : &quot;Contrast&quot;,                // Direction of contrast processing applied by camera
+		0xA409 : &quot;Saturation&quot;,              // Direction of saturation processing applied by camera
+		0xA40A : &quot;Sharpness&quot;,               // Direction of sharpness processing applied by camera
+		0xA40B : &quot;DeviceSettingDescription&quot;,    //
+		0xA40C : &quot;SubjectDistanceRange&quot;,    // Distance to subject
+
+		// other tags
+		0xA005 : &quot;InteroperabilityIFDPointer&quot;,
+		0xA420 : &quot;ImageUniqueID&quot;            // Identifier assigned uniquely to each image
+	};
+
+	var TiffTags = EXIF.TiffTags = {
+		0x0100 : &quot;ImageWidth&quot;,
+		0x0101 : &quot;ImageHeight&quot;,
+		0x8769 : &quot;ExifIFDPointer&quot;,
+		0x8825 : &quot;GPSInfoIFDPointer&quot;,
+		0xA005 : &quot;InteroperabilityIFDPointer&quot;,
+		0x0102 : &quot;BitsPerSample&quot;,
+		0x0103 : &quot;Compression&quot;,
+		0x0106 : &quot;PhotometricInterpretation&quot;,
+		0x0112 : &quot;Orientation&quot;,
+		0x0115 : &quot;SamplesPerPixel&quot;,
+		0x011C : &quot;PlanarConfiguration&quot;,
+		0x0212 : &quot;YCbCrSubSampling&quot;,
+		0x0213 : &quot;YCbCrPositioning&quot;,
+		0x011A : &quot;XResolution&quot;,
+		0x011B : &quot;YResolution&quot;,
+		0x0128 : &quot;ResolutionUnit&quot;,
+		0x0111 : &quot;StripOffsets&quot;,
+		0x0116 : &quot;RowsPerStrip&quot;,
+		0x0117 : &quot;StripByteCounts&quot;,
+		0x0201 : &quot;JPEGInterchangeFormat&quot;,
+		0x0202 : &quot;JPEGInterchangeFormatLength&quot;,
+		0x012D : &quot;TransferFunction&quot;,
+		0x013E : &quot;WhitePoint&quot;,
+		0x013F : &quot;PrimaryChromaticities&quot;,
+		0x0211 : &quot;YCbCrCoefficients&quot;,
+		0x0214 : &quot;ReferenceBlackWhite&quot;,
+		0x0132 : &quot;DateTime&quot;,
+		0x010E : &quot;ImageDescription&quot;,
+		0x010F : &quot;Make&quot;,
+		0x0110 : &quot;Model&quot;,
+		0x0131 : &quot;Software&quot;,
+		0x013B : &quot;Artist&quot;,
+		0x8298 : &quot;Copyright&quot;
+	};
+
+	var GPSTags = EXIF.GPSTags = {
+		0x0000 : &quot;GPSVersionID&quot;,
+		0x0001 : &quot;GPSLatitudeRef&quot;,
+		0x0002 : &quot;GPSLatitude&quot;,
+		0x0003 : &quot;GPSLongitudeRef&quot;,
+		0x0004 : &quot;GPSLongitude&quot;,
+		0x0005 : &quot;GPSAltitudeRef&quot;,
+		0x0006 : &quot;GPSAltitude&quot;,
+		0x0007 : &quot;GPSTimeStamp&quot;,
+		0x0008 : &quot;GPSSatellites&quot;,
+		0x0009 : &quot;GPSStatus&quot;,
+		0x000A : &quot;GPSMeasureMode&quot;,
+		0x000B : &quot;GPSDOP&quot;,
+		0x000C : &quot;GPSSpeedRef&quot;,
+		0x000D : &quot;GPSSpeed&quot;,
+		0x000E : &quot;GPSTrackRef&quot;,
+		0x000F : &quot;GPSTrack&quot;,
+		0x0010 : &quot;GPSImgDirectionRef&quot;,
+		0x0011 : &quot;GPSImgDirection&quot;,
+		0x0012 : &quot;GPSMapDatum&quot;,
+		0x0013 : &quot;GPSDestLatitudeRef&quot;,
+		0x0014 : &quot;GPSDestLatitude&quot;,
+		0x0015 : &quot;GPSDestLongitudeRef&quot;,
+		0x0016 : &quot;GPSDestLongitude&quot;,
+		0x0017 : &quot;GPSDestBearingRef&quot;,
+		0x0018 : &quot;GPSDestBearing&quot;,
+		0x0019 : &quot;GPSDestDistanceRef&quot;,
+		0x001A : &quot;GPSDestDistance&quot;,
+		0x001B : &quot;GPSProcessingMethod&quot;,
+		0x001C : &quot;GPSAreaInformation&quot;,
+		0x001D : &quot;GPSDateStamp&quot;,
+		0x001E : &quot;GPSDifferential&quot;
+	};
+
+	var StringValues = EXIF.StringValues = {
+		ExposureProgram : {
+			0 : &quot;Not defined&quot;,
+			1 : &quot;Manual&quot;,
+			2 : &quot;Normal program&quot;,
+			3 : &quot;Aperture priority&quot;,
+			4 : &quot;Shutter priority&quot;,
+			5 : &quot;Creative program&quot;,
+			6 : &quot;Action program&quot;,
+			7 : &quot;Portrait mode&quot;,
+			8 : &quot;Landscape mode&quot;
+		},
+		MeteringMode : {
+			0 : &quot;Unknown&quot;,
+			1 : &quot;Average&quot;,
+			2 : &quot;CenterWeightedAverage&quot;,
+			3 : &quot;Spot&quot;,
+			4 : &quot;MultiSpot&quot;,
+			5 : &quot;Pattern&quot;,
+			6 : &quot;Partial&quot;,
+			255 : &quot;Other&quot;
+		},
+		LightSource : {
+			0 : &quot;Unknown&quot;,
+			1 : &quot;Daylight&quot;,
+			2 : &quot;Fluorescent&quot;,
+			3 : &quot;Tungsten (incandescent light)&quot;,
+			4 : &quot;Flash&quot;,
+			9 : &quot;Fine weather&quot;,
+			10 : &quot;Cloudy weather&quot;,
+			11 : &quot;Shade&quot;,
+			12 : &quot;Daylight fluorescent (D 5700 - 7100K)&quot;,
+			13 : &quot;Day white fluorescent (N 4600 - 5400K)&quot;,
+			14 : &quot;Cool white fluorescent (W 3900 - 4500K)&quot;,
+			15 : &quot;White fluorescent (WW 3200 - 3700K)&quot;,
+			17 : &quot;Standard light A&quot;,
+			18 : &quot;Standard light B&quot;,
+			19 : &quot;Standard light C&quot;,
+			20 : &quot;D55&quot;,
+			21 : &quot;D65&quot;,
+			22 : &quot;D75&quot;,
+			23 : &quot;D50&quot;,
+			24 : &quot;ISO studio tungsten&quot;,
+			255 : &quot;Other&quot;
+		},
+		Flash : {
+			0x0000 : &quot;Flash did not fire&quot;,
+			0x0001 : &quot;Flash fired&quot;,
+			0x0005 : &quot;Strobe return light not detected&quot;,
+			0x0007 : &quot;Strobe return light detected&quot;,
+			0x0009 : &quot;Flash fired, compulsory flash mode&quot;,
+			0x000D : &quot;Flash fired, compulsory flash mode, return light not detected&quot;,
+			0x000F : &quot;Flash fired, compulsory flash mode, return light detected&quot;,
+			0x0010 : &quot;Flash did not fire, compulsory flash mode&quot;,
+			0x0018 : &quot;Flash did not fire, auto mode&quot;,
+			0x0019 : &quot;Flash fired, auto mode&quot;,
+			0x001D : &quot;Flash fired, auto mode, return light not detected&quot;,
+			0x001F : &quot;Flash fired, auto mode, return light detected&quot;,
+			0x0020 : &quot;No flash function&quot;,
+			0x0041 : &quot;Flash fired, red-eye reduction mode&quot;,
+			0x0045 : &quot;Flash fired, red-eye reduction mode, return light not detected&quot;,
+			0x0047 : &quot;Flash fired, red-eye reduction mode, return light detected&quot;,
+			0x0049 : &quot;Flash fired, compulsory flash mode, red-eye reduction mode&quot;,
+			0x004D : &quot;Flash fired, compulsory flash mode, red-eye reduction mode, return light not detected&quot;,
+			0x004F : &quot;Flash fired, compulsory flash mode, red-eye reduction mode, return light detected&quot;,
+			0x0059 : &quot;Flash fired, auto mode, red-eye reduction mode&quot;,
+			0x005D : &quot;Flash fired, auto mode, return light not detected, red-eye reduction mode&quot;,
+			0x005F : &quot;Flash fired, auto mode, return light detected, red-eye reduction mode&quot;
+		},
+		SensingMethod : {
+			1 : &quot;Not defined&quot;,
+			2 : &quot;One-chip color area sensor&quot;,
+			3 : &quot;Two-chip color area sensor&quot;,
+			4 : &quot;Three-chip color area sensor&quot;,
+			5 : &quot;Color sequential area sensor&quot;,
+			7 : &quot;Trilinear sensor&quot;,
+			8 : &quot;Color sequential linear sensor&quot;
+		},
+		SceneCaptureType : {
+			0 : &quot;Standard&quot;,
+			1 : &quot;Landscape&quot;,
+			2 : &quot;Portrait&quot;,
+			3 : &quot;Night scene&quot;
+		},
+		SceneType : {
+			1 : &quot;Directly photographed&quot;
+		},
+		CustomRendered : {
+			0 : &quot;Normal process&quot;,
+			1 : &quot;Custom process&quot;
+		},
+		WhiteBalance : {
+			0 : &quot;Auto white balance&quot;,
+			1 : &quot;Manual white balance&quot;
+		},
+		GainControl : {
+			0 : &quot;None&quot;,
+			1 : &quot;Low gain up&quot;,
+			2 : &quot;High gain up&quot;,
+			3 : &quot;Low gain down&quot;,
+			4 : &quot;High gain down&quot;
+		},
+		Contrast : {
+			0 : &quot;Normal&quot;,
+			1 : &quot;Soft&quot;,
+			2 : &quot;Hard&quot;
+		},
+		Saturation : {
+			0 : &quot;Normal&quot;,
+			1 : &quot;Low saturation&quot;,
+			2 : &quot;High saturation&quot;
+		},
+		Sharpness : {
+			0 : &quot;Normal&quot;,
+			1 : &quot;Soft&quot;,
+			2 : &quot;Hard&quot;
+		},
+		SubjectDistanceRange : {
+			0 : &quot;Unknown&quot;,
+			1 : &quot;Macro&quot;,
+			2 : &quot;Close view&quot;,
+			3 : &quot;Distant view&quot;
+		},
+		FileSource : {
+			3 : &quot;DSC&quot;
+		},
+
+		Components : {
+			0 : &quot;&quot;,
+			1 : &quot;Y&quot;,
+			2 : &quot;Cb&quot;,
+			3 : &quot;Cr&quot;,
+			4 : &quot;R&quot;,
+			5 : &quot;G&quot;,
+			6 : &quot;B&quot;
+		}
+	};
+
+	function addEvent(element, event, handler) {
+		if (element.addEventListener) {
+			element.addEventListener(event, handler, false);
+		} else if (element.attachEvent) {
+			element.attachEvent(&quot;on&quot; + event, handler);
+		}
+	}
+
+	function imageHasData(img) {
+		return !!(img.exifdata);
+	}
+
+
+	function base64ToArrayBuffer(base64, contentType) {
+		contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || &#39;&#39;; // e.g. &#39;data:image/jpeg;base64,...&#39; =&gt; &#39;image/jpeg&#39;
+		base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, &#39;&#39;);
+		var binary = atob(base64);
+		var len = binary.length;
+		var buffer = new ArrayBuffer(len);
+		var view = new Uint8Array(buffer);
+		for (var i = 0; i &lt; len; i++) {
+			view[i] = binary.charCodeAt(i);
+		}
+		return buffer;
+	}
+
+	function objectURLToBlob(url, callback) {
+		var http = new XMLHttpRequest();
+		http.open(&quot;GET&quot;, url, true);
+		http.responseType = &quot;blob&quot;;
+		http.onload = function(e) {
+			if (this.status == 200 || this.status === 0) {
+				callback(this.response);
+			}
+		};
+		http.send();
+	}
+
+	function getImageData(img, callback) {
+		function handleBinaryFile(binFile) {
+			var data = findEXIFinJPEG(binFile);
+			var iptcdata = findIPTCinJPEG(binFile);
+			img.exifdata = data || {};
+			img.iptcdata = iptcdata || {};
+			if (callback) {
+				callback.call(img);
+			}
+		}
+
+		if (img.src) {
+			if (/^data\:/i.test(img.src)) { // Data URI
+				var arrayBuffer = base64ToArrayBuffer(img.src);
+				handleBinaryFile(arrayBuffer);
+
+			} else if (/^blob\:/i.test(img.src)) { // Object URL
+				var fileReader = new FileReader();
+				fileReader.onload = function(e) {
+					handleBinaryFile(e.target.result);
+				};
+				objectURLToBlob(img.src, function (blob) {
+					fileReader.readAsArrayBuffer(blob);
+				});
+			} else {
+				var http = new XMLHttpRequest();
+				http.onload = function() {
+					if (this.status == 200 || this.status === 0) {
+						handleBinaryFile(http.response);
+					} else {
+						throw &quot;Could not load image&quot;;
+					}
+					http = null;
+				};
+				http.open(&quot;GET&quot;, img.src, true);
+				http.responseType = &quot;arraybuffer&quot;;
+				http.send(null);
+			}
+		} else if (window.FileReader &amp;&amp; (img instanceof window.Blob || img instanceof window.File)) {
+			var fileReader = new FileReader();
+			fileReader.onload = function(e) {
+				if (debug) console.log(&quot;Got file of length &quot; + e.target.result.byteLength);
+				handleBinaryFile(e.target.result);
+			};
+
+			fileReader.readAsArrayBuffer(img);
+		}
+	}
+
+	function findEXIFinJPEG(file) {
+		var dataView = new DataView(file);
+
+		if (debug) console.log(&quot;Got file of length &quot; + file.byteLength);
+		if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
+			if (debug) console.log(&quot;Not a valid JPEG&quot;);
+			return false; // not a valid jpeg
+		}
+
+		var offset = 2,
+			length = file.byteLength,
+			marker;
+
+		while (offset &lt; length) {
+			if (dataView.getUint8(offset) != 0xFF) {
+				if (debug) console.log(&quot;Not a valid marker at offset &quot; + offset + &quot;, found: &quot; + dataView.getUint8(offset));
+				return false; // not a valid marker, something is wrong
+			}
+
+			marker = dataView.getUint8(offset + 1);
+			if (debug) console.log(marker);
+
+			// we could implement handling for other markers here,
+			// but we&#39;re only looking for 0xFFE1 for EXIF data
+
+			if (marker == 225) {
+				if (debug) console.log(&quot;Found 0xFFE1 marker&quot;);
+
+				return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
+
+				// offset += 2 + file.getShortAt(offset+2, true);
+
+			} else {
+				offset += 2 + dataView.getUint16(offset+2);
+			}
+
+		}
+
+	}
+
+	function findIPTCinJPEG(file) {
+		var dataView = new DataView(file);
+
+		if (debug) console.log(&quot;Got file of length &quot; + file.byteLength);
+		if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
+			if (debug) console.log(&quot;Not a valid JPEG&quot;);
+			return false; // not a valid jpeg
+		}
+
+		var offset = 2,
+			length = file.byteLength;
+
+
+		var isFieldSegmentStart = function(dataView, offset){
+			return (
+				dataView.getUint8(offset) === 0x38 &amp;&amp;
+				dataView.getUint8(offset+1) === 0x42 &amp;&amp;
+				dataView.getUint8(offset+2) === 0x49 &amp;&amp;
+				dataView.getUint8(offset+3) === 0x4D &amp;&amp;
+				dataView.getUint8(offset+4) === 0x04 &amp;&amp;
+				dataView.getUint8(offset+5) === 0x04
+			);
+		};
+
+		while (offset &lt; length) {
+
+			if ( isFieldSegmentStart(dataView, offset )){
+
+				// Get the length of the name header (which is padded to an even number of bytes)
+				var nameHeaderLength = dataView.getUint8(offset+7);
+				if(nameHeaderLength % 2 !== 0) nameHeaderLength += 1;
+				// Check for pre photoshop 6 format
+				if(nameHeaderLength === 0) {
+					// Always 4
+					nameHeaderLength = 4;
+				}
+
+				var startOffset = offset + 8 + nameHeaderLength;
+				var sectionLength = dataView.getUint16(offset + 6 + nameHeaderLength);
+
+				return readIPTCData(file, startOffset, sectionLength);
+
+				break;
+
+			}
+
+
+			// Not the marker, continue searching
+			offset++;
+
+		}
+
+	}
+	var IptcFieldMap = {
+		0x78 : &#39;caption&#39;,
+		0x6E : &#39;credit&#39;,
+		0x19 : &#39;keywords&#39;,
+		0x37 : &#39;dateCreated&#39;,
+		0x50 : &#39;byline&#39;,
+		0x55 : &#39;bylineTitle&#39;,
+		0x7A : &#39;captionWriter&#39;,
+		0x69 : &#39;headline&#39;,
+		0x74 : &#39;copyright&#39;,
+		0x0F : &#39;category&#39;
+	};
+	function readIPTCData(file, startOffset, sectionLength){
+		var dataView = new DataView(file);
+		var data = {};
+		var fieldValue, fieldName, dataSize, segmentType, segmentSize;
+		var segmentStartPos = startOffset;
+		while(segmentStartPos &lt; startOffset+sectionLength) {
+			if(dataView.getUint8(segmentStartPos) === 0x1C &amp;&amp; dataView.getUint8(segmentStartPos+1) === 0x02){
+				segmentType = dataView.getUint8(segmentStartPos+2);
+				if(segmentType in IptcFieldMap) {
+					dataSize = dataView.getInt16(segmentStartPos+3);
+					segmentSize = dataSize + 5;
+					fieldName = IptcFieldMap[segmentType];
+					fieldValue = getStringFromDB(dataView, segmentStartPos+5, dataSize);
+					// Check if we already stored a value with this name
+					if(data.hasOwnProperty(fieldName)) {
+						// Value already stored with this name, create multivalue field
+						if(data[fieldName] instanceof Array) {
+							data[fieldName].push(fieldValue);
+						}
+						else {
+							data[fieldName] = [data[fieldName], fieldValue];
+						}
+					}
+					else {
+						data[fieldName] = fieldValue;
+					}
+				}
+
+			}
+			segmentStartPos++;
+		}
+		return data;
+	}
+
+
+
+	function readTags(file, tiffStart, dirStart, strings, bigEnd) {
+		var entries = file.getUint16(dirStart, !bigEnd),
+			tags = {},
+			entryOffset, tag,
+			i;
+
+		for (i=0;i&lt;entries;i++) {
+			entryOffset = dirStart + i*12 + 2;
+			tag = strings[file.getUint16(entryOffset, !bigEnd)];
+			if (!tag &amp;&amp; debug) console.log(&quot;Unknown tag: &quot; + file.getUint16(entryOffset, !bigEnd));
+			tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
+		}
+		return tags;
+	}
+
+
+	function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
+		var type = file.getUint16(entryOffset+2, !bigEnd),
+			numValues = file.getUint32(entryOffset+4, !bigEnd),
+			valueOffset = file.getUint32(entryOffset+8, !bigEnd) + tiffStart,
+			offset,
+			vals, val, n,
+			numerator, denominator;
+
+		switch (type) {
+			case 1: // byte, 8-bit unsigned int
+			case 7: // undefined, 8-bit byte, value depending on field
+				if (numValues == 1) {
+					return file.getUint8(entryOffset + 8, !bigEnd);
+				} else {
+					offset = numValues &gt; 4 ? valueOffset : (entryOffset + 8);
+					vals = [];
+					for (n=0;n&lt;numValues;n++) {
+						vals[n] = file.getUint8(offset + n);
+					}
+					return vals;
+				}
+
+			case 2: // ascii, 8-bit byte
+				offset = numValues &gt; 4 ? valueOffset : (entryOffset + 8);
+				return getStringFromDB(file, offset, numValues-1);
+
+			case 3: // short, 16 bit int
+				if (numValues == 1) {
+					return file.getUint16(entryOffset + 8, !bigEnd);
+				} else {
+					offset = numValues &gt; 2 ? valueOffset : (entryOffset + 8);
+					vals = [];
+					for (n=0;n&lt;numValues;n++) {
+						vals[n] = file.getUint16(offset + 2*n, !bigEnd);
+					}
+					return vals;
+				}
+
+			case 4: // long, 32 bit int
+				if (numValues == 1) {
+					return file.getUint32(entryOffset + 8, !bigEnd);
+				} else {
+					vals = [];
+					for (n=0;n&lt;numValues;n++) {
+						vals[n] = file.getUint32(valueOffset + 4*n, !bigEnd);
+					}
+					return vals;
+				}
+
+			case 5:    // rational = two long values, first is numerator, second is denominator
+				if (numValues == 1) {
+					numerator = file.getUint32(valueOffset, !bigEnd);
+					denominator = file.getUint32(valueOffset+4, !bigEnd);
+					val = new Number(numerator / denominator);
+					val.numerator = numerator;
+					val.denominator = denominator;
+					return val;
+				} else {
+					vals = [];
+					for (n=0;n&lt;numValues;n++) {
+						numerator = file.getUint32(valueOffset + 8*n, !bigEnd);
+						denominator = file.getUint32(valueOffset+4 + 8*n, !bigEnd);
+						vals[n] = new Number(numerator / denominator);
+						vals[n].numerator = numerator;
+						vals[n].denominator = denominator;
+					}
+					return vals;
+				}
+
+			case 9: // slong, 32 bit signed int
+				if (numValues == 1) {
+					return file.getInt32(entryOffset + 8, !bigEnd);
+				} else {
+					vals = [];
+					for (n=0;n&lt;numValues;n++) {
+						vals[n] = file.getInt32(valueOffset + 4*n, !bigEnd);
+					}
+					return vals;
+				}
+
+			case 10: // signed rational, two slongs, first is numerator, second is denominator
+				if (numValues == 1) {
+					return file.getInt32(valueOffset, !bigEnd) / file.getInt32(valueOffset+4, !bigEnd);
+				} else {
+					vals = [];
+					for (n=0;n&lt;numValues;n++) {
+						vals[n] = file.getInt32(valueOffset + 8*n, !bigEnd) / file.getInt32(valueOffset+4 + 8*n, !bigEnd);
+					}
+					return vals;
+				}
+		}
+	}
+
+	function getStringFromDB(buffer, start, length) {
+		var outstr = &quot;&quot;;
+		for (n = start; n &lt; start+length; n++) {
+			outstr += String.fromCharCode(buffer.getUint8(n));
+		}
+		return outstr;
+	}
+
+	function readEXIFData(file, start) {
+		if (getStringFromDB(file, start, 4) != &quot;Exif&quot;) {
+			if (debug) console.log(&quot;Not valid EXIF data! &quot; + getStringFromDB(file, start, 4));
+			return false;
+		}
+
+		var bigEnd,
+			tags, tag,
+			exifData, gpsData,
+			tiffOffset = start + 6;
+
+		// test for TIFF validity and endianness
+		if (file.getUint16(tiffOffset) == 0x4949) {
+			bigEnd = false;
+		} else if (file.getUint16(tiffOffset) == 0x4D4D) {
+			bigEnd = true;
+		} else {
+			if (debug) console.log(&quot;Not valid TIFF data! (no 0x4949 or 0x4D4D)&quot;);
+			return false;
+		}
+
+		if (file.getUint16(tiffOffset+2, !bigEnd) != 0x002A) {
+			if (debug) console.log(&quot;Not valid TIFF data! (no 0x002A)&quot;);
+			return false;
+		}
+
+		var firstIFDOffset = file.getUint32(tiffOffset+4, !bigEnd);
+
+		if (firstIFDOffset &lt; 0x00000008) {
+			if (debug) console.log(&quot;Not valid TIFF data! (First offset less than 8)&quot;, file.getUint32(tiffOffset+4, !bigEnd));
+			return false;
+		}
+
+		tags = readTags(file, tiffOffset, tiffOffset + firstIFDOffset, TiffTags, bigEnd);
+
+		if (tags.ExifIFDPointer) {
+			exifData = readTags(file, tiffOffset, tiffOffset + tags.ExifIFDPointer, ExifTags, bigEnd);
+			for (tag in exifData) {
+				switch (tag) {
+					case &quot;LightSource&quot; :
+					case &quot;Flash&quot; :
+					case &quot;MeteringMode&quot; :
+					case &quot;ExposureProgram&quot; :
+					case &quot;SensingMethod&quot; :
+					case &quot;SceneCaptureType&quot; :
+					case &quot;SceneType&quot; :
+					case &quot;CustomRendered&quot; :
+					case &quot;WhiteBalance&quot; :
+					case &quot;GainControl&quot; :
+					case &quot;Contrast&quot; :
+					case &quot;Saturation&quot; :
+					case &quot;Sharpness&quot; :
+					case &quot;SubjectDistanceRange&quot; :
+					case &quot;FileSource&quot; :
+						exifData[tag] = StringValues[tag][exifData[tag]];
+						break;
+
+					case &quot;ExifVersion&quot; :
+					case &quot;FlashpixVersion&quot; :
+						exifData[tag] = String.fromCharCode(exifData[tag][0], exifData[tag][1], exifData[tag][2], exifData[tag][3]);
+						break;
+
+					case &quot;ComponentsConfiguration&quot; :
+						exifData[tag] =
+							StringValues.Components[exifData[tag][0]] +
+							StringValues.Components[exifData[tag][1]] +
+							StringValues.Components[exifData[tag][2]] +
+							StringValues.Components[exifData[tag][3]];
+						break;
+				}
+				tags[tag] = exifData[tag];
+			}
+		}
+
+		if (tags.GPSInfoIFDPointer) {
+			gpsData = readTags(file, tiffOffset, tiffOffset + tags.GPSInfoIFDPointer, GPSTags, bigEnd);
+			for (tag in gpsData) {
+				switch (tag) {
+					case &quot;GPSVersionID&quot; :
+						gpsData[tag] = gpsData[tag][0] +
+							&quot;.&quot; + gpsData[tag][1] +
+							&quot;.&quot; + gpsData[tag][2] +
+							&quot;.&quot; + gpsData[tag][3];
+						break;
+				}
+				tags[tag] = gpsData[tag];
+			}
+		}
+
+		return tags;
+	}
+
+	EXIF.getData = function(img, callback) {
+		if ((img instanceof Image || img instanceof HTMLImageElement) &amp;&amp; !img.complete) return false;
+
+		if (!imageHasData(img)) {
+			getImageData(img, callback);
+		} else {
+			if (callback) {
+				callback.call(img);
+			}
+		}
+		return true;
+	}
+
+	EXIF.getTag = function(img, tag) {
+		if (!imageHasData(img)) return;
+		return img.exifdata[tag];
+	}
+
+	EXIF.getAllTags = function(img) {
+		if (!imageHasData(img)) return {};
+		var a,
+			data = img.exifdata,
+			tags = {};
+		for (a in data) {
+			if (data.hasOwnProperty(a)) {
+				tags[a] = data[a];
+			}
+		}
+		return tags;
+	}
+
+	EXIF.pretty = function(img) {
+		if (!imageHasData(img)) return &quot;&quot;;
+		var a,
+			data = img.exifdata,
+			strPretty = &quot;&quot;;
+		for (a in data) {
+			if (data.hasOwnProperty(a)) {
+				if (typeof data[a] == &quot;object&quot;) {
+					if (data[a] instanceof Number) {
+						strPretty += a + &quot; : &quot; + data[a] + &quot; [&quot; + data[a].numerator + &quot;/&quot; + data[a].denominator + &quot;]\r\n&quot;;
+					} else {
+						strPretty += a + &quot; : [&quot; + data[a].length + &quot; values]\r\n&quot;;
+					}
+				} else {
+					strPretty += a + &quot; : &quot; + data[a] + &quot;\r\n&quot;;
+				}
+			}
+		}
+		return strPretty;
+	}
+
+	EXIF.readFromBinaryFile = function(file) {
+		return findEXIFinJPEG(file);
+	}
+
+	if (typeof define === &#39;function&#39; &amp;&amp; define.amd) {
+		define(&#39;exif-js&#39;, [], function() {
+			return EXIF;
+		});
+	}
+}.call(this));
+</pre>
+</body>
+</html>

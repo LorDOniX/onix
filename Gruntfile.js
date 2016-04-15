@@ -1,14 +1,19 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
 		watch: {
-			userweb: {
+			css: {
 				files: ["static/css/*.less"],
-				tasks: ['less:userweb']
+				tasks: ['less:css']
+			},
+			
+			js: {
+				files: ["src/*.js"],
+				tasks: ['concat:dist']
 			}
 		},
 		
 		less: {
-			userweb: {
+			css: {
 				files: {
 					"static/css/main.css": "static/css/main.less"
 				}
@@ -21,31 +26,24 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: [
-					"static/js/onix/polyfills.js",
-					"static/js/onix/onix.js",
-					"static/js/onix/config.js",
-
-					"static/js/onix/service/routeParams.js",
-					"static/js/onix/factory/_promise.js",
-					"static/js/onix/factory/promise.js",
-					"static/js/onix/factory/_my-query.js",
-					"static/js/onix/factory/my-query.js",
-					"static/js/onix/service/dom.js",
-					"static/js/onix/service/location.js",
-					"static/js/onix/service/provide.js",
-
-					"static/js/onix/service/common.js",
-					"static/js/onix/factory/_notify.js",
-					"static/js/onix/service/notify.js",
-					"static/js/onix/factory/event.js",
-					"static/js/onix/service/loader.js",
-
-					"static/js/onix/service/http.js",
-					"static/js/onix/service/i18n.js",
-
-					"static/js/onix/service/template.js",
-					"static/js/onix/service/route.js",
-					"static/js/onix/factory/select.js"
+					"src/polyfills.js",
+					"src/exif.js",
+					"src/onix.js",
+					"src/config.js",
+					"src/localstorage.js",
+					"src/promise.js",
+					"src/job.js",
+					"src/my-query.js",
+					"src/dom.js",
+					"src/location.js",
+					"src/common.js",
+					"src/notify.js",
+					"src/event.js",
+					"src/loader.js",
+					"src/http.js",
+					"src/i18n.js",
+					"src/template.js",
+					"src/select.js"
 				],
 
 				dest: 'dist/onix-js-framework.js',
@@ -69,18 +67,17 @@ module.exports = function(grunt) {
 			}
 		},
 
-
 		jsduck: {
 			dist: {
-				src: ['static/js/onix/*.js', 'static/js/onix/*/*.js'],
+				src: ['src/*.js'],
 
 				dest: 'docs',
 
 				// extra options
 				options: {
-					'builtin-classes': true,
-					'warnings': ['-no_doc', '-dup_member', '-link_ambiguous'],
-					'external': ['XMLHttpRequest']
+					'builtin-classes': false,
+					'warnings': ['-nodoc', '-dup_member', '-link_ambiguous'],
+					'external': ['XMLHttpRequest', '$q']
 				}
 			}
 		}
@@ -94,6 +91,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-jsduck');
 
 	// Default task.
-	grunt.registerTask('default', ['less:userweb', 'watch:userweb']);
+	grunt.registerTask('default', ['less:css', 'watch:css']);
+	grunt.registerTask('dev', ['less:css', 'concat:dist', 'watch']);
 	grunt.registerTask('dist', ['concat:dist', 'uglify', 'concat:distEnd', 'jsduck']);
 };

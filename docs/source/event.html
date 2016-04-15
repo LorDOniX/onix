@@ -22,25 +22,23 @@ function(
 ) {
 <span id='$event'>	/**
 </span> 	 * @class $event
- 	 * @description DI: $common;
  	 */
 	return {
 <span id='$event-property-_allEvents'>		/**
 </span>		 * All events. { name: name, event: function, scope, [once] }
 		 * 
-		 * @private
 		 * @type {Array}
-		 * @memberof $event
+		 * @member $event
+		 * @private
 		 */
 		_allEvents: [],
 
 <span id='$event-method-_getEvents'>		/**
 </span>		 * Get all events by his name.
 		 * 
-		 * @private
 		 * @param  {String} name 
 		 * @return {Array}
-		 * @memberof $event
+		 * @member $event
 		 */
 		_getEvents: function (name) {
 			var events = [];
@@ -60,11 +58,10 @@ function(
 <span id='$event-method-on'>		/**
 </span>		 * Add new event to the stack.
 		 * 
-		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} fn   
-		 * @param  {Object|Function}   scope
-		 * @memberof $event
+		 * @param  {(Object|Function)}   scope
+		 * @member $event
 		 */
 		on: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -77,10 +74,9 @@ function(
 <span id='$event-method-off'>		/**
 </span>		 * Remove event from the stack.
 		 * 
-		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
-		 * @memberof $event
+		 * @member $event
 		 */
 		off: function (name, fn) {
 			var events = this._getEvents(name);
@@ -95,11 +91,10 @@ function(
 <span id='$event-method-once'>		/**
 </span>		 * Add one time event to the stack.
 		 * 
-		 * @public
 		 * @param  {String}   name 
 		 * @param  {Function} [fn]
-		 * @param  {Object|Function}   scope
-		 * @memberof $event
+		 * @param  {(Object|Function)}   scope
+		 * @member $event
 		 */
 		once: function (name, fn, scope) {
 			this._allEvents.push({ 
@@ -113,9 +108,8 @@ function(
 <span id='$event-method-trigger'>		/**
 </span>		 * Trigger event with arguments 0..n
 		 * 
-		 * @public
 		 * @param  {String} name
-		 * @memberof $event
+		 * @member $event
 		 */
 		trigger: function (name) {
 			var events = this._getEvents(name);

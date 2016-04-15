@@ -32,11 +32,10 @@ onix.service(&quot;$dom&quot;, function() {
 	 * }
 	 * exported - to this object will be exported all marked elements (_exported attr.)
 	 *
-	 * @public
 	 * @param  {Object} config
 	 * @param  {Object} [exported]
-	 * @return {NodeElement}
-	 * @memberof $dom
+	 * @return {Object}
+	 * @member $dom
 	 */
 	this.create = function(config, exported) {
 		var el = document.createElement(config.el);
@@ -92,11 +91,10 @@ onix.service(&quot;$dom&quot;, function() {
 <span id='$dom-method-get'>	/**
 </span>	 * Get element from the document.
 	 *
-	 * @public
 	 * @param  {String|Array} els     els = &quot;&quot; -&gt; element; array [] -&gt; {...}
-	 * @param  {NodeElement} parent
-	 * @return {NodeElement}
-	 * @memberof $dom
+	 * @param  {Object} parent
+	 * @return {Object}
+	 * @member $dom
 	 */
 	this.get = function(els, parent) {
 		var output;

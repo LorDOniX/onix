@@ -17,7 +17,6 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$common'>/**
 </span> * @class $common
- * @description DI: $q;
  */
 onix.service(&quot;$common&quot;, [
 	&quot;$q&quot;,
@@ -27,10 +26,10 @@ function(
 <span id='$common-method-_objCopy'>	/**
 </span>	 * Object copy, from source to dest
 	 *
-	 * @private
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof $common
+	 * @member $common
+	 * @private
 	 */
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
@@ -69,10 +68,10 @@ function(
 <span id='$common-method-getCookie'>	/**
 </span>	 * Get cookie by her name
 	 *
-	 * @public
 	 * @param  {String} name
-	 * @return {String}     
-	 * @memberof $common
+	 * @return {String}
+	 * @member $common
+	 * @private
 	 */
 	this.getCookie = function(name) {
 		var cookieValue = null;
@@ -97,10 +96,9 @@ function(
 <span id='$common-method-confirm'>	/**
 </span>	 * Confirm window.
 	 *
-	 * @public
 	 * @param  {String} txt
 	 * @return {$q}
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.confirm = function(txt) {
 		var promise = $q.defer();
@@ -118,12 +116,11 @@ function(
 <span id='$common-method-create'>	/**
 </span>	 * Create one object from arguments
 	 *
-	 * @public
 	 * @param  {Object|Function} mainObj
 	 * @param  {Object|Function|Array} a data | dependicies
 	 * @param  {Object|Function} [b] data | dependicies
 	 * @return {Object}
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.create = function(mainObj, a, b) {
 		var args = [];
@@ -150,9 +147,8 @@ function(
 <span id='$common-method-merge'>	/**
 </span>	 * Merge X objects into the single one.
 	 *
-	 * @public
 	 * @return {Object}
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.merge = function() {
 		var count = arguments.length;
@@ -172,10 +168,9 @@ function(
 <span id='$common-method-extend'>	/**
 </span>	 * Extend one object by other; from source to dest.
 	 *
-	 * @public
 	 * @param  {Object} dest
 	 * @param  {Object} source
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.extend = function(dest, source) {
 		dest = dest || {};
@@ -187,10 +182,9 @@ function(
 <span id='$common-method-bindWithoutScope'>	/**
 </span>	 * Bind function arguments without scope
 	 *
-	 * @public
 	 * @param  {Function} cb
 	 * @return {Function}
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.bindWithoutScope = function(cb) {
 		var bindArgs = Array.prototype.slice.call(arguments, 1);
@@ -205,11 +199,10 @@ function(
 <span id='$common-method-nodesForEach'>	/**
 </span>	 * Missing for each for Node array.
 	 *
-	 * @public
-	 * @param  {NodeArray} nodes
+	 * @param  {Object[]} nodes
 	 * @param  {Function} cb
-	 * @param  {Object|Function}   scope
-	 * @memberof $common
+	 * @param  {(Object|Function)}   scope
+	 * @member $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
 		cb = cb || function() {};
@@ -224,11 +217,10 @@ function(
 <span id='$common-method-reverseForEach'>	/**
 </span>	 * Reverse for each
 	 *
-	 * @public
 	 * @param  {Array} arr 
 	 * @param {Function} cb
 	 * @param {Function} scope
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.reverseForEach = function (arr, cb, scope) {
 		arr = arr || [];
@@ -242,10 +234,9 @@ function(
 <span id='$common-method-hxToDe'>	/**
 </span>	 * HEX value to DEC
 	 *
-	 * @public
 	 * @param  {String} hex
 	 * @return {Number}    
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.hxToDe = function(hex) {
 		hex = hex.toLowerCase();
@@ -271,10 +262,9 @@ function(
 <span id='$common-method-hexToRGB'>	/**
 </span>	 * HEX value to RGB
 	 *
-	 * @public
 	 * @param  {String} hexColor
-	 * @return {Object}         
-	 * @memberof $common
+	 * @return {Object}
+	 * @member $common
 	 */
 	this.hexToRGB = function(hexColor) {
 		if (hexColor[0] == &quot;#&quot;) {
@@ -300,31 +290,25 @@ function(
 		}
 	};
 
-<span id='$common-method-ift'>	/**
-</span>	 * If EXPR then function
-	 *
-	 * @public
-	 * @param  {Boolean} expr  test if (EXPR)
-	 * @param  {Function} fn
-	 * @param  {Function} scope
-	 * @memberof $common
-	 */
-	this.ift = function(expr, th, scope) {
-		if (expr) {
-			th.apply(scope || th, [expr]);
-		}
-	};
-
 <span id='$common-method-isElement'>	/**
 </span>	 * Is value element?
 	 *
-	 * @public
 	 * @param  {Object} val
 	 * @return {Boolean}
-	 * @memberof $common
+	 * @member $common
 	 */
 	this.isElement = function(val) {
 		return (val instanceof HTMLElement);
+	};
+
+<span id='$common-method-isObject'>	/**
+</span>	 * Is item object?
+	 * @param  {Object} item
+	 * @return {Boolean}
+	 * @member $common
+	 */
+	this.isObject = function(item) {
+		return (typeof item === &quot;object&quot; &amp;&amp; !Array.isArray(item) &amp;&amp; item !== null);
 	};
 }]);
 </pre>

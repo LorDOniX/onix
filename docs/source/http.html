@@ -17,21 +17,22 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$http'>/**
 </span> * @class $http
- * @description DI: $q;
  */
 onix.service(&quot;$http&quot;, [
 	&quot;$q&quot;,
+	&quot;$common&quot;,
 function(
-	$q
+	$q,
+	$common
 ) {
 <span id='$http-method-_preparePostData'>	/**
 </span>	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
 	 * Prepare post data
 	 *
+	 * @param  {(Object|Array)} data { name, value }
+	 * @return {Object}
+	 * @member $http
 	 * @private
-	 * @param  {Object|Array} data { name, value }
-	 * @return {FormData}
-	 * @memberof $http
 	 */
 	this._preparePostData = function(data) {
 		var formData = new FormData();
@@ -55,11 +56,11 @@ function(
 <span id='$http-method-_updateURL'>	/**
 </span>	 * Update URL by get data.
 	 *
-	 * @private
 	 * @param  {String} url
 	 * @param  {Array} data { name, value }
-	 * @return {String}    
-	 * @memberof $http
+	 * @return {String}
+	 * @member $http
+	 * @private
 	 */
 	this._updateURL = function(url, data) {
 		if (data) {
@@ -77,39 +78,42 @@ function(
 		return url;
 	};
 
-<span id='this-POST_TYPES'>	/**
+<span id='$http-property-POST_TYPES'>	/**
 </span>	 * Request types
 	 *
-	 * @public
-	 * @const
-	 * @memberof $http
+	 * @property {Object}
+	 * @param {Number} JSON
+	 * @param {Number} FORM_DATA
+	 * @member $http
 	 */
 	this.POST_TYPES = {
-<span id='this-POST_TYPES-property-JSON'>		JSON: 1,
-</span><span id='this-POST_TYPES-property-FORM_DATA'>		FORM_DATA: 2
-</span>	};
+		JSON: 1,
+		FORM_DATA: 2
+	};
 
-<span id='this-METHOD'>	/**
+<span id='$http-property-METHOD'>	/**
 </span>	 * Http methods.
 	 *
-	 * @public
-	 * @const
-	 * @memberof $http
+	 * @property {Object}
+	 * @param {String} POST
+	 * @param {String} GET
+	 * @param {String} DELETE
+	 * @param {String} PATCH
+	 * @member $http
 	 */
 	this.METHOD = {
-<span id='this-METHOD-property-POST'>		POST: &quot;POST&quot;,
-</span><span id='this-METHOD-property-GET'>		GET: &quot;GET&quot;,
-</span><span id='this-METHOD-property-DELETE'>		DELETE: &quot;DELETE&quot;,
-</span><span id='this-METHOD-property-PATCH'>		PATCH: &quot;PATCH&quot;
-</span>	};
+		POST: &quot;POST&quot;,
+		GET: &quot;GET&quot;,
+		DELETE: &quot;DELETE&quot;,
+		PATCH: &quot;PATCH&quot;
+	};
 
-<span id='this-METHOD-method-createRequest'>	/**
+<span id='$http-method-createRequest'>	/**
 </span>	 * Create new XHR request.
 	 *
-	 * @public
 	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
 	 * @return {$q}
-	 * @memberof $http
+	 * @member $http
 	 */
 	this.createRequest = function(config) {
 		var promise = $q.defer();
@@ -158,9 +162,10 @@ function(
 		try {
 			// add headers
 			var headers = config.headers;
-			if (headers &amp;&amp; Array.isArray(headers)) {
-				headers.forEach(function(header) {
-					request.setRequestHeader(header.type, header.value);
+			
+			if ($common.isObject(headers)) {
+				Object.keys(headers).forEach(function(headerName) {
+					request.setRequestHeader(headerName, headers[headerName]);
 				});
 			}
 

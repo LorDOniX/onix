@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">onix.factory(&quot;$job&quot;, [
+	&quot;$q&quot;,
+function(
+	$q
+) {
+<span id='$job'>	/**
+</span> 	 * @class $job
+ 	 */
+	var $job = function() {
+		this._donePromise = $q.defer();
+		this._tasks = [];
+		this._taskDone = {
+			cb: null,
+			scope: null
+		};
+	};
+
+<span id='$job-method-add'>	/**
+</span>	 * Add task to JOB
+	 * 
+	 * @param {Function} task 
+	 * @param {Function|Object} scope
+	 * @param {Object} args Add params
+	 * @member $job
+	 */
+	$job.prototype.add = function(task, scope, args) {
+		args = args || [];
+
+		if (!Array.isArray(args)) {
+			args = [args];
+		}
+
+		this._tasks.push({
+			task: task,
+			scope: scope,
+			args: args
+		});
+	};
+
+<span id='$job-method-start'>	/**
+</span>	 * Start job.
+	 *
+	 * @member $job
+	 */
+	$job.prototype.start = function() {
+		if (!this._tasks.length) return;
+
+		// kvuli pop
+		this._tasks.reverse();
+
+		this._doJob();
+
+		return this._donePromise;
+	};
+
+<span id='$job-method-clear'>	/**
+</span>	 * Clear all job taks.
+	 *
+	 * @member $job
+	 */
+	$job.prototype.clear = function() {
+		this._tasks = [];
+	};
+
+<span id='$job-method-setTaskDone'>	/**
+</span>	 * Set progress function, which will be called after each task will be done
+	 * 
+	 * @param {Function} cb
+	 * @param {Function|Object} scope
+	 * @member $job
+	 */
+	$job.prototype.setTaskDone = function(cb, scope) {
+		this._taskDone.cb = cb;
+		this._taskDone.scope = scope;
+	};
+
+<span id='$job-method-_doJob'>	/**
+</span>	 * Internal function for running job queue.
+	 *
+	 * @member $job
+	 */
+	$job.prototype._doJob = function() {
+		var rest = this._tasks.length;
+
+		if (rest == 0) {
+			this._donePromise.resolve();
+		}
+		else {
+			var job = this._tasks.pop();
+
+			var doneFn = function() {
+				if (this._taskDone.cb) {
+					var doneFnArgs = Array.prototype.slice.call(arguments, 0);
+
+					this._taskDone.cb.apply(this._taskDone.scope || this._taskDone.cb, doneFnArgs);
+				}
+
+				this._doJob();
+			}.bind(this);
+
+			job.task.apply(job.scope || job.task, job.args.concat(doneFn));
+		}
+	};
+
+	return {
+<span id='$job-method-create'>		/**
+</span>		 * Factory for creating new Job
+		 *
+		 * @member $job
+		 */
+		create: function() {
+			return new $job();
+		}
+	};
+}]);
+</pre>
+</body>
+</html>

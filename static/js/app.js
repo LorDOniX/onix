@@ -1,6 +1,4 @@
-testApp = onix.module("testApp");
-
-testApp.config({
+onix.config({
 	// app localization
 	LOCALIZATION: {
 		LANG: "en",
@@ -16,15 +14,15 @@ testApp.config({
 	DETAIL_SEL: ".detail"
 });
 
-testApp.run([
-	"$route",
+onix.run([
+	"Route",
 	"$template",
 	"$config",
 	"$q",
 	"$i18n",
 	"HomePage",
 function(
-	$route,
+	Route,
 	$template,
 	$config,
 	$q,
@@ -33,8 +31,10 @@ function(
 ) {
 	$i18n.setLanguage("en");
 
+	Route.init();
+
 	// application routes
-	$route
+	Route
 		.when("/", {
 			controller: function() {
 				HomePage.setConfig({});
@@ -57,7 +57,7 @@ function(
 		$template.load("testTempl", "/js/home/test-templ.html"),
 		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
 	]).then(function() {
-		$route.go();
+		Route.go();
 	}, function() {
 		console.error("Error during app run");
 	});

@@ -27,15 +27,27 @@ function(
 	 * DI: $common, $event;
 	 *
 	 * @class $select
-	 * @param {NodeElement} el Where element has class &quot;dropdown&quot;
+	 * @param {HTMLElement} el Where element has class &quot;dropdown&quot;
+	 * @param {Object} opts
+	 * @param {Boolean} opts.addCaption Add caption to select
+	 * @member $select
 	 */
-	var $select = function(el) {
+	var $select = function(el, opts) {
 		// extend our class
 		$common.extend(this, $event);
 
-		this._CONST = {
+		this._opts = {
+			addCaption: false
+		};
+
+		for (var key in opts) {
+			this._opts[key] = opts[key];
+		}
+
+		this._const = {
 			CAPTION_SEL: &quot;.dropdown-toggle&quot;,
 			OPTIONS_SEL: &quot;.dropdown-menu a&quot;,
+			CARET_SEL: &quot;.caret&quot;,
 			OPEN_DROPDOWN_SEL: &quot;.dropdown.open&quot;,
 			OPEN_CLASS: &quot;open&quot;,
 			ACTIVE_CLASS: &quot;active&quot;
@@ -43,70 +55,231 @@ function(
 
 		this._el = el;
 
-		this._bind(el);
+		this._optinsRef = [];
+		this._captionEl = null;
+		this.captionTextEl = null;
+
+		this._binds = {
+			captionClick: $common.bindWithoutScope(this._captionClick, this),
+			choiceClick: $common.bindWithoutScope(this._choiceClick, this)
+		};
+
+		this._bind();
 	};
 
 <span id='$select-method-_bind'>	/**
 </span>	 * Bind clicks on the select.
 	 *
+	 * @member $select
 	 * @private
-	 * @param {NodeElement} el Where element has class &quot;dropdown&quot;
-	 * @memberof $select
 	 */
-	$select.prototype._bind = function(el) {
-		var captionEl = el.querySelector(this._CONST.CAPTION_SEL);
-		var con = this._CONST;
+	$select.prototype._bind = function() {
+		this._bindCaption();
+		this._bindChoices();
+	};
 
-		// click on the caption
-		captionEl.addEventListener(&quot;click&quot;, function(e) {
-			e.stopPropagation();
+<span id='$select-method-_bindCaption'>	/**
+</span>	 * Bind caption el.
+	 * 
+	 * @param {HTMLElement} el Where element has class &quot;dropdown&quot;
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._bindCaption = function() {
+		var captionEl = this._el.querySelector(this._const.CAPTION_SEL);
 
-			var isOpen = el.classList.contains(con.OPEN_CLASS);
+		if (captionEl) {
+			// click on the caption
+			captionEl.addEventListener(&quot;click&quot;, this._binds.captionClick);
 
-			var removeAllOpened = function() {
-				// remove all
-				onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-					item.classList.remove(&quot;open&quot;);
-				});
-			};
+			// insert span placeholder for caption
+			if (this._opts.addCaption) {
+				var caretEl = captionEl.querySelector(this._const.CARET_SEL);
 
-			var clickFn = function(e) {
-				removeAllOpened();
-				window.removeEventListener(&quot;click&quot;, clickFn);
-			};
+				if (caretEl) {
+					var captionTextEl = Framework.DOM.create({
+						el: &quot;span&quot;,
+						&quot;class&quot;: &quot;add-caption&quot;
+					});
 
-			removeAllOpened();
+					captionEl.insertBefore(captionTextEl, caretEl);
 
-			if (isOpen) {
-				// outside click
-				window.removeEventListener(&quot;click&quot;, clickFn);
-			}
-			else {
-				// outside click
-				window.addEventListener(&quot;click&quot;, clickFn);
-
-				el.classList.add(con.OPEN_CLASS);
-			}
-		});
-
-		onix.element(this._CONST.OPTIONS_SEL, el).forEach(function(option) {
-			option.addEventListener(&quot;click&quot;, $common.bindWithoutScope(function(e, scope) {
-				e.stopPropagation();
-
-				if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
-					// remove previously selected
-					this.parentNode.parentNode.querySelector(&quot;.&quot; + con.ACTIVE_CLASS).classList.remove(con.ACTIVE_CLASS);
-
-					// add to the current
-					this.parentNode.classList.add(con.ACTIVE_CLASS);
-
-					el.classList.remove(con.OPEN_CLASS);
-
-					// trigger click
-					var value = this.getAttribute(&quot;data-value&quot;) || &quot;&quot;;
-					scope.trigger(&quot;change&quot;, value);
+					this._captionTextEl = captionTextEl;
 				}
-			}, this));
+			}
+		}
+
+		this._captionEl = captionEl;
+	};
+
+<span id='$select-method-_captionClick'>	/**
+</span>	 * Click on caption
+	 * 
+	 * @param  {Event} e 
+	 * @param  {Object} scope
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._captionClick = function(e, scope) {
+		var con = scope._const;
+
+		e.stopPropagation();
+
+		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
+
+		var removeAllOpened = function() {
+			// remove all
+			onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+				item.classList.remove(&quot;open&quot;);
+			});
+		};
+
+		var clickFn = function() {
+			removeAllOpened();
+			window.removeEventListener(&quot;click&quot;, clickFn);
+		};
+
+		removeAllOpened();
+
+		if (isOpen) {
+			// outside click
+			window.removeEventListener(&quot;click&quot;, clickFn);
+		}
+		else {
+			// outside click
+			window.addEventListener(&quot;click&quot;, clickFn);
+
+			scope._el.classList.add(con.OPEN_CLASS);
+		}
+	};
+
+<span id='$select-method-_bindChoices'>	/**
+</span>	 * Bind choices els.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._bindChoices = function() {
+		onix.element(this._const.OPTIONS_SEL, this._el).forEach(function(option) {
+			option.addEventListener(&quot;click&quot;, this._binds.choiceClick);
+
+			// event ref
+			this._optinsRef.push({
+				el: option,
+				event: &quot;click&quot;,
+				fn: this._binds.choiceClick
+			});
+		}, this);
+	};
+
+<span id='$select-method-_choiceClick'>	/**
+</span>	 * Click on option
+	 * 
+	 * @param  {Event} e 
+	 * @param  {Object} scope
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._choiceClick = function(e, scope) {
+		var con = scope._const;
+
+		e.stopPropagation();
+
+		if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
+			// remove previously selected
+			var active = this.parentNode.parentNode.querySelector(&quot;.&quot; + con.ACTIVE_CLASS);
+			
+			if (active) {
+				active.classList.remove(con.ACTIVE_CLASS);
+			}
+
+			// add to the current
+			this.parentNode.classList.add(con.ACTIVE_CLASS);
+
+			scope._el.classList.remove(con.OPEN_CLASS);
+
+			if (scope._opts.addCaption &amp;&amp; scope._captionTextEl) {
+				scope._captionTextEl.innerHTML = this.innerHTML;
+			}
+
+			// trigger click
+			var value = this.getAttribute(&quot;data-value&quot;) || &quot;&quot;;
+			scope.trigger(&quot;change&quot;, value);
+		}
+	};
+
+<span id='$select-method-unbindChoices'>	/**
+</span>	 * Unbind choices.
+	 *
+	 * @member $select
+	 */
+	$select.prototype.unbindChoices = function() {
+		if (this._optinsRef.length) {
+			this._optinsRef.forEach(function(option) {
+				option.el.removeEventListener(option.event, option.fn);
+			});
+
+			this._optinsRef = [];
+		}
+	};
+
+<span id='$select-method-rebindChoices'>	/**
+</span>	 * Rebind choices.
+	 *
+	 * @member $select
+	 */
+	$select.prototype.rebindChoices = function() {
+		this.unbindChoices();
+		this._bindChoices();
+	};
+
+<span id='$select-method-selectOption'>	/**
+</span>	 * Select option.
+	 * 
+	 * @param {Number} ind
+	 * @member $select
+	 */
+	$select.prototype.selectOption = function(ind) {
+		if (typeof ind === &quot;undefined&quot;) {
+			ind = 0;
+		}
+
+		var optionsCount = this._optinsRef.length;
+
+		if (optionsCount &gt; 0 &amp;&amp; ind &gt;= 0 &amp;&amp; ind &lt; optionsCount) {
+			var el = this._optinsRef[ind].el;
+			var parent = this._optinsRef[ind].el.parentNode;
+
+			if (!parent.classList.contains(this._const.ACTIVE_CLASS)) {
+				parent.classList.add(this._const.ACTIVE_CLASS);
+
+				if (this._opts.addCaption &amp;&amp; this._captionTextEl) {
+					this._captionTextEl.innerHTML = el.innerHTML;
+				}
+
+				// trigger click
+				var value = el.getAttribute(&quot;data-value&quot;) || &quot;&quot;;
+				this.trigger(&quot;change&quot;, value);
+			}
+		}
+	};
+
+<span id='$select-method-setAddCaption'>	/**
+</span>	 * Set add caption.
+	 *
+	 * @member $select
+	 */
+	$select.prototype.setAddCaption = function() {
+		if (!this._opts.addCaption) return;
+
+		this._optinsRef.every(function(item) {
+			var parent = item.el.parentNode;
+
+			if (parent.classList.contains(this._const.ACTIVE_CLASS)) {
+				this._captionTextEl.innerHTML = item.el.innerHTML;
+				return false;
+			}
+			else return true;
 		}, this);
 	};
 

@@ -17,7 +17,6 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$i18n'>/**
 </span> * @class $i18n
- * @description DI: $http, $q;
  */
 onix.service(&quot;$i18n&quot;, [
 	&quot;$http&quot;,
@@ -31,7 +30,8 @@ function(
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof $i18n
+	 * @member $i18n
+	 * @private
 	 */
 	this._langs = {};
 
@@ -40,17 +40,17 @@ function(
 	 *
 	 * @private
 	 * @type {String}
-	 * @memberof $i18n
+	 * @member $i18n
+	 * @private
 	 */
 	this._currentLang = &quot;&quot;;
 
 <span id='$i18n-method-addLanguage'>	/**
 </span>	 * Add a new language
 	 *
-	 * @public
 	 * @param {String} lang Language key
 	 * @param {Object} data
-	 * @memberof $i18n
+	 * @member $i18n
 	 */
 	this.addLanguage = function(lang, data) {
 		this._langs[lang] = data;
@@ -59,9 +59,8 @@ function(
 <span id='$i18n-method-setLanguage'>	/**
 </span>	 * Set new language by his key.
 	 *
-	 * @public
 	 * @param {String} lang Language key
-	 * @memberof $i18n
+	 * @member $i18n
 	 */
 	this.setLanguage = function(lang) {
 		this._currentLang = lang;
@@ -70,12 +69,12 @@ function(
 <span id='$i18n-method-_'>	/**
 </span>	 * Get text function. Translate for the current language and the key.
 	 *
-	 * @public
 	 * @param  {String} key
-	 * @return {String}    
-	 * @memberof $i18n
+	 * @param  {Object} replace Replace all {} in the string
+	 * @return {String}
+	 * @member $i18n
 	 */
-	this._ = function(key) {
+	this._ = function(key, replace) {
 		key = key || &quot;&quot;;
 		var lObj = this._langs[this._currentLang];
 		var translate = &quot;&quot;;
@@ -100,17 +99,94 @@ function(
 			});
 		}
 
+		return this._transReplace(translate, replace);
+	};
+
+<span id='$i18n-method-_transReplace'>	/**
+</span>	 * Replace translated text by object.
+	 *
+	 * @param  {String} translate
+	 * @param  {Object} replace Replace all {} in the string
+	 * @return {String}
+	 * @member $i18n
+	 * @private
+	 */
+	this._transReplace = function(translate, replace) {
+		translate = translate || &quot;&quot;;
+		replace = replace || {};
+
+		var replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
+
+		if (replaceParts) {
+			var finalReplace = {};
+
+			replaceParts.forEach(function(part) {
+				var key = part;
+
+				if (key.length &gt; 2) {
+					key = key.substr(1, key.length - 2);
+				}
+
+				// multi
+				var parts = key.split(&quot;,&quot;);
+				var name = parts[0].trim();
+				var multiPartsObj = {};
+
+				if (parts.length == 2) {
+					var multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
+
+					if (multiParts) {
+						multiParts.forEach(function(mpart) {
+							var mpartSplits = mpart.split(&quot;{&quot;);
+							var mpartValue = mpartSplits[1];
+							mpartValue = mpartValue.substr(0, mpartValue.length - 1);
+
+							multiPartsObj[mpartSplits[0].trim()] = mpartValue;
+						});
+					}
+				}
+
+				var replaceValue = name in replace ? replace[name] : &quot;&quot;;
+
+				if (typeof replaceValue === &quot;number&quot; &amp;&amp; Object.keys(multiPartsObj).length) {
+					var multiKey;
+
+					switch (replaceValue) {
+						case 1:
+							multiKey = &quot;one&quot;;
+							break;
+
+						case 2:
+						case 3:
+						case 4:
+							multiKey = &quot;few&quot;;
+							break;
+
+						default:
+							multiKey = &quot;other&quot;;
+					}
+
+					replaceValue = multiKey in multiPartsObj ? multiPartsObj[multiKey] : &quot;&quot;;
+				}
+
+				finalReplace[part] = replaceValue;
+			});
+
+			Object.keys(finalReplace).forEach(function(key) {
+				translate = translate.replace(new RegExp(key, &quot;g&quot;), finalReplace[key]);
+			});
+		}
+
 		return translate;
 	};
 
 <span id='$i18n-method-loadLanguage'>	/**
 </span>	 * Load language from the file.
 	 *
-	 * @public
 	 * @param  {String} lang Language key
 	 * @param  {String} url  Path to the file
 	 * @return {$q}
-	 * @memberof $i18n
+	 * @member $i18n
 	 */
 	this.loadLanguage = function(lang, url) {
 		var promise = $q.defer();
