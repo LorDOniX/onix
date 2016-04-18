@@ -3,7 +3,13 @@
  *
  * $notify uses bootstrap alerts and provides additional functionality
  */
-onix.service("$notify", function() {
+onix.service("$notify", [
+	"$common",
+	"$q",
+function(
+	$common,
+	$q
+) {
 	/**
 	 * Create notification object from the element
 	 * 
@@ -138,4 +144,4 @@ onix.service("$notify", function() {
 	this.get = function(el) {
 		return new $notify(el);
 	};
-});
+}]);

@@ -20,7 +20,13 @@
  *
  * $notify uses bootstrap alerts and provides additional functionality
  */
-onix.service(&quot;$notify&quot;, function() {
+onix.service(&quot;$notify&quot;, [
+	&quot;$common&quot;,
+	&quot;$q&quot;,
+function(
+	$common,
+	$q
+) {
 <span id='$notify-method-S-notify'>	/**
 </span>	 * Create notification object from the element
 	 * 
@@ -155,7 +161,7 @@ onix.service(&quot;$notify&quot;, function() {
 	this.get = function(el) {
 		return new $notify(el);
 	};
-});
+}]);
 </pre>
 </body>
 </html>

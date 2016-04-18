@@ -2683,7 +2683,13 @@ function(
  *
  * $notify uses bootstrap alerts and provides additional functionality
  */
-onix.service("$notify", function() {
+onix.service("$notify", [
+	"$common",
+	"$q",
+function(
+	$common,
+	$q
+) {
 	/**
 	 * Create notification object from the element
 	 * 
@@ -2818,7 +2824,7 @@ onix.service("$notify", function() {
 	this.get = function(el) {
 		return new $notify(el);
 	};
-});
+}]);
 ;onix.factory("$event", [
 	"$common",
 function(
@@ -4056,7 +4062,12 @@ function(
 
 	return $select;
 }]);
-;onix.factory("$uploadImages", [
+;/**
+ * @class $uploadImages
+ *
+ * Class for creating img previews from File[] variable
+ */
+onix.service("$uploadImages", [
 	"$job",
 	"$q",
 	"$dom",
@@ -4066,17 +4077,23 @@ function(
 	$dom
 ) {
 	/**
-	 * @class $uploadImages
+	 * Disable?
 	 *
-	 * Class for creating img previews from File[] variable
+	 * @private
+	 * @member $uploadImages
+	 * @type {Boolean}
 	 */
-	var uploadImages = function() {
-		this._disable = !("FileReader" in window);
+	this._disable = !("FileReader" in window);
 
-		this._const = {
-			// max preview image height
-			previewMaxSize: 180
-		};
+	/**
+	 * Max preview image height
+	 *
+	 * @private
+	 * @member $uploadImages
+	 * @type {Object}
+	 */
+	this._const = {
+		previewMaxSize: 180
 	};
 
 	/**
@@ -4090,7 +4107,7 @@ function(
 	 * @return {$q} Callback after all job is done
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._doJobs = function(dataArray, fn, count, taskDoneObj) {
+	this._doJobs = function(dataArray, fn, count, taskDoneObj) {
 		var len = dataArray.length;
 		var jobs = [];
 
@@ -4125,7 +4142,7 @@ function(
 	 * @return {Boolean}
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._isPicture = function(file) {
+	this._isPicture = function(file) {
 		if (file) {
 			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
 		}
@@ -4142,7 +4159,7 @@ function(
 	 * @param  {Function} doneFn Callback, after one preview is loaded and drawed to canvas
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._readFile = function(fileObj, doneFn) {
+	this._readFile = function(fileObj, doneFn) {
 		var file = fileObj.file;
 		var previewID = fileObj.previewID;
 
@@ -4202,7 +4219,7 @@ function(
 	 * @return {Object} dom references
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._createPreview = function(file) {
+	this._createPreview = function(file) {
 		var exported = {};
 
 		var cont = $dom.create({
@@ -4238,7 +4255,7 @@ function(
 	 * @return {Object}
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._getImageDim = function(img) {
+	this._getImageDim = function(img) {
 		var maxSize = this._const.previewMaxSize;
 		var largeWidth = img.width > maxSize;
 		var largeHeight = img.height > maxSize;
@@ -4286,7 +4303,7 @@ function(
 	 * @return {Canvas}
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._processInputImage = function(img, imd, orientation) {
+	this._processInputImage = function(img, imd, orientation) {
 		var canvas = document.createElement("canvas");
 		var ctx = canvas.getContext("2d");
 		var draw = true;
@@ -4396,7 +4413,7 @@ function(
 	 * @return {String}
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._fileToBase64 = function(fileType, binaryData) {
+	this._fileToBase64 = function(fileType, binaryData) {
 		var length = binaryData.length
 		var output = "";
 
@@ -4415,7 +4432,7 @@ function(
 	 * @param {Number} count
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype._createPreviewHolders = function(el, count) {
+	this._createPreviewHolders = function(el, count) {
 		if (!el || (count != 4 && count != 7)) return;
 
 		var exported = {};
@@ -4460,7 +4477,7 @@ function(
 	 * @param  {File[]} files
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype.show = function(el, files) {
+	this.show = function(el, files) {
 		if (this._disable || !el || !files) return;
 
 		// clear previous
@@ -4502,7 +4519,7 @@ function(
 	 * @return {Array}
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype.getPictureFiles = function(files) {
+	this.getPictureFiles = function(files) {
 		var pictureFiles = [];
 
 		if (files && files.length) {
@@ -4525,9 +4542,7 @@ function(
 	 * @return {Boolean}
 	 * @member $uploadImages
 	 */
-	uploadImages.prototype.getPicturesCount = function(files) {
+	this.getPicturesCount = function(files) {
 		return this.getPictureFiles(files).length;
 	};
-
-	return uploadImages;
 }]);
