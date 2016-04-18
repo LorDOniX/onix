@@ -1,5 +1,7 @@
 /**
  * @class $i18n
+ *
+ * Language support, string translation with support for message format syntax
  */
 onix.service("$i18n", [
 	"$http",
@@ -9,7 +11,7 @@ function(
 	$q
 ) {
 	/**
-	 * All langs data.
+	 * All langs data
 	 *
 	 * @private
 	 * @type {Object}
@@ -53,7 +55,7 @@ function(
 	 * Get text function. Translate for the current language and the key.
 	 *
 	 * @param  {String} key
-	 * @param  {Object} replace Replace all {} in the string
+	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18n
 	 */
@@ -86,10 +88,10 @@ function(
 	};
 
 	/**
-	 * Replace translated text by object.
+	 * Replace translated text by object. This functions is implementation of message format object replace inside the string
 	 *
 	 * @param  {String} translate
-	 * @param  {Object} replace Replace all {} in the string
+	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18n
 	 * @private

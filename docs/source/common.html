@@ -17,6 +17,8 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$common'>/**
 </span> * @class $common
+ *
+ * Commom functions used in whole application.
  */
 onix.service(&quot;$common&quot;, [
 	&quot;$q&quot;,
@@ -94,7 +96,7 @@ function(
 	};
 
 <span id='$common-method-confirm'>	/**
-</span>	 * Confirm window.
+</span>	 * Confirm window, returns promise.
 	 *
 	 * @param  {String} txt
 	 * @return {$q}
@@ -145,7 +147,7 @@ function(
 	};
 
 <span id='$common-method-merge'>	/**
-</span>	 * Merge X objects into the single one.
+</span>	 * Merge multiple objects into the single one
 	 *
 	 * @return {Object}
 	 * @member $common
@@ -201,7 +203,7 @@ function(
 	 *
 	 * @param  {Object[]} nodes
 	 * @param  {Function} cb
-	 * @param  {(Object|Function)}   scope
+	 * @param  {Object|Function} scope
 	 * @member $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
@@ -235,7 +237,7 @@ function(
 </span>	 * HEX value to DEC
 	 *
 	 * @param  {String} hex
-	 * @return {Number}    
+	 * @return {Number}
 	 * @member $common
 	 */
 	this.hxToDe = function(hex) {
@@ -303,6 +305,7 @@ function(
 
 <span id='$common-method-isObject'>	/**
 </span>	 * Is item object?
+	 * 
 	 * @param  {Object} item
 	 * @return {Boolean}
 	 * @member $common

@@ -82,7 +82,7 @@
 <span id='onix-method-bindDI'>	/**
 </span>	 * Dependency injection bind
 	 *
-	 * @param  {(Function|Array)} param
+	 * @param  {Function|Array} param
 	 * @param  {Object} [replace]
 	 * @return {Object}
 	 * @member onix
@@ -112,6 +112,7 @@
 
 <span id='onix-method-'>		/**
 </span>		 * Run new binded function - with the new
+		 * 
 		 * @param  {Function|Object} [scope] 
 		 * @param  {Boolean} [callWithNew] 
 		 * @return {Function}
@@ -192,7 +193,15 @@
 		$route,
 		$myQuery
 	) {
-		// binds
+<span id='onix-property-element'>		/**
+</span>		 * Quick acces to myQuery and DOM manipulation
+		 *
+		 * @param  {String|HTMLElement|Array} value
+		 * @param {HTMLElement} [parent]
+		 * @return {$myQuery}
+		 * @member onix
+		 * @property {Function}
+		 */
 		this.element = function(value, parent) {
 			return new $myQuery.get(value, parent);
 		};
@@ -201,7 +210,15 @@
 		$loader.init();
 		$template.init();
 
-		// language
+<span id='window-property-_'>		/**
+</span>		 * Get text function. Translate for the current language and the key.
+		 *
+		 * @param  {String} key
+		 * @param  {Object} [replace] Replace all {} in the string
+		 * @return {String}
+		 * @member window
+		 * @property {Function}
+		 */
 		window._ = $i18n._.bind($i18n);
 	}];
 
@@ -312,7 +329,7 @@
 		console.log(
 			&quot;Onix JS Framework\n&quot; +
 			&quot;Version: 2.2.0\n&quot; +
-			&quot;Date: 15. 4. 2016&quot;
+			&quot;Date: 18. 4. 2016&quot;
 		);
 	};
 

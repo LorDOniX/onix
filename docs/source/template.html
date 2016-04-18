@@ -17,6 +17,8 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$template'>/**
 </span> * @class $template
+ *
+ * Handle templates, binds events - syntax similar to moustache and angular template system
  */
 onix.service(&quot;$template&quot;, [
 	&quot;$common&quot;,
@@ -39,7 +41,7 @@ function(
 	this._cache = {};
 
 <span id='$template-property-_RE'>	/**
-</span>	 * Regular expressions
+</span>	 * Regular expressions for handle template variables
 	 *
 	 * @type {Object}
 	 * @member $template
@@ -54,7 +56,7 @@ function(
 	};
 
 <span id='$template-method-_parseFnName'>	/**
-</span>	 * Parse a function name from the string.
+</span>	 * Parse a function name from the string
 	 *
 	 * @param  {String} value
 	 * @return {String}
@@ -71,7 +73,9 @@ function(
 </span>	 * Parse arguments from the string -&gt; makes array from them
 	 *
 	 * @param  {String} value
-	 * @param  {Object} config { event, element... }
+	 * @param  {Object} config
+	 * @param  {Object} config.$event Event object
+	 * @param  {Object} config.$element Reference to element
 	 * @return {Array}
 	 * @member $template
 	 * @private
@@ -131,11 +135,11 @@ function(
 	};
 
 <span id='$template-method-_bindEvent'>	/**
-</span>	 * Bind one single event to element.
+</span>	 * Bind one single event to the element
 	 * 
 	 * @param  {HTMLElement} el
 	 * @param  {String} eventName click, keydown...
-	 * @param  {String} data      data-x value
+	 * @param  {String} data data-x value
 	 * @param  {Function} scope
 	 * @member $template
 	 * @private
@@ -156,7 +160,7 @@ function(
 	};
 
 <span id='$template-method-init'>	/**
-</span>	 * Init - get all templates from the page.
+</span>	 * Init - get all templates from the page. Uses &#39;text/template&#39; script with template data
 	 *
 	 * @member $template
 	 */
@@ -180,7 +184,7 @@ function(
 <span id='$template-method-compile'>	/**
 </span>	 * Compile one template - replaces all ocurances of {} by model
 	 *
-	 * @param  {String} key  Template key/name
+	 * @param  {String} key Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
 	 * @member $template
@@ -210,11 +214,11 @@ function(
 	};
 
 <span id='$template-method-bindTemplate'>	/**
-</span>	 * Bind all elements in the root element.
-	 * Supports: click, change, bind
+</span>	 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+	 * Supports: click, change, keydown, bind
 	 *
 	 * @param  {HTMLElement} root
-	 * @param  {(Object|Function)} scope
+	 * @param  {Object|Function} scope
 	 * @member $template
 	 */
 	this.bindTemplate = function(root, scope) {
@@ -242,7 +246,7 @@ function(
 	};
 
 <span id='$template-method-load'>	/**
-</span>	 * Load template from the path.
+</span>	 * Load template from the path, returns promise after load
 	 *
 	 * @param  {String} key
 	 * @param  {String} path

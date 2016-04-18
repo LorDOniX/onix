@@ -1,5 +1,7 @@
 /**
  * @class $http
+ *
+ * XMLHttpRequest cover class.
  */
 onix.service("$http", [
 	"$q",
@@ -12,7 +14,7 @@ function(
 	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
 	 * Prepare post data
 	 *
-	 * @param  {(Object|Array)} data { name, value }
+	 * @param  {Object|Array} data { name, value }
 	 * @return {Object}
 	 * @member $http
 	 * @private
@@ -37,7 +39,7 @@ function(
 	};
 
 	/**
-	 * Update URL by get data.
+	 * Update URL using get data.
 	 *
 	 * @param  {String} url
 	 * @param  {Array} data { name, value }
@@ -92,9 +94,15 @@ function(
 	};
 
 	/**
-	 * Create new XHR request.
+	 * Create new XHR request, returns promise.
 	 *
-	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
+	 * @param  {Object} config
+	 * @param  {String} config.url URL
+	 * @param  {String} [config.method] Method from $http.METHOD
+	 * @param  {String} [config.postType] Post type from $http.POST_TYPES
+	 * @param  {Array} [config.getData] Data, which will be send in the url (GET)
+	 * @param  {Object|FormData} [config.postData] Post data
+	 * @param  {Object} [config.headers] Additional headers
 	 * @return {$q}
 	 * @member $http
 	 */

@@ -1,6 +1,6 @@
 onix.factory("$myQuery", function() {
 	/**
-	 * Cover function
+	 * DOM manipulation in the style of jquery.
 	 * 
 	 * @class $myQuery
 	 * @chainable
@@ -30,7 +30,7 @@ onix.factory("$myQuery", function() {
 	 * Operation on elements
 	 * 
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 * @private
 	 */
@@ -49,7 +49,7 @@ onix.factory("$myQuery", function() {
 	 * Set or get all - cover function.
 	 * 
 	 * @chainable
-	 * @param  {String} newValue
+	 * @param  {String} [newValue]
 	 * @param  {String} attr
 	 * @member $myQuery
 	 * @private
@@ -103,7 +103,7 @@ onix.factory("$myQuery", function() {
 	 * Get or set attribute
 	 *
 	 * @chainable
-	 * @param  {String} name 
+	 * @param  {String} name
 	 * @param  {String} [newValue]
 	 * @return {String|Array}
 	 * @member $myQuery
@@ -169,7 +169,7 @@ onix.factory("$myQuery", function() {
 	 */
 	$myQuery.prototype.show = function(displayStyle) {
 		this._operation(function(item) {
-			item.style.display = displayStyle || "block";
+			item.style.display = displayStyle || "";
 		});
 
 		return this;
@@ -191,7 +191,7 @@ onix.factory("$myQuery", function() {
 	 * Get or set HTML
 	 * 
 	 * @param  {String} [newValue]
-	 * @return {this|String}
+	 * @return {String}
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.html = function(newValue) {
@@ -215,7 +215,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Add css class
+	 * Add CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -230,7 +230,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Remove css class
+	 * Remove CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -245,7 +245,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Toggle css class
+	 * Toggle CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -296,7 +296,7 @@ onix.factory("$myQuery", function() {
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.click = function(cb, scope) {
@@ -314,7 +314,7 @@ onix.factory("$myQuery", function() {
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.change = function(cb, scope) {
@@ -332,7 +332,7 @@ onix.factory("$myQuery", function() {
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.forEach = function(cb, scope) {
@@ -401,7 +401,7 @@ onix.factory("$myQuery", function() {
 
 	return {
 		 /**
-		 * Main cover function.
+		 * Main cover function
 		 * 
 		 * @param  {String|HTMLElement|Array} value
 		 * @param {HTMLElement} [parent]

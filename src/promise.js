@@ -1,6 +1,8 @@
 onix.factory("$q", function() {
 	/**
 	 * @class $q
+	 *
+	 * Promise implementation which is similar to angular $q
 	 */
 	var $promise = function() {
 		/**
@@ -58,7 +60,7 @@ onix.factory("$q", function() {
 	};
 
 	/**
-	 * Resolve promise using obj.
+	 * Resolve promise using obj
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -69,7 +71,7 @@ onix.factory("$q", function() {
 	};
 
 	/**
-	 * Reject promise using obj.
+	 * Reject promise using obj
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -82,9 +84,9 @@ onix.factory("$q", function() {
 	/**
 	 * After promise resolve/reject call then (okFn, errorFn)
 	 *
+	 * @chainable
 	 * @param {Function} [cbOk]
 	 * @param {Function} [cbError]
-	 * @return {$q}
 	 * @member $q
 	 */
 	$promise.prototype.then = function(cbOk, cbError) {
@@ -110,8 +112,8 @@ onix.factory("$q", function() {
 	/**
 	 * After promise resolve call then cbOk
 	 *
-	 * @param  {Function}   cbOk
-	 * @return {$q}
+	 * @chainable
+	 * @param  {Function} cbOk
 	 * @member $q
 	 */
 	$promise.prototype.done = function(cbOk) {
@@ -128,8 +130,8 @@ onix.factory("$q", function() {
 	/**
 	 * After promise reject call then cbError
 	 *
-	 * @param  {Function}   cbError
-	 * @return {$q}
+	 * @chainable
+	 * @param  {Function} cbError
 	 * @member $q
 	 */
 	$promise.prototype.error = function(cbError) {
@@ -146,8 +148,8 @@ onix.factory("$q", function() {
 	/**
 	 * Finally for promise
 	 *
-	 * @param  {Function}   cb
-	 * @return {$q}
+	 * @chainable
+	 * @param  {Function} cb
 	 * @member $q
 	 */
 	$promise.prototype["finally"] = function(cb) {
@@ -165,7 +167,7 @@ onix.factory("$q", function() {
 		/**
 		 * Resolve all promises in the array
 		 *
-		 * @param {Array} promises
+		 * @param {$q[]} promises
 		 * @return {$q}
 		 * @member $q
 		 */
@@ -194,7 +196,7 @@ onix.factory("$q", function() {
 		},
 
 		/**
-		 * Deferable object of the promise.
+		 * Deferable object of the promise
 		 *
 		 * @return {$q}
 		 * @member $q

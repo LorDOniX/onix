@@ -17,6 +17,8 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$route'>/**
 </span> * @class $route
+ *
+ * Simple router for the application
  */
 onix.service(&quot;$route&quot;, [
 	&quot;$location&quot;,
@@ -50,6 +52,8 @@ function(
 	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
 	 * @member $route
 	 */
 	this.when = function(url, config) {
@@ -64,9 +68,11 @@ function(
 <span id='$route-method-otherwise'>	/**
 </span>	 * Otherwise.
 	 *
+	 * @chainable
 	 * @param  {String} page
 	 * @param  {Object} config
-	 * @return {Himself}
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
 	 * @member $route
 	 */
 	this.otherwise = function(config) {
@@ -99,7 +105,7 @@ function(
 	};
 
 <span id='$route-method-go'>	/**
-</span>	 * Route GO.
+</span>	 * Route GO. Walk through all routes, if there is match, route controller will be called
 	 *
 	 * @member $route
 	 */

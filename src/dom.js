@@ -1,22 +1,19 @@
 /**
  * @class $dom
+ *
+ * Class for creating DOM elements and getting their references.
  */
 onix.service("$dom", function() {
 	/**
 	 * Create $dom from the configuration.
-	 * config: {
-	 * 	el string: element name
-	 * 	attrs json: attributes
-	 * 	child array: children, with same config
-	 * 	events array
-	 * 	innerHTML -- default
-	 * 	value
-	 * 	multiple...
-	 * }
-	 * exported - to this object will be exported all marked elements (_exported attr.)
 	 *
 	 * @param  {Object} config
-	 * @param  {Object} [exported]
+	 * @param  {String} config.el Element name
+	 * @param  {Object} config.attrs Atributes
+	 * @param  {Array} config.child Child nodes
+	 * @param  {Array} config.events Bind events
+	 * @param  {String|Array} config.class Add CSS class/es
+	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
 	 * @return {Object}
 	 * @member $dom
 	 */
@@ -75,7 +72,7 @@ onix.service("$dom", function() {
 	 * Get element from the document.
 	 *
 	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
-	 * @param  {Object} parent
+	 * @param  {Object} [parent]
 	 * @return {Object}
 	 * @member $dom
 	 */

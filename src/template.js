@@ -1,5 +1,7 @@
 /**
  * @class $template
+ *
+ * Handle templates, binds events - syntax similar to moustache and angular template system
  */
 onix.service("$template", [
 	"$common",
@@ -22,7 +24,7 @@ function(
 	this._cache = {};
 
 	/**
-	 * Regular expressions
+	 * Regular expressions for handle template variables
 	 *
 	 * @type {Object}
 	 * @member $template
@@ -37,7 +39,7 @@ function(
 	};
 
 	/**
-	 * Parse a function name from the string.
+	 * Parse a function name from the string
 	 *
 	 * @param  {String} value
 	 * @return {String}
@@ -54,7 +56,9 @@ function(
 	 * Parse arguments from the string -> makes array from them
 	 *
 	 * @param  {String} value
-	 * @param  {Object} config { event, element... }
+	 * @param  {Object} config
+	 * @param  {Object} config.$event Event object
+	 * @param  {Object} config.$element Reference to element
 	 * @return {Array}
 	 * @member $template
 	 * @private
@@ -114,11 +118,11 @@ function(
 	};
 
 	/**
-	 * Bind one single event to element.
+	 * Bind one single event to the element
 	 * 
 	 * @param  {HTMLElement} el
 	 * @param  {String} eventName click, keydown...
-	 * @param  {String} data      data-x value
+	 * @param  {String} data data-x value
 	 * @param  {Function} scope
 	 * @member $template
 	 * @private
@@ -139,7 +143,7 @@ function(
 	};
 
 	/**
-	 * Init - get all templates from the page.
+	 * Init - get all templates from the page. Uses 'text/template' script with template data
 	 *
 	 * @member $template
 	 */
@@ -163,7 +167,7 @@ function(
 	/**
 	 * Compile one template - replaces all ocurances of {} by model
 	 *
-	 * @param  {String} key  Template key/name
+	 * @param  {String} key Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
 	 * @member $template
@@ -193,11 +197,11 @@ function(
 	};
 
 	/**
-	 * Bind all elements in the root element.
-	 * Supports: click, change, bind
+	 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+	 * Supports: click, change, keydown, bind
 	 *
 	 * @param  {HTMLElement} root
-	 * @param  {(Object|Function)} scope
+	 * @param  {Object|Function} scope
 	 * @member $template
 	 */
 	this.bindTemplate = function(root, scope) {
@@ -225,7 +229,7 @@ function(
 	};
 
 	/**
-	 * Load template from the path.
+	 * Load template from the path, returns promise after load
 	 *
 	 * @param  {String} key
 	 * @param  {String} path

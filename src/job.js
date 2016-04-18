@@ -5,6 +5,8 @@ function(
 ) {
 	/**
  	 * @class $job
+ 	 *
+ 	 * Factory for manage multiple tasks
  	 */
 	var $job = function() {
 		this._donePromise = $q.defer();
@@ -19,8 +21,8 @@ function(
 	 * Add task to JOB
 	 * 
 	 * @param {Function} task 
-	 * @param {Function|Object} scope
-	 * @param {Object} args Add params
+	 * @param {Function|Object} [scope]
+	 * @param {Object} [args] Add params
 	 * @member $job
 	 */
 	$job.prototype.add = function(task, scope, args) {
@@ -66,7 +68,7 @@ function(
 	 * Set progress function, which will be called after each task will be done
 	 * 
 	 * @param {Function} cb
-	 * @param {Function|Object} scope
+	 * @param {Function|Object} [scope]
 	 * @member $job
 	 */
 	$job.prototype.setTaskDone = function(cb, scope) {

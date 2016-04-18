@@ -1124,7 +1124,7 @@ if (!("classList" in document.documentElement) && window.Element) {
 	/**
 	 * Dependency injection bind
 	 *
-	 * @param  {(Function|Array)} param
+	 * @param  {Function|Array} param
 	 * @param  {Object} [replace]
 	 * @return {Object}
 	 * @member onix
@@ -1154,6 +1154,7 @@ if (!("classList" in document.documentElement) && window.Element) {
 
 		/**
 		 * Run new binded function - with the new
+		 * 
 		 * @param  {Function|Object} [scope] 
 		 * @param  {Boolean} [callWithNew] 
 		 * @return {Function}
@@ -1234,7 +1235,15 @@ if (!("classList" in document.documentElement) && window.Element) {
 		$route,
 		$myQuery
 	) {
-		// binds
+		/**
+		 * Quick acces to myQuery and DOM manipulation
+		 *
+		 * @param  {String|HTMLElement|Array} value
+		 * @param {HTMLElement} [parent]
+		 * @return {$myQuery}
+		 * @member onix
+		 * @property {Function}
+		 */
 		this.element = function(value, parent) {
 			return new $myQuery.get(value, parent);
 		};
@@ -1243,7 +1252,15 @@ if (!("classList" in document.documentElement) && window.Element) {
 		$loader.init();
 		$template.init();
 
-		// language
+		/**
+		 * Get text function. Translate for the current language and the key.
+		 *
+		 * @param  {String} key
+		 * @param  {Object} [replace] Replace all {} in the string
+		 * @return {String}
+		 * @member window
+		 * @property {Function}
+		 */
 		window._ = $i18n._.bind($i18n);
 	}];
 
@@ -1354,7 +1371,7 @@ if (!("classList" in document.documentElement) && window.Element) {
 		console.log(
 			"Onix JS Framework\n" +
 			"Version: 2.2.0\n" +
-			"Date: 15. 4. 2016"
+			"Date: 18. 4. 2016"
 		);
 	};
 
@@ -1367,6 +1384,7 @@ if (!("classList" in document.documentElement) && window.Element) {
 })();
 ;/**
  * Main framework configuration
+ * 
  * @class CONFIG
  */
 onix.config({
@@ -1383,6 +1401,8 @@ onix.config({
 });
 ;/**
  * @class $localStorage
+ *
+ * Cover class for localStorage
  */
 onix.service("$localStorage", function() {
 	this._disable = !("localStorage" in window);
@@ -1391,7 +1411,7 @@ onix.service("$localStorage", function() {
 	 * Set value to localStorage
 	 *
 	 * @param {String} key
-	 * @param {String} value
+	 * @param {String} [value]
 	 * @member $localStorage
 	 */
 	this.set = function(key, value) {
@@ -1429,6 +1449,8 @@ onix.service("$localStorage", function() {
 ;onix.factory("$q", function() {
 	/**
 	 * @class $q
+	 *
+	 * Promise implementation which is similar to angular $q
 	 */
 	var $promise = function() {
 		/**
@@ -1486,7 +1508,7 @@ onix.service("$localStorage", function() {
 	};
 
 	/**
-	 * Resolve promise using obj.
+	 * Resolve promise using obj
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -1497,7 +1519,7 @@ onix.service("$localStorage", function() {
 	};
 
 	/**
-	 * Reject promise using obj.
+	 * Reject promise using obj
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -1510,9 +1532,9 @@ onix.service("$localStorage", function() {
 	/**
 	 * After promise resolve/reject call then (okFn, errorFn)
 	 *
+	 * @chainable
 	 * @param {Function} [cbOk]
 	 * @param {Function} [cbError]
-	 * @return {$q}
 	 * @member $q
 	 */
 	$promise.prototype.then = function(cbOk, cbError) {
@@ -1538,8 +1560,8 @@ onix.service("$localStorage", function() {
 	/**
 	 * After promise resolve call then cbOk
 	 *
-	 * @param  {Function}   cbOk
-	 * @return {$q}
+	 * @chainable
+	 * @param  {Function} cbOk
 	 * @member $q
 	 */
 	$promise.prototype.done = function(cbOk) {
@@ -1556,8 +1578,8 @@ onix.service("$localStorage", function() {
 	/**
 	 * After promise reject call then cbError
 	 *
-	 * @param  {Function}   cbError
-	 * @return {$q}
+	 * @chainable
+	 * @param  {Function} cbError
 	 * @member $q
 	 */
 	$promise.prototype.error = function(cbError) {
@@ -1574,8 +1596,8 @@ onix.service("$localStorage", function() {
 	/**
 	 * Finally for promise
 	 *
-	 * @param  {Function}   cb
-	 * @return {$q}
+	 * @chainable
+	 * @param  {Function} cb
 	 * @member $q
 	 */
 	$promise.prototype["finally"] = function(cb) {
@@ -1593,7 +1615,7 @@ onix.service("$localStorage", function() {
 		/**
 		 * Resolve all promises in the array
 		 *
-		 * @param {Array} promises
+		 * @param {$q[]} promises
 		 * @return {$q}
 		 * @member $q
 		 */
@@ -1622,7 +1644,7 @@ onix.service("$localStorage", function() {
 		},
 
 		/**
-		 * Deferable object of the promise.
+		 * Deferable object of the promise
 		 *
 		 * @return {$q}
 		 * @member $q
@@ -1639,6 +1661,8 @@ function(
 ) {
 	/**
  	 * @class $job
+ 	 *
+ 	 * Factory for manage multiple tasks
  	 */
 	var $job = function() {
 		this._donePromise = $q.defer();
@@ -1653,8 +1677,8 @@ function(
 	 * Add task to JOB
 	 * 
 	 * @param {Function} task 
-	 * @param {Function|Object} scope
-	 * @param {Object} args Add params
+	 * @param {Function|Object} [scope]
+	 * @param {Object} [args] Add params
 	 * @member $job
 	 */
 	$job.prototype.add = function(task, scope, args) {
@@ -1700,7 +1724,7 @@ function(
 	 * Set progress function, which will be called after each task will be done
 	 * 
 	 * @param {Function} cb
-	 * @param {Function|Object} scope
+	 * @param {Function|Object} [scope]
 	 * @member $job
 	 */
 	$job.prototype.setTaskDone = function(cb, scope) {
@@ -1749,7 +1773,7 @@ function(
 }]);
 ;onix.factory("$myQuery", function() {
 	/**
-	 * Cover function
+	 * DOM manipulation in the style of jquery.
 	 * 
 	 * @class $myQuery
 	 * @chainable
@@ -1779,7 +1803,7 @@ function(
 	 * Operation on elements
 	 * 
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 * @private
 	 */
@@ -1798,7 +1822,7 @@ function(
 	 * Set or get all - cover function.
 	 * 
 	 * @chainable
-	 * @param  {String} newValue
+	 * @param  {String} [newValue]
 	 * @param  {String} attr
 	 * @member $myQuery
 	 * @private
@@ -1852,7 +1876,7 @@ function(
 	 * Get or set attribute
 	 *
 	 * @chainable
-	 * @param  {String} name 
+	 * @param  {String} name
 	 * @param  {String} [newValue]
 	 * @return {String|Array}
 	 * @member $myQuery
@@ -1918,7 +1942,7 @@ function(
 	 */
 	$myQuery.prototype.show = function(displayStyle) {
 		this._operation(function(item) {
-			item.style.display = displayStyle || "block";
+			item.style.display = displayStyle || "";
 		});
 
 		return this;
@@ -1940,7 +1964,7 @@ function(
 	 * Get or set HTML
 	 * 
 	 * @param  {String} [newValue]
-	 * @return {this|String}
+	 * @return {String}
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.html = function(newValue) {
@@ -1964,7 +1988,7 @@ function(
 	};
 
 	/**
-	 * Add css class
+	 * Add CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -1979,7 +2003,7 @@ function(
 	};
 
 	/**
-	 * Remove css class
+	 * Remove CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -1994,7 +2018,7 @@ function(
 	};
 
 	/**
-	 * Toggle css class
+	 * Toggle CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -2045,7 +2069,7 @@ function(
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.click = function(cb, scope) {
@@ -2063,7 +2087,7 @@ function(
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.change = function(cb, scope) {
@@ -2081,7 +2105,7 @@ function(
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.forEach = function(cb, scope) {
@@ -2150,7 +2174,7 @@ function(
 
 	return {
 		 /**
-		 * Main cover function.
+		 * Main cover function
 		 * 
 		 * @param  {String|HTMLElement|Array} value
 		 * @param {HTMLElement} [parent]
@@ -2164,23 +2188,20 @@ function(
 });
 ;/**
  * @class $dom
+ *
+ * Class for creating DOM elements and getting their references.
  */
 onix.service("$dom", function() {
 	/**
 	 * Create $dom from the configuration.
-	 * config: {
-	 * 	el string: element name
-	 * 	attrs json: attributes
-	 * 	child array: children, with same config
-	 * 	events array
-	 * 	innerHTML -- default
-	 * 	value
-	 * 	multiple...
-	 * }
-	 * exported - to this object will be exported all marked elements (_exported attr.)
 	 *
 	 * @param  {Object} config
-	 * @param  {Object} [exported]
+	 * @param  {String} config.el Element name
+	 * @param  {Object} config.attrs Atributes
+	 * @param  {Array} config.child Child nodes
+	 * @param  {Array} config.events Bind events
+	 * @param  {String|Array} config.class Add CSS class/es
+	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
 	 * @return {Object}
 	 * @member $dom
 	 */
@@ -2239,7 +2260,7 @@ onix.service("$dom", function() {
 	 * Get element from the document.
 	 *
 	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
-	 * @param  {Object} parent
+	 * @param  {Object} [parent]
 	 * @return {Object}
 	 * @member $dom
 	 */
@@ -2272,12 +2293,14 @@ onix.service("$dom", function() {
 });
 ;/**
  * @class $location
+ *
+ * Support class for location operations.
  */
 onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
 	
 	/**
-	 * Page refresh.
+	 * Page refresh
 	 *
 	 * @member $location
 	 */
@@ -2286,7 +2309,7 @@ onix.service("$location", function() {
 	};
 
 	/**
-	 * Create a new search url.
+	 * Create a new search url
 	 * 
 	 * @param  {Object} obj
 	 * @return {String}
@@ -2358,6 +2381,8 @@ onix.service("$location", function() {
 });
 ;/**
  * @class $common
+ *
+ * Commom functions used in whole application.
  */
 onix.service("$common", [
 	"$q",
@@ -2435,7 +2460,7 @@ function(
 	};
 
 	/**
-	 * Confirm window.
+	 * Confirm window, returns promise.
 	 *
 	 * @param  {String} txt
 	 * @return {$q}
@@ -2486,7 +2511,7 @@ function(
 	};
 
 	/**
-	 * Merge X objects into the single one.
+	 * Merge multiple objects into the single one
 	 *
 	 * @return {Object}
 	 * @member $common
@@ -2542,7 +2567,7 @@ function(
 	 *
 	 * @param  {Object[]} nodes
 	 * @param  {Function} cb
-	 * @param  {(Object|Function)}   scope
+	 * @param  {Object|Function} scope
 	 * @member $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
@@ -2576,7 +2601,7 @@ function(
 	 * HEX value to DEC
 	 *
 	 * @param  {String} hex
-	 * @return {Number}    
+	 * @return {Number}
 	 * @member $common
 	 */
 	this.hxToDe = function(hex) {
@@ -2644,6 +2669,7 @@ function(
 
 	/**
 	 * Is item object?
+	 * 
 	 * @param  {Object} item
 	 * @return {Boolean}
 	 * @member $common
@@ -2654,10 +2680,12 @@ function(
 }]);
 ;/**
  * @class $notify
+ *
+ * $notify uses bootstrap alerts and provides additional functionality
  */
 onix.service("$notify", function() {
 	/**
-	 * Notification object
+	 * Create notification object from the element
 	 * 
 	 * @param {HTMLElement} el
 	 * @member $notify
@@ -2680,7 +2708,7 @@ onix.service("$notify", function() {
 	/**
 	 * Set value to the notify element
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 * @private
 	 */
@@ -2694,7 +2722,7 @@ onix.service("$notify", function() {
 	};
 
 	/**
-	 * Reset classess
+	 * Reset CSS classes
 	 *
 	 * @member $notify
 	 */
@@ -2709,7 +2737,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show OK state
 	 * 
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.ok = function(txt) {
@@ -2723,7 +2751,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show ERROR state
 	 * 
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.error = function(txt) {
@@ -2737,7 +2765,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show INFO state
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.info = function(txt) {
@@ -2751,7 +2779,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show WARNING state
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.warn = function(txt) {
@@ -2763,7 +2791,7 @@ onix.service("$notify", function() {
 	};
 
 	/**
-	 * Timeout hide.
+	 * Hide alert after timeout and returns promise at the end of operation
 	 *
 	 * @return {$q}
 	 * @member $notify
@@ -2781,7 +2809,7 @@ onix.service("$notify", function() {
 	};
 
 	/**
-	 * Main public access to the notify obj.
+	 * Main public access to the notify obj
 	 *
 	 * @param  {HTMLElement} el
 	 * @return {$notify}
@@ -2798,6 +2826,8 @@ function(
 ) {
 	/**
  	 * @class $event
+ 	 *
+ 	 * This class is used for extending existing objects and brings signal functionality.
  	 */
 	return {
 		/**
@@ -2834,9 +2864,9 @@ function(
 		/**
 		 * Add new event to the stack.
 		 * 
-		 * @param  {String}   name 
-		 * @param  {Function} fn   
-		 * @param  {(Object|Function)}   scope
+		 * @param  {String} name 
+		 * @param  {Function} fn
+		 * @param  {Object|Function} scope
 		 * @member $event
 		 */
 		on: function (name, fn, scope) {
@@ -2850,7 +2880,7 @@ function(
 		/**
 		 * Remove event from the stack.
 		 * 
-		 * @param  {String}   name 
+		 * @param  {String} name 
 		 * @param  {Function} [fn]
 		 * @member $event
 		 */
@@ -2867,9 +2897,9 @@ function(
 		/**
 		 * Add one time event to the stack.
 		 * 
-		 * @param  {String}   name 
+		 * @param  {String} name
 		 * @param  {Function} [fn]
-		 * @param  {(Object|Function)}   scope
+		 * @param  {Object|Function} [scope]
 		 * @member $event
 		 */
 		once: function (name, fn, scope) {
@@ -2912,6 +2942,8 @@ function(
 }]);
 ;/**
  * @class $loader
+ *
+ * Progress loader in the application
  */
 onix.service("$loader", [
 	"$dom",
@@ -2919,7 +2951,7 @@ function(
 	$dom
 ) {
 	/**
-	 * Create loader.
+	 * Create loader
 	 *
 	 * @private
 	 * @member $loader
@@ -2935,7 +2967,7 @@ function(
 	};
 	
 	/**
-	 * Loader init.
+	 * Loader init
 	 *
 	 * @member $loader
 	 */
@@ -2944,7 +2976,7 @@ function(
 	};
 
 	/**
-	 * Start loader.
+	 * Start loader
 	 *
 	 * @member $loader
 	 */
@@ -2953,7 +2985,7 @@ function(
 	};
 
 	/**
-	 * End loader.
+	 * End loader
 	 *
 	 * @member $loader
 	 */
@@ -2973,6 +3005,8 @@ function(
 }]);
 ;/**
  * @class $http
+ *
+ * XMLHttpRequest cover class.
  */
 onix.service("$http", [
 	"$q",
@@ -2985,7 +3019,7 @@ function(
 	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
 	 * Prepare post data
 	 *
-	 * @param  {(Object|Array)} data { name, value }
+	 * @param  {Object|Array} data { name, value }
 	 * @return {Object}
 	 * @member $http
 	 * @private
@@ -3010,7 +3044,7 @@ function(
 	};
 
 	/**
-	 * Update URL by get data.
+	 * Update URL using get data.
 	 *
 	 * @param  {String} url
 	 * @param  {Array} data { name, value }
@@ -3065,9 +3099,15 @@ function(
 	};
 
 	/**
-	 * Create new XHR request.
+	 * Create new XHR request, returns promise.
 	 *
-	 * @param  {Object} config { url, method, [getData], [postData], [headers {type, value}] }
+	 * @param  {Object} config
+	 * @param  {String} config.url URL
+	 * @param  {String} [config.method] Method from $http.METHOD
+	 * @param  {String} [config.postType] Post type from $http.POST_TYPES
+	 * @param  {Array} [config.getData] Data, which will be send in the url (GET)
+	 * @param  {Object|FormData} [config.postData] Post data
+	 * @param  {Object} [config.headers] Additional headers
 	 * @return {$q}
 	 * @member $http
 	 */
@@ -3151,6 +3191,8 @@ function(
 }]);
 ;/**
  * @class $i18n
+ *
+ * Language support, string translation with support for message format syntax
  */
 onix.service("$i18n", [
 	"$http",
@@ -3160,7 +3202,7 @@ function(
 	$q
 ) {
 	/**
-	 * All langs data.
+	 * All langs data
 	 *
 	 * @private
 	 * @type {Object}
@@ -3204,7 +3246,7 @@ function(
 	 * Get text function. Translate for the current language and the key.
 	 *
 	 * @param  {String} key
-	 * @param  {Object} replace Replace all {} in the string
+	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18n
 	 */
@@ -3237,10 +3279,10 @@ function(
 	};
 
 	/**
-	 * Replace translated text by object.
+	 * Replace translated text by object. This functions is implementation of message format object replace inside the string
 	 *
 	 * @param  {String} translate
-	 * @param  {Object} replace Replace all {} in the string
+	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18n
 	 * @private
@@ -3339,6 +3381,8 @@ function(
 }]);
 ;/**
  * @class $template
+ *
+ * Handle templates, binds events - syntax similar to moustache and angular template system
  */
 onix.service("$template", [
 	"$common",
@@ -3361,7 +3405,7 @@ function(
 	this._cache = {};
 
 	/**
-	 * Regular expressions
+	 * Regular expressions for handle template variables
 	 *
 	 * @type {Object}
 	 * @member $template
@@ -3376,7 +3420,7 @@ function(
 	};
 
 	/**
-	 * Parse a function name from the string.
+	 * Parse a function name from the string
 	 *
 	 * @param  {String} value
 	 * @return {String}
@@ -3393,7 +3437,9 @@ function(
 	 * Parse arguments from the string -> makes array from them
 	 *
 	 * @param  {String} value
-	 * @param  {Object} config { event, element... }
+	 * @param  {Object} config
+	 * @param  {Object} config.$event Event object
+	 * @param  {Object} config.$element Reference to element
 	 * @return {Array}
 	 * @member $template
 	 * @private
@@ -3453,11 +3499,11 @@ function(
 	};
 
 	/**
-	 * Bind one single event to element.
+	 * Bind one single event to the element
 	 * 
 	 * @param  {HTMLElement} el
 	 * @param  {String} eventName click, keydown...
-	 * @param  {String} data      data-x value
+	 * @param  {String} data data-x value
 	 * @param  {Function} scope
 	 * @member $template
 	 * @private
@@ -3478,7 +3524,7 @@ function(
 	};
 
 	/**
-	 * Init - get all templates from the page.
+	 * Init - get all templates from the page. Uses 'text/template' script with template data
 	 *
 	 * @member $template
 	 */
@@ -3502,7 +3548,7 @@ function(
 	/**
 	 * Compile one template - replaces all ocurances of {} by model
 	 *
-	 * @param  {String} key  Template key/name
+	 * @param  {String} key Template key/name
 	 * @param  {Object} data Model
 	 * @return {String}
 	 * @member $template
@@ -3532,11 +3578,11 @@ function(
 	};
 
 	/**
-	 * Bind all elements in the root element.
-	 * Supports: click, change, bind
+	 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+	 * Supports: click, change, keydown, bind
 	 *
 	 * @param  {HTMLElement} root
-	 * @param  {(Object|Function)} scope
+	 * @param  {Object|Function} scope
 	 * @member $template
 	 */
 	this.bindTemplate = function(root, scope) {
@@ -3564,7 +3610,7 @@ function(
 	};
 
 	/**
-	 * Load template from the path.
+	 * Load template from the path, returns promise after load
 	 *
 	 * @param  {String} key
 	 * @param  {String} path
@@ -3589,6 +3635,8 @@ function(
 }]);
 ;/**
  * @class $route
+ *
+ * Simple router for the application
  */
 onix.service("$route", [
 	"$location",
@@ -3622,6 +3670,8 @@ function(
 	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
 	 * @member $route
 	 */
 	this.when = function(url, config) {
@@ -3636,9 +3686,11 @@ function(
 	/**
 	 * Otherwise.
 	 *
+	 * @chainable
 	 * @param  {String} page
 	 * @param  {Object} config
-	 * @return {Himself}
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
 	 * @member $route
 	 */
 	this.otherwise = function(config) {
@@ -3671,7 +3723,7 @@ function(
 	};
 
 	/**
-	 * Route GO.
+	 * Route GO. Walk through all routes, if there is match, route controller will be called
 	 *
 	 * @member $route
 	 */
@@ -3737,13 +3789,14 @@ function(
 ;onix.factory("$select", [
 	"$common",
 	"$event",
+	"$dom",
 function(
 	$common,
-	$event
+	$event,
+	$dom
 ) {
 	/**
-	 * Main class for select.
-	 * DI: $common, $event;
+	 * $select uses bootstrap dropdown and provides additional functionality
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class "dropdown"
@@ -3787,7 +3840,7 @@ function(
 	};
 
 	/**
-	 * Bind clicks on the select.
+	 * Bind clicks on the select
 	 *
 	 * @member $select
 	 * @private
@@ -3798,9 +3851,8 @@ function(
 	};
 
 	/**
-	 * Bind caption el.
+	 * Bind caption el
 	 * 
-	 * @param {HTMLElement} el Where element has class "dropdown"
 	 * @member $select
 	 * @private
 	 */
@@ -3816,7 +3868,7 @@ function(
 				var caretEl = captionEl.querySelector(this._const.CARET_SEL);
 
 				if (caretEl) {
-					var captionTextEl = Framework.DOM.create({
+					var captionTextEl = $dom.create({
 						el: "span",
 						"class": "add-caption"
 					});
@@ -3832,7 +3884,7 @@ function(
 	};
 
 	/**
-	 * Click on caption
+	 * Event - click on caption
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -3873,7 +3925,7 @@ function(
 	};
 
 	/**
-	 * Bind choices els.
+	 * Bind choices inside select
 	 *
 	 * @member $select
 	 * @private
@@ -3892,7 +3944,7 @@ function(
 	};
 
 	/**
-	 * Click on option
+	 * Event - click on option
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -3928,7 +3980,7 @@ function(
 	};
 
 	/**
-	 * Unbind choices.
+	 * Unbind choices
 	 *
 	 * @member $select
 	 */
@@ -3943,7 +3995,7 @@ function(
 	};
 
 	/**
-	 * Rebind choices.
+	 * Rebind choices
 	 *
 	 * @member $select
 	 */
@@ -3953,9 +4005,9 @@ function(
 	};
 
 	/**
-	 * Select option.
+	 * Select option from the select
 	 * 
-	 * @param {Number} ind
+	 * @param {Number} ind Position 0..n
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
@@ -3984,7 +4036,7 @@ function(
 	};
 
 	/**
-	 * Set add caption.
+	 * Set add caption from the current value
 	 *
 	 * @member $select
 	 */
@@ -4015,6 +4067,8 @@ function(
 ) {
 	/**
 	 * @class $uploadImages
+	 *
+	 * Class for creating img previews from File[] variable
 	 */
 	var uploadImages = function() {
 		this._disable = !("FileReader" in window);
@@ -4026,14 +4080,14 @@ function(
 	};
 
 	/**
-	 * Do jobs for processing all images.
+	 * Do jobs for processing all images
 	 *
 	 * @private
 	 * @param  {Array} dataArray Array of files with images
-	 * @param  {Function} fn       Job task
+	 * @param  {Function} fn Job task
 	 * @param  {Number} count How many functions processed simultinously
 	 * @param  {Function} taskDoneObj Callback after one task have been done
-	 * @return {Promise} Callback after all job is done
+	 * @return {$q} Callback after all job is done
 	 * @member $uploadImages
 	 */
 	uploadImages.prototype._doJobs = function(dataArray, fn, count, taskDoneObj) {
@@ -4079,10 +4133,12 @@ function(
 	};
 
 	/**
-	 * Read one file, create one preview.
+	 * Read one file, create one preview
 	 *
 	 * @private
 	 * @param  {Object} fileObj
+	 * @param  {Object} fileObj.file File reference
+	 * @param  {String} fileObj.previewID Preview ID for DOM position
 	 * @param  {Function} doneFn Callback, after one preview is loaded and drawed to canvas
 	 * @member $uploadImages
 	 */
@@ -4139,10 +4195,10 @@ function(
 	};
 
 	/**
-	 * Create one image preview.
+	 * Create one image preview
 	 *
 	 * @private
-	 * @param  {File} file 
+	 * @param  {File} file
 	 * @return {Object} dom references
 	 * @member $uploadImages
 	 */
@@ -4401,7 +4457,7 @@ function(
 	 * Main function for showing img previews.
 	 * 
 	 * @param  {HTMLElement} el
-	 * @param  {Files} files
+	 * @param  {File[]} files
 	 * @member $uploadImages
 	 */
 	uploadImages.prototype.show = function(el, files) {
@@ -4440,7 +4496,7 @@ function(
 	};
 
 	/**
-	 * Get picture files.
+	 * Get picture files from array of files
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
@@ -4463,7 +4519,7 @@ function(
 	};
 
 	/**
-	 * Get files count.
+	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}

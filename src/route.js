@@ -1,5 +1,7 @@
 /**
  * @class $route
+ *
+ * Simple router for the application
  */
 onix.service("$route", [
 	"$location",
@@ -33,6 +35,8 @@ function(
 	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
 	 * @member $route
 	 */
 	this.when = function(url, config) {
@@ -47,9 +51,11 @@ function(
 	/**
 	 * Otherwise.
 	 *
+	 * @chainable
 	 * @param  {String} page
 	 * @param  {Object} config
-	 * @return {Himself}
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
 	 * @member $route
 	 */
 	this.otherwise = function(config) {
@@ -82,7 +88,7 @@ function(
 	};
 
 	/**
-	 * Route GO.
+	 * Route GO. Walk through all routes, if there is match, route controller will be called
 	 *
 	 * @member $route
 	 */

@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">onix.factory(&quot;$myQuery&quot;, function() {
 <span id='$myQuery'>	/**
-</span>	 * Cover function
+</span>	 * DOM manipulation in the style of jquery.
 	 * 
 	 * @class $myQuery
 	 * @chainable
@@ -47,7 +47,7 @@
 </span>	 * Operation on elements
 	 * 
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 * @private
 	 */
@@ -66,7 +66,7 @@
 </span>	 * Set or get all - cover function.
 	 * 
 	 * @chainable
-	 * @param  {String} newValue
+	 * @param  {String} [newValue]
 	 * @param  {String} attr
 	 * @member $myQuery
 	 * @private
@@ -120,7 +120,7 @@
 </span>	 * Get or set attribute
 	 *
 	 * @chainable
-	 * @param  {String} name 
+	 * @param  {String} name
 	 * @param  {String} [newValue]
 	 * @return {String|Array}
 	 * @member $myQuery
@@ -186,7 +186,7 @@
 	 */
 	$myQuery.prototype.show = function(displayStyle) {
 		this._operation(function(item) {
-			item.style.display = displayStyle || &quot;block&quot;;
+			item.style.display = displayStyle || &quot;&quot;;
 		});
 
 		return this;
@@ -208,7 +208,7 @@
 </span>	 * Get or set HTML
 	 * 
 	 * @param  {String} [newValue]
-	 * @return {this|String}
+	 * @return {String}
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.html = function(newValue) {
@@ -232,7 +232,7 @@
 	};
 
 <span id='$myQuery-method-addClass'>	/**
-</span>	 * Add css class
+</span>	 * Add CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -247,7 +247,7 @@
 	};
 
 <span id='$myQuery-method-removeClass'>	/**
-</span>	 * Remove css class
+</span>	 * Remove CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -262,7 +262,7 @@
 	};
 
 <span id='$myQuery-method-toggleClass'>	/**
-</span>	 * Toggle css class
+</span>	 * Toggle CSS class
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -313,7 +313,7 @@
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.click = function(cb, scope) {
@@ -331,7 +331,7 @@
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.change = function(cb, scope) {
@@ -349,7 +349,7 @@
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @param  {Function} scope
+	 * @param  {Function} [scope]
 	 * @member $myQuery
 	 */
 	$myQuery.prototype.forEach = function(cb, scope) {
@@ -418,7 +418,7 @@
 
 	return {
 <span id='$myQuery-method-get'>		 /**
-</span>		 * Main cover function.
+</span>		 * Main cover function
 		 * 
 		 * @param  {String|HTMLElement|Array} value
 		 * @param {HTMLElement} [parent]

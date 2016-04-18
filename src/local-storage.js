@@ -1,5 +1,7 @@
 /**
  * @class $localStorage
+ *
+ * Cover class for localStorage
  */
 onix.service("$localStorage", function() {
 	this._disable = !("localStorage" in window);
@@ -8,7 +10,7 @@ onix.service("$localStorage", function() {
 	 * Set value to localStorage
 	 *
 	 * @param {String} key
-	 * @param {String} value
+	 * @param {String} [value]
 	 * @member $localStorage
 	 */
 	this.set = function(key, value) {

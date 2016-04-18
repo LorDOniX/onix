@@ -1,5 +1,7 @@
 /**
  * @class $common
+ *
+ * Commom functions used in whole application.
  */
 onix.service("$common", [
 	"$q",
@@ -77,7 +79,7 @@ function(
 	};
 
 	/**
-	 * Confirm window.
+	 * Confirm window, returns promise.
 	 *
 	 * @param  {String} txt
 	 * @return {$q}
@@ -128,7 +130,7 @@ function(
 	};
 
 	/**
-	 * Merge X objects into the single one.
+	 * Merge multiple objects into the single one
 	 *
 	 * @return {Object}
 	 * @member $common
@@ -184,7 +186,7 @@ function(
 	 *
 	 * @param  {Object[]} nodes
 	 * @param  {Function} cb
-	 * @param  {(Object|Function)}   scope
+	 * @param  {Object|Function} scope
 	 * @member $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
@@ -218,7 +220,7 @@ function(
 	 * HEX value to DEC
 	 *
 	 * @param  {String} hex
-	 * @return {Number}    
+	 * @return {Number}
 	 * @member $common
 	 */
 	this.hxToDe = function(hex) {
@@ -286,6 +288,7 @@ function(
 
 	/**
 	 * Is item object?
+	 * 
 	 * @param  {Object} item
 	 * @return {Boolean}
 	 * @member $common

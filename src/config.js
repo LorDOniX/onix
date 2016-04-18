@@ -1,5 +1,6 @@
 /**
  * Main framework configuration
+ * 
  * @class CONFIG
  */
 onix.config({

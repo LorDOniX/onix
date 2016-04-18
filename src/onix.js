@@ -65,7 +65,7 @@ onix = (function() {
 	/**
 	 * Dependency injection bind
 	 *
-	 * @param  {(Function|Array)} param
+	 * @param  {Function|Array} param
 	 * @param  {Object} [replace]
 	 * @return {Object}
 	 * @member onix
@@ -95,6 +95,7 @@ onix = (function() {
 
 		/**
 		 * Run new binded function - with the new
+		 * 
 		 * @param  {Function|Object} [scope] 
 		 * @param  {Boolean} [callWithNew] 
 		 * @return {Function}
@@ -175,7 +176,15 @@ onix = (function() {
 		$route,
 		$myQuery
 	) {
-		// binds
+		/**
+		 * Quick acces to myQuery and DOM manipulation
+		 *
+		 * @param  {String|HTMLElement|Array} value
+		 * @param {HTMLElement} [parent]
+		 * @return {$myQuery}
+		 * @member onix
+		 * @property {Function}
+		 */
 		this.element = function(value, parent) {
 			return new $myQuery.get(value, parent);
 		};
@@ -184,7 +193,15 @@ onix = (function() {
 		$loader.init();
 		$template.init();
 
-		// language
+		/**
+		 * Get text function. Translate for the current language and the key.
+		 *
+		 * @param  {String} key
+		 * @param  {Object} [replace] Replace all {} in the string
+		 * @return {String}
+		 * @member window
+		 * @property {Function}
+		 */
 		window._ = $i18n._.bind($i18n);
 	}];
 
@@ -295,7 +312,7 @@ onix = (function() {
 		console.log(
 			"Onix JS Framework\n" +
 			"Version: 2.2.0\n" +
-			"Date: 15. 4. 2016"
+			"Date: 18. 4. 2016"
 		);
 	};
 

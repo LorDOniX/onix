@@ -1,11 +1,13 @@
 /**
  * @class $location
+ *
+ * Support class for location operations.
  */
 onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
 	
 	/**
-	 * Page refresh.
+	 * Page refresh
 	 *
 	 * @member $location
 	 */
@@ -14,7 +16,7 @@ onix.service("$location", function() {
 	};
 
 	/**
-	 * Create a new search url.
+	 * Create a new search url
 	 * 
 	 * @param  {Object} obj
 	 * @return {String}

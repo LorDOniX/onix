@@ -1,13 +1,14 @@
 onix.factory("$select", [
 	"$common",
 	"$event",
+	"$dom",
 function(
 	$common,
-	$event
+	$event,
+	$dom
 ) {
 	/**
-	 * Main class for select.
-	 * DI: $common, $event;
+	 * $select uses bootstrap dropdown and provides additional functionality
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class "dropdown"
@@ -51,7 +52,7 @@ function(
 	};
 
 	/**
-	 * Bind clicks on the select.
+	 * Bind clicks on the select
 	 *
 	 * @member $select
 	 * @private
@@ -62,9 +63,8 @@ function(
 	};
 
 	/**
-	 * Bind caption el.
+	 * Bind caption el
 	 * 
-	 * @param {HTMLElement} el Where element has class "dropdown"
 	 * @member $select
 	 * @private
 	 */
@@ -80,7 +80,7 @@ function(
 				var caretEl = captionEl.querySelector(this._const.CARET_SEL);
 
 				if (caretEl) {
-					var captionTextEl = Framework.DOM.create({
+					var captionTextEl = $dom.create({
 						el: "span",
 						"class": "add-caption"
 					});
@@ -96,7 +96,7 @@ function(
 	};
 
 	/**
-	 * Click on caption
+	 * Event - click on caption
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -137,7 +137,7 @@ function(
 	};
 
 	/**
-	 * Bind choices els.
+	 * Bind choices inside select
 	 *
 	 * @member $select
 	 * @private
@@ -156,7 +156,7 @@ function(
 	};
 
 	/**
-	 * Click on option
+	 * Event - click on option
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -192,7 +192,7 @@ function(
 	};
 
 	/**
-	 * Unbind choices.
+	 * Unbind choices
 	 *
 	 * @member $select
 	 */
@@ -207,7 +207,7 @@ function(
 	};
 
 	/**
-	 * Rebind choices.
+	 * Rebind choices
 	 *
 	 * @member $select
 	 */
@@ -217,9 +217,9 @@ function(
 	};
 
 	/**
-	 * Select option.
+	 * Select option from the select
 	 * 
-	 * @param {Number} ind
+	 * @param {Number} ind Position 0..n
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
@@ -248,7 +248,7 @@ function(
 	};
 
 	/**
-	 * Set add caption.
+	 * Set add caption from the current value
 	 *
 	 * @member $select
 	 */

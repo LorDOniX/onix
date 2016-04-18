@@ -1,9 +1,11 @@
 /**
  * @class $notify
+ *
+ * $notify uses bootstrap alerts and provides additional functionality
  */
 onix.service("$notify", function() {
 	/**
-	 * Notification object
+	 * Create notification object from the element
 	 * 
 	 * @param {HTMLElement} el
 	 * @member $notify
@@ -26,7 +28,7 @@ onix.service("$notify", function() {
 	/**
 	 * Set value to the notify element
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 * @private
 	 */
@@ -40,7 +42,7 @@ onix.service("$notify", function() {
 	};
 
 	/**
-	 * Reset classess
+	 * Reset CSS classes
 	 *
 	 * @member $notify
 	 */
@@ -55,7 +57,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show OK state
 	 * 
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.ok = function(txt) {
@@ -69,7 +71,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show ERROR state
 	 * 
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.error = function(txt) {
@@ -83,7 +85,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show INFO state
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.info = function(txt) {
@@ -97,7 +99,7 @@ onix.service("$notify", function() {
 	/**
 	 * Show WARNING state
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.warn = function(txt) {
@@ -109,7 +111,7 @@ onix.service("$notify", function() {
 	};
 
 	/**
-	 * Timeout hide.
+	 * Hide alert after timeout and returns promise at the end of operation
 	 *
 	 * @return {$q}
 	 * @member $notify
@@ -127,7 +129,7 @@ onix.service("$notify", function() {
 	};
 
 	/**
-	 * Main public access to the notify obj.
+	 * Main public access to the notify obj
 	 *
 	 * @param  {HTMLElement} el
 	 * @return {$notify}

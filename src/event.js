@@ -5,6 +5,8 @@ function(
 ) {
 	/**
  	 * @class $event
+ 	 *
+ 	 * This class is used for extending existing objects and brings signal functionality.
  	 */
 	return {
 		/**
@@ -41,9 +43,9 @@ function(
 		/**
 		 * Add new event to the stack.
 		 * 
-		 * @param  {String}   name 
-		 * @param  {Function} fn   
-		 * @param  {(Object|Function)}   scope
+		 * @param  {String} name 
+		 * @param  {Function} fn
+		 * @param  {Object|Function} scope
 		 * @member $event
 		 */
 		on: function (name, fn, scope) {
@@ -57,7 +59,7 @@ function(
 		/**
 		 * Remove event from the stack.
 		 * 
-		 * @param  {String}   name 
+		 * @param  {String} name 
 		 * @param  {Function} [fn]
 		 * @member $event
 		 */
@@ -74,9 +76,9 @@ function(
 		/**
 		 * Add one time event to the stack.
 		 * 
-		 * @param  {String}   name 
+		 * @param  {String} name
 		 * @param  {Function} [fn]
-		 * @param  {(Object|Function)}   scope
+		 * @param  {Object|Function} [scope]
 		 * @member $event
 		 */
 		once: function (name, fn, scope) {

@@ -9,6 +9,8 @@ function(
 ) {
 	/**
 	 * @class $uploadImages
+	 *
+	 * Class for creating img previews from File[] variable
 	 */
 	var uploadImages = function() {
 		this._disable = !("FileReader" in window);
@@ -20,14 +22,14 @@ function(
 	};
 
 	/**
-	 * Do jobs for processing all images.
+	 * Do jobs for processing all images
 	 *
 	 * @private
 	 * @param  {Array} dataArray Array of files with images
-	 * @param  {Function} fn       Job task
+	 * @param  {Function} fn Job task
 	 * @param  {Number} count How many functions processed simultinously
 	 * @param  {Function} taskDoneObj Callback after one task have been done
-	 * @return {Promise} Callback after all job is done
+	 * @return {$q} Callback after all job is done
 	 * @member $uploadImages
 	 */
 	uploadImages.prototype._doJobs = function(dataArray, fn, count, taskDoneObj) {
@@ -73,10 +75,12 @@ function(
 	};
 
 	/**
-	 * Read one file, create one preview.
+	 * Read one file, create one preview
 	 *
 	 * @private
 	 * @param  {Object} fileObj
+	 * @param  {Object} fileObj.file File reference
+	 * @param  {String} fileObj.previewID Preview ID for DOM position
 	 * @param  {Function} doneFn Callback, after one preview is loaded and drawed to canvas
 	 * @member $uploadImages
 	 */
@@ -133,10 +137,10 @@ function(
 	};
 
 	/**
-	 * Create one image preview.
+	 * Create one image preview
 	 *
 	 * @private
-	 * @param  {File} file 
+	 * @param  {File} file
 	 * @return {Object} dom references
 	 * @member $uploadImages
 	 */
@@ -395,7 +399,7 @@ function(
 	 * Main function for showing img previews.
 	 * 
 	 * @param  {HTMLElement} el
-	 * @param  {Files} files
+	 * @param  {File[]} files
 	 * @member $uploadImages
 	 */
 	uploadImages.prototype.show = function(el, files) {
@@ -434,7 +438,7 @@ function(
 	};
 
 	/**
-	 * Get picture files.
+	 * Get picture files from array of files
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
@@ -457,7 +461,7 @@ function(
 	};
 
 	/**
-	 * Get files count.
+	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}

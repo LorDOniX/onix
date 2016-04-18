@@ -17,6 +17,8 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$i18n'>/**
 </span> * @class $i18n
+ *
+ * Language support, string translation with support for message format syntax
  */
 onix.service(&quot;$i18n&quot;, [
 	&quot;$http&quot;,
@@ -26,7 +28,7 @@ function(
 	$q
 ) {
 <span id='$i18n-property-_langs'>	/**
-</span>	 * All langs data.
+</span>	 * All langs data
 	 *
 	 * @private
 	 * @type {Object}
@@ -70,7 +72,7 @@ function(
 </span>	 * Get text function. Translate for the current language and the key.
 	 *
 	 * @param  {String} key
-	 * @param  {Object} replace Replace all {} in the string
+	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18n
 	 */
@@ -103,10 +105,10 @@ function(
 	};
 
 <span id='$i18n-method-_transReplace'>	/**
-</span>	 * Replace translated text by object.
+</span>	 * Replace translated text by object. This functions is implementation of message format object replace inside the string
 	 *
 	 * @param  {String} translate
-	 * @param  {Object} replace Replace all {} in the string
+	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18n
 	 * @private

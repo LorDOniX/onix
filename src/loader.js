@@ -1,5 +1,7 @@
 /**
  * @class $loader
+ *
+ * Progress loader in the application
  */
 onix.service("$loader", [
 	"$dom",
@@ -7,7 +9,7 @@ function(
 	$dom
 ) {
 	/**
-	 * Create loader.
+	 * Create loader
 	 *
 	 * @private
 	 * @member $loader
@@ -23,7 +25,7 @@ function(
 	};
 	
 	/**
-	 * Loader init.
+	 * Loader init
 	 *
 	 * @member $loader
 	 */
@@ -32,7 +34,7 @@ function(
 	};
 
 	/**
-	 * Start loader.
+	 * Start loader
 	 *
 	 * @member $loader
 	 */
@@ -41,7 +43,7 @@ function(
 	};
 
 	/**
-	 * End loader.
+	 * End loader
 	 *
 	 * @member $loader
 	 */

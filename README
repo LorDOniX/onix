@@ -53,9 +53,13 @@
 # CHANGELOG
 
 ## 2.2.0
-15. 4. 2016
+18. 4. 2016
 
-* 
+* add EXIF library
+* add local storage
+* add upload images
+* change directory structure
+* add support for message format in i18n
 
 ## 2.1.1
 

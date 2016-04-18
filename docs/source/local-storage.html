@@ -17,6 +17,8 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$localStorage'>/**
 </span> * @class $localStorage
+ *
+ * Cover class for localStorage
  */
 onix.service(&quot;$localStorage&quot;, function() {
 	this._disable = !(&quot;localStorage&quot; in window);
@@ -25,7 +27,7 @@ onix.service(&quot;$localStorage&quot;, function() {
 </span>	 * Set value to localStorage
 	 *
 	 * @param {String} key
-	 * @param {String} value
+	 * @param {String} [value]
 	 * @member $localStorage
 	 */
 	this.set = function(key, value) {

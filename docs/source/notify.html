@@ -17,10 +17,12 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$notify'>/**
 </span> * @class $notify
+ *
+ * $notify uses bootstrap alerts and provides additional functionality
  */
 onix.service(&quot;$notify&quot;, function() {
 <span id='$notify-method-S-notify'>	/**
-</span>	 * Notification object
+</span>	 * Create notification object from the element
 	 * 
 	 * @param {HTMLElement} el
 	 * @member $notify
@@ -43,7 +45,7 @@ onix.service(&quot;$notify&quot;, function() {
 <span id='$notify-method-_setValue'>	/**
 </span>	 * Set value to the notify element
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 * @private
 	 */
@@ -57,7 +59,7 @@ onix.service(&quot;$notify&quot;, function() {
 	};
 
 <span id='$notify-method-reset'>	/**
-</span>	 * Reset classess
+</span>	 * Reset CSS classes
 	 *
 	 * @member $notify
 	 */
@@ -72,7 +74,7 @@ onix.service(&quot;$notify&quot;, function() {
 <span id='$notify-method-ok'>	/**
 </span>	 * Show OK state
 	 * 
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.ok = function(txt) {
@@ -86,7 +88,7 @@ onix.service(&quot;$notify&quot;, function() {
 <span id='$notify-method-error'>	/**
 </span>	 * Show ERROR state
 	 * 
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.error = function(txt) {
@@ -100,7 +102,7 @@ onix.service(&quot;$notify&quot;, function() {
 <span id='$notify-method-info'>	/**
 </span>	 * Show INFO state
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.info = function(txt) {
@@ -114,7 +116,7 @@ onix.service(&quot;$notify&quot;, function() {
 <span id='$notify-method-warn'>	/**
 </span>	 * Show WARNING state
 	 *
-	 * @param  {(String|HTMLElement)} txt
+	 * @param  {String|HTMLElement} txt
 	 * @member $notify
 	 */
 	$notify.prototype.warn = function(txt) {
@@ -126,7 +128,7 @@ onix.service(&quot;$notify&quot;, function() {
 	};
 
 <span id='$notify-method-hide'>	/**
-</span>	 * Timeout hide.
+</span>	 * Hide alert after timeout and returns promise at the end of operation
 	 *
 	 * @return {$q}
 	 * @member $notify
@@ -144,7 +146,7 @@ onix.service(&quot;$notify&quot;, function() {
 	};
 
 <span id='$notify-method-get'>	/**
-</span>	 * Main public access to the notify obj.
+</span>	 * Main public access to the notify obj
 	 *
 	 * @param  {HTMLElement} el
 	 * @return {$notify}

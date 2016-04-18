@@ -18,13 +18,14 @@
   <pre class="prettyprint lang-js">onix.factory(&quot;$select&quot;, [
 	&quot;$common&quot;,
 	&quot;$event&quot;,
+	&quot;$dom&quot;,
 function(
 	$common,
-	$event
+	$event,
+	$dom
 ) {
 <span id='$select'>	/**
-</span>	 * Main class for select.
-	 * DI: $common, $event;
+</span>	 * $select uses bootstrap dropdown and provides additional functionality
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class &quot;dropdown&quot;
@@ -68,7 +69,7 @@ function(
 	};
 
 <span id='$select-method-_bind'>	/**
-</span>	 * Bind clicks on the select.
+</span>	 * Bind clicks on the select
 	 *
 	 * @member $select
 	 * @private
@@ -79,9 +80,8 @@ function(
 	};
 
 <span id='$select-method-_bindCaption'>	/**
-</span>	 * Bind caption el.
+</span>	 * Bind caption el
 	 * 
-	 * @param {HTMLElement} el Where element has class &quot;dropdown&quot;
 	 * @member $select
 	 * @private
 	 */
@@ -97,7 +97,7 @@ function(
 				var caretEl = captionEl.querySelector(this._const.CARET_SEL);
 
 				if (caretEl) {
-					var captionTextEl = Framework.DOM.create({
+					var captionTextEl = $dom.create({
 						el: &quot;span&quot;,
 						&quot;class&quot;: &quot;add-caption&quot;
 					});
@@ -113,7 +113,7 @@ function(
 	};
 
 <span id='$select-method-_captionClick'>	/**
-</span>	 * Click on caption
+</span>	 * Event - click on caption
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -154,7 +154,7 @@ function(
 	};
 
 <span id='$select-method-_bindChoices'>	/**
-</span>	 * Bind choices els.
+</span>	 * Bind choices inside select
 	 *
 	 * @member $select
 	 * @private
@@ -173,7 +173,7 @@ function(
 	};
 
 <span id='$select-method-_choiceClick'>	/**
-</span>	 * Click on option
+</span>	 * Event - click on option
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -209,7 +209,7 @@ function(
 	};
 
 <span id='$select-method-unbindChoices'>	/**
-</span>	 * Unbind choices.
+</span>	 * Unbind choices
 	 *
 	 * @member $select
 	 */
@@ -224,7 +224,7 @@ function(
 	};
 
 <span id='$select-method-rebindChoices'>	/**
-</span>	 * Rebind choices.
+</span>	 * Rebind choices
 	 *
 	 * @member $select
 	 */
@@ -234,9 +234,9 @@ function(
 	};
 
 <span id='$select-method-selectOption'>	/**
-</span>	 * Select option.
+</span>	 * Select option from the select
 	 * 
-	 * @param {Number} ind
+	 * @param {Number} ind Position 0..n
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
@@ -265,7 +265,7 @@ function(
 	};
 
 <span id='$select-method-setAddCaption'>	/**
-</span>	 * Set add caption.
+</span>	 * Set add caption from the current value
 	 *
 	 * @member $select
 	 */
