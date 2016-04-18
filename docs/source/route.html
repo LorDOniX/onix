@@ -1,44 +1,56 @@
-onix.service("Route", [
-	"$location",
-	"$template",
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$route'>/**
+</span> * @class $route
+ */
+onix.service(&quot;$route&quot;, [
+	&quot;$location&quot;,
+	&quot;$template&quot;,
 function(
 	$location,
 	$template
 ) {
-	/**
-	 * All routes
+<span id='$route-property-_routes'>	/**
+</span>	 * All routes
 	 *
 	 * @private
 	 * @type {Array}
+	 * @member $route
 	 */
+	
 	this._routes = [];
 
-	/**
-	 * Otherwise route
+<span id='$route-property-_otherwise'>	/**
+</span>	 * Otherwise route
 	 *
 	 * @private
 	 * @type {Object}
-	 * @memberof route
+	 * @member $route
 	 */
 	this._otherwise = null;
 
-	/**
-	 * Route init.
+<span id='$route-method-when'>	/**
+</span>	 * Add route to the router.
 	 *
-	 * @public
-	 * @memberof route
-	 */
-	this.init = function() {
-	};
-
-	/**
-	 * Add route to the router.
-	 *
-	 * @public
+	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
-	 * @return {Himself}
-	 * @memberof route
+	 * @member $route
 	 */
 	this.when = function(url, config) {
 		this._routes.push({
@@ -49,14 +61,13 @@ function(
 		return this;
 	};
 
-	/**
-	 * Otherwise.
+<span id='$route-method-otherwise'>	/**
+</span>	 * Otherwise.
 	 *
-	 * @public
 	 * @param  {String} page
 	 * @param  {Object} config
 	 * @return {Himself}
-	 * @memberof route
+	 * @member $route
 	 */
 	this.otherwise = function(config) {
 		this._otherwise = {
@@ -66,14 +77,15 @@ function(
 		return this;
 	};
 
-	/**
-	 * Run controller from route path
+<span id='$route-method-_runController'>	/**
+</span>	 * Run controller from route path
 	 *
+	 * @private
 	 * @param  {String|Array|Function} contr
 	 * @param  {Object} [contrData] 
 	 */
 	this._runController = function(contr, contrData) {
-		if (typeof contr === "string") {
+		if (typeof contr === &quot;string&quot;) {
 			var param = onix.getObject(contr);
 
 			onix.bindDI(param, contrData)();
@@ -81,16 +93,15 @@ function(
 		else if (Array.isArray(contr)) {
 			onix.bindDI(contr, contrData)();
 		}
-		else if (typeof contr === "function") {
+		else if (typeof contr === &quot;function&quot;) {
 			contr.apply(contr, [contrData]);
 		}
 	};
 
-	/**
-	 * Route GO.
+<span id='$route-method-go'>	/**
+</span>	 * Route GO.
 	 *
-	 * @public
-	 * @memberof route
+	 * @member $route
 	 */
 	this.go = function() {
 		var path = $location.get();
@@ -110,7 +121,7 @@ function(
 			}
 		});
 
-		if (!find && this._otherwise) {
+		if (!find &amp;&amp; this._otherwise) {
 			config = this._otherwise.config;
 		}
 
@@ -123,11 +134,11 @@ function(
 				var value = config[key];
 
 				switch (key) {
-					case "templateUrl":
+					case &quot;templateUrl&quot;:
 						templateUrl = value;
 						break;
 						
-					case "controller":
+					case &quot;controller&quot;:
 						contr = value;
 						break;
 
@@ -151,3 +162,6 @@ function(
 		}
 	};
 }]);
+</pre>
+</body>
+</html>

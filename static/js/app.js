@@ -15,14 +15,14 @@ onix.config({
 });
 
 onix.run([
-	"Route",
+	"$route",
 	"$template",
 	"$config",
 	"$q",
 	"$i18n",
 	"HomePage",
 function(
-	Route,
+	$route,
 	$template,
 	$config,
 	$q,
@@ -31,10 +31,8 @@ function(
 ) {
 	$i18n.setLanguage("en");
 
-	Route.init();
-
 	// application routes
-	Route
+	$route
 		.when("/", {
 			controller: function() {
 				HomePage.setConfig({});
@@ -57,7 +55,7 @@ function(
 		$template.load("testTempl", "/js/home/test-templ.html"),
 		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
 	]).then(function() {
-		Route.go();
+		$route.go();
 	}, function() {
 		console.error("Error during app run");
 	});

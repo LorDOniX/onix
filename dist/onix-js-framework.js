@@ -3587,6 +3587,153 @@ function(
 		return promise;
 	};
 }]);
+;/**
+ * @class $route
+ */
+onix.service("$route", [
+	"$location",
+	"$template",
+function(
+	$location,
+	$template
+) {
+	/**
+	 * All routes
+	 *
+	 * @private
+	 * @type {Array}
+	 * @member $route
+	 */
+	
+	this._routes = [];
+
+	/**
+	 * Otherwise route
+	 *
+	 * @private
+	 * @type {Object}
+	 * @member $route
+	 */
+	this._otherwise = null;
+
+	/**
+	 * Add route to the router.
+	 *
+	 * @chainable
+	 * @param  {String} url 
+	 * @param  {Object} config
+	 * @member $route
+	 */
+	this.when = function(url, config) {
+		this._routes.push({
+			url: url,
+			config: config
+		});
+
+		return this;
+	};
+
+	/**
+	 * Otherwise.
+	 *
+	 * @param  {String} page
+	 * @param  {Object} config
+	 * @return {Himself}
+	 * @member $route
+	 */
+	this.otherwise = function(config) {
+		this._otherwise = {
+			config: config
+		};
+
+		return this;
+	};
+
+	/**
+	 * Run controller from route path
+	 *
+	 * @private
+	 * @param  {String|Array|Function} contr
+	 * @param  {Object} [contrData] 
+	 */
+	this._runController = function(contr, contrData) {
+		if (typeof contr === "string") {
+			var param = onix.getObject(contr);
+
+			onix.bindDI(param, contrData)();
+		}
+		else if (Array.isArray(contr)) {
+			onix.bindDI(contr, contrData)();
+		}
+		else if (typeof contr === "function") {
+			contr.apply(contr, [contrData]);
+		}
+	};
+
+	/**
+	 * Route GO.
+	 *
+	 * @member $route
+	 */
+	this.go = function() {
+		var path = $location.get();
+		var find = false;
+		var config = null;
+		var data = {};
+
+		this._routes.every(function(item) {
+			if (path.match(new RegExp(item.url))) {
+				config = item.config;
+				find = true;
+				
+				return false;
+			}
+			else {
+				return true;
+			}
+		});
+
+		if (!find && this._otherwise) {
+			config = this._otherwise.config;
+		}
+
+		if (config) {
+			var templateUrl = null;
+			var contr = null;
+			var contrData = {};
+
+			Object.keys(config).forEach(function(key) {
+				var value = config[key];
+
+				switch (key) {
+					case "templateUrl":
+						templateUrl = value;
+						break;
+						
+					case "controller":
+						contr = value;
+						break;
+
+					default:
+						contrData[key] = value;
+				}
+			});
+
+			if (templateUrl) {
+				$template.load(config.templateUrl, config.templateUrl).done(function() {
+					if (contr) {
+						this._runController(contr, contrData);
+					}
+				}.bind(this));
+			}
+			else {
+				if (contr) {
+					this._runController(contr, contrData);
+				}
+			}
+		}
+	};
+}]);
 ;onix.factory("$select", [
 	"$common",
 	"$event",
@@ -3856,4 +4003,475 @@ function(
 	};
 
 	return $select;
+}]);
+;onix.factory("$uploadImages", [
+	"$job",
+	"$q",
+	"$dom",
+function(
+	$job,
+	$q,
+	$dom
+) {
+	/**
+	 * @class $uploadImages
+	 */
+	var uploadImages = function() {
+		this._disable = !("FileReader" in window);
+
+		this._const = {
+			// max preview image height
+			previewMaxSize: 180
+		};
+	};
+
+	/**
+	 * Do jobs for processing all images.
+	 *
+	 * @private
+	 * @param  {Array} dataArray Array of files with images
+	 * @param  {Function} fn       Job task
+	 * @param  {Number} count How many functions processed simultinously
+	 * @param  {Function} taskDoneObj Callback after one task have been done
+	 * @return {Promise} Callback after all job is done
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._doJobs = function(dataArray, fn, count, taskDoneObj) {
+		var len = dataArray.length;
+		var jobs = [];
+
+		for (var i = 0; i < len; i++) {
+			var jp = i % count;
+
+			if (!jobs[jp]) {
+				jobs[jp] = $job.create();
+
+				if (taskDoneObj) {
+					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
+				}
+			}
+
+			jobs[jp].add(fn, this, dataArray[i]);
+		}
+
+		var jobPromises = [];
+
+		jobs.forEach(function(job) {
+			jobPromises.push(job.start());
+		});
+
+		return $q.all(jobPromises);
+	};
+
+	/**
+	 * Is file a picture?
+	 *
+	 * @private
+	 * @param  {File}  file
+	 * @return {Boolean}
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._isPicture = function(file) {
+		if (file) {
+			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
+		}
+		else return false;
+	};
+
+	/**
+	 * Read one file, create one preview.
+	 *
+	 * @private
+	 * @param  {Object} fileObj
+	 * @param  {Function} doneFn Callback, after one preview is loaded and drawed to canvas
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._readFile = function(fileObj, doneFn) {
+		var file = fileObj.file;
+		var previewID = fileObj.previewID;
+
+		var fileObj = {
+			file: file,
+			exif: null,
+			img: null
+		};
+
+		var preview = this._createPreview(file);
+		
+		// append
+		if (previewID in this._dom) {
+			this._dom[previewID].appendChild(preview.cont);
+		}
+		else {
+			this._dom.previewItems.appendChild(preview.cont);
+		}
+
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+			var binaryData = reader.result;
+			var binaryDataArray = new Uint8Array(binaryData);
+			var exif = null;
+
+			if (file.type != "png") {
+				exif = EXIF.readFromBinaryFile(binaryData);
+			}
+
+			var img = new Image();
+
+			img.onload = function() {
+				var imd = this._getImageDim(img);
+				var canvas = this._processInputImage(img, imd, exif.Orientation);
+				
+				preview.cont.classList.remove("preview-loading");
+				preview.canvasCover.innerHTML = "";
+				preview.canvasCover.appendChild(canvas);
+
+				fileObj.exif = exif;
+				fileObj.img = img;
+				doneFn();
+			}.bind(this);
+
+			img.src = this._fileToBase64(file.type, binaryDataArray);
+		}.bind(this);
+
+		reader.readAsArrayBuffer(file);
+	};
+
+	/**
+	 * Create one image preview.
+	 *
+	 * @private
+	 * @param  {File} file 
+	 * @return {Object} dom references
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._createPreview = function(file) {
+		var exported = {};
+
+		var cont = $dom.create({
+			el: "span",
+			"class": ["preview-item", "preview-loading"],
+			child: [{
+				el: "span",
+				"class": "canvas-cover",
+				child: [{
+					el: "img",
+					"class": "preview-loader",
+					src: "/static/img/loading.gif"
+				}],
+				_exported: "canvasCover"
+			}, {
+				el: "span",
+				"class": "title",
+				innerHTML: file.name.replace(/\..*/g, "")
+			}]
+		}, exported);
+
+		return {
+			cont: cont,
+			canvasCover: exported.canvasCover
+		};
+	};
+
+	/**
+	 * Counts image dimension; if maxSize is available, new dimension is calculated
+	 *
+	 * @private
+	 * @param  {Image} img
+	 * @return {Object}
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._getImageDim = function(img) {
+		var maxSize = this._const.previewMaxSize;
+		var largeWidth = img.width > maxSize;
+		var largeHeight = img.height > maxSize;
+
+		var output = {
+			width: img.width,
+			height: img.height,
+			scale: 1,
+			large: false
+		};
+
+		if (largeWidth || largeHeight) {
+			// resizneme obrazek
+			var imgWidth = img.width;
+			var imgHeight = img.height;
+
+			// vybereme vetsi ze stran
+			if (img.width > img.height) {
+				// sirka
+				imgHeight = maxSize * imgHeight / imgWidth;
+				imgWidth = maxSize;
+			}
+			else {
+				// vyska
+				imgWidth = maxSize * imgWidth / imgHeight;
+				imgHeight = maxSize;
+			}
+
+			output.scale = img.width / imgWidth; // pomer orig. a zmenseneho obrazku
+			output.width = imgWidth;
+			output.height = imgHeight;
+			output.large = true;
+		}
+
+		return output;
+	};
+
+	/**
+	 * Process image: rotate by exif, decrase size according to MAX SIZE
+	 *
+	 * @private
+	 * @param  {Image} img
+	 * @param  {Object} imd object dimension
+	 * @param  {Number} orientation EXIF orientation
+	 * @return {Canvas}
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._processInputImage = function(img, imd, orientation) {
+		var canvas = document.createElement("canvas");
+		var ctx = canvas.getContext("2d");
+		var draw = true;
+
+		canvas.width = imd.width;
+		canvas.height = imd.height;
+
+		// rotate
+		if (orientation) {
+			switch (orientation) {
+				case 2:
+					// horizontal flip
+					ctx.translate(imd.width, 0);
+					ctx.scale(-1, 1);
+					break;
+
+				case 3:
+					// 180° rotate left
+					ctx.translate(imd.width, imd.height);
+					ctx.rotate(Math.PI);
+					break;
+
+				case 4:
+					// vertical flip
+					ctx.translate(0, imd.height);
+					ctx.scale(1, -1);
+					break;
+
+				case 5:
+					// vertical flip + 90 rotate right
+					canvas.width = imd.height;
+					canvas.height = imd.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.scale(1, -1);
+
+					if (imd.large) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+
+				case 6:
+					// 90° rotate right
+					canvas.width = imd.height;
+					canvas.height = imd.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(0, -imd.height);
+					
+					if (imd.large) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+
+				case 7:
+					// horizontal flip + 90 rotate right
+					canvas.width = imd.height;
+					canvas.height = imd.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(imd.width, -imd.height);
+					ctx.scale(-1, 1);
+
+					if (imd.large) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+
+				case 8:
+					// 90° rotate left
+					canvas.width = imd.height;
+					canvas.height = imd.width;
+					ctx.rotate(-0.5 * Math.PI);
+					ctx.translate(-imd.width, 0);
+
+					if (imd.large) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+			}
+		}
+
+		if (draw) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			if (imd.large) {
+				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+			}
+			else {
+				ctx.drawImage(img, 0, 0);
+			}
+		}
+
+		return canvas;
+	};
+
+	/**
+	 * Binary data to base64
+	 *
+	 * @private
+	 * @param  {String} fileType
+	 * @param  {Array} binaryData
+	 * @return {String}
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._fileToBase64 = function(fileType, binaryData) {
+		var length = binaryData.length
+		var output = "";
+
+		for (var i = 0; i < length; i += 1) {
+			output += String.fromCharCode(binaryData[i]);
+		}
+
+		return 'data:' + fileType + ';base64,' + btoa(output);
+	};
+
+	/**
+	 * Create preview holders.
+	 *
+	 * @private
+	 * @param {HTMLElement} el
+	 * @param {Number} count
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype._createPreviewHolders = function(el, count) {
+		if (!el || (count != 4 && count != 7)) return;
+
+		var exported = {};
+
+		// placeholder for panorama
+		if (count == 7) {
+			// ceiling line
+			el.appendChild($dom.create({
+				el: "div",
+				child: [{
+					el: "span",
+					_exported: "img_06"
+				}]
+			}, exported));
+		}
+
+		var child = [];
+		var childCount = count == 7 ? 6 : 4;
+
+		for (var i = 0; i < childCount; i++) {
+			child.push({
+				el: "span",
+				_exported: "img_0" + i
+			});
+		}
+
+		// rest line
+		el.appendChild($dom.create({
+			el: "div",
+			child: child
+		}, exported));
+
+		for (var i = 0; i < count; i++) {
+			this._dom["img_0" + i] = exported["img_0" + i];
+		}
+	};
+
+	/**
+	 * Main function for showing img previews.
+	 * 
+	 * @param  {HTMLElement} el
+	 * @param  {Files} files
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype.show = function(el, files) {
+		if (this._disable || !el || !files) return;
+
+		// clear previous
+		el.innerHTML = "";
+
+		this._dom = {
+			previewItems: el
+		};
+
+		var pictureFiles = this.getPictureFiles(files);
+		var count = pictureFiles.length;
+
+		if (count) {
+			this._createPreviewHolders(el, count);
+
+			// sort by name, make previewID - only for 7 pictures
+			pictureFiles = pictureFiles.sort(function(a, b) {
+				if (a.name < b.name)
+					return -1;
+				else if (a.name > b.name)
+					return 1;
+				else 
+					return 0;
+			}).map(function(file, ind) {
+				return {
+					file: file,
+					previewID: "img_0" + ind
+				};
+			});
+
+			this._doJobs(pictureFiles, this._readFile, 2);
+		}
+	};
+
+	/**
+	 * Get picture files.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Array}
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype.getPictureFiles = function(files) {
+		var pictureFiles = [];
+
+		if (files && files.length) {
+			for (var i = 0; i < files.length; i++) {
+				var item = files[i];
+
+				if (this._isPicture(item)) {
+					pictureFiles.push(item);
+				}
+			}
+		}
+
+		return pictureFiles;
+	};
+
+	/**
+	 * Get files count.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Boolean}
+	 * @member $uploadImages
+	 */
+	uploadImages.prototype.getPicturesCount = function(files) {
+		return this.getPictureFiles(files).length;
+	};
+
+	return uploadImages;
 }]);

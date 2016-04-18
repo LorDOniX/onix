@@ -30,7 +30,7 @@ module.exports = function(grunt) {
 					"src/exif.js",
 					"src/onix.js",
 					"src/config.js",
-					"src/localstorage.js",
+					"src/local-storage.js",
 					"src/promise.js",
 					"src/job.js",
 					"src/my-query.js",
@@ -43,7 +43,9 @@ module.exports = function(grunt) {
 					"src/http.js",
 					"src/i18n.js",
 					"src/template.js",
-					"src/select.js"
+					"src/route.js",
+					"src/select.js",
+					"src/upload-images.js"
 				],
 
 				dest: 'dist/onix-js-framework.js',
