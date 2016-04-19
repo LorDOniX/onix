@@ -1370,8 +1370,8 @@ if (!("classList" in document.documentElement) && window.Element) {
 	onix.prototype.info = function() {
 		console.log(
 			"Onix JS Framework\n" +
-			"Version: 2.2.0\n" +
-			"Date: 18. 4. 2016"
+			"Version: 2.2.1\n" +
+			"Date: 19. 4. 2016"
 		);
 	};
 
@@ -2676,6 +2676,133 @@ function(
 	 */
 	this.isObject = function(item) {
 		return (typeof item === "object" && !Array.isArray(item) && item !== null);
+	};
+
+
+	/**
+	 * Cover function for console.log, which allows to replace {0..n} occurences inside string.
+	 * First argument is string, other arguments are for replace objects by key
+	 * 
+	 * @member $common
+	 */
+	this.col = function() {
+		var args = Array.prototype.slice.call(arguments);
+		var output = "";
+		var params = {};
+
+		args.forEach(function(arg, ind) {
+			if (ind == 0) {
+				output = arg;
+			}
+			else {
+				params["[{]" + (ind - 1) + "[}]"] = arg;
+			}
+		});
+
+		Object.keys(params).forEach(function(param) {
+			output = output.replace(new RegExp(param, "g"), params[param]);
+		});
+
+		if (output) {
+			console.log(output);
+		}
+	};
+
+	/**
+	 * Size to KB/MB.
+	 * 
+	 * @param  {Number} size
+	 * @return {String}
+	 * @member $common
+	 */
+	this.humanLength = function(size) {
+		size = size || 0;
+
+		var sizeKB = size / 1024;
+		var sizeMB = size / (1024 * 1024);
+
+		if (sizeKB < 1024) {
+			return sizeKB.toFixed(2) + " KB";
+		}
+		else {
+			return sizeMB.toFixed(2) + " MB";
+		}
+	};
+
+
+	/**
+	 * Chaining multiple methods with promises, returns promise
+	 * 
+	 * @param  {Object[]} opts
+	 * @param  {String|Function} opts.method Function or method name inside scope
+	 * @param  {Object} opts.scope Scope for method function
+	 * @param  {Array} opts.args Additional arguments for function
+	 * @return {$q}
+	 * @member $common
+	 */
+	this.chainPromises = function(opts) {
+		var promise = $q.defer();
+
+		this._chainPromisesInner(opts, promise, []);
+
+		return promise;
+	};
+
+	/**
+	 * Inner method for chaining promises
+	 * 
+	 * @param  {Object[]} opts
+	 * @param  {String|Function} opts.method Function or method name inside scope
+	 * @param  {Object} opts.scope Scope for method function
+	 * @param  {Array} opts.args Additional arguments for function
+	 * @param  {promise} promise Done promise
+	 * @param  {Array} outArray Array for output from all executed promises
+	 * @member $common
+	 */
+	this._chainPromisesInner = function(opts, promise, outArray) {
+		var firstItem = opts.shift();
+
+		if (firstItem) {
+			// string or function itself
+			var fn;
+			var error = false;
+
+			switch (typeof firstItem.method) {
+				case "string":
+					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
+						error = true;
+					}
+					else {
+						fn = firstItem.scope[firstItem.method];
+
+						if (typeof fn !== "function") {
+							error = true;
+						}
+					}
+					break;
+				case "function":
+					fn = firstItem.method;
+					break;
+				default:
+					error = true;
+			}
+
+			if (!error) {
+				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
+					outArray.push(data);
+					this._chainPromisesInner(opts, promise, outArray);
+				}.bind(this), function(err) {
+					outArray.push(err);
+					this._chainPromisesInner(opts, promise, outArray);
+				}.bind(this));
+			}
+			else {
+				promise.resolve(outArray);
+			}
+		}
+		else {
+			promise.resolve(outArray);
+		}
 	};
 }]);
 ;/**

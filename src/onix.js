@@ -311,8 +311,8 @@ onix = (function() {
 	onix.prototype.info = function() {
 		console.log(
 			"Onix JS Framework\n" +
-			"Version: 2.2.0\n" +
-			"Date: 18. 4. 2016"
+			"Version: 2.2.1\n" +
+			"Date: 19. 4. 2016"
 		);
 	};
 

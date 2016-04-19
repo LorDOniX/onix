@@ -4,24 +4,20 @@ onix.factory("HomePage", [
 	"$template",
 	"$loader",
 	"$select",
+	"$q",
 	"HomeResource",
 	"HomeSnippet",
-	"$routeParams",
 function(
 	Page,
 	$common,
 	$template,
 	$loader,
 	$select,
+	$q,
 	HomeResource,
-	HomeSnippet,
-	$routeParams
+	HomeSnippet
 ) {
 	// test
-	console.log("HomeCtrl");
-
-	console.log($routeParams);
-
 	HomeSnippet.dirTest();
 
 	var HomePage = Page.create();
@@ -29,31 +25,75 @@ function(
 	// ------------------------ private ---------------------------------------
 	HomePage._afterInit = function() {
 		// set title - using i18n get text _ function
-		HomePage._getEl("title").innerHTML = _("home_page.title");
+		this._getEl("title").innerHTML = _("home_page.title");
 
 		// this._testRequest();
 
-		HomePage._loadTemplate();
+		this._loadTemplate();
 
 		// dropdowns
-		var dropdown = new $select(HomePage._getEl("dropdown"));
+		var dropdown = new $select(this._getEl("dropdown"));
 
 		dropdown.on("change", function(value) {
 			console.log("dropdown change - " + value);
-		}, HomePage);
+		}, this);
 
 		// events
-		HomePage.once("onceEvent", function() {
+		this.once("onceEvent", function() {
 			console.log("onceEvent");
 		});
 
-		HomePage.on("anotherEvent", function() {
+		this.on("anotherEvent", function() {
 			console.log("anotherEvent");
 		});
 
-		HomePage.once("onceEvent", function() {
+		this.once("onceEvent", function() {
 			console.log("onceEvent - another function");
 		});
+
+		// test for chaining promises
+		$common.chainPromises([{
+			method: "_testPromise1",
+			scope: this,
+			args: [5]
+		}, {
+			method: "_testPromise2",
+			scope: this,
+			args: [10]
+		}, {
+			method: function() {
+				var promise = $q.defer();
+
+				setTimeout(function() {
+					promise.resolve("test promise 3 - " + $common.humanLength(123456789));
+				}, 1000);
+
+				return promise; 
+			}
+		}]).done(function(output) {
+			console.log("All done");
+			console.log(output);
+		});
+	};
+
+	HomePage._testPromise1 = function(val) {
+		var promise = $q.defer();
+
+		setTimeout(function() {
+			promise.resolve("test promise 1 - " + val);
+		}, 1000);
+
+		return promise;
+	};
+
+	HomePage._testPromise2 = function(val) {
+		var promise = $q.defer();
+
+		setTimeout(function() {
+			promise.resolve("test promise 2 - " + val);
+		}, 800);
+
+		return promise;
 	};
 
 	/**
@@ -74,10 +114,7 @@ function(
 			name: "Name from HP"
 		}));
 
-		console.log(el)
-		console.log(el.getEl())
-
-		$template.bindTemplate(el.getEl(), HomePage);
+		$template.bindTemplate(el.getEl(), this);
 	};
 
 	HomePage.ed = function() {
@@ -89,79 +126,6 @@ function(
 		});
 
 		el.dispatchEvent(event);
-	};
-
-	HomePage._angularTest = function() {
-		var x = {};
-
-		var bindWatcher = function(obj, cb) {
-			var key = "$watcher";
-
-			if (!(key in obj)) {
-				obj[key] = cb || function() {};
-			}
-		};
-
-		var bindProp = function(obj, prop) {
-			var key = "$data";
-			var key2 = "$watcher";
-
-			if (!(key in obj)) {
-				obj[key] = {};
-			}
-
-			Object.defineProperty(obj, prop, {
-				get: function() {
-					//console.log('get!');
-					return obj[key][prop];
-				},
-
-				set: function(value) {
-					//console.log('set!');
-					obj[key][prop] = value;
-					if (obj[key2] && typeof obj[key2] === "function") {
-						obj[key2](prop, value);
-					}
-				}
-			});
-		};
-
-		bindWatcher(x, function() {
-			console.log("zmena set objektu x");
-			console.log(arguments);
-		});
-		bindProp(x, "hod1");
-
-		x.hod1 = "onix";
-		console.log("hodnta je " + x.hod1); // get
-
-		setTimeout(function() {
-			x.hod1 = "roman";
-		}, 1000)
-
-
-		/*
-		var propName = 'value' 
-		var get = Function("return this['" + propName + "']")
-		var set = Function("newValue", "this['" + propName + "'] = newValue")
-		var handler = { 'get': get, 'set': set, enumerable: true, configurable: true }
-		Object.defineProperty(x, propName, handler)
-
-		var testObj = {};
-		Object.defineProperty(testObj, "hod1", {
-			get: function() {
-				console.log('get!');
-				return hod1;
-			},
-			set: function(value) {
-				console.log('set!');
-				hod1 = value;
-			}
-		});
-		*/
-		
-		//testObj.hod1 = "nastavime hodntou;"
-		//console.log(testObj.hod1); // get
 	};
 
 	// ------------------------ public ----------------------------------------
@@ -179,11 +143,11 @@ function(
 		$loader.start();
 
 		// test for once events
-		HomePage.trigger("onceEvent");
-		HomePage.trigger("anotherEvent");
+		this.trigger("onceEvent");
+		this.trigger("anotherEvent");
 
 		// test for off event
-		HomePage.off("anotherEvent");
+		this.off("anotherEvent");
 
 		setTimeout(function() {
 			$loader.end();

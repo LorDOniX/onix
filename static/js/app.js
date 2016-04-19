@@ -38,10 +38,7 @@ function(
 				HomePage.setConfig({});
 				HomePage.init();
 			},
-			templateUrl: "/js/home/test-templ.html",
-			data: {
-				a: 5
-			}
+			templateUrl: "/js/test-templ.html"
 		})
 		.otherwise({
 			controller: function() {
@@ -52,7 +49,7 @@ function(
 
 	// all dependencies before start
 	$q.all([
-		$template.load("testTempl", "/js/home/test-templ.html"),
+		$template.load("testTempl", "/js/test-templ.html"),
 		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
 	]).then(function() {
 		$route.go();
