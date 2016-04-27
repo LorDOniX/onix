@@ -31,6 +31,11 @@ navigate to dist/ folder
 
 6) CHANGELOG
 
+2.2.3
+27. 4. 2016
+
+* handle circular dependency injection problem
+
 2.2.2
 27. 4. 2016
 

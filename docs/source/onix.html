@@ -128,10 +128,18 @@
 </span>	 * Run object configuration; returns his cache (data)
 	 * 
 	 * @param  {Object}  obj Object configuration
-	 * @param  {Boolean} isConfig Is config phase?
+	 * @param  {Boolean} [isConfig] Is config phase?
+	 * @param  {Array} [parent] Parent objects
 	 * @return {Object}
 	 */
-	onix.prototype._run = function(obj, isConfig) {
+	onix.prototype._run = function(obj, isConfig, parent) {
+		parent = parent || [];
+
+		if (parent.indexOf(obj.name) != -1) {
+			console.error(&quot;Circular dependency error! Object name: &quot; + obj.name + &quot;, parents: &quot; + parent.join(&quot;|&quot;));
+			return null;
+		}
+
 		var inject = [];
 
 		if (obj.provider) {
@@ -155,7 +163,7 @@
 			obj.inject.forEach(function(objName) {
 				var injObj = this._objects[objName];
 
-				inject.push(this._run(injObj, isConfig));
+				inject.push(this._run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 			}, this);
 		}
 
@@ -371,7 +379,7 @@
 	onix.prototype.info = function() {
 		console.log(
 			&quot;OnixJS framework\n&quot; +
-			&quot;2.2.2/27. 4. 2016\n&quot; +
+			&quot;2.2.3/27. 4. 2016\n&quot; +
 			&quot;source: https://gitlab.com/LorDOniX/onix\n&quot; +
 			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs&quot;
 		);
