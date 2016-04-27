@@ -20,63 +20,71 @@
  *
  * Progress loader in the application
  */
-onix.service(&quot;$loader&quot;, [
+onix.factory(&quot;$loader&quot;, [
 	&quot;$dom&quot;,
 function(
 	$dom
 ) {
-<span id='$loader-method-_create'>	/**
-</span>	 * Create loader
-	 *
-	 * @private
-	 * @member $loader
-	 */
-	this._create = function() {
-		this._el = $dom.create({
-			el: &quot;div&quot;,
-			&quot;class&quot;: &quot;loader&quot;
-		});
+	var $loader = {
+<span id='$loader-method-_create'>		/**
+</span>		 * Create loader
+		 *
+		 * @private
+		 * @member $loader
+		 */
+		_create: function() {
+			this._el = $dom.create({
+				el: &quot;div&quot;,
+				&quot;class&quot;: &quot;loader&quot;
+			});
 
-		// insert into the body on first position
-		document.body.insertBefore(this._el, document.body.firstChild);
-	};
-	
-<span id='$loader-method-init'>	/**
-</span>	 * Loader init
-	 *
-	 * @member $loader
-	 */
-	this.init = function() {
-		this._create();
-	};
+			// insert into the body on first position
+			document.body.insertBefore(this._el, document.body.firstChild);
+		},
+		
+<span id='$loader-method-_init'>		/**
+</span>		 * Loader init
+		 *
+		 * @private
+		 * @member $loader
+		 */
+		_init: function() {
+			this._create();
+		},
 
-<span id='$loader-method-start'>	/**
-</span>	 * Start loader
-	 *
-	 * @member $loader
-	 */
-	this.start = function() {
-		this._el.classList.add(&quot;start&quot;);
-	};
+<span id='$loader-method-start'>		/**
+</span>		 * Start loader
+		 *
+		 * @member $loader
+		 */
+		start: function() {
+			this._el.classList.add(&quot;start&quot;);
+		},
 
-<span id='$loader-method-end'>	/**
-</span>	 * End loader
-	 *
-	 * @member $loader
-	 */
-	this.end = function() {
-		this._el.classList.remove(&quot;start&quot;);
-		this._el.classList.add(&quot;end&quot;);
-
-		setTimeout(function() {
-			this._el.classList.remove(&quot;end&quot;);
-			this._el.classList.add(&quot;hide&quot;);
+<span id='$loader-method-end'>		/**
+</span>		 * End loader
+		 *
+		 * @member $loader
+		 */
+		end: function() {
+			this._el.classList.remove(&quot;start&quot;);
+			this._el.classList.add(&quot;end&quot;);
 
 			setTimeout(function() {
-				this._el.classList.remove(&quot;hide&quot;);
-			}.bind(this), 350);
-		}.bind(this), 150);
+				this._el.classList.remove(&quot;end&quot;);
+				this._el.classList.add(&quot;hide&quot;);
+
+				setTimeout(function() {
+					this._el.classList.remove(&quot;hide&quot;);
+				}.bind(this), 350);
+			}.bind(this), 150);
+		}
 	};
+
+	// loader init
+	$loader._init();
+
+	return $loader;
 }]);
 </pre>
 </body>

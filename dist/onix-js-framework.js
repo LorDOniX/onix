@@ -1,15 +1,12 @@
 (function() {
 	Event = Event || window.Event;
-
 	Event.prototype.stopPropagation = Event.prototype.stopPropagation || function() {
 		this.cancelBubble = true;
 	};
-
 	Event.prototype.preventDefault = Event.prototype.preventDefault || function () {
 		this.returnValue = false;
 	};
 })();
-
 if(!Array.isArray) {
 	/**
 	 * Array.isArray dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
@@ -18,7 +15,6 @@ if(!Array.isArray) {
 		return Object.prototype.toString.call(vArg) === "[object Array]";
 	};
 }
-
 if (!Array.prototype.forEach) { 
 	Array.prototype.forEach = function(cb, _this) {
 	    var len = this.length;
@@ -27,7 +23,6 @@ if (!Array.prototype.forEach) {
 		}
 	}
 }
-
 if (!Array.prototype.every) { 
 	Array.prototype.every = function(cb, _this) {
 	    var len = this.length;
@@ -37,7 +32,6 @@ if (!Array.prototype.every) {
 	    return true;
 	}
 }
-
 if (!Array.prototype.indexOf) { 
 	Array.prototype.indexOf = function(item, from) {
 	    var len = this.length;
@@ -49,24 +43,19 @@ if (!Array.prototype.indexOf) {
 	    return -1;
 	}
 }
-
 if (!("console" in window)) {
 	var emptyFn = function() {};
-
 	window.console = {};
-
 	["log", "warn", "error", "clear", "info"].forEach(function(name) {
 		window.console[name] = emptyFn;
 	});
 }
-
 if (!Object.keys) {
 	/**
 	 * Object.keys dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
 	 */
 	Object.keys = (function () {
 		'use strict';
-
 		var hasOwnProperty = Object.prototype.hasOwnProperty,
 			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
 			dontEnums = [
@@ -79,20 +68,16 @@ if (!Object.keys) {
 				'constructor'
 			],
 			dontEnumsLength = dontEnums.length;
-
 		return function (obj) {
 			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
 				throw new TypeError('Object.keys called on non-object');
 			}
-
 			var result = [], prop, i;
-
 			for (prop in obj) {
 				if (hasOwnProperty.call(obj, prop)) {
 					result.push(prop);
 				}
 			}
-
 			if (hasDontEnumBug) {
 				for (i = 0; i < dontEnumsLength; i++) {
 					if (hasOwnProperty.call(obj, dontEnums[i])) {
@@ -104,7 +89,6 @@ if (!Object.keys) {
 		};
 	}());
 }
-
 (function() {
   if(navigator.appVersion.indexOf('MSIE 8') > 0) {
     var _slice = Array.prototype.slice;
@@ -123,7 +107,6 @@ if (!Object.keys) {
     };
   }
 })();
-
 if (!Object.create) {
 	/**
 	 * Object.create dle ES5 - https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
@@ -135,7 +118,6 @@ if (!Object.create) {
 		return new tmp();
 	};
 }
-
 if (!Function.prototype.bind) {
 	/**
 	 * ES5 Function.prototype.bind
@@ -152,12 +134,10 @@ if (!Function.prototype.bind) {
 		}
 	}
 };
-
 if (!("addEventListener" in document)) {
 	var w = Window.prototype;
 	var h = HTMLDocument.prototype;
 	var e = Element.prototype;
-
 	w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
 		if (eventName == "DOMContentLoaded") {
 			document.attachEvent("onreadystatechange", function() {
@@ -168,18 +148,15 @@ if (!("addEventListener" in document)) {
 		}
 		else {
 			var obj = this;
-
 			this.attachEvent("on" + eventName, function() {
 				return listener.apply(obj, arguments);
 			});
 		}
 	};
-
 	w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
 		return this.detachEvent("on" + eventName, listener);
 	};
 }
-
 if (!("classList" in document.documentElement) && window.Element) {
 	(function () {
 		var prototype = Array.prototype,
@@ -188,24 +165,20 @@ if (!("classList" in document.documentElement) && window.Element) {
 		push = prototype.push,
 		splice = prototype.splice,
 		join = prototype.join;
-
 		function DOMTokenList(elm) {
 			this._element = elm;
 			if (elm.className == this._classCache) { return; }
 			this._classCache = elm.className;
 			if (!this._classCache) { return; }
-
 			var classes = this._classCache.replace(/^\s+|\s+$/g,'').split(/\s+/);
 			for (var i = 0; i < classes.length; i++) {
 				push.call(this, classes[i]);
 			}
 		}
 		window.DOMTokenList = DOMTokenList;
-
 		function setToClassName(el, classes) {
 			el.className = classes.join(" ");
 		}
-
 		DOMTokenList.prototype = {
 			add: function(token) {
 				if (this.contains(token)) { return; }
@@ -237,7 +210,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 				}
 			}
 		};
-
 		function defineElementGetter (obj, prop, getter) {
 			if (Object.defineProperty) {
 				Object.defineProperty(obj, prop, {
@@ -247,24 +219,19 @@ if (!("classList" in document.documentElement) && window.Element) {
 				obj.__defineGetter__(prop, getter);
 			}
 		}
-
 		defineElementGetter(Element.prototype, "classList", function() {
 			return new DOMTokenList(this);
 		});
 	})();
 }
-;(function() {
-
+(function() {
 	var debug = false;
-
 	var root = this;
-
 	var EXIF = function(obj) {
 		if (obj instanceof EXIF) return obj;
 		if (!(this instanceof EXIF)) return new EXIF(obj);
 		this.EXIFwrapped = obj;
 	};
-
 	if (typeof exports !== 'undefined') {
 		if (typeof module !== 'undefined' && module.exports) {
 			exports = module.exports = EXIF;
@@ -273,36 +240,28 @@ if (!("classList" in document.documentElement) && window.Element) {
 	} else {
 		root.EXIF = EXIF;
 	}
-
 	var ExifTags = EXIF.Tags = {
-
 		// version tags
 		0x9000 : "ExifVersion",             // EXIF version
 		0xA000 : "FlashpixVersion",         // Flashpix format version
-
 		// colorspace tags
 		0xA001 : "ColorSpace",              // Color space information tag
-
 		// image configuration
 		0xA002 : "PixelXDimension",         // Valid width of meaningful image
 		0xA003 : "PixelYDimension",         // Valid height of meaningful image
 		0x9101 : "ComponentsConfiguration", // Information about channels
 		0x9102 : "CompressedBitsPerPixel",  // Compressed bits per pixel
-
 		// user information
 		0x927C : "MakerNote",               // Any desired information written by the manufacturer
 		0x9286 : "UserComment",             // Comments by user
-
 		// related file
 		0xA004 : "RelatedSoundFile",        // Name of related sound file
-
 		// date and time
 		0x9003 : "DateTimeOriginal",        // Date and time when the original image was generated
 		0x9004 : "DateTimeDigitized",       // Date and time when the image was stored digitally
 		0x9290 : "SubsecTime",              // Fractions of seconds for DateTime
 		0x9291 : "SubsecTimeOriginal",      // Fractions of seconds for DateTimeOriginal
 		0x9292 : "SubsecTimeDigitized",     // Fractions of seconds for DateTimeDigitized
-
 		// picture-taking conditions
 		0x829A : "ExposureTime",            // Exposure time (in seconds)
 		0x829D : "FNumber",                 // F number
@@ -344,12 +303,10 @@ if (!("classList" in document.documentElement) && window.Element) {
 		0xA40A : "Sharpness",               // Direction of sharpness processing applied by camera
 		0xA40B : "DeviceSettingDescription",    //
 		0xA40C : "SubjectDistanceRange",    // Distance to subject
-
 		// other tags
 		0xA005 : "InteroperabilityIFDPointer",
 		0xA420 : "ImageUniqueID"            // Identifier assigned uniquely to each image
 	};
-
 	var TiffTags = EXIF.TiffTags = {
 		0x0100 : "ImageWidth",
 		0x0101 : "ImageHeight",
@@ -385,7 +342,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		0x013B : "Artist",
 		0x8298 : "Copyright"
 	};
-
 	var GPSTags = EXIF.GPSTags = {
 		0x0000 : "GPSVersionID",
 		0x0001 : "GPSLatitudeRef",
@@ -419,7 +375,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		0x001D : "GPSDateStamp",
 		0x001E : "GPSDifferential"
 	};
-
 	var StringValues = EXIF.StringValues = {
 		ExposureProgram : {
 			0 : "Not defined",
@@ -546,7 +501,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		FileSource : {
 			3 : "DSC"
 		},
-
 		Components : {
 			0 : "",
 			1 : "Y",
@@ -557,7 +511,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 			6 : "B"
 		}
 	};
-
 	function addEvent(element, event, handler) {
 		if (element.addEventListener) {
 			element.addEventListener(event, handler, false);
@@ -565,12 +518,9 @@ if (!("classList" in document.documentElement) && window.Element) {
 			element.attachEvent("on" + event, handler);
 		}
 	}
-
 	function imageHasData(img) {
 		return !!(img.exifdata);
 	}
-
-
 	function base64ToArrayBuffer(base64, contentType) {
 		contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
 		base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
@@ -583,7 +533,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		}
 		return buffer;
 	}
-
 	function objectURLToBlob(url, callback) {
 		var http = new XMLHttpRequest();
 		http.open("GET", url, true);
@@ -595,7 +544,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		};
 		http.send();
 	}
-
 	function getImageData(img, callback) {
 		function handleBinaryFile(binFile) {
 			var data = findEXIFinJPEG(binFile);
@@ -606,12 +554,10 @@ if (!("classList" in document.documentElement) && window.Element) {
 				callback.call(img);
 			}
 		}
-
 		if (img.src) {
 			if (/^data\:/i.test(img.src)) { // Data URI
 				var arrayBuffer = base64ToArrayBuffer(img.src);
 				handleBinaryFile(arrayBuffer);
-
 			} else if (/^blob\:/i.test(img.src)) { // Object URL
 				var fileReader = new FileReader();
 				fileReader.onload = function(e) {
@@ -640,64 +586,46 @@ if (!("classList" in document.documentElement) && window.Element) {
 				if (debug) console.log("Got file of length " + e.target.result.byteLength);
 				handleBinaryFile(e.target.result);
 			};
-
 			fileReader.readAsArrayBuffer(img);
 		}
 	}
-
 	function findEXIFinJPEG(file) {
 		var dataView = new DataView(file);
-
 		if (debug) console.log("Got file of length " + file.byteLength);
 		if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
 			if (debug) console.log("Not a valid JPEG");
 			return false; // not a valid jpeg
 		}
-
 		var offset = 2,
 			length = file.byteLength,
 			marker;
-
 		while (offset < length) {
 			if (dataView.getUint8(offset) != 0xFF) {
 				if (debug) console.log("Not a valid marker at offset " + offset + ", found: " + dataView.getUint8(offset));
 				return false; // not a valid marker, something is wrong
 			}
-
 			marker = dataView.getUint8(offset + 1);
 			if (debug) console.log(marker);
-
 			// we could implement handling for other markers here,
 			// but we're only looking for 0xFFE1 for EXIF data
-
 			if (marker == 225) {
 				if (debug) console.log("Found 0xFFE1 marker");
-
 				return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
-
 				// offset += 2 + file.getShortAt(offset+2, true);
-
 			} else {
 				offset += 2 + dataView.getUint16(offset+2);
 			}
-
 		}
-
 	}
-
 	function findIPTCinJPEG(file) {
 		var dataView = new DataView(file);
-
 		if (debug) console.log("Got file of length " + file.byteLength);
 		if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
 			if (debug) console.log("Not a valid JPEG");
 			return false; // not a valid jpeg
 		}
-
 		var offset = 2,
 			length = file.byteLength;
-
-
 		var isFieldSegmentStart = function(dataView, offset){
 			return (
 				dataView.getUint8(offset) === 0x38 &&
@@ -708,11 +636,8 @@ if (!("classList" in document.documentElement) && window.Element) {
 				dataView.getUint8(offset+5) === 0x04
 			);
 		};
-
 		while (offset < length) {
-
 			if ( isFieldSegmentStart(dataView, offset )){
-
 				// Get the length of the name header (which is padded to an even number of bytes)
 				var nameHeaderLength = dataView.getUint8(offset+7);
 				if(nameHeaderLength % 2 !== 0) nameHeaderLength += 1;
@@ -721,22 +646,14 @@ if (!("classList" in document.documentElement) && window.Element) {
 					// Always 4
 					nameHeaderLength = 4;
 				}
-
 				var startOffset = offset + 8 + nameHeaderLength;
 				var sectionLength = dataView.getUint16(offset + 6 + nameHeaderLength);
-
 				return readIPTCData(file, startOffset, sectionLength);
-
 				break;
-
 			}
-
-
 			// Not the marker, continue searching
 			offset++;
-
 		}
-
 	}
 	var IptcFieldMap = {
 		0x78 : 'caption',
@@ -777,21 +694,16 @@ if (!("classList" in document.documentElement) && window.Element) {
 						data[fieldName] = fieldValue;
 					}
 				}
-
 			}
 			segmentStartPos++;
 		}
 		return data;
 	}
-
-
-
 	function readTags(file, tiffStart, dirStart, strings, bigEnd) {
 		var entries = file.getUint16(dirStart, !bigEnd),
 			tags = {},
 			entryOffset, tag,
 			i;
-
 		for (i=0;i<entries;i++) {
 			entryOffset = dirStart + i*12 + 2;
 			tag = strings[file.getUint16(entryOffset, !bigEnd)];
@@ -800,8 +712,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		}
 		return tags;
 	}
-
-
 	function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
 		var type = file.getUint16(entryOffset+2, !bigEnd),
 			numValues = file.getUint32(entryOffset+4, !bigEnd),
@@ -809,7 +719,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 			offset,
 			vals, val, n,
 			numerator, denominator;
-
 		switch (type) {
 			case 1: // byte, 8-bit unsigned int
 			case 7: // undefined, 8-bit byte, value depending on field
@@ -823,11 +732,9 @@ if (!("classList" in document.documentElement) && window.Element) {
 					}
 					return vals;
 				}
-
 			case 2: // ascii, 8-bit byte
 				offset = numValues > 4 ? valueOffset : (entryOffset + 8);
 				return getStringFromDB(file, offset, numValues-1);
-
 			case 3: // short, 16 bit int
 				if (numValues == 1) {
 					return file.getUint16(entryOffset + 8, !bigEnd);
@@ -839,7 +746,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 					}
 					return vals;
 				}
-
 			case 4: // long, 32 bit int
 				if (numValues == 1) {
 					return file.getUint32(entryOffset + 8, !bigEnd);
@@ -850,7 +756,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 					}
 					return vals;
 				}
-
 			case 5:    // rational = two long values, first is numerator, second is denominator
 				if (numValues == 1) {
 					numerator = file.getUint32(valueOffset, !bigEnd);
@@ -870,7 +775,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 					}
 					return vals;
 				}
-
 			case 9: // slong, 32 bit signed int
 				if (numValues == 1) {
 					return file.getInt32(entryOffset + 8, !bigEnd);
@@ -881,7 +785,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 					}
 					return vals;
 				}
-
 			case 10: // signed rational, two slongs, first is numerator, second is denominator
 				if (numValues == 1) {
 					return file.getInt32(valueOffset, !bigEnd) / file.getInt32(valueOffset+4, !bigEnd);
@@ -894,7 +797,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 				}
 		}
 	}
-
 	function getStringFromDB(buffer, start, length) {
 		var outstr = "";
 		for (n = start; n < start+length; n++) {
@@ -902,18 +804,15 @@ if (!("classList" in document.documentElement) && window.Element) {
 		}
 		return outstr;
 	}
-
 	function readEXIFData(file, start) {
 		if (getStringFromDB(file, start, 4) != "Exif") {
 			if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
 			return false;
 		}
-
 		var bigEnd,
 			tags, tag,
 			exifData, gpsData,
 			tiffOffset = start + 6;
-
 		// test for TIFF validity and endianness
 		if (file.getUint16(tiffOffset) == 0x4949) {
 			bigEnd = false;
@@ -923,21 +822,16 @@ if (!("classList" in document.documentElement) && window.Element) {
 			if (debug) console.log("Not valid TIFF data! (no 0x4949 or 0x4D4D)");
 			return false;
 		}
-
 		if (file.getUint16(tiffOffset+2, !bigEnd) != 0x002A) {
 			if (debug) console.log("Not valid TIFF data! (no 0x002A)");
 			return false;
 		}
-
 		var firstIFDOffset = file.getUint32(tiffOffset+4, !bigEnd);
-
 		if (firstIFDOffset < 0x00000008) {
 			if (debug) console.log("Not valid TIFF data! (First offset less than 8)", file.getUint32(tiffOffset+4, !bigEnd));
 			return false;
 		}
-
 		tags = readTags(file, tiffOffset, tiffOffset + firstIFDOffset, TiffTags, bigEnd);
-
 		if (tags.ExifIFDPointer) {
 			exifData = readTags(file, tiffOffset, tiffOffset + tags.ExifIFDPointer, ExifTags, bigEnd);
 			for (tag in exifData) {
@@ -959,12 +853,10 @@ if (!("classList" in document.documentElement) && window.Element) {
 					case "FileSource" :
 						exifData[tag] = StringValues[tag][exifData[tag]];
 						break;
-
 					case "ExifVersion" :
 					case "FlashpixVersion" :
 						exifData[tag] = String.fromCharCode(exifData[tag][0], exifData[tag][1], exifData[tag][2], exifData[tag][3]);
 						break;
-
 					case "ComponentsConfiguration" :
 						exifData[tag] =
 							StringValues.Components[exifData[tag][0]] +
@@ -976,7 +868,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 				tags[tag] = exifData[tag];
 			}
 		}
-
 		if (tags.GPSInfoIFDPointer) {
 			gpsData = readTags(file, tiffOffset, tiffOffset + tags.GPSInfoIFDPointer, GPSTags, bigEnd);
 			for (tag in gpsData) {
@@ -991,13 +882,10 @@ if (!("classList" in document.documentElement) && window.Element) {
 				tags[tag] = gpsData[tag];
 			}
 		}
-
 		return tags;
 	}
-
 	EXIF.getData = function(img, callback) {
 		if ((img instanceof Image || img instanceof HTMLImageElement) && !img.complete) return false;
-
 		if (!imageHasData(img)) {
 			getImageData(img, callback);
 		} else {
@@ -1007,12 +895,10 @@ if (!("classList" in document.documentElement) && window.Element) {
 		}
 		return true;
 	}
-
 	EXIF.getTag = function(img, tag) {
 		if (!imageHasData(img)) return;
 		return img.exifdata[tag];
 	}
-
 	EXIF.getAllTags = function(img) {
 		if (!imageHasData(img)) return {};
 		var a,
@@ -1025,7 +911,6 @@ if (!("classList" in document.documentElement) && window.Element) {
 		}
 		return tags;
 	}
-
 	EXIF.pretty = function(img) {
 		if (!imageHasData(img)) return "";
 		var a,
@@ -1046,18 +931,16 @@ if (!("classList" in document.documentElement) && window.Element) {
 		}
 		return strPretty;
 	}
-
 	EXIF.readFromBinaryFile = function(file) {
 		return findEXIFinJPEG(file);
 	}
-
 	if (typeof define === 'function' && define.amd) {
 		define('exif-js', [], function() {
 			return EXIF;
 		});
 	}
 }.call(this));
-;onix = (function() {
+onix = (function() {
 	/**
 	 * Main framework object.
 	 * 
@@ -1067,110 +950,79 @@ if (!("classList" in document.documentElement) && window.Element) {
 		/**
 		 * All objects
 		 *
-		 * @type {Array}
-		 * @member onix
-		 * @private
-		 */
-		this._allObj = [];
-
-		/**
-		 * All processed objects
-		 *
 		 * @type {Object}
 		 * @member onix
 		 * @private
 		 */
 		this._objects = {};
-
 		/**
-		 * Config name
+		 * All run objects
 		 *
+		 * @type {Object}
 		 * @member onix
 		 * @private
 		 */
-		this._CONFIG_NAME = "$config";
-	};
-
-	/**
-	 * App types
-	 *
-	 * @property {Object}
-	 * @param {Number} SERVICE
-	 * @param {Number} FACTORY
-	 * @param {Number} CONSTANT
-	 * @param {Number} RUN
-	 * @member onix
-	 */
-	onix.TYPES = {
-		SERVICE: 1,
-		FACTORY: 2,
-		CONSTANT: 3,
-		RUN: 4
-	};
-
-	/**
-	 * Init function
-	 *
-	 * @member onix
-	 */
-	onix.prototype.init = function() {
-		// pred DOM loadem
-		this._objects[this._CONFIG_NAME] = {};
-
+		this._runs = [];
+		/**
+		 * All config objectss
+		 *
+		 * @type {Object}
+		 * @member onix
+		 * @private
+		 */
+		this._configs = [];
+		/**
+		 * Constants: provider name and types
+		 *
+		 * @property {Object}
+		 * @type {Object}
+		 * @member onix
+		 * @private
+		 */
+		this._CONST = {
+			PROVIDER_NAME: "Provider",
+			TYPE: {
+				PROVIDER: 1,
+				SERVICE: 2,
+				FACTORY: 3,
+				CONSTANT: 4,
+				VALUE: 5,
+				CONFIG: 6,
+				RUN: 7
+			}
+		};
+		// bind DOM ready
 		document.addEventListener("DOMContentLoaded", this._domLoad.bind(this));
 	};
-
-
 	/**
-	 * Dependency injection bind
-	 *
-	 * @param  {Function|Array} param
-	 * @param  {Object} [replace]
-	 * @return {Object}
-	 * @member onix
+	 * Parse param for injections and function
+	 * 
+	 * @param  {Array|Function} param
+	 * @return {Object} Parsed object
 	 */
-	onix.prototype.bindDI = function(param, replace) {
+	onix.prototype._parseParam = function(param) {
 		var fn;
-		var args = [];
-
-		replace = replace || {};
-
+		var inject = [];
 		if (Array.isArray(param)) {
 			param.every(function(item) {
 				if (typeof item === "function") {
 					fn = item;
 					return false;
 				}
-				else {
-					args.push(item in replace ? replace[item] : this._objects[item]);
+				else if (typeof item === "string") {
+					inject.push(item);
 				}
-
 				return true;
 			}, this);
 		}
 		else {
 			fn = param;
 		}
-
-		/**
-		 * Run new binded function - with the new
-		 * 
-		 * @param  {Function|Object} [scope] 
-		 * @param  {Boolean} [callWithNew] 
-		 * @return {Function}
-		 */
-		return function(scope, callWithNew) {
-			if (callWithNew) {
-				var obj = Object.create(fn.prototype);
-				fn.apply(obj, args);
-				return obj;
-			}
-			else {
-				return fn.apply(scope || fn, args);
-			}
-		};
+		return {
+			fn: fn,
+			inject: inject
+		}
 	};
-
 	/**
 	 * Event - Dom LOAD
 	 *
@@ -1178,110 +1030,121 @@ if (!("classList" in document.documentElement) && window.Element) {
 	 * @private
 	 */
 	onix.prototype._domLoad = function() {
-		var runs = [];
-
-		// process all inner items
-		this._allObj.forEach(function(item) {
-			// only 2 types
-			switch (item.type) {
-				case onix.TYPES.SERVICE:
-					this._objects[item.name] = this.bindDI(item.param)(null, true);
-					break;
-
-				case onix.TYPES.FACTORY:
-					this._objects[item.name] = this.bindDI(item.param)();
-					break;
-
-				case onix.TYPES.CONSTANT:
-					this._objects[item.name] = item.param;
-					break;
-
-				case onix.TYPES.RUN:
-					runs.push(item.param);
-					break;
+		// promise -> runs
+		this._configs.forEach(function(config) {
+			this._run(config, true);
+		}, this);
+		this._runs.forEach(function(run) {
+			this._run(run);
+		}, this);
+	};
+	/**
+	 * Run object configuration; returns his cache (data)
+	 * 
+	 * @param  {Object}  obj Object configuration
+	 * @param  {Boolean} isConfig Is config phase?
+	 * @return {Object}
+	 */
+	onix.prototype._run = function(obj, isConfig) {
+		var inject = [];
+		if (obj.provider) {
+			var providerObj = this._objects[obj.provider];
+			if (!providerObj.cache) {
+				var providerFn = providerObj.fn || this.noop;
+				providerObj.cache = new providerFn();
 			}
-		}, this);
-
-		// delete them
-		this._allObj.length = 0;
-
-		// onix main run
-		this.bindDI(this._run)(this);
-
-		// run all runs
-		runs.forEach(function(run) {
-			this.bindDI(run)();
-		}, this);
-
-		//testTempl
+			var getFn = providerObj.cache["$get"] || this.noop;
+			var pp = this._parseParam(getFn);
+			obj.fn = pp.fn;
+			obj.inject = pp.inject;
+			delete obj.provider;
+		}
+		if (obj.inject && obj.inject.length) {
+			obj.inject.forEach(function(objName) {
+				var injObj = this._objects[objName];
+				inject.push(this._run(injObj, isConfig));
+			}, this);
+		}
+		// config phase
+		if (isConfig) {
+			switch (obj.type) {
+				case this._CONST.TYPE.PROVIDER:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = new fn();
+					}
+					return obj.cache;
+					break;
+				case this._CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+				case this._CONST.TYPE.CONFIG:
+					var fn = obj.fn || this.noop;
+					obj.cache = fn.apply(fn, inject);
+					break;
+				default:
+					return null;
+			}
+		}
+		// run phase
+		else {
+			switch (obj.type) {
+				case this._CONST.TYPE.FACTORY:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = fn.apply(fn, inject);
+					}
+					return obj.cache;
+					break;
+				case this._CONST.TYPE.SERVICE:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						var serviceObj = Object.create(fn.prototype);
+						fn.apply(serviceObj, inject);
+						obj.cache = serviceObj;
+					}
+					return obj.cache;
+					break;
+				case this._CONST.TYPE.VALUE:
+					return obj.cache;
+					break;
+				case this._CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+				case this._CONST.TYPE.RUN:
+					var fn = obj.fn || this.noop;
+					obj.cache = fn.apply(fn, inject);
+					break;
+				default:
+					return null;
+			}
+		}
 	};
-
 	/**
-	 * Main access point in the framework
+	 * Add service to the application.
 	 *
+	 * @param  {String} name 
+	 * @param  {Function} param
 	 * @member onix
-	 * @private
 	 */
-	onix.prototype._run = [
-		"$i18n",
-		"$template",
-		"$loader",
-		"$route",
-		"$myQuery",
-	function(
-		$i18n,
-		$template,
-		$loader,
-		$route,
-		$myQuery
-	) {
-		/**
-		 * Quick acces to myQuery and DOM manipulation
-		 *
-		 * @param  {String|HTMLElement|Array} value
-		 * @param {HTMLElement} [parent]
-		 * @return {$myQuery}
-		 * @member onix
-		 * @property {Function}
-		 */
-		this.element = function(value, parent) {
-			return new $myQuery.get(value, parent);
+	onix.prototype.provider = function(name, param) {
+		var pp = this._parseParam(param);
+		this._objects[name + this._CONST.PROVIDER_NAME] = {
+			name: name + this._CONST.PROVIDER_NAME,
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: this._CONST.TYPE.PROVIDER
 		};
-
-		// inits
-		$loader.init();
-		$template.init();
-
-		/**
-		 * Get text function. Translate for the current language and the key.
-		 *
-		 * @param  {String} key
-		 * @param  {Object} [replace] Replace all {} in the string
-		 * @return {String}
-		 * @member window
-		 * @property {Function}
-		 */
-		window._ = $i18n._.bind($i18n);
-	}];
-
-	/**
-	 * Read/add config to the onix application.
-	 *
-	 * @param  {Object|String} obj
-	 * @member onix
-	 */
-	onix.prototype.config = function(obj) {
-		if (typeof obj === "string") {
-			// obj is key
-			return this._objects[this._CONFIG_NAME][obj];
-		}
-		else if (typeof obj === "object") {
-			Object.keys(obj).forEach(function(key) {
-				this._objects[this._CONFIG_NAME][key] = obj[key];
-			}.bind(this));
-		}
+		this._objects[name] = {
+			name: name,
+			inject: null,
+			fn: null,
+			cache: null,
+			provider: name + this._CONST.PROVIDER_NAME,
+			type: this._CONST.TYPE.FACTORY
+		};
 	};
-
 	/**
 	 * Add service to the application.
 	 *
@@ -1290,13 +1153,15 @@ if (!("classList" in document.documentElement) && window.Element) {
 	 * @member onix
 	 */
 	onix.prototype.service = function(name, param) {
-		this._allObj.push({
+		var pp = this._parseParam(param);
+		this._objects[name] = {
 			name: name,
-			param: param,
-			type: onix.TYPES.SERVICE
-		});
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: this._CONST.TYPE.SERVICE
+		};
 	};
-
 	/**
 	 * Add factory to the application.
 	 *
@@ -1305,13 +1170,15 @@ if (!("classList" in document.documentElement) && window.Element) {
 	 * @member onix
 	 */
 	onix.prototype.factory = function(name, param) {
-		this._allObj.push({
+		var pp = this._parseParam(param);
+		this._objects[name] = {
 			name: name,
-			param: param,
-			type: onix.TYPES.FACTORY
-		});
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: this._CONST.TYPE.FACTORY
+		};
 	};
-
 	/**
 	 * Add new constant
 	 * 
@@ -1320,13 +1187,40 @@ if (!("classList" in document.documentElement) && window.Element) {
 	 * @member onix
 	 */
 	onix.prototype.constant = function(name, obj) {
-		this._allObj.push({
+		this._objects[name] = {
 			name: name,
-			param: obj,
-			type: onix.TYPES.CONSTANT
+			cache: obj,
+			type: this._CONST.TYPE.CONSTANT
+		};
+	};
+	/**
+	 * Add new value
+	 * 
+	 * @param  {String} name
+	 * @param  {Object} param
+	 * @member onix
+	 */
+	onix.prototype.value = function(name, obj) {
+		this._objects[name] = {
+			name: name,
+			cache: obj,
+			type: this._CONST.TYPE.VALUE
+		};
+	};
+	/**
+	 * Add a new config
+	 * 
+	 * @param  {Array|Function} param With DI
+	 * @member onix
+	 */
+	onix.prototype.config = function(param) {
+		var pp = this._parseParam(param);
+		this._configs.push({
+			fn: pp.fn,
+			inject: pp.inject,
+			type: this._CONST.TYPE.CONFIG
 		});
 	};
-
 	/**
 	 * Add a new run
 	 * 
@@ -1334,34 +1228,20 @@ if (!("classList" in document.documentElement) && window.Element) {
 	 * @member onix
 	 */
 	onix.prototype.run = function(param) {
-		this._allObj.push({
-			param: param,
-			type: onix.TYPES.RUN
+		var pp = this._parseParam(param);
+		this._runs.push({
+			fn: pp.fn,
+			inject: pp.inject,
+			type: this._CONST.TYPE.RUN
 		});
 	};
-
-	/**
-	 * Get object
-	 *
-	 * @param  {String} name
-	 * @return {Function|Object} 
-	 * @member onix
-	 */
-	onix.prototype.getObject = function(name) {
-		name = name || "";
-
-		return this._objects[name];
-	};
-
 	/**
 	 * Empty function
 	 *
 	 * @member onix
 	 */
 	onix.prototype.noop = function() {
-
 	};
-
 	/**
 	 * Framework info.
 	 *
@@ -1369,44 +1249,21 @@ if (!("classList" in document.documentElement) && window.Element) {
 	 */
 	onix.prototype.info = function() {
 		console.log(
-			"Onix JS Framework\n" +
-			"Version: 2.2.1\n" +
-			"Date: 19. 4. 2016"
+			"OnixJS framework\n" +
+			"2.2.2/27. 4. 2016\n" +
+			"source: https://gitlab.com/LorDOniX/onix\n" +
+			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);
 	};
-
-	var onixInst = new onix();
-
-	// init app
-	onixInst.init();
-
-	return onixInst;
+	return new onix()
 })();
-;/**
- * Main framework configuration
- * 
- * @class CONFIG
- */
-onix.config({
-	/**
-	 * Template delimiter
-	 *
-	 * @type {Object}
-	 * @member CONFIG
-	 */
-	TMPL_DELIMITER: {
-		LEFT: "{{",
-		RIGHT: "}}"
-	}
-});
-;/**
+/**
  * @class $localStorage
  *
  * Cover class for localStorage
  */
 onix.service("$localStorage", function() {
 	this._disable = !("localStorage" in window);
-
 	/**
 	 * Set value to localStorage
 	 *
@@ -1416,10 +1273,8 @@ onix.service("$localStorage", function() {
 	 */
 	this.set = function(key, value) {
 		if (this._disable || !key) return;
-
 		localStorage.setItem(key, value);
 	};
-
 	/**
 	 * Get value from localStorage
 	 *
@@ -1429,10 +1284,8 @@ onix.service("$localStorage", function() {
 	 */
 	this.get = function(key) {
 		if (this._disable || !key) return null;
-
 		return localStorage.getItem(key);
 	};
-
 	/**
 	 * Remove key from localStorage
 	 *
@@ -1442,11 +1295,10 @@ onix.service("$localStorage", function() {
 	 */
 	this.remove = function(key) {
 		if (this._disable || !key) return null;
-
 		return localStorage.removeItem(key);
 	};
 });
-;onix.factory("$q", function() {
+onix.factory("$q", function() {
 	/**
 	 * @class $q
 	 *
@@ -1464,17 +1316,13 @@ onix.service("$localStorage", function() {
 			RESOLVED: 1,
 			REJECTED: 2
 		};
-
 		// current state
 		this._state = this._E_STATES.IDLE;
-
 		// all funcs
 		this._funcs = [];
-
 		// done data
 		this._finishData = null;
 	};
-
 	/**
 	 * Resolve all functions
 	 *
@@ -1488,12 +1336,10 @@ onix.service("$localStorage", function() {
 				(fnItem.fn)(this._finishData);
 			}
 		}, this);
-		
 		// clear array
 		this._funcs.length = 0;
 		this._state = isError ? this._E_STATES.REJECTED : this._E_STATES.RESOLVED;
 	};
-
 	/**
 	 * Is promise already finished?
 	 *
@@ -1506,7 +1352,6 @@ onix.service("$localStorage", function() {
 			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
 		}
 	};
-
 	/**
 	 * Resolve promise using obj
 	 *
@@ -1517,7 +1362,6 @@ onix.service("$localStorage", function() {
 		this._finishData = obj;
 		this._resolveFuncs(false);
 	};
-
 	/**
 	 * Reject promise using obj
 	 *
@@ -1528,7 +1372,6 @@ onix.service("$localStorage", function() {
 		this._finishData = obj;
 		this._resolveFuncs(true);
 	};
-
 	/**
 	 * After promise resolve/reject call then (okFn, errorFn)
 	 *
@@ -1544,19 +1387,15 @@ onix.service("$localStorage", function() {
 				isError: false
 			});
 		}
-
 		if (cbError && typeof cbError === "function") {
 			this._funcs.push({
 				fn: cbError,
 				isError: true
 			});
 		}
-
 		this._isAlreadyFinished();
-		
 		return this;
 	};
-
 	/**
 	 * After promise resolve call then cbOk
 	 *
@@ -1569,12 +1408,9 @@ onix.service("$localStorage", function() {
 			fn: cbOk,
 			isError: false
 		});
-
 		this._isAlreadyFinished();
-
 		return this;
 	};
-
 	/**
 	 * After promise reject call then cbError
 	 *
@@ -1587,12 +1423,9 @@ onix.service("$localStorage", function() {
 			fn: cbError,
 			isError: true
 		});
-
 		this._isAlreadyFinished();
-
 		return this;
 	};
-
 	/**
 	 * Finally for promise
 	 *
@@ -1605,12 +1438,9 @@ onix.service("$localStorage", function() {
 			fn: cb,
 			"finally": true
 		});
-
 		this._isAlreadyFinished();
-
 		return this;
 	};
-	
 	return {
 		/**
 		 * Resolve all promises in the array
@@ -1621,17 +1451,14 @@ onix.service("$localStorage", function() {
 		 */
 		all: function(promises) {
 			var promise = new $promise();
-
 			if (Array.isArray(promises)) {
 				var count = promises.length;
 				var test = function() {
 					count--;
-
 					if (count == 0) {
 						promise.resolve();
 					}
 				};
-
 				promises.forEach(function(item) {
 					item["finally"](test);
 				});
@@ -1639,10 +1466,8 @@ onix.service("$localStorage", function() {
 			else {
 				promise.resolve();
 			}
-
 			return promise;
 		},
-
 		/**
 		 * Deferable object of the promise
 		 *
@@ -1651,10 +1476,20 @@ onix.service("$localStorage", function() {
 		 */
 		defer: function() {
 			return new $promise();
+		},
+		/**
+		 * Is object promise?
+		 * 
+		 * @param  {Object}  obj Tested object
+		 * @return {Boolean}
+		 * @member $q
+		 */
+		isPromise: function(obj) {
+			return obj instanceof $promise;
 		}
 	};
 });
-;onix.factory("$job", [
+onix.factory("$job", [
 	"$q",
 function(
 	$q
@@ -1672,7 +1507,6 @@ function(
 			scope: null
 		};
 	};
-
 	/**
 	 * Add task to JOB
 	 * 
@@ -1683,18 +1517,15 @@ function(
 	 */
 	$job.prototype.add = function(task, scope, args) {
 		args = args || [];
-
 		if (!Array.isArray(args)) {
 			args = [args];
 		}
-
 		this._tasks.push({
 			task: task,
 			scope: scope,
 			args: args
 		});
 	};
-
 	/**
 	 * Start job.
 	 *
@@ -1702,15 +1533,11 @@ function(
 	 */
 	$job.prototype.start = function() {
 		if (!this._tasks.length) return;
-
 		// kvuli pop
 		this._tasks.reverse();
-
 		this._doJob();
-
 		return this._donePromise;
 	};
-
 	/**
 	 * Clear all job taks.
 	 *
@@ -1719,7 +1546,6 @@ function(
 	$job.prototype.clear = function() {
 		this._tasks = [];
 	};
-
 	/**
 	 * Set progress function, which will be called after each task will be done
 	 * 
@@ -1731,7 +1557,6 @@ function(
 		this._taskDone.cb = cb;
 		this._taskDone.scope = scope;
 	};
-
 	/**
 	 * Internal function for running job queue.
 	 *
@@ -1739,27 +1564,21 @@ function(
 	 */
 	$job.prototype._doJob = function() {
 		var rest = this._tasks.length;
-
 		if (rest == 0) {
 			this._donePromise.resolve();
 		}
 		else {
 			var job = this._tasks.pop();
-
 			var doneFn = function() {
 				if (this._taskDone.cb) {
 					var doneFnArgs = Array.prototype.slice.call(arguments, 0);
-
 					this._taskDone.cb.apply(this._taskDone.scope || this._taskDone.cb, doneFnArgs);
 				}
-
 				this._doJob();
 			}.bind(this);
-
 			job.task.apply(job.scope || job.task, job.args.concat(doneFn));
 		}
 	};
-
 	return {
 		/**
 		 * Factory for creating new Job
@@ -1771,7 +1590,7 @@ function(
 		}
 	};
 }]);
-;onix.factory("$myQuery", function() {
+onix.factory("$myQuery", function() {
 	/**
 	 * DOM manipulation in the style of jquery.
 	 * 
@@ -1784,7 +1603,6 @@ function(
 	var $myQuery = function(value, parent) {
 		this._els = [];
 		parent = parent || document;
-
 		if (typeof value === "string") {
 			this._els = parent.querySelectorAll(value);
 		}
@@ -1792,13 +1610,10 @@ function(
 			this._els = value;
 		}
 		else {
-			// node element todo
 			this._els.push(value);
 		}
-
 		return this;
 	};
-
 	/**
 	 * Operation on elements
 	 * 
@@ -1812,12 +1627,10 @@ function(
 		if (!Array.isArray(this._els)) {
 			this._els = Array.prototype.slice.call(this._els);
 		}
-
 		this._els.forEach(function(item, ind) {
 			cb.apply(scope || cb, [item, ind]);
 		});
 	};
-
 	/**
 	 * Set or get all - cover function.
 	 * 
@@ -1832,16 +1645,13 @@ function(
 			this._operation(function(item) {
 				item[attr] = newValue;
 			});
-
 			return this;
 		}
 		else {
 			var values = [];
-
 			this._operation(function(item) {
 				values.push(item[attr]);
 			});
-
 			if (!values.length) {
 				return null;
 			}
@@ -1853,7 +1663,6 @@ function(
 			}
 		}
 	};
-
 	/**
 	 * Get original element.
 	 *
@@ -1863,7 +1672,6 @@ function(
 	 */
 	$myQuery.prototype.getEl = function(ind) {
 		ind = ind || 0;
-
 		if (ind > this._els.length) {
 			return null;
 		}
@@ -1871,7 +1679,6 @@ function(
 			return this._els[ind];
 		}
 	};
-
 	/**
 	 * Get or set attribute
 	 *
@@ -1886,16 +1693,13 @@ function(
 			this._operation(function(item) {
 				item.setAttribute(name, newValue);
 			});
-
 			return this;
 		}
 		else {
 			var values = [];
-
 			this._operation(function(item) {
 				values.push(item.getAttribute(name));
 			});
-
 			if (!values.length) {
 				return null;
 			}
@@ -1907,7 +1711,6 @@ function(
 			}
 		}
 	};
-
 	/**
 	 * Get or set src
 	 * 
@@ -1918,7 +1721,6 @@ function(
 	$myQuery.prototype.src = function(newValue) {
 		return this._setGetAll(newValue, "src");
 	};
-
 	/**
 	 * Hide element
 	 * 
@@ -1929,10 +1731,8 @@ function(
 		this._operation(function(item) {
 			item.style.display = "none";
 		});
-
 		return this;
 	};
-
 	/**
 	 * Show element
 	 *
@@ -1944,10 +1744,8 @@ function(
 		this._operation(function(item) {
 			item.style.display = displayStyle || "";
 		});
-
 		return this;
 	};
-
 	/**
 	 * Get or set value
 	 *
@@ -1959,7 +1757,6 @@ function(
 	$myQuery.prototype.val = function(newValue) {
 		return this._setGetAll(newValue, "value");
 	};
-
 	/**
 	 * Get or set HTML
 	 * 
@@ -1970,10 +1767,8 @@ function(
 	$myQuery.prototype.html = function(newValue) {
 		return this._setGetAll(newValue, "innerHTML");
 	};
-
 	/**
 	 * Append another element to this one
-	 * TODO: cannot use on n elements
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -1983,10 +1778,8 @@ function(
 		this._operation(function(item) {
 			item.appendChild(child);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Add CSS class
 	 *
@@ -1998,10 +1791,8 @@ function(
 		this._operation(function(item) {
 			item.classList.add(className);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Remove CSS class
 	 *
@@ -2013,10 +1804,8 @@ function(
 		this._operation(function(item) {
 			item.classList.remove(className);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Toggle CSS class
 	 *
@@ -2028,10 +1817,8 @@ function(
 		this._operation(function(item) {
 			item.classList.toggle(className);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Get width
 	 * 
@@ -2040,14 +1827,11 @@ function(
 	 */
 	$myQuery.prototype.width = function() {
 		var width = 0;
-
 		this._operation(function(item) {
 			width += item.offsetWidth;
 		});
-
 		return width;
 	};
-
 	/**
 	 * Get height
 	 * 
@@ -2056,14 +1840,11 @@ function(
 	 */
 	$myQuery.prototype.height = function() {
 		var height = 0;
-
 		this._operation(function(item) {
 			height += item.offsetHeight;
 		});
-
 		return height;
 	};
-
 	/**
 	 * Click event
 	 *
@@ -2078,10 +1859,8 @@ function(
 				cb.apply(scope || cb, [event, item]);
 			});
 		});
-
 		return this;
 	};
-
 	/**
 	 * Change event
 	 *
@@ -2096,10 +1875,8 @@ function(
 				cb.apply(scope || cb, [event, item]);
 			});
 		});
-
 		return this;
 	};
-
 	/**
 	 * Foreach
 	 *
@@ -2112,10 +1889,8 @@ function(
 		this._operation(function(item, ind) {
 			cb.apply(scope || cb, [item, ind]);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Remove element
 	 *
@@ -2126,10 +1901,8 @@ function(
 		this._operation(function(item) {
 			item.parentNode.removeChild(item);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Prepend element
 	 *
@@ -2141,10 +1914,8 @@ function(
 		this._operation(function(item) {
 			item.parentNode.insertBefore(child, item);
 		});
-
 		return this;
 	};
-
 	/**
 	 * Empty element - clear all its children.
 	 * Much faster than innerHTML = "".
@@ -2158,10 +1929,8 @@ function(
 				item.removeChild(item.firstChild);
 			}
 		});
-
 		return this;
 	};
-
 	/**
 	 * Get all elements length
 	 * 
@@ -2171,7 +1940,18 @@ function(
 	$myQuery.prototype.len = function() {
 		return this._els.length;
 	};
-
+	/**
+	 * Quick acces to myQuery and DOM manipulation
+	 *
+	 * @param  {String|HTMLElement|Array} value
+	 * @param {HTMLElement} [parent]
+	 * @return {$myQuery}
+	 * @member onix
+	 * @property {Function}
+	 */
+	onix.element = function(value, parent) {
+		return new $myQuery(value, parent);
+	};
 	return {
 		 /**
 		 * Main cover function
@@ -2186,7 +1966,9 @@ function(
 		}
 	};
 });
-;/**
+// needs to be cached
+onix.run(["$myQuery", function($myQuery) {}]);
+/**
  * @class $dom
  *
  * Class for creating DOM elements and getting their references.
@@ -2207,37 +1989,30 @@ onix.service("$dom", function() {
 	 */
 	this.create = function(config, exported) {
 		var el = document.createElement(config.el);
-
 		Object.keys(config).forEach(function(key) {
 			switch (key) {
 				case "el":
 					break;
-
 				case "attrs":
 					Object.keys(config.attrs).forEach(function(attr) {
 						el.setAttribute(attr, config.attrs[attr]);
 					});
 					break;
-
 				case "events":
 					config.events.forEach(function(item) {
 						el.addEventListener(item.event, item.fn);
 					});
 					break;
-
 				case "child":
 					config.child.forEach(function(child) {
 						el.appendChild(this.create(child, exported));
 					}, this);
 					break;
-
 				case "_exported":
 					exported[config._exported] = el;
 					break;
-
 				case "class":
 					var value = config["class"];
-
 					if (typeof value === "string") {
 						el.classList.add(value);
 					}
@@ -2247,15 +2022,12 @@ onix.service("$dom", function() {
 						});
 					}
 					break;
-
 				default:
 					el[key] = config[key];
 			}
 		}, this);
-
 		return el;
 	};
-
 	/**
 	 * Get element from the document.
 	 *
@@ -2267,38 +2039,32 @@ onix.service("$dom", function() {
 	this.get = function(els, parent) {
 		var output;
 		parent = parent || document;
-
 		if (typeof els === "string" && els) {
 			output = parent.querySelector(els);
 		}
 		else if (Array.isArray(els)) {
 			output = {};
-
 			els.forEach(function(item) {
 				if (typeof item === "string") {
 					var name = item.replace(/^[.# ]+/g, "");
-
 					output[name] = parent.querySelector(item);
 				}
 				else {
 					var name = item.sel.replace(/^[.# ]+/g, "");
-
 					output[item.name || name] = parent.querySelector(item.sel);
 				}
 			});
 		}
-
 		return output;
 	};
 });
-;/**
+/**
  * @class $location
  *
  * Support class for location operations.
  */
 onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
-	
 	/**
 	 * Page refresh
 	 *
@@ -2307,7 +2073,6 @@ onix.service("$location", function() {
 	this.refresh = function() {
 		window.location.reload();
 	};
-
 	/**
 	 * Create a new search url
 	 * 
@@ -2317,22 +2082,18 @@ onix.service("$location", function() {
 	 */
 	this.createSearchURL = function(obj) {
 		var newURL = [];
-
 		if (obj) {
 			// write
 			var newURL = [];
-
 			Object.keys(obj).forEach(function(key) {
 				newURL.push(key + "=" + encodeURIComponent(obj[key]));
 			});
 		}
-
 		if (newURL.length) {
 			return "?" + newURL.join("&");
 		}
 		else return "";
 	};
-
 	/**
 	 * Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url
 	 *
@@ -2344,7 +2105,6 @@ onix.service("$location", function() {
 		if (obj) {
 			// write
 			var newURL = this.createSearchURL(obj);
-
 			if (newURL) {
 				window.location.search = newURL;
 			}
@@ -2353,21 +2113,16 @@ onix.service("$location", function() {
 			// read
 			var data = location.search;
 			var output = {};
-
 			if (data) {
 				data = data.replace("?", "");
-
 				data.split("&").forEach(function(item) {
 					var parts = item.split("=");
-					
 					output[parts[0]] = decodeURIComponent(parts[1]);
 				});
 			}
-
 			return output;
 		}
 	};
-
 	/**
 	 * Get current location
 	 *
@@ -2377,9 +2132,8 @@ onix.service("$location", function() {
 	this.get = function() {
 		return window.location.pathname;
 	};
-	
 });
-;/**
+/**
  * @class $common
  *
  * Commom functions used in whole application.
@@ -2402,16 +2156,13 @@ function(
 			if (source.hasOwnProperty(prop)) {
 				var sourceVal = source[prop];
 				var sourceType = typeof sourceVal;
-
 				// array
 				if (Array.isArray(sourceVal)) {
 					// array - copy object to another array - keep referencings on array, objects
 					var newArray = [];
-
 					sourceVal.forEach(function(item) {
 						newArray.push(item);
 					});
-
 					dest[prop] = newArray;
 				}
 				// not null and object
@@ -2420,7 +2171,6 @@ function(
 					if (!(prop in dest)) {
 						dest[prop] = {};
  					}
-
 					this._objCopy(dest[prop], sourceVal);
 				}
 				else {
@@ -2430,7 +2180,6 @@ function(
 			}
 		}.bind(this));
 	};
-
 	/**
 	 * Get cookie by her name
 	 *
@@ -2441,13 +2190,10 @@ function(
 	 */
 	this.getCookie = function(name) {
 		var cookieValue = null;
-
 		if (document.cookie && document.cookie != '') {
 			var cookies = document.cookie.split(';');
-
 			cookies.every(function(cookie) {
 				cookie = cookie.trim();
-
 				if (cookie.substring(0, name.length + 1) == (name + '=')) {
 					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
 					return false;
@@ -2455,10 +2201,8 @@ function(
 				else return true;
 			});
 		}
-
 		return cookieValue;
 	};
-
 	/**
 	 * Confirm window, returns promise.
 	 *
@@ -2468,17 +2212,14 @@ function(
 	 */
 	this.confirm = function(txt) {
 		var promise = $q.defer();
-
 		if (confirm(txt)) {
 			promise.resolve();
 		}
 		else {
 			promise.reject();
 		}
-
 		return promise;
 	};
-
 	/**
 	 * Create one object from arguments
 	 *
@@ -2490,26 +2231,20 @@ function(
 	 */
 	this.create = function(mainObj, a, b) {
 		var args = [];
-
 		if (a && b && Array.isArray(a)) {
 			// a == dependicies
 			// b == data
-
 			// arguments
 			a.forEach(function(item) {
 				args.push(onix.getObject(item));
 			});
 		}
-
 		// data
 		args.push(mainObj);
-
 		// data override
 		args.push(b || a);
-
 		return this.merge.apply(this, args);
 	};
-
 	/**
 	 * Merge multiple objects into the single one
 	 *
@@ -2519,18 +2254,14 @@ function(
 	this.merge = function() {
 		var count = arguments.length;
 		var dest = {};
-		
 		if (count > 0) {
 			for (var i = 0; i < count; i++) {
 				var source = arguments[i];
-
 				this._objCopy(dest, source);
 			}
 		}
-
 		return dest;
 	};
-
 	/**
 	 * Extend one object by other; from source to dest.
 	 *
@@ -2541,10 +2272,8 @@ function(
 	this.extend = function(dest, source) {
 		dest = dest || {};
 		source = source || {};
-
 		this._objCopy(dest, source);
 	};
-
 	/**
 	 * Bind function arguments without scope
 	 *
@@ -2554,14 +2283,12 @@ function(
 	 */
 	this.bindWithoutScope = function(cb) {
 		var bindArgs = Array.prototype.slice.call(arguments, 1);
-
 		return function () {
 			var internalArgs = Array.prototype.slice.call(arguments, 0);
 			var args = Array.prototype.concat(internalArgs, bindArgs);
 			return cb.apply(this, args);
 		};
 	};
-	
 	/**
 	 * Missing for each for Node array.
 	 *
@@ -2572,14 +2299,12 @@ function(
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
 		cb = cb || function() {};
-		
 		if (nodes) {
 			Array.prototype.slice.call(nodes).forEach(function(item, ind) {
 				cb.apply(scope || cb, [item, ind]);
 			});
 		}
 	};
-
 	/**
 	 * Reverse for each
 	 *
@@ -2591,12 +2316,10 @@ function(
 	this.reverseForEach = function (arr, cb, scope) {
 		arr = arr || [];
 		cb = cb || function() {};
-
 		for (var i = arr.length - 1; i >= 0; i--) {
 			cb.apply(scope || this, [arr[i], i]);
 		}
 	};
-
 	/**
 	 * HEX value to DEC
 	 *
@@ -2606,7 +2329,6 @@ function(
 	 */
 	this.hxToDe = function(hex) {
 		hex = hex.toLowerCase();
-
 		switch (hex) {
 			case "a":
 				return 10;
@@ -2624,7 +2346,6 @@ function(
 				return parseInt(hex, 10);
 		}
 	};
-
 	/**
 	 * HEX value to RGB
 	 *
@@ -2635,7 +2356,6 @@ function(
 	this.hexToRGB = function(hexColor) {
 		if (hexColor[0] == "#") {
 			hexColor = hexColor.replace("#", "");
-
 			if (hexColor.length == 3) {
 				return {
 					r: this.hxToDe(hexColor[0]) * 16 + this.hxToDe(hexColor[0]),
@@ -2655,7 +2375,6 @@ function(
 			return hexColor;
 		}
 	};
-
 	/**
 	 * Is value element?
 	 *
@@ -2666,7 +2385,6 @@ function(
 	this.isElement = function(val) {
 		return (val instanceof HTMLElement);
 	};
-
 	/**
 	 * Is item object?
 	 * 
@@ -2677,8 +2395,6 @@ function(
 	this.isObject = function(item) {
 		return (typeof item === "object" && !Array.isArray(item) && item !== null);
 	};
-
-
 	/**
 	 * Cover function for console.log, which allows to replace {0..n} occurences inside string.
 	 * First argument is string, other arguments are for replace objects by key
@@ -2689,7 +2405,6 @@ function(
 		var args = Array.prototype.slice.call(arguments);
 		var output = "";
 		var params = {};
-
 		args.forEach(function(arg, ind) {
 			if (ind == 0) {
 				output = arg;
@@ -2698,16 +2413,13 @@ function(
 				params["[{]" + (ind - 1) + "[}]"] = arg;
 			}
 		});
-
 		Object.keys(params).forEach(function(param) {
 			output = output.replace(new RegExp(param, "g"), params[param]);
 		});
-
 		if (output) {
 			console.log(output);
 		}
 	};
-
 	/**
 	 * Size to KB/MB.
 	 * 
@@ -2717,10 +2429,8 @@ function(
 	 */
 	this.humanLength = function(size) {
 		size = size || 0;
-
 		var sizeKB = size / 1024;
 		var sizeMB = size / (1024 * 1024);
-
 		if (sizeKB < 1024) {
 			return sizeKB.toFixed(2) + " KB";
 		}
@@ -2728,8 +2438,6 @@ function(
 			return sizeMB.toFixed(2) + " MB";
 		}
 	};
-
-
 	/**
 	 * Chaining multiple methods with promises, returns promise
 	 * 
@@ -2742,12 +2450,9 @@ function(
 	 */
 	this.chainPromises = function(opts) {
 		var promise = $q.defer();
-
 		this._chainPromisesInner(opts, promise, []);
-
 		return promise;
 	};
-
 	/**
 	 * Inner method for chaining promises
 	 * 
@@ -2761,12 +2466,10 @@ function(
 	 */
 	this._chainPromisesInner = function(opts, promise, outArray) {
 		var firstItem = opts.shift();
-
 		if (firstItem) {
 			// string or function itself
 			var fn;
 			var error = false;
-
 			switch (typeof firstItem.method) {
 				case "string":
 					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
@@ -2774,7 +2477,6 @@ function(
 					}
 					else {
 						fn = firstItem.scope[firstItem.method];
-
 						if (typeof fn !== "function") {
 							error = true;
 						}
@@ -2786,7 +2488,6 @@ function(
 				default:
 					error = true;
 			}
-
 			if (!error) {
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
 					outArray.push(data);
@@ -2805,7 +2506,7 @@ function(
 		}
 	};
 }]);
-;/**
+/**
  * @class $notify
  *
  * $notify uses bootstrap alerts and provides additional functionality
@@ -2825,19 +2526,15 @@ function(
 	 */
 	var $notify = function(el) {
 		this._el = el;
-
 		this._HIDE_TIMEOUT = 1500; // [ms]
-
 		this._options = {
 			"ok": "alert-success",
 			"error": "alert-danger",
 			"info": "alert-info",
 			"warn": "alert-warning"
 		};
-
 		return this;
 	};
-
 	/**
 	 * Set value to the notify element
 	 *
@@ -2853,7 +2550,6 @@ function(
 			this._el.innerHTML = txt;
 		}
 	};
-
 	/**
 	 * Reset CSS classes
 	 *
@@ -2863,10 +2559,8 @@ function(
 		Object.keys(this._options).forEach(function(key) {
 			this._el.classList.remove(this._options[key]);
 		}.bind(this));
-
 		return this;
 	};
-
 	/**
 	 * Show OK state
 	 * 
@@ -2875,12 +2569,9 @@ function(
 	 */
 	$notify.prototype.ok = function(txt) {
 		this._el.classList.add(this._options["ok"]);
-		
 		this._setValue(txt);
-
 		return this;
 	};
-
 	/**
 	 * Show ERROR state
 	 * 
@@ -2889,12 +2580,9 @@ function(
 	 */
 	$notify.prototype.error = function(txt) {
 		this._el.classList.add(this._options["error"]);
-		
 		this._setValue(txt);
-
 		return this;
 	};
-
 	/**
 	 * Show INFO state
 	 *
@@ -2903,12 +2591,9 @@ function(
 	 */
 	$notify.prototype.info = function(txt) {
 		this._el.classList.add(this._options["info"]);
-		
 		this._setValue(txt);
-
 		return this;
 	};
-
 	/**
 	 * Show WARNING state
 	 *
@@ -2917,12 +2602,9 @@ function(
 	 */
 	$notify.prototype.warn = function(txt) {
 		this._el.classList.add(this._options["warn"]);
-		
 		this._setValue(txt);
-
 		return this;
 	};
-
 	/**
 	 * Hide alert after timeout and returns promise at the end of operation
 	 *
@@ -2931,16 +2613,12 @@ function(
 	 */
 	$notify.prototype.hide = function() {
 		var promise = $q.defer();
-
 		setTimeout(function() {
 			this.reset();
-			
 			promise.resolve();
 		}.bind(this), this._HIDE_TIMEOUT);
-
 		return promise;
 	};
-
 	/**
 	 * Main public access to the notify obj
 	 *
@@ -2952,7 +2630,7 @@ function(
 		return new $notify(el);
 	};
 }]);
-;onix.factory("$event", [
+onix.factory("$event", [
 	"$common",
 function(
 	$common
@@ -2971,7 +2649,6 @@ function(
 		 * @private
 		 */
 		_allEvents: [],
-
 		/**
 		 * Get all events by his name.
 		 * 
@@ -2981,7 +2658,6 @@ function(
 		 */
 		_getEvents: function (name) {
 			var events = [];
-
 			this._allEvents.forEach(function(item, ind) {
 				if (name == item.name) {
 					events.push({
@@ -2990,10 +2666,8 @@ function(
 					});
 				}
 			});
-
 			return events;
 		},
-
 		/**
 		 * Add new event to the stack.
 		 * 
@@ -3009,7 +2683,6 @@ function(
 				scope: scope
 			});
 		},
-
 		/**
 		 * Remove event from the stack.
 		 * 
@@ -3019,14 +2692,12 @@ function(
 		 */
 		off: function (name, fn) {
 			var events = this._getEvents(name);
-
 			$common.reverseForEach(events, function(item) {
 				if (!fn || fn && item.fn == fn) {
 					this._allEvents.splice(item.pos, 1);
 				}
 			}, this);
 		},
-
 		/**
 		 * Add one time event to the stack.
 		 * 
@@ -3043,7 +2714,6 @@ function(
 				once: true
 			});
 		},
-
 		/**
 		 * Trigger event with arguments 0..n
 		 * 
@@ -3054,89 +2724,85 @@ function(
 			var events = this._getEvents(name);
 			var args = arguments;
 			var onceArray = [];
-
 			events.forEach(function(event) {
 				var newArgs = Array.prototype.slice.call(args, 0);
 				newArgs.shift();
-
 				var item = event.item;
-
 				item.fn.apply(item.scope || this, newArgs);
 				if (item.once) {
 					onceArray.push(event.pos);
 				}
 			}, this);
-
 			$common.reverseForEach(onceArray, function(pos) {
 				this._allEvents.splice(pos, 1);
 			}, this);
 		}
 	};
 }]);
-;/**
+/**
  * @class $loader
  *
  * Progress loader in the application
  */
-onix.service("$loader", [
+onix.factory("$loader", [
 	"$dom",
 function(
 	$dom
 ) {
-	/**
-	 * Create loader
-	 *
-	 * @private
-	 * @member $loader
-	 */
-	this._create = function() {
-		this._el = $dom.create({
-			el: "div",
-			"class": "loader"
-		});
-
-		// insert into the body on first position
-		document.body.insertBefore(this._el, document.body.firstChild);
-	};
-	
-	/**
-	 * Loader init
-	 *
-	 * @member $loader
-	 */
-	this.init = function() {
-		this._create();
-	};
-
-	/**
-	 * Start loader
-	 *
-	 * @member $loader
-	 */
-	this.start = function() {
-		this._el.classList.add("start");
-	};
-
-	/**
-	 * End loader
-	 *
-	 * @member $loader
-	 */
-	this.end = function() {
-		this._el.classList.remove("start");
-		this._el.classList.add("end");
-
-		setTimeout(function() {
-			this._el.classList.remove("end");
-			this._el.classList.add("hide");
-
+	var $loader = {
+		/**
+		 * Create loader
+		 *
+		 * @private
+		 * @member $loader
+		 */
+		_create: function() {
+			this._el = $dom.create({
+				el: "div",
+				"class": "loader"
+			});
+			// insert into the body on first position
+			document.body.insertBefore(this._el, document.body.firstChild);
+		},
+		/**
+		 * Loader init
+		 *
+		 * @private
+		 * @member $loader
+		 */
+		_init: function() {
+			this._create();
+		},
+		/**
+		 * Start loader
+		 *
+		 * @member $loader
+		 */
+		start: function() {
+			this._el.classList.add("start");
+		},
+		/**
+		 * End loader
+		 *
+		 * @member $loader
+		 */
+		end: function() {
+			this._el.classList.remove("start");
+			this._el.classList.add("end");
 			setTimeout(function() {
-				this._el.classList.remove("hide");
-			}.bind(this), 350);
-		}.bind(this), 150);
+				this._el.classList.remove("end");
+				this._el.classList.add("hide");
+				setTimeout(function() {
+					this._el.classList.remove("hide");
+				}.bind(this), 350);
+			}.bind(this), 150);
+		}
 	};
+	// loader init
+	$loader._init();
+	return $loader;
 }]);
-;/**
+/**
  * @class $http
  *
  * XMLHttpRequest cover class.
@@ -3159,7 +2825,6 @@ function(
 	 */
 	this._preparePostData = function(data) {
 		var formData = new FormData();
-
 		if (data) {
 			if (Array.isArray(data)) {
 				data.forEach(function(item) {
@@ -3172,10 +2837,8 @@ function(
 				});
 			}
 		}
-
 		return formData;
 	};
-
 	/**
 	 * Update URL using get data.
 	 *
@@ -3188,19 +2851,15 @@ function(
 	this._updateURL = function(url, data) {
 		if (data) {
 			var add = [];
-
 			if (Array.isArray(data)) {
 				data.forEach(function(item) {
 					add.push(item.name + "=" + encodeURIComponent(item.value));
 				});
-
 				url += (url.indexOf("?") == -1 ? "?" : "") + add.join("&");
 			}
 		}
-
 		return url;
 	};
-
 	/**
 	 * Request types
 	 *
@@ -3213,7 +2872,6 @@ function(
 		JSON: 1,
 		FORM_DATA: 2
 	};
-
 	/**
 	 * Http methods.
 	 *
@@ -3230,7 +2888,6 @@ function(
 		DELETE: "DELETE",
 		PATCH: "PATCH"
 	};
-
 	/**
 	 * Create new XHR request, returns promise.
 	 *
@@ -3247,19 +2904,14 @@ function(
 	this.createRequest = function(config) {
 		var promise = $q.defer();
 		var request = new XMLHttpRequest();
-
 		config = config || {};
-
 		var method = config.method || this.METHOD.GET;
 		var url = config.url || "";
-
 		if (!url) {
 			promise.reject();
 			return promise;
 		}
-
 		url = this._updateURL(url, config.getData);
-
 		request.onerror = function () { promise.reject(); };
 		request.open(method, url, true);
 		request.onreadystatechange = function() {
@@ -3267,14 +2919,12 @@ function(
 				var responseData = request.responseText || "";
 				var responseType = request.getResponseHeader("Content-Type");
 				var promiseData = null;
-
 				if (responseType == "application/json") {
 					promiseData = responseData.length ? JSON.parse(responseData) : {};
 				}
 				else {
 					promiseData = responseData;
 				}
-
 				// 200 ok
 				// 201 created
 				// 204 succesfully deleted
@@ -3287,23 +2937,18 @@ function(
 				});
 			}
 		};
-
 		try {
 			// add headers
 			var headers = config.headers;
-			
 			if ($common.isObject(headers)) {
 				Object.keys(headers).forEach(function(headerName) {
 					request.setRequestHeader(headerName, headers[headerName]);
 				});
 			}
-
 			if (method == this.METHOD.GET) {
 				request.setRequestHeader('Accept', 'application/json');
 			}
-
 			var type = config.postType || this.POST_TYPES.JSON;
-
 			if (config.postData && type == this.POST_TYPES.JSON) {
 				request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 				request.send(JSON.stringify(config.postData));
@@ -3318,455 +2963,421 @@ function(
 		catch (err) {
 			promise.reject();
 		}
-
 		return promise;
 	};
 }]);
-;/**
+/**
  * @class $i18n
  *
  * Language support, string translation with support for message format syntax
  */
-onix.service("$i18n", [
+onix.factory("$i18n", [
 	"$http",
 	"$q",
 function(
 	$http,
 	$q
 ) {
-	/**
-	 * All langs data
-	 *
-	 * @private
-	 * @type {Object}
-	 * @member $i18n
-	 * @private
-	 */
-	this._langs = {};
-
-	/**
-	 * Current language
-	 *
-	 * @private
-	 * @type {String}
-	 * @member $i18n
-	 * @private
-	 */
-	this._currentLang = "";
-
-	/**
-	 * Add a new language
-	 *
-	 * @param {String} lang Language key
-	 * @param {Object} data
-	 * @member $i18n
-	 */
-	this.addLanguage = function(lang, data) {
-		this._langs[lang] = data;
+	var $i18n = {
+		/**
+		 * All langs data
+		 *
+		 * @private
+		 * @type {Object}
+		 * @member $i18n
+		 * @private
+		 */
+		_langs: {},
+		/**
+		 * Current language
+		 *
+		 * @private
+		 * @type {String}
+		 * @member $i18n
+		 * @private
+		 */
+		_currentLang: "",
+		/**
+		 * Add a new language
+		 *
+		 * @param {String} lang Language key
+		 * @param {Object} data
+		 * @member $i18n
+		 */
+		addLanguage: function(lang, data) {
+			this._langs[lang] = data;
+		},
+		/**
+		 * Set new language by his key.
+		 *
+		 * @param {String} lang Language key
+		 * @member $i18n
+		 */
+		setLanguage: function(lang) {
+			this._currentLang = lang;
+		},
+		/**
+		 * Get text function. Translate for the current language and the key.
+		 *
+		 * @param  {String} key
+		 * @param  {Object} [replace] Replace all {} in the string
+		 * @return {String}
+		 * @member $i18n
+		 */
+		_: function(key, replace) {
+			key = key || "";
+			var lObj = this._langs[this._currentLang];
+			var translate = "";
+			if (lObj) {
+				var parts = key.split(".");
+				var len = parts.length;
+				parts.every(function(item, ind) {
+					if (item in lObj) {
+						lObj = lObj[item];
+						if (ind == len - 1) {
+							translate = lObj;
+							return false;
+						}
+					}
+					else return false;
+					// go on
+					return true;
+				});
+			}
+			return this._transReplace(translate, replace);
+		},
+		/**
+		 * Replace translated text by object. This functions is implementation of message format object replace inside the string
+		 *
+		 * @param  {String} translate
+		 * @param  {Object} [replace] Replace all {} in the string
+		 * @return {String}
+		 * @member $i18n
+		 * @private
+		 */
+		_transReplace: function(translate, replace) {
+			translate = translate || "";
+			replace = replace || {};
+			var replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
+			if (replaceParts) {
+				var finalReplace = {};
+				replaceParts.forEach(function(part) {
+					var key = part;
+					if (key.length > 2) {
+						key = key.substr(1, key.length - 2);
+					}
+					// multi
+					var parts = key.split(",");
+					var name = parts[0].trim();
+					var multiPartsObj = {};
+					if (parts.length == 2) {
+						var multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
+						if (multiParts) {
+							multiParts.forEach(function(mpart) {
+								var mpartSplits = mpart.split("{");
+								var mpartValue = mpartSplits[1];
+								mpartValue = mpartValue.substr(0, mpartValue.length - 1);
+								multiPartsObj[mpartSplits[0].trim()] = mpartValue;
+							});
+						}
+					}
+					var replaceValue = name in replace ? replace[name] : "";
+					if (typeof replaceValue === "number" && Object.keys(multiPartsObj).length) {
+						var multiKey;
+						switch (replaceValue) {
+							case 1:
+								multiKey = "one";
+								break;
+							case 2:
+							case 3:
+							case 4:
+								multiKey = "few";
+								break;
+							default:
+								multiKey = "other";
+						}
+						replaceValue = multiKey in multiPartsObj ? multiPartsObj[multiKey] : "";
+					}
+					finalReplace[part] = replaceValue;
+				});
+				Object.keys(finalReplace).forEach(function(key) {
+					translate = translate.replace(new RegExp(key, "g"), finalReplace[key]);
+				});
+			}
+			return translate;
+		},
+		/**
+		 * Load language from the file.
+		 *
+		 * @param  {String} lang Language key
+		 * @param  {String} url  Path to the file
+		 * @return {$q}
+		 * @member $i18n
+		 */
+		loadLanguage: function(lang, url) {
+			var promise = $q.defer();
+			$http.createRequest({
+				url: url
+			}).then(function(data) {
+				this.addLanguage(lang, data.data);
+				promise.resolve();
+			}.bind(this), function(data) {
+				promise.resolve();
+			});
+			return promise;
+		},
 	};
-
-	/**
-	 * Set new language by his key.
-	 *
-	 * @param {String} lang Language key
-	 * @member $i18n
-	 */
-	this.setLanguage = function(lang) {
-		this._currentLang = lang;
-	};
-
 	/**
 	 * Get text function. Translate for the current language and the key.
 	 *
 	 * @param  {String} key
 	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
-	 * @member $i18n
+	 * @member window
+	 * @property {Function}
 	 */
-	this._ = function(key, replace) {
-		key = key || "";
-		var lObj = this._langs[this._currentLang];
-		var translate = "";
-
-		if (lObj) {
-			var parts = key.split(".");
-			var len = parts.length;
-
-			parts.every(function(item, ind) {
-				if (item in lObj) {
-					lObj = lObj[item];
-
-					if (ind == len - 1) {
-						translate = lObj;
-						return false;
-					}
-				}
-				else return false;
-
-				// go on
-				return true;
-			});
-		}
-
-		return this._transReplace(translate, replace);
+	window._ = $i18n._.bind($i18n);
+	return $i18n;
+}]);
+onix.provider("$template", function() {
+	var conf = {
+		left: "{{",
+		right: "}}"
 	};
-
 	/**
-	 * Replace translated text by object. This functions is implementation of message format object replace inside the string
-	 *
-	 * @param  {String} translate
-	 * @param  {Object} [replace] Replace all {} in the string
-	 * @return {String}
-	 * @member $i18n
-	 * @private
+	 * Set template config; you can use "left" {{ and "right" }} template delimeters.
+	 * 
+	 * @param {Object} confParam Object with new config
+	 * @member $templateProvider
 	 */
-	this._transReplace = function(translate, replace) {
-		translate = translate || "";
-		replace = replace || {};
-
-		var replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
-
-		if (replaceParts) {
-			var finalReplace = {};
-
-			replaceParts.forEach(function(part) {
-				var key = part;
-
-				if (key.length > 2) {
-					key = key.substr(1, key.length - 2);
-				}
-
-				// multi
-				var parts = key.split(",");
-				var name = parts[0].trim();
-				var multiPartsObj = {};
-
-				if (parts.length == 2) {
-					var multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
-
-					if (multiParts) {
-						multiParts.forEach(function(mpart) {
-							var mpartSplits = mpart.split("{");
-							var mpartValue = mpartSplits[1];
-							mpartValue = mpartValue.substr(0, mpartValue.length - 1);
-
-							multiPartsObj[mpartSplits[0].trim()] = mpartValue;
+	this.setConfig = function(confParam) {
+		Object.keys(confParam).forEach(function(confParamKey) {
+			conf[confParamKey] = confParam[confParamKey];
+		});
+	};
+	/**
+	 * @class $template
+	 *
+	 * Handle templates, binds events - syntax similar to moustache and angular template system.
+	 * $myQuery is used for cache record
+	 */
+	this.$get = ["$common", "$q", "$http", function(
+				$common, $q, $http) {
+		var $template = {
+			/**
+			 * Template cache.
+			 *
+			 * @type {Object}
+			 * @member $template
+			 * @private
+			 */
+			_cache: {},
+			/**
+			 * Regular expressions for handle template variables
+			 *
+			 * @type {Object}
+			 * @member $template
+			 * @private
+			 */
+			_RE: {
+				VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
+				NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
+				STRINGS: /["'][^"']+["']/g,
+				JSONS: /[{][^}]+[}]/g,
+				ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+			},
+			/**
+			 * Parse a function name from the string
+			 *
+			 * @param  {String} value
+			 * @return {String}
+			 * @member $template
+			 * @private
+			 */
+			_parseFnName: function(value) {
+				value = value || "";
+				return value.match(/[a-zA-Z0-9_]+/)[0];
+			},
+			/**
+			 * Parse arguments from the string -> makes array from them
+			 *
+			 * @param  {String} value
+			 * @param  {Object} config
+			 * @param  {Object} config.$event Event object
+			 * @param  {Object} config.$element Reference to element
+			 * @return {Array}
+			 * @member $template
+			 * @private
+			 */
+			_parseArgs: function(value, config) {
+				argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
+				var args = [];
+				var matches = argsValue.match(this._RE.ALL);
+				if (matches) {
+					var all = [];
+					matches.forEach(function(item) {
+						var value;
+						if (item.match(this._RE.STRINGS)) {
+							value = item.substr(1, item.length - 2)
+						}
+						else if (item.match(this._RE.NUMBERS)) {
+							value = parseFloat(item);
+						}
+						else if (item.match(this._RE.JSONS)) {
+							value = JSON.parse(item);
+						}
+						else if (item.match(this._RE.VARIABLE)) {
+							var variable = item.match(this._RE.VARIABLE)[0];
+							if (variable == "$event") {
+								value = config.event;
+							}
+							else if (variable == "$element") {
+								value = config.el;
+							}
+							else {
+								// todo - maybe eval with scope
+								value = null;
+							}
+						}
+						all.push({
+							value: value,
+							pos: argsValue.indexOf(item)
+						});
+					}, this);
+					if (all.length) {
+						all.sort(function(a, b) {
+							return a.pos - b.pos
+						}).forEach(function(item) {
+							args.push(item.value);
 						});
 					}
 				}
-
-				var replaceValue = name in replace ? replace[name] : "";
-
-				if (typeof replaceValue === "number" && Object.keys(multiPartsObj).length) {
-					var multiKey;
-
-					switch (replaceValue) {
-						case 1:
-							multiKey = "one";
-							break;
-
-						case 2:
-						case 3:
-						case 4:
-							multiKey = "few";
-							break;
-
-						default:
-							multiKey = "other";
-					}
-
-					replaceValue = multiKey in multiPartsObj ? multiPartsObj[multiKey] : "";
+				return args;
+			},
+			/**
+			 * Bind one single event to the element
+			 * 
+			 * @param  {HTMLElement} el
+			 * @param  {String} eventName click, keydown...
+			 * @param  {String} data data-x value
+			 * @param  {Function} scope
+			 * @member $template
+			 * @private
+			 */
+			_bindEvent: function(el, eventName, data, scope) {
+				if (data && this._parseFnName(data) in scope) {
+					el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
+						var value = this.getAttribute("data-" + eventName);
+						var fnName = templScope._parseFnName(value);
+						var args = templScope._parseArgs(value, {
+							el: this,
+							event: event
+						});
+						scope[fnName].apply(scope, args);
+					}, this));
 				}
-
-				finalReplace[part] = replaceValue;
-			});
-
-			Object.keys(finalReplace).forEach(function(key) {
-				translate = translate.replace(new RegExp(key, "g"), finalReplace[key]);
-			});
-		}
-
-		return translate;
-	};
-
-	/**
-	 * Load language from the file.
-	 *
-	 * @param  {String} lang Language key
-	 * @param  {String} url  Path to the file
-	 * @return {$q}
-	 * @member $i18n
-	 */
-	this.loadLanguage = function(lang, url) {
-		var promise = $q.defer();
-
-		$http.createRequest({
-			url: url
-		}).then(function(data) {
-			this.addLanguage(lang, data.data);
-			promise.resolve();
-		}.bind(this), function(data) {
-			promise.resolve();
-		});
-
-		return promise;
-	};
-}]);
-;/**
- * @class $template
- *
- * Handle templates, binds events - syntax similar to moustache and angular template system
- */
-onix.service("$template", [
-	"$common",
-	"$q",
-	"$http",
-	"$config",
-function(
-	$common,
-	$q,
-	$http,
-	$config
-) {
-	/**
-	 * Template cache.
-	 *
-	 * @type {Object}
-	 * @member $template
-	 * @private
-	 */
-	this._cache = {};
-
-	/**
-	 * Regular expressions for handle template variables
-	 *
-	 * @type {Object}
-	 * @member $template
-	 * @private
-	 */
-	this._RE = {
-		VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
-		NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
-		STRINGS: /["'][^"']+["']/g,
-		JSONS: /[{][^}]+[}]/g,
-		ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
-	};
-
-	/**
-	 * Parse a function name from the string
-	 *
-	 * @param  {String} value
-	 * @return {String}
-	 * @member $template
-	 * @private
-	 */
-	this._parseFnName = function(value) {
-		value = value || "";
-
-		return value.match(/[a-zA-Z0-9_]+/)[0];
-	};
-
-	/**
-	 * Parse arguments from the string -> makes array from them
-	 *
-	 * @param  {String} value
-	 * @param  {Object} config
-	 * @param  {Object} config.$event Event object
-	 * @param  {Object} config.$element Reference to element
-	 * @return {Array}
-	 * @member $template
-	 * @private
-	 */
-	this._parseArgs = function(value, config) {
-		argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
-
-		var args = [];
-		var matches = argsValue.match(this._RE.ALL);
-		
-		if (matches) {
-			var all = [];
-
-			matches.forEach(function(item) {
-				var value;
-
-				if (item.match(this._RE.STRINGS)) {
-					value = item.substr(1, item.length - 2)
+			},
+			/**
+			 * Init - get all templates from the page. Uses 'text/template' script with template data
+			 *
+			 * @private
+			 * @member $template
+			 */
+			_init: function() {
+				onix.element("script[type='text/template']").forEach(function(item) {
+					this.add(item.id, item.innerHTML);
+				}, this);
+			},
+			/**
+			 * Add new item to the cachce
+			 *
+			 * @param {String} key 
+			 * @param {String} data
+			 * @member $template
+			 */
+			add: function(key, data) {
+				this._cache[key] = data;
+			},
+			/**
+			 * Compile one template - replaces all ocurances of {} by model
+			 *
+			 * @param  {String} key Template key/name
+			 * @param  {Object} data Model
+			 * @return {String}
+			 * @member $template
+			 */
+			compile: function(key, data) {
+				var tmpl = this.get(key);
+				if (data) {
+					Object.keys(data).forEach(function(key) {
+						tmpl = tmpl.replace(new RegExp(conf.left + "[ ]*" + key + "[ ]*" + conf.right, "g"), data[key]);
+					});
 				}
-				else if (item.match(this._RE.NUMBERS)) {
-					value = parseFloat(item);
-				}
-				else if (item.match(this._RE.JSONS)) {
-					value = JSON.parse(item);
-				}
-				else if (item.match(this._RE.VARIABLE)) {
-					var variable = item.match(this._RE.VARIABLE)[0];
-
-					if (variable == "$event") {
-						value = config.event;
-					}
-					else if (variable == "$element") {
-						value = config.el;
-					}
-					else {
-						// todo - maybe eval with scope
-						value = null;
+				return tmpl;
+			},
+			/**
+			 * Get template from the cache
+			 *
+			 * @param  {String} key Template key/name
+			 * @return {String}
+			 * @member $template
+			 */
+			get: function(key) {
+				return this._cache[key] || "";
+			},
+			/**
+			 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+			 * Supports: click, change, keydown, bind
+			 *
+			 * @param  {HTMLElement} root
+			 * @param  {Object|Function} scope
+			 * @member $template
+			 */
+			bindTemplate: function(root, scope) {
+				var allElements = onix.element("*[data-click], *[data-change], *[data-bind], *[data-keydown]", root);
+				if (allElements.len()) {
+					var newEls = {};
+					allElements.forEach(function(item) {
+						this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
+						this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
+						this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
+						var dataBind = item.getAttribute("data-bind");
+						if (dataBind) {
+							newEls[dataBind] = item;
+						}
+					}, this);
+					if ("addEls" in scope && typeof scope.addEls === "function") {
+						scope.addEls(newEls);
 					}
 				}
-
-				all.push({
-					value: value,
-					pos: argsValue.indexOf(item)
+			},
+			/**
+			 * Load template from the path, returns promise after load
+			 *
+			 * @param  {String} key
+			 * @param  {String} path
+			 * @return {$q}
+			 * @member $template
+			 */
+			load: function(key, path) {
+				var promise = $q.defer();
+				$http.createRequest({
+					url: path
+				}).then(function(data) {
+					this.add(key, data.data);
+					promise.resolve();
+				}.bind(this), function(data) {
+					promise.reject();
 				});
-			}, this);
-
-			if (all.length) {
-				all.sort(function(a, b) {
-					return a.pos - b.pos
-				}).forEach(function(item) {
-					args.push(item.value);
-				});
+				return promise;
 			}
-		}
-
-		return args;
-	};
-
-	/**
-	 * Bind one single event to the element
-	 * 
-	 * @param  {HTMLElement} el
-	 * @param  {String} eventName click, keydown...
-	 * @param  {String} data data-x value
-	 * @param  {Function} scope
-	 * @member $template
-	 * @private
-	 */
-	this._bindEvent = function(el, eventName, data, scope) {
-		if (data && this._parseFnName(data) in scope) {
-			el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
-				var value = this.getAttribute("data-" + eventName);
-				var fnName = templScope._parseFnName(value);
-				var args = templScope._parseArgs(value, {
-					el: this,
-					event: event
-				});
-
-				scope[fnName].apply(scope, args);
-			}, this));
-		}
-	};
-
-	/**
-	 * Init - get all templates from the page. Uses 'text/template' script with template data
-	 *
-	 * @member $template
-	 */
-	this.init = function() {
-		onix.element("script[type='text/template']").forEach(function(item) {
-			this.add(item.id, item.innerHTML);
-		}, this);
-	};
-	
-	/**
-	 * Add new item to the cachce
-	 *
-	 * @param {String} key 
-	 * @param {String} data
-	 * @member $template
-	 */
-	this.add = function(key, data) {
-		this._cache[key] = data;
-	};
-
-	/**
-	 * Compile one template - replaces all ocurances of {} by model
-	 *
-	 * @param  {String} key Template key/name
-	 * @param  {Object} data Model
-	 * @return {String}
-	 * @member $template
-	 */
-	this.compile = function(key, data) {
-		var tmpl = this.get(key);
-		var cnf = $config.TMPL_DELIMITER;
-
-		if (data) {
-			Object.keys(data).forEach(function(key) {
-				tmpl = tmpl.replace(new RegExp(cnf.LEFT + "[ ]*" + key + "[ ]*" + cnf.RIGHT, "g"), data[key]);
-			});
-		}
-
-		return tmpl;
-	};
-
-	/**
-	 * Get template from the cache
-	 *
-	 * @param  {String} key Template key/name
-	 * @return {String}
-	 * @member $template
-	 */
-	this.get = function(key) {
-		return this._cache[key] || "";
-	};
-
-	/**
-	 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
-	 * Supports: click, change, keydown, bind
-	 *
-	 * @param  {HTMLElement} root
-	 * @param  {Object|Function} scope
-	 * @member $template
-	 */
-	this.bindTemplate = function(root, scope) {
-		var allElements = onix.element("*[data-click], *[data-change], *[data-bind], *[data-keydown]", root);
-
-		if (allElements.len()) {
-			var newEls = {};
-
-			allElements.forEach(function(item) {
-				this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
-				this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
-				this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
-
-				var dataBind = item.getAttribute("data-bind");
-
-				if (dataBind) {
-					newEls[dataBind] = item;
-				}
-			}, this);
-
-			if ("addEls" in scope && typeof scope.addEls === "function") {
-				scope.addEls(newEls);
-			}
-		}
-	};
-
-	/**
-	 * Load template from the path, returns promise after load
-	 *
-	 * @param  {String} key
-	 * @param  {String} path
-	 * @return {$q}
-	 * @member $template
-	 */
-	this.load = function(key, path) {
-		var promise = $q.defer();
-
-		$http.createRequest({
-			url: path
-		}).then(function(data) {
-			this.add(key, data.data);
-
-			promise.resolve();
-		}.bind(this), function(data) {
-			promise.reject();
-		});
-
-		return promise;
-	};
-}]);
-;/**
+		};
+		// template init
+		$template._init();
+		return $template;
+	}];
+});
+/**
  * @class $route
  *
  * Simple router for the application
@@ -3785,9 +3396,7 @@ function(
 	 * @type {Array}
 	 * @member $route
 	 */
-	
 	this._routes = [];
-
 	/**
 	 * Otherwise route
 	 *
@@ -3796,7 +3405,6 @@ function(
 	 * @member $route
 	 */
 	this._otherwise = null;
-
 	/**
 	 * Add route to the router.
 	 *
@@ -3812,10 +3420,8 @@ function(
 			url: url,
 			config: config
 		});
-
 		return this;
 	};
-
 	/**
 	 * Otherwise.
 	 *
@@ -3830,10 +3436,8 @@ function(
 		this._otherwise = {
 			config: config
 		};
-
 		return this;
 	};
-
 	/**
 	 * Run controller from route path
 	 *
@@ -3844,7 +3448,6 @@ function(
 	this._runController = function(contr, contrData) {
 		if (typeof contr === "string") {
 			var param = onix.getObject(contr);
-
 			onix.bindDI(param, contrData)();
 		}
 		else if (Array.isArray(contr)) {
@@ -3854,7 +3457,6 @@ function(
 			contr.apply(contr, [contrData]);
 		}
 	};
-
 	/**
 	 * Route GO. Walk through all routes, if there is match, route controller will be called
 	 *
@@ -3865,45 +3467,36 @@ function(
 		var find = false;
 		var config = null;
 		var data = {};
-
 		this._routes.every(function(item) {
 			if (path.match(new RegExp(item.url))) {
 				config = item.config;
 				find = true;
-				
 				return false;
 			}
 			else {
 				return true;
 			}
 		});
-
 		if (!find && this._otherwise) {
 			config = this._otherwise.config;
 		}
-
 		if (config) {
 			var templateUrl = null;
 			var contr = null;
 			var contrData = {};
-
 			Object.keys(config).forEach(function(key) {
 				var value = config[key];
-
 				switch (key) {
 					case "templateUrl":
 						templateUrl = value;
 						break;
-						
 					case "controller":
 						contr = value;
 						break;
-
 					default:
 						contrData[key] = value;
 				}
 			});
-
 			if (templateUrl) {
 				$template.load(config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
@@ -3919,7 +3512,7 @@ function(
 		}
 	};
 }]);
-;onix.factory("$select", [
+onix.factory("$select", [
 	"$common",
 	"$event",
 	"$dom",
@@ -3940,15 +3533,12 @@ function(
 	var $select = function(el, opts) {
 		// extend our class
 		$common.extend(this, $event);
-
 		this._opts = {
 			addCaption: false
 		};
-
 		for (var key in opts) {
 			this._opts[key] = opts[key];
 		}
-
 		this._const = {
 			CAPTION_SEL: ".dropdown-toggle",
 			OPTIONS_SEL: ".dropdown-menu a",
@@ -3957,21 +3547,16 @@ function(
 			OPEN_CLASS: "open",
 			ACTIVE_CLASS: "active"
 		};
-
 		this._el = el;
-
 		this._optinsRef = [];
 		this._captionEl = null;
 		this.captionTextEl = null;
-
 		this._binds = {
 			captionClick: $common.bindWithoutScope(this._captionClick, this),
 			choiceClick: $common.bindWithoutScope(this._choiceClick, this)
 		};
-
 		this._bind();
 	};
-
 	/**
 	 * Bind clicks on the select
 	 *
@@ -3982,7 +3567,6 @@ function(
 		this._bindCaption();
 		this._bindChoices();
 	};
-
 	/**
 	 * Bind caption el
 	 * 
@@ -3991,31 +3575,24 @@ function(
 	 */
 	$select.prototype._bindCaption = function() {
 		var captionEl = this._el.querySelector(this._const.CAPTION_SEL);
-
 		if (captionEl) {
 			// click on the caption
 			captionEl.addEventListener("click", this._binds.captionClick);
-
 			// insert span placeholder for caption
 			if (this._opts.addCaption) {
 				var caretEl = captionEl.querySelector(this._const.CARET_SEL);
-
 				if (caretEl) {
 					var captionTextEl = $dom.create({
 						el: "span",
 						"class": "add-caption"
 					});
-
 					captionEl.insertBefore(captionTextEl, caretEl);
-
 					this._captionTextEl = captionTextEl;
 				}
 			}
 		}
-
 		this._captionEl = captionEl;
 	};
-
 	/**
 	 * Event - click on caption
 	 * 
@@ -4026,25 +3603,19 @@ function(
 	 */
 	$select.prototype._captionClick = function(e, scope) {
 		var con = scope._const;
-
 		e.stopPropagation();
-
 		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
-
 		var removeAllOpened = function() {
 			// remove all
 			onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
 				item.classList.remove("open");
 			});
 		};
-
 		var clickFn = function() {
 			removeAllOpened();
 			window.removeEventListener("click", clickFn);
 		};
-
 		removeAllOpened();
-
 		if (isOpen) {
 			// outside click
 			window.removeEventListener("click", clickFn);
@@ -4052,11 +3623,9 @@ function(
 		else {
 			// outside click
 			window.addEventListener("click", clickFn);
-
 			scope._el.classList.add(con.OPEN_CLASS);
 		}
 	};
-
 	/**
 	 * Bind choices inside select
 	 *
@@ -4066,7 +3635,6 @@ function(
 	$select.prototype._bindChoices = function() {
 		onix.element(this._const.OPTIONS_SEL, this._el).forEach(function(option) {
 			option.addEventListener("click", this._binds.choiceClick);
-
 			// event ref
 			this._optinsRef.push({
 				el: option,
@@ -4075,7 +3643,6 @@ function(
 			});
 		}, this);
 	};
-
 	/**
 	 * Event - click on option
 	 * 
@@ -4086,32 +3653,24 @@ function(
 	 */
 	$select.prototype._choiceClick = function(e, scope) {
 		var con = scope._const;
-
 		e.stopPropagation();
-
 		if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
 			// remove previously selected
 			var active = this.parentNode.parentNode.querySelector("." + con.ACTIVE_CLASS);
-			
 			if (active) {
 				active.classList.remove(con.ACTIVE_CLASS);
 			}
-
 			// add to the current
 			this.parentNode.classList.add(con.ACTIVE_CLASS);
-
 			scope._el.classList.remove(con.OPEN_CLASS);
-
 			if (scope._opts.addCaption && scope._captionTextEl) {
 				scope._captionTextEl.innerHTML = this.innerHTML;
 			}
-
 			// trigger click
 			var value = this.getAttribute("data-value") || "";
 			scope.trigger("change", value);
 		}
 	};
-
 	/**
 	 * Unbind choices
 	 *
@@ -4122,11 +3681,9 @@ function(
 			this._optinsRef.forEach(function(option) {
 				option.el.removeEventListener(option.event, option.fn);
 			});
-
 			this._optinsRef = [];
 		}
 	};
-
 	/**
 	 * Rebind choices
 	 *
@@ -4136,7 +3693,6 @@ function(
 		this.unbindChoices();
 		this._bindChoices();
 	};
-
 	/**
 	 * Select option from the select
 	 * 
@@ -4147,27 +3703,21 @@ function(
 		if (typeof ind === "undefined") {
 			ind = 0;
 		}
-
 		var optionsCount = this._optinsRef.length;
-
 		if (optionsCount > 0 && ind >= 0 && ind < optionsCount) {
 			var el = this._optinsRef[ind].el;
 			var parent = this._optinsRef[ind].el.parentNode;
-
 			if (!parent.classList.contains(this._const.ACTIVE_CLASS)) {
 				parent.classList.add(this._const.ACTIVE_CLASS);
-
 				if (this._opts.addCaption && this._captionTextEl) {
 					this._captionTextEl.innerHTML = el.innerHTML;
 				}
-
 				// trigger click
 				var value = el.getAttribute("data-value") || "";
 				this.trigger("change", value);
 			}
 		}
 	};
-
 	/**
 	 * Set add caption from the current value
 	 *
@@ -4175,10 +3725,8 @@ function(
 	 */
 	$select.prototype.setAddCaption = function() {
 		if (!this._opts.addCaption) return;
-
 		this._optinsRef.every(function(item) {
 			var parent = item.el.parentNode;
-
 			if (parent.classList.contains(this._const.ACTIVE_CLASS)) {
 				this._captionTextEl.innerHTML = item.el.innerHTML;
 				return false;
@@ -4186,10 +3734,9 @@ function(
 			else return true;
 		}, this);
 	};
-
 	return $select;
 }]);
-;/**
+/**
  * @class $uploadImages
  *
  * Class for creating img previews from File[] variable
@@ -4211,7 +3758,6 @@ function(
 	 * @type {Boolean}
 	 */
 	this._disable = !("FileReader" in window);
-
 	/**
 	 * Max preview image height
 	 *
@@ -4222,7 +3768,6 @@ function(
 	this._const = {
 		previewMaxSize: 180
 	};
-
 	/**
 	 * Do jobs for processing all images
 	 *
@@ -4237,30 +3782,22 @@ function(
 	this._doJobs = function(dataArray, fn, count, taskDoneObj) {
 		var len = dataArray.length;
 		var jobs = [];
-
 		for (var i = 0; i < len; i++) {
 			var jp = i % count;
-
 			if (!jobs[jp]) {
 				jobs[jp] = $job.create();
-
 				if (taskDoneObj) {
 					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
 				}
 			}
-
 			jobs[jp].add(fn, this, dataArray[i]);
 		}
-
 		var jobPromises = [];
-
 		jobs.forEach(function(job) {
 			jobPromises.push(job.start());
 		});
-
 		return $q.all(jobPromises);
 	};
-
 	/**
 	 * Is file a picture?
 	 *
@@ -4275,7 +3812,6 @@ function(
 		}
 		else return false;
 	};
-
 	/**
 	 * Read one file, create one preview
 	 *
@@ -4289,15 +3825,12 @@ function(
 	this._readFile = function(fileObj, doneFn) {
 		var file = fileObj.file;
 		var previewID = fileObj.previewID;
-
 		var fileObj = {
 			file: file,
 			exif: null,
 			img: null
 		};
-
 		var preview = this._createPreview(file);
-		
 		// append
 		if (previewID in this._dom) {
 			this._dom[previewID].appendChild(preview.cont);
@@ -4305,39 +3838,29 @@ function(
 		else {
 			this._dom.previewItems.appendChild(preview.cont);
 		}
-
 		var reader = new FileReader();
-
 		reader.onload = function(e) {
 			var binaryData = reader.result;
 			var binaryDataArray = new Uint8Array(binaryData);
 			var exif = null;
-
 			if (file.type != "png") {
 				exif = EXIF.readFromBinaryFile(binaryData);
 			}
-
 			var img = new Image();
-
 			img.onload = function() {
 				var imd = this._getImageDim(img);
 				var canvas = this._processInputImage(img, imd, exif.Orientation);
-				
 				preview.cont.classList.remove("preview-loading");
 				preview.canvasCover.innerHTML = "";
 				preview.canvasCover.appendChild(canvas);
-
 				fileObj.exif = exif;
 				fileObj.img = img;
 				doneFn();
 			}.bind(this);
-
 			img.src = this._fileToBase64(file.type, binaryDataArray);
 		}.bind(this);
-
 		reader.readAsArrayBuffer(file);
 	};
-
 	/**
 	 * Create one image preview
 	 *
@@ -4348,7 +3871,6 @@ function(
 	 */
 	this._createPreview = function(file) {
 		var exported = {};
-
 		var cont = $dom.create({
 			el: "span",
 			"class": ["preview-item", "preview-loading"],
@@ -4367,13 +3889,11 @@ function(
 				innerHTML: file.name.replace(/\..*/g, "")
 			}]
 		}, exported);
-
 		return {
 			cont: cont,
 			canvasCover: exported.canvasCover
 		};
 	};
-
 	/**
 	 * Counts image dimension; if maxSize is available, new dimension is calculated
 	 *
@@ -4386,19 +3906,16 @@ function(
 		var maxSize = this._const.previewMaxSize;
 		var largeWidth = img.width > maxSize;
 		var largeHeight = img.height > maxSize;
-
 		var output = {
 			width: img.width,
 			height: img.height,
 			scale: 1,
 			large: false
 		};
-
 		if (largeWidth || largeHeight) {
 			// resizneme obrazek
 			var imgWidth = img.width;
 			var imgHeight = img.height;
-
 			// vybereme vetsi ze stran
 			if (img.width > img.height) {
 				// sirka
@@ -4410,16 +3927,13 @@ function(
 				imgWidth = maxSize * imgWidth / imgHeight;
 				imgHeight = maxSize;
 			}
-
 			output.scale = img.width / imgWidth; // pomer orig. a zmenseneho obrazku
 			output.width = imgWidth;
 			output.height = imgHeight;
 			output.large = true;
 		}
-
 		return output;
 	};
-
 	/**
 	 * Process image: rotate by exif, decrase size according to MAX SIZE
 	 *
@@ -4434,10 +3948,8 @@ function(
 		var canvas = document.createElement("canvas");
 		var ctx = canvas.getContext("2d");
 		var draw = true;
-
 		canvas.width = imd.width;
 		canvas.height = imd.height;
-
 		// rotate
 		if (orientation) {
 			switch (orientation) {
@@ -4446,47 +3958,40 @@ function(
 					ctx.translate(imd.width, 0);
 					ctx.scale(-1, 1);
 					break;
-
 				case 3:
 					// 180° rotate left
 					ctx.translate(imd.width, imd.height);
 					ctx.rotate(Math.PI);
 					break;
-
 				case 4:
 					// vertical flip
 					ctx.translate(0, imd.height);
 					ctx.scale(1, -1);
 					break;
-
 				case 5:
 					// vertical flip + 90 rotate right
 					canvas.width = imd.height;
 					canvas.height = imd.width;
 					ctx.rotate(0.5 * Math.PI);
 					ctx.scale(1, -1);
-
 					if (imd.large) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
-
 				case 6:
 					// 90° rotate right
 					canvas.width = imd.height;
 					canvas.height = imd.width;
 					ctx.rotate(0.5 * Math.PI);
 					ctx.translate(0, -imd.height);
-					
 					if (imd.large) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
-
 				case 7:
 					// horizontal flip + 90 rotate right
 					canvas.width = imd.height;
@@ -4494,21 +3999,18 @@ function(
 					ctx.rotate(0.5 * Math.PI);
 					ctx.translate(imd.width, -imd.height);
 					ctx.scale(-1, 1);
-
 					if (imd.large) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
-
 				case 8:
 					// 90° rotate left
 					canvas.width = imd.height;
 					canvas.height = imd.width;
 					ctx.rotate(-0.5 * Math.PI);
 					ctx.translate(-imd.width, 0);
-
 					if (imd.large) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
@@ -4516,10 +4018,8 @@ function(
 					}
 			}
 		}
-
 		if (draw) {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 			if (imd.large) {
 				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
 			}
@@ -4527,10 +4027,8 @@ function(
 				ctx.drawImage(img, 0, 0);
 			}
 		}
-
 		return canvas;
 	};
-
 	/**
 	 * Binary data to base64
 	 *
@@ -4543,14 +4041,11 @@ function(
 	this._fileToBase64 = function(fileType, binaryData) {
 		var length = binaryData.length
 		var output = "";
-
 		for (var i = 0; i < length; i += 1) {
 			output += String.fromCharCode(binaryData[i]);
 		}
-
 		return 'data:' + fileType + ';base64,' + btoa(output);
 	};
-
 	/**
 	 * Create preview holders.
 	 *
@@ -4561,9 +4056,7 @@ function(
 	 */
 	this._createPreviewHolders = function(el, count) {
 		if (!el || (count != 4 && count != 7)) return;
-
 		var exported = {};
-
 		// placeholder for panorama
 		if (count == 7) {
 			// ceiling line
@@ -4575,28 +4068,23 @@ function(
 				}]
 			}, exported));
 		}
-
 		var child = [];
 		var childCount = count == 7 ? 6 : 4;
-
 		for (var i = 0; i < childCount; i++) {
 			child.push({
 				el: "span",
 				_exported: "img_0" + i
 			});
 		}
-
 		// rest line
 		el.appendChild($dom.create({
 			el: "div",
 			child: child
 		}, exported));
-
 		for (var i = 0; i < count; i++) {
 			this._dom["img_0" + i] = exported["img_0" + i];
 		}
 	};
-
 	/**
 	 * Main function for showing img previews.
 	 * 
@@ -4606,20 +4094,15 @@ function(
 	 */
 	this.show = function(el, files) {
 		if (this._disable || !el || !files) return;
-
 		// clear previous
 		el.innerHTML = "";
-
 		this._dom = {
 			previewItems: el
 		};
-
 		var pictureFiles = this.getPictureFiles(files);
 		var count = pictureFiles.length;
-
 		if (count) {
 			this._createPreviewHolders(el, count);
-
 			// sort by name, make previewID - only for 7 pictures
 			pictureFiles = pictureFiles.sort(function(a, b) {
 				if (a.name < b.name)
@@ -4634,11 +4117,9 @@ function(
 					previewID: "img_0" + ind
 				};
 			});
-
 			this._doJobs(pictureFiles, this._readFile, 2);
 		}
 	};
-
 	/**
 	 * Get picture files from array of files
 	 * 
@@ -4648,20 +4129,16 @@ function(
 	 */
 	this.getPictureFiles = function(files) {
 		var pictureFiles = [];
-
 		if (files && files.length) {
 			for (var i = 0; i < files.length; i++) {
 				var item = files[i];
-
 				if (this._isPicture(item)) {
 					pictureFiles.push(item);
 				}
 			}
 		}
-
 		return pictureFiles;
 	};
-
 	/**
 	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'
 	 * 

@@ -1,4 +1,4 @@
-onix.config({
+onix.value("Config", {
 	// app localization
 	LOCALIZATION: {
 		LANG: "en",
@@ -14,17 +14,20 @@ onix.config({
 	DETAIL_SEL: ".detail"
 });
 
+onix.config(["$templateProvider", function($templateProvider) {
+}]);
+
 onix.run([
 	"$route",
 	"$template",
-	"$config",
+	"Config",
 	"$q",
 	"$i18n",
 	"HomePage",
 function(
 	$route,
 	$template,
-	$config,
+	Config,
 	$q,
 	$i18n,
 	HomePage
@@ -50,7 +53,7 @@ function(
 	// all dependencies before start
 	$q.all([
 		$template.load("testTempl", "/js/test-templ.html"),
-		$i18n.loadLanguage($config.LOCALIZATION.LANG, $config.LOCALIZATION.PATH)
+		$i18n.loadLanguage(Config.LOCALIZATION.LANG, Config.LOCALIZATION.PATH)
 	]).then(function() {
 		$route.go();
 	}, function() {

@@ -36,7 +36,6 @@
 			this._els = value;
 		}
 		else {
-			// node element todo
 			this._els.push(value);
 		}
 
@@ -217,7 +216,6 @@
 
 <span id='$myQuery-method-append'>	/**
 </span>	 * Append another element to this one
-	 * TODO: cannot use on n elements
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -416,6 +414,19 @@
 		return this._els.length;
 	};
 
+<span id='onix-property-element'>	/**
+</span>	 * Quick acces to myQuery and DOM manipulation
+	 *
+	 * @param  {String|HTMLElement|Array} value
+	 * @param {HTMLElement} [parent]
+	 * @return {$myQuery}
+	 * @member onix
+	 * @property {Function}
+	 */
+	onix.element = function(value, parent) {
+		return new $myQuery(value, parent);
+	};
+
 	return {
 <span id='$myQuery-method-get'>		 /**
 </span>		 * Main cover function
@@ -430,6 +441,9 @@
 		}
 	};
 });
+
+// needs to be cached
+onix.run([&quot;$myQuery&quot;, function($myQuery) {}]);
 </pre>
 </body>
 </html>

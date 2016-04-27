@@ -1,16 +1,19 @@
 onix.service("HomeResource", [
 	"$http",
-	"$config",
+	"Config",
 function(
 	$http,
-	$config
+	Config
 ) {
+	console.log($http)
+	console.log(Config)
+	
 	// ------------------------ private ---------------------------------------
 	/**
 	 * Base URL.
 	 * @type {String}
 	 */
-	this._baseURL = $config.URLS.HOME;
+	this._baseURL = Config.URLS.HOME;
 
 	// ------------------------ public ----------------------------------------
 

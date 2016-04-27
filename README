@@ -1,44 +1,53 @@
-# README
+1.) Instalation
 
-## 1.) Documentation
+npm install
+sudo apt-get install ruby ruby-dev
+sudo gem install jsduck
 
-* please run docs/index.html
+2.) Documentation
 
-## 2.) Server
+please run docs/index.html
 
-* sudo apt-get install nodejs npm grunt
+3.) Server
 
-### run:
+./dev-server.js
 
-* ./dev-server.js
+navigate to the browser on page:
 
-* navigate to the browser on page:
+http://localhost:8001/
 
-* http://localhost:8001/
+4.) Building
 
-### 3.) Building
+./bundler.js dist
 
-* grunt dist
-
-* navigate to dist/ folder
+navigate to dist/ folder
 
 # Application workflow
 
-## 1.)
+5.) About framework
 
-* you can change application config: onix.config(function(config) { ... config ... });
+* like angular js way
+* now its not implemented: modules, controllers, filters, directives
 
-* entry point: onix.run(); after execution of this function application will start
+6) CHANGELOG
 
-# CHANGELOG
+2.2.2
+27. 4. 2016
 
-## 2.2.1
+* add providers
+* change application in angular way
+* dynamic object load
+* remove grunt
+* bundler.js
+* add isPromise to $q
+
+2.2.1
 19. 4. 2016
 
 * update and bugfixing example files
 * add functions to $common (chainPromises, col...)
 
-## 2.2.0
+2.2.0
 18. 4. 2016
 
 * add EXIF library
@@ -47,30 +56,26 @@
 * change directory structure
 * add support for message format in i18n
 
-## 2.1.1
-
+2.1.1
 6. 1. 2016
 
 * route is not executed after run functions
 * polyfills for IE8 support
 * firefox SELECT fix
 
-## 2.1.0
-
+2.1.0
 15. 7. 2015
 
 * remove controller & directive
 * whole framework is in angular way, but is like dependency injection framework
 
-## 2.0.0
-
+2.0.0
 29. 6. 2015
 
 * complete change to angular way
 * add shadow dom - it's in the development state; not ready for user and it is not included into the final js framework
 
-## 1.1.4
-
+1.1.4
 29. 6. 2015
 
 * Common.isElement function
@@ -78,18 +83,19 @@
 * snippet isLocked function
 * new service Provide - decorator function
 
-## 1.1.3
-
+1.1.3
 18. 6. 2015
 
-*add support for keydown data event
+* add support for keydown data event
 
-## 1.1.2
+1.1.2
 
-* once event
-## 1.1.1
+*once event
+
+1.1.1
 
 * promise refactor
-## 1.0.0
+
+1.0.0
 
 * framework release

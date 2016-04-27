@@ -22,17 +22,8 @@
 	 * @class onix
 	 */
 	var onix = function() {
-<span id='onix-property-_allObj'>		/**
-</span>		 * All objects
-		 *
-		 * @type {Array}
-		 * @member onix
-		 * @private
-		 */
-		this._allObj = [];
-
 <span id='onix-property-_objects'>		/**
-</span>		 * All processed objects
+</span>		 * All objects
 		 *
 		 * @type {Object}
 		 * @member onix
@@ -40,58 +31,58 @@
 		 */
 		this._objects = {};
 
-<span id='onix-property-_CONFIG_NAME'>		/**
-</span>		 * Config name
+<span id='onix-property-_runs'>		/**
+</span>		 * All run objects
 		 *
+		 * @type {Object}
 		 * @member onix
 		 * @private
 		 */
-		this._CONFIG_NAME = &quot;$config&quot;;
-	};
+		this._runs = [];
 
-<span id='onix-property-TYPES'>	/**
-</span>	 * App types
-	 *
-	 * @property {Object}
-	 * @param {Number} SERVICE
-	 * @param {Number} FACTORY
-	 * @param {Number} CONSTANT
-	 * @param {Number} RUN
-	 * @member onix
-	 */
-	onix.TYPES = {
-		SERVICE: 1,
-		FACTORY: 2,
-		CONSTANT: 3,
-		RUN: 4
-	};
+<span id='onix-property-_configs'>		/**
+</span>		 * All config objectss
+		 *
+		 * @type {Object}
+		 * @member onix
+		 * @private
+		 */
+		this._configs = [];
 
-<span id='onix-method-init'>	/**
-</span>	 * Init function
-	 *
-	 * @member onix
-	 */
-	onix.prototype.init = function() {
-		// pred DOM loadem
-		this._objects[this._CONFIG_NAME] = {};
+<span id='onix-property-_CONST'>		/**
+</span>		 * Constants: provider name and types
+		 *
+		 * @property {Object}
+		 * @type {Object}
+		 * @member onix
+		 * @private
+		 */
+		this._CONST = {
+			PROVIDER_NAME: &quot;Provider&quot;,
+			TYPE: {
+				PROVIDER: 1,
+				SERVICE: 2,
+				FACTORY: 3,
+				CONSTANT: 4,
+				VALUE: 5,
+				CONFIG: 6,
+				RUN: 7
+			}
+		};
 
+		// bind DOM ready
 		document.addEventListener(&quot;DOMContentLoaded&quot;, this._domLoad.bind(this));
 	};
 
-
-<span id='onix-method-bindDI'>	/**
-</span>	 * Dependency injection bind
-	 *
-	 * @param  {Function|Array} param
-	 * @param  {Object} [replace]
-	 * @return {Object}
-	 * @member onix
+<span id='onix-method-_parseParam'>	/**
+</span>	 * Parse param for injections and function
+	 * 
+	 * @param  {Array|Function} param
+	 * @return {Object} Parsed object
 	 */
-	onix.prototype.bindDI = function(param, replace) {
+	onix.prototype._parseParam = function(param) {
 		var fn;
-		var args = [];
-
-		replace = replace || {};
+		var inject = [];
 
 		if (Array.isArray(param)) {
 			param.every(function(item) {
@@ -99,8 +90,8 @@
 					fn = item;
 					return false;
 				}
-				else {
-					args.push(item in replace ? replace[item] : this._objects[item]);
+				else if (typeof item === &quot;string&quot;) {
+					inject.push(item);
 				}
 
 				return true;
@@ -110,23 +101,10 @@
 			fn = param;
 		}
 
-<span id='onix-method-'>		/**
-</span>		 * Run new binded function - with the new
-		 * 
-		 * @param  {Function|Object} [scope] 
-		 * @param  {Boolean} [callWithNew] 
-		 * @return {Function}
-		 */
-		return function(scope, callWithNew) {
-			if (callWithNew) {
-				var obj = Object.create(fn.prototype);
-				fn.apply(obj, args);
-				return obj;
-			}
-			else {
-				return fn.apply(scope || fn, args);
-			}
-		};
+		return {
+			fn: fn,
+			inject: inject
+		}
 	};
 
 <span id='onix-method-_domLoad'>	/**
@@ -136,108 +114,144 @@
 	 * @private
 	 */
 	onix.prototype._domLoad = function() {
-		var runs = [];
-
-		// process all inner items
-		this._allObj.forEach(function(item) {
-			// only 2 types
-			switch (item.type) {
-				case onix.TYPES.SERVICE:
-					this._objects[item.name] = this.bindDI(item.param)(null, true);
-					break;
-
-				case onix.TYPES.FACTORY:
-					this._objects[item.name] = this.bindDI(item.param)();
-					break;
-
-				case onix.TYPES.CONSTANT:
-					this._objects[item.name] = item.param;
-					break;
-
-				case onix.TYPES.RUN:
-					runs.push(item.param);
-					break;
-			}
+		// promise -&gt; runs
+		this._configs.forEach(function(config) {
+			this._run(config, true);
 		}, this);
 
-		// delete them
-		this._allObj.length = 0;
-
-		// onix main run
-		this.bindDI(this._run)(this);
-
-		// run all runs
-		runs.forEach(function(run) {
-			this.bindDI(run)();
+		this._runs.forEach(function(run) {
+			this._run(run);
 		}, this);
-
-		//testTempl
 	};
 
-<span id='onix-property-_run'>	/**
-</span>	 * Main access point in the framework
-	 *
-	 * @member onix
-	 * @private
+<span id='onix-method-_run'>	/**
+</span>	 * Run object configuration; returns his cache (data)
+	 * 
+	 * @param  {Object}  obj Object configuration
+	 * @param  {Boolean} isConfig Is config phase?
+	 * @return {Object}
 	 */
-	onix.prototype._run = [
-		&quot;$i18n&quot;,
-		&quot;$template&quot;,
-		&quot;$loader&quot;,
-		&quot;$route&quot;,
-		&quot;$myQuery&quot;,
-	function(
-		$i18n,
-		$template,
-		$loader,
-		$route,
-		$myQuery
-	) {
-<span id='onix-property-element'>		/**
-</span>		 * Quick acces to myQuery and DOM manipulation
-		 *
-		 * @param  {String|HTMLElement|Array} value
-		 * @param {HTMLElement} [parent]
-		 * @return {$myQuery}
-		 * @member onix
-		 * @property {Function}
-		 */
-		this.element = function(value, parent) {
-			return new $myQuery.get(value, parent);
+	onix.prototype._run = function(obj, isConfig) {
+		var inject = [];
+
+		if (obj.provider) {
+			var providerObj = this._objects[obj.provider];
+
+			if (!providerObj.cache) {
+				var providerFn = providerObj.fn || this.noop;
+				providerObj.cache = new providerFn();
+			}
+
+			var getFn = providerObj.cache[&quot;$get&quot;] || this.noop;
+			var pp = this._parseParam(getFn);
+
+			obj.fn = pp.fn;
+			obj.inject = pp.inject;
+
+			delete obj.provider;
+		}
+
+		if (obj.inject &amp;&amp; obj.inject.length) {
+			obj.inject.forEach(function(objName) {
+				var injObj = this._objects[objName];
+
+				inject.push(this._run(injObj, isConfig));
+			}, this);
+		}
+
+		// config phase
+		if (isConfig) {
+			switch (obj.type) {
+				case this._CONST.TYPE.PROVIDER:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = new fn();
+					}
+
+					return obj.cache;
+					break;
+
+				case this._CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+
+				case this._CONST.TYPE.CONFIG:
+					var fn = obj.fn || this.noop;
+					obj.cache = fn.apply(fn, inject);
+					break;
+
+				default:
+					return null;
+			}
+		}
+		// run phase
+		else {
+			switch (obj.type) {
+				case this._CONST.TYPE.FACTORY:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = fn.apply(fn, inject);
+					}
+
+					return obj.cache;
+					break;
+
+				case this._CONST.TYPE.SERVICE:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						var serviceObj = Object.create(fn.prototype);
+						fn.apply(serviceObj, inject);
+						obj.cache = serviceObj;
+					}
+					
+					return obj.cache;
+					break;
+
+				case this._CONST.TYPE.VALUE:
+					return obj.cache;
+					break;
+
+				case this._CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+
+				case this._CONST.TYPE.RUN:
+					var fn = obj.fn || this.noop;
+					obj.cache = fn.apply(fn, inject);
+					break;
+
+				default:
+					return null;
+			}
+		}
+	};
+
+<span id='onix-method-provider'>	/**
+</span>	 * Add service to the application.
+	 *
+	 * @param  {String} name 
+	 * @param  {Function} param
+	 * @member onix
+	 */
+	onix.prototype.provider = function(name, param) {
+		var pp = this._parseParam(param);
+
+		this._objects[name + this._CONST.PROVIDER_NAME] = {
+			name: name + this._CONST.PROVIDER_NAME,
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: this._CONST.TYPE.PROVIDER
 		};
 
-		// inits
-		$loader.init();
-		$template.init();
-
-<span id='window-property-_'>		/**
-</span>		 * Get text function. Translate for the current language and the key.
-		 *
-		 * @param  {String} key
-		 * @param  {Object} [replace] Replace all {} in the string
-		 * @return {String}
-		 * @member window
-		 * @property {Function}
-		 */
-		window._ = $i18n._.bind($i18n);
-	}];
-
-<span id='onix-method-config'>	/**
-</span>	 * Read/add config to the onix application.
-	 *
-	 * @param  {Object|String} obj
-	 * @member onix
-	 */
-	onix.prototype.config = function(obj) {
-		if (typeof obj === &quot;string&quot;) {
-			// obj is key
-			return this._objects[this._CONFIG_NAME][obj];
-		}
-		else if (typeof obj === &quot;object&quot;) {
-			Object.keys(obj).forEach(function(key) {
-				this._objects[this._CONFIG_NAME][key] = obj[key];
-			}.bind(this));
-		}
+		this._objects[name] = {
+			name: name,
+			inject: null,
+			fn: null,
+			cache: null,
+			provider: name + this._CONST.PROVIDER_NAME,
+			type: this._CONST.TYPE.FACTORY
+		};
 	};
 
 <span id='onix-method-service'>	/**
@@ -248,11 +262,15 @@
 	 * @member onix
 	 */
 	onix.prototype.service = function(name, param) {
-		this._allObj.push({
+		var pp = this._parseParam(param);
+
+		this._objects[name] = {
 			name: name,
-			param: param,
-			type: onix.TYPES.SERVICE
-		});
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: this._CONST.TYPE.SERVICE
+		};
 	};
 
 <span id='onix-method-factory'>	/**
@@ -263,11 +281,15 @@
 	 * @member onix
 	 */
 	onix.prototype.factory = function(name, param) {
-		this._allObj.push({
+		var pp = this._parseParam(param);
+
+		this._objects[name] = {
 			name: name,
-			param: param,
-			type: onix.TYPES.FACTORY
-		});
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: this._CONST.TYPE.FACTORY
+		};
 	};
 
 <span id='onix-method-constant'>	/**
@@ -278,10 +300,41 @@
 	 * @member onix
 	 */
 	onix.prototype.constant = function(name, obj) {
-		this._allObj.push({
+		this._objects[name] = {
 			name: name,
-			param: obj,
-			type: onix.TYPES.CONSTANT
+			cache: obj,
+			type: this._CONST.TYPE.CONSTANT
+		};
+	};
+
+<span id='onix-method-value'>	/**
+</span>	 * Add new value
+	 * 
+	 * @param  {String} name
+	 * @param  {Object} param
+	 * @member onix
+	 */
+	onix.prototype.value = function(name, obj) {
+		this._objects[name] = {
+			name: name,
+			cache: obj,
+			type: this._CONST.TYPE.VALUE
+		};
+	};
+
+<span id='onix-method-config'>	/**
+</span>	 * Add a new config
+	 * 
+	 * @param  {Array|Function} param With DI
+	 * @member onix
+	 */
+	onix.prototype.config = function(param) {
+		var pp = this._parseParam(param);
+
+		this._configs.push({
+			fn: pp.fn,
+			inject: pp.inject,
+			type: this._CONST.TYPE.CONFIG
 		});
 	};
 
@@ -292,23 +345,13 @@
 	 * @member onix
 	 */
 	onix.prototype.run = function(param) {
-		this._allObj.push({
-			param: param,
-			type: onix.TYPES.RUN
+		var pp = this._parseParam(param);
+
+		this._runs.push({
+			fn: pp.fn,
+			inject: pp.inject,
+			type: this._CONST.TYPE.RUN
 		});
-	};
-
-<span id='onix-method-getObject'>	/**
-</span>	 * Get object
-	 *
-	 * @param  {String} name
-	 * @return {Function|Object} 
-	 * @member onix
-	 */
-	onix.prototype.getObject = function(name) {
-		name = name || &quot;&quot;;
-
-		return this._objects[name];
 	};
 
 <span id='onix-method-noop'>	/**
@@ -327,18 +370,14 @@
 	 */
 	onix.prototype.info = function() {
 		console.log(
-			&quot;Onix JS Framework\n&quot; +
-			&quot;Version: 2.2.1\n&quot; +
-			&quot;Date: 19. 4. 2016&quot;
+			&quot;OnixJS framework\n&quot; +
+			&quot;2.2.2/27. 4. 2016\n&quot; +
+			&quot;source: https://gitlab.com/LorDOniX/onix\n&quot; +
+			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs&quot;
 		);
 	};
 
-	var onixInst = new onix();
-
-	// init app
-	onixInst.init();
-
-	return onixInst;
+	return new onix()
 })();
 </pre>
 </body>

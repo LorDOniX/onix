@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">onix.factory(&quot;$q&quot;, function() {
+<span id='$q'>	/**
+</span>	 * @class $q
+	 *
+	 * Promise implementation which is similar to angular $q
+	 */
+	var $promise = function() {
+<span id='$q-property-_E_STATES'>		/**
+</span>		 * Promise states
+		 *
+		 * @member $q
+		 * @private
+		 */
+		this._E_STATES = {
+			IDLE: 0,
+			RESOLVED: 1,
+			REJECTED: 2
+		};
+
+		// current state
+		this._state = this._E_STATES.IDLE;
+
+		// all funcs
+		this._funcs = [];
+
+		// done data
+		this._finishData = null;
+	};
+
+<span id='$q-method-_resolveFuncs'>	/**
+</span>	 * Resolve all functions
+	 *
+	 * @param  {Boolean} isError
+	 * @member $q
+	 * @private
+	 */
+	$promise.prototype._resolveFuncs = function(isError) {
+		this._funcs.forEach(function(fnItem) {
+			if (fnItem[&quot;finally&quot;] || (fnItem.isError &amp;&amp; isError) || (!fnItem.isError &amp;&amp; !isError)) {
+				(fnItem.fn)(this._finishData);
+			}
+		}, this);
+		
+		// clear array
+		this._funcs.length = 0;
+		this._state = isError ? this._E_STATES.REJECTED : this._E_STATES.RESOLVED;
+	};
+
+<span id='$q-method-_isAlreadyFinished'>	/**
+</span>	 * Is promise already finished?
+	 *
+	 * @return {Boolean}
+	 * @member $q
+	 * @private
+	 */
+	$promise.prototype._isAlreadyFinished = function() {
+		if (this._state != this._E_STATES.IDLE) {
+			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
+		}
+	};
+
+<span id='$q-method-resolve'>	/**
+</span>	 * Resolve promise using obj
+	 *
+	 * @param  {Object} obj
+	 * @member $q
+	 */
+	$promise.prototype.resolve = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(false);
+	};
+
+<span id='$q-method-reject'>	/**
+</span>	 * Reject promise using obj
+	 *
+	 * @param  {Object} obj
+	 * @member $q
+	 */
+	$promise.prototype.reject = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(true);
+	};
+
+<span id='$q-method-then'>	/**
+</span>	 * After promise resolve/reject call then (okFn, errorFn)
+	 *
+	 * @chainable
+	 * @param {Function} [cbOk]
+	 * @param {Function} [cbError]
+	 * @member $q
+	 */
+	$promise.prototype.then = function(cbOk, cbError) {
+		if (cbOk &amp;&amp; typeof cbOk === &quot;function&quot;) {
+			this._funcs.push({
+				fn: cbOk,
+				isError: false
+			});
+		}
+
+		if (cbError &amp;&amp; typeof cbError === &quot;function&quot;) {
+			this._funcs.push({
+				fn: cbError,
+				isError: true
+			});
+		}
+
+		this._isAlreadyFinished();
+		
+		return this;
+	};
+
+<span id='$q-method-done'>	/**
+</span>	 * After promise resolve call then cbOk
+	 *
+	 * @chainable
+	 * @param  {Function} cbOk
+	 * @member $q
+	 */
+	$promise.prototype.done = function(cbOk) {
+		this._funcs.push({
+			fn: cbOk,
+			isError: false
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
+<span id='$q-method-error'>	/**
+</span>	 * After promise reject call then cbError
+	 *
+	 * @chainable
+	 * @param  {Function} cbError
+	 * @member $q
+	 */
+	$promise.prototype.error = function(cbError) {
+		this._funcs.push({
+			fn: cbError,
+			isError: true
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+
+<span id='$q-method-prototype["finally"]'>	/**
+</span>	 * Finally for promise
+	 *
+	 * @chainable
+	 * @param  {Function} cb
+	 * @member $q
+	 */
+	$promise.prototype[&quot;finally&quot;] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			&quot;finally&quot;: true
+		});
+
+		this._isAlreadyFinished();
+
+		return this;
+	};
+	
+	return {
+<span id='$q-method-all'>		/**
+</span>		 * Resolve all promises in the array
+		 *
+		 * @param {$q[]} promises
+		 * @return {$q}
+		 * @member $q
+		 */
+		all: function(promises) {
+			var promise = new $promise();
+
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+
+					if (count == 0) {
+						promise.resolve();
+					}
+				};
+
+				promises.forEach(function(item) {
+					item[&quot;finally&quot;](test);
+				});
+			}
+			else {
+				promise.resolve();
+			}
+
+			return promise;
+		},
+
+<span id='$q-method-defer'>		/**
+</span>		 * Deferable object of the promise
+		 *
+		 * @return {$q}
+		 * @member $q
+		 */
+		defer: function() {
+			return new $promise();
+		},
+
+<span id='$q-method-isPromise'>		/**
+</span>		 * Is object promise?
+		 * 
+		 * @param  {Object}  obj Tested object
+		 * @return {Boolean}
+		 * @member $q
+		 */
+		isPromise: function(obj) {
+			return obj instanceof $promise;
+		}
+	};
+});
+</pre>
+</body>
+</html>

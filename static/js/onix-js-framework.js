@@ -1,1 +1,0 @@
-../../dist/onix-js-framework.js

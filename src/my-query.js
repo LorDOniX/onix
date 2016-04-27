@@ -19,7 +19,6 @@ onix.factory("$myQuery", function() {
 			this._els = value;
 		}
 		else {
-			// node element todo
 			this._els.push(value);
 		}
 
@@ -200,7 +199,6 @@ onix.factory("$myQuery", function() {
 
 	/**
 	 * Append another element to this one
-	 * TODO: cannot use on n elements
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -399,6 +397,19 @@ onix.factory("$myQuery", function() {
 		return this._els.length;
 	};
 
+	/**
+	 * Quick acces to myQuery and DOM manipulation
+	 *
+	 * @param  {String|HTMLElement|Array} value
+	 * @param {HTMLElement} [parent]
+	 * @return {$myQuery}
+	 * @member onix
+	 * @property {Function}
+	 */
+	onix.element = function(value, parent) {
+		return new $myQuery(value, parent);
+	};
+
 	return {
 		 /**
 		 * Main cover function
@@ -413,3 +424,6 @@ onix.factory("$myQuery", function() {
 		}
 	};
 });
+
+// needs to be cached
+onix.run(["$myQuery", function($myQuery) {}]);

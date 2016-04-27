@@ -1,15 +1,15 @@
 onix.factory("Page", [
 	"$dom",
 	"$template",
-	"$config",
 	"$common",
 	"$event",
+	"Config",
 function(
 	$dom,
 	$template,
-	$config,
 	$common,
-	$event
+	$event,
+	Config
 ) {
 
 	// private Page obj
@@ -32,7 +32,7 @@ function(
 			this._els = {};
 
 			// each page contanins only one detail div
-			var rootEl = $dom.get($config.DETAIL_SEL);
+			var rootEl = $dom.get(Config.DETAIL_SEL);
 
 			if (config.els) {
 				this._els = $dom.get(config.els, rootEl);
