@@ -9,6 +9,7 @@ var MAIN_PATH = "static";
 // paths
 app.use("/css", express.static(path.join(__dirname, MAIN_PATH + '/css')));
 app.use("/js", express.static(path.join(__dirname, MAIN_PATH + '/js')));
+app.use("/img", express.static(path.join(__dirname, MAIN_PATH + '/img')));
 app.use("/dist", express.static(path.join(__dirname, 'dist')));
 
 // test api

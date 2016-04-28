@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.3.2 (28. 4. 2016)
+
+* upload images - set loading gif url
+
 ## 2.3.1 (28. 4. 2016)
 
 * remove $common.create

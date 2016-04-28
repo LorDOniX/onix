@@ -964,7 +964,7 @@ onix = (function() {
 		 */
 		this._runs = [];
 		/**
-		 * All config objectss
+		 * All config objects
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -1482,7 +1482,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.1/28. 4. 2016\n" +
+			"2.3.2/28. 4. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);
@@ -3993,8 +3993,14 @@ function(
 	 * @type {Object}
 	 */
 	this._const = {
-		previewMaxSize: 180
+		PREVIEW_MAX_SIZE: 180
 	};
+	/**
+	 * Loading gif URL path
+	 * 
+	 * @type {String}
+	 */
+	this._loadingGifUrl = "/img/loading.gif";
 	/**
 	 * Do jobs for processing all images
 	 *
@@ -4107,7 +4113,7 @@ function(
 				child: [{
 					el: "img",
 					"class": "preview-loader",
-					src: "/static/img/loading.gif"
+					src: this._loadingGifUrl
 				}],
 				_exported: "canvasCover"
 			}, {
@@ -4130,7 +4136,7 @@ function(
 	 * @member $uploadImages
 	 */
 	this._getImageDim = function(img) {
-		var maxSize = this._const.previewMaxSize;
+		var maxSize = this._const.PREVIEW_MAX_SIZE;
 		var largeWidth = img.width > maxSize;
 		var largeHeight = img.height > maxSize;
 		var output = {
@@ -4375,5 +4381,14 @@ function(
 	 */
 	this.getPicturesCount = function(files) {
 		return this.getPictureFiles(files).length;
+	};
+	/**
+	 * Set loading gif URL
+	 * 
+	 * @param {String} lgu URL path
+	 * @member $uploadImages
+	 */
+	this.setLoadingGifUrl = function(lgu) {
+		this._loadingGifUrl = lgu || "";
 	};
 }]);

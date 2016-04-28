@@ -46,8 +46,15 @@ function(
 	 * @type {Object}
 	 */
 	this._const = {
-		previewMaxSize: 180
+		PREVIEW_MAX_SIZE: 180
 	};
+
+<span id='$uploadImages-property-_loadingGifUrl'>	/**
+</span>	 * Loading gif URL path
+	 * 
+	 * @type {String}
+	 */
+	this._loadingGifUrl = &quot;/img/loading.gif&quot;;
 
 <span id='$uploadImages-method-_doJobs'>	/**
 </span>	 * Do jobs for processing all images
@@ -184,7 +191,7 @@ function(
 				child: [{
 					el: &quot;img&quot;,
 					&quot;class&quot;: &quot;preview-loader&quot;,
-					src: &quot;/static/img/loading.gif&quot;
+					src: this._loadingGifUrl
 				}],
 				_exported: &quot;canvasCover&quot;
 			}, {
@@ -209,7 +216,7 @@ function(
 	 * @member $uploadImages
 	 */
 	this._getImageDim = function(img) {
-		var maxSize = this._const.previewMaxSize;
+		var maxSize = this._const.PREVIEW_MAX_SIZE;
 		var largeWidth = img.width &gt; maxSize;
 		var largeHeight = img.height &gt; maxSize;
 
@@ -497,6 +504,16 @@ function(
 	 */
 	this.getPicturesCount = function(files) {
 		return this.getPictureFiles(files).length;
+	};
+
+<span id='$uploadImages-method-setLoadingGifUrl'>	/**
+</span>	 * Set loading gif URL
+	 * 
+	 * @param {String} lgu URL path
+	 * @member $uploadImages
+	 */
+	this.setLoadingGifUrl = function(lgu) {
+		this._loadingGifUrl = lgu || &quot;&quot;;
 	};
 }]);
 </pre>

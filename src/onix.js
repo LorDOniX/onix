@@ -24,7 +24,7 @@ onix = (function() {
 		this._runs = [];
 
 		/**
-		 * All config objectss
+		 * All config objects
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -623,7 +623,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.1/28. 4. 2016\n" +
+			"2.3.2/28. 4. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);

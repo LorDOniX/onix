@@ -29,8 +29,15 @@ function(
 	 * @type {Object}
 	 */
 	this._const = {
-		previewMaxSize: 180
+		PREVIEW_MAX_SIZE: 180
 	};
+
+	/**
+	 * Loading gif URL path
+	 * 
+	 * @type {String}
+	 */
+	this._loadingGifUrl = "/img/loading.gif";
 
 	/**
 	 * Do jobs for processing all images
@@ -167,7 +174,7 @@ function(
 				child: [{
 					el: "img",
 					"class": "preview-loader",
-					src: "/static/img/loading.gif"
+					src: this._loadingGifUrl
 				}],
 				_exported: "canvasCover"
 			}, {
@@ -192,7 +199,7 @@ function(
 	 * @member $uploadImages
 	 */
 	this._getImageDim = function(img) {
-		var maxSize = this._const.previewMaxSize;
+		var maxSize = this._const.PREVIEW_MAX_SIZE;
 		var largeWidth = img.width > maxSize;
 		var largeHeight = img.height > maxSize;
 
@@ -480,5 +487,15 @@ function(
 	 */
 	this.getPicturesCount = function(files) {
 		return this.getPictureFiles(files).length;
+	};
+
+	/**
+	 * Set loading gif URL
+	 * 
+	 * @param {String} lgu URL path
+	 * @member $uploadImages
+	 */
+	this.setLoadingGifUrl = function(lgu) {
+		this._loadingGifUrl = lgu || "";
 	};
 }]);
