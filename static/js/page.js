@@ -1,4 +1,4 @@
-onix.factory("Page", [
+app.factory("Page", [
 	"$dom",
 	"$template",
 	"$common",

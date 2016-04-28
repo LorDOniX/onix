@@ -1,4 +1,4 @@
-onix.factory("Snippet", [
+app.factory("Snippet", [
 	"$template",
 	"$common",
 	"$event",

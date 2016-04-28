@@ -1,4 +1,4 @@
-onix.service("HomeResource", [
+app.service("HomeResource", [
 	"$http",
 	"Config",
 function(

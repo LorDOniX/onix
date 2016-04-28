@@ -1,4 +1,4 @@
-onix.factory("HomePage", [
+app.factory("HomePage", [
 	"Page",
 	"$common",
 	"$template",
@@ -7,6 +7,7 @@ onix.factory("HomePage", [
 	"$q",
 	"HomeResource",
 	"HomeSnippet",
+	"myModule::TestFromModule",
 function(
 	Page,
 	$common,
@@ -15,10 +16,13 @@ function(
 	$select,
 	$q,
 	HomeResource,
-	HomeSnippet
+	HomeSnippet,
+	TestFromModule
 ) {
 	// test
 	HomeSnippet.dirTest();
+
+	TestFromModule.test();
 
 	var HomePage = Page.create();
 	

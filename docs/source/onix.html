@@ -16,71 +16,88 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">onix = (function() {
-<span id='onix'>	/**
-</span>	 * Main framework object.
-	 * 
-	 * @class onix
+<span id='$module'>	/**
+</span>	 * Module object - handles one module object with services, factories etc.
+	 *
+	 * @class $module
 	 */
-	var onix = function() {
-<span id='onix-property-_objects'>		/**
+	var $module = function(name, dependencies) {
+<span id='$module-property-_objects'>		/**
 </span>		 * All objects
 		 *
 		 * @type {Object}
-		 * @member onix
+		 * @member $module
 		 * @private
 		 */
 		this._objects = {};
 
-<span id='onix-property-_runs'>		/**
+<span id='$module-property-_runs'>		/**
 </span>		 * All run objects
 		 *
 		 * @type {Object}
-		 * @member onix
+		 * @member $module
 		 * @private
 		 */
 		this._runs = [];
 
-<span id='onix-property-_configs'>		/**
+<span id='$module-property-_configs'>		/**
 </span>		 * All config objectss
 		 *
 		 * @type {Object}
-		 * @member onix
+		 * @member $module
 		 * @private
 		 */
 		this._configs = [];
 
-<span id='onix-property-_CONST'>		/**
-</span>		 * Constants: provider name and types
-		 *
-		 * @property {Object}
-		 * @type {Object}
-		 * @member onix
+<span id='$module-property-_name'>		/**
+</span>		 * Module name
+		 * 
+		 * @type {String}
+		 * @member $module
 		 * @private
 		 */
-		this._CONST = {
-			PROVIDER_NAME: &quot;Provider&quot;,
-			TYPE: {
-				PROVIDER: 1,
-				SERVICE: 2,
-				FACTORY: 3,
-				CONSTANT: 4,
-				VALUE: 5,
-				CONFIG: 6,
-				RUN: 7
-			}
-		};
+		this._name = name || &quot;&quot;;
 
-		// bind DOM ready
-		document.addEventListener(&quot;DOMContentLoaded&quot;, this._domLoad.bind(this));
+<span id='$module-property-_dependencies'>		/**
+</span>		 * Module dependencies
+		 * 
+		 * @type {Array}
+		 * @member $module
+		 * @private
+		 */
+		this._dependencies = dependencies || [];
 	};
 
-<span id='onix-method-_parseParam'>	/**
-</span>	 * Parse param for injections and function
-	 * 
-	 * @param  {Array|Function} param
-	 * @return {Object} Parsed object
+<span id='$module-property-CONST'>	/**
+</span>	 * Module constants
+	 *
+	 * @property {Object}
+	 * @type {Object}
+	 * @member $module
+	 * @private
 	 */
-	onix.prototype._parseParam = function(param) {
+	$module.CONST = {
+		PROVIDER_NAME: &quot;Provider&quot;,
+		TYPE: {
+			PROVIDER: 1,
+			SERVICE: 2,
+			FACTORY: 3,
+			CONSTANT: 4,
+			VALUE: 5,
+			CONFIG: 6,
+			RUN: 7
+		}
+	};
+
+<span id='$module-property-parseParam'>	/**
+</span>	 * Parse parameters. From param parse function and dependencies
+	 *
+	 * @property {Function}
+	 * @param  {Array|Function} param 
+	 * @return {Object} Parse object
+	 * @member $module
+	 */
+	$module.parseParam = function(param) {
 		var fn;
 		var inject = [];
 
@@ -107,149 +124,73 @@
 		}
 	};
 
-<span id='onix-method-_domLoad'>	/**
-</span>	 * Event - Dom LOAD
-	 *
-	 * @member onix
-	 * @private
-	 */
-	onix.prototype._domLoad = function() {
-		// promise -&gt; runs
-		this._configs.forEach(function(config) {
-			this._run(config, true);
-		}, this);
-
-		this._runs.forEach(function(run) {
-			this._run(run);
-		}, this);
-	};
-
-<span id='onix-method-_run'>	/**
-</span>	 * Run object configuration; returns his cache (data)
+<span id='$module-method-getDependencies'>	/**
+</span>	 * Get dependencies
 	 * 
-	 * @param  {Object}  obj Object configuration
-	 * @param  {Boolean} [isConfig] Is config phase?
-	 * @param  {Array} [parent] Parent objects
-	 * @return {Object}
+	 * @return {Array}
+	 * @member $module
 	 */
-	onix.prototype._run = function(obj, isConfig, parent) {
-		parent = parent || [];
-
-		if (parent.indexOf(obj.name) != -1) {
-			console.error(&quot;Circular dependency error! Object name: &quot; + obj.name + &quot;, parents: &quot; + parent.join(&quot;|&quot;));
-			return null;
-		}
-
-		var inject = [];
-
-		if (obj.provider) {
-			var providerObj = this._objects[obj.provider];
-
-			if (!providerObj.cache) {
-				var providerFn = providerObj.fn || this.noop;
-				providerObj.cache = new providerFn();
-			}
-
-			var getFn = providerObj.cache[&quot;$get&quot;] || this.noop;
-			var pp = this._parseParam(getFn);
-
-			obj.fn = pp.fn;
-			obj.inject = pp.inject;
-
-			delete obj.provider;
-		}
-
-		if (obj.inject &amp;&amp; obj.inject.length) {
-			obj.inject.forEach(function(objName) {
-				var injObj = this._objects[objName];
-
-				inject.push(this._run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
-			}, this);
-		}
-
-		// config phase
-		if (isConfig) {
-			switch (obj.type) {
-				case this._CONST.TYPE.PROVIDER:
-					if (!obj.cache) {
-						var fn = obj.fn || this.noop;
-						obj.cache = new fn();
-					}
-
-					return obj.cache;
-					break;
-
-				case this._CONST.TYPE.CONSTANT:
-					return obj.cache;
-					break;
-
-				case this._CONST.TYPE.CONFIG:
-					var fn = obj.fn || this.noop;
-					obj.cache = fn.apply(fn, inject);
-					break;
-
-				default:
-					return null;
-			}
-		}
-		// run phase
-		else {
-			switch (obj.type) {
-				case this._CONST.TYPE.FACTORY:
-					if (!obj.cache) {
-						var fn = obj.fn || this.noop;
-						obj.cache = fn.apply(fn, inject);
-					}
-
-					return obj.cache;
-					break;
-
-				case this._CONST.TYPE.SERVICE:
-					if (!obj.cache) {
-						var fn = obj.fn || this.noop;
-						var serviceObj = Object.create(fn.prototype);
-						fn.apply(serviceObj, inject);
-						obj.cache = serviceObj;
-					}
-					
-					return obj.cache;
-					break;
-
-				case this._CONST.TYPE.VALUE:
-					return obj.cache;
-					break;
-
-				case this._CONST.TYPE.CONSTANT:
-					return obj.cache;
-					break;
-
-				case this._CONST.TYPE.RUN:
-					var fn = obj.fn || this.noop;
-					obj.cache = fn.apply(fn, inject);
-					break;
-
-				default:
-					return null;
-			}
-		}
+	$module.prototype.getDependencies = function() {
+		return this._dependencies;
 	};
 
-<span id='onix-method-provider'>	/**
-</span>	 * Add service to the application.
+<span id='$module-method-getName'>	/**
+</span>	 * Get module name
+	 * 
+	 * @return {String}
+	 * @member $module
+	 */
+	$module.prototype.getName = function() {
+		return this._name;
+	};
+
+<span id='$module-method-getConfigs'>	/**
+</span>	 * Get module configs
+	 * 
+	 * @return {Array}
+	 * @member $module
+	 */
+	$module.prototype.getConfigs = function() {
+		return this._configs;
+	};
+
+<span id='$module-method-getRuns'>	/**
+</span>	 * Get module runs
+	 * 
+	 * @return {Array}
+	 * @member $module
+	 */
+	$module.prototype.getRuns = function() {
+		return this._runs;
+	};
+
+<span id='$module-method-getObjects'>	/**
+</span>	 * Get module objects
+	 * 
+	 * @return {Array}
+	 * @member $module
+	 */
+	$module.prototype.getObjects = function() {
+		return this._objects;
+	};
+
+<span id='$module-method-provider'>	/**
+</span>	 * Add provider to the application
 	 *
+	 * @chainable
 	 * @param  {String} name 
 	 * @param  {Function} param
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.provider = function(name, param) {
-		var pp = this._parseParam(param);
+	$module.prototype.provider = function(name, param) {
+		var pp = $module.parseParam(param);
 
-		this._objects[name + this._CONST.PROVIDER_NAME] = {
-			name: name + this._CONST.PROVIDER_NAME,
+		this._objects[name + $module.CONST.PROVIDER_NAME] = {
+			name: name + $module.CONST.PROVIDER_NAME,
 			inject: pp.inject,
 			fn: pp.fn,
 			cache: null,
-			type: this._CONST.TYPE.PROVIDER
+			type: $module.CONST.TYPE.PROVIDER
 		};
 
 		this._objects[name] = {
@@ -257,109 +198,429 @@
 			inject: null,
 			fn: null,
 			cache: null,
-			provider: name + this._CONST.PROVIDER_NAME,
-			type: this._CONST.TYPE.FACTORY
+			provider: name + $module.CONST.PROVIDER_NAME,
+			type: $module.CONST.TYPE.FACTORY
 		};
+
+		return this;
 	};
 
-<span id='onix-method-service'>	/**
-</span>	 * Add service to the application.
+<span id='$module-method-service'>	/**
+</span>	 * Add service to the application
 	 *
+	 * @chainable
 	 * @param  {String} name 
 	 * @param  {Function|Array} param
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.service = function(name, param) {
-		var pp = this._parseParam(param);
+	$module.prototype.service = function(name, param) {
+		var pp = $module.parseParam(param);
 
 		this._objects[name] = {
 			name: name,
 			inject: pp.inject,
 			fn: pp.fn,
 			cache: null,
-			type: this._CONST.TYPE.SERVICE
+			type: $module.CONST.TYPE.SERVICE
 		};
+
+		return this;
 	};
 
-<span id='onix-method-factory'>	/**
-</span>	 * Add factory to the application.
+<span id='$module-method-factory'>	/**
+</span>	 * Add factory to the application
 	 *
+	 * @chainable
 	 * @param  {String} name 
 	 * @param  {Function|Array} param
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.factory = function(name, param) {
-		var pp = this._parseParam(param);
+	$module.prototype.factory = function(name, param) {
+		var pp = $module.parseParam(param);
 
 		this._objects[name] = {
 			name: name,
 			inject: pp.inject,
 			fn: pp.fn,
 			cache: null,
-			type: this._CONST.TYPE.FACTORY
+			type: $module.CONST.TYPE.FACTORY
 		};
+
+		return this;
 	};
 
-<span id='onix-method-constant'>	/**
+<span id='$module-method-constant'>	/**
 </span>	 * Add new constant
-	 * 
+	 *
+	 * @chainable
 	 * @param  {String} name
 	 * @param  {Object} param
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.constant = function(name, obj) {
+	$module.prototype.constant = function(name, obj) {
 		this._objects[name] = {
 			name: name,
 			cache: obj,
-			type: this._CONST.TYPE.CONSTANT
+			type: $module.CONST.TYPE.CONSTANT
 		};
+
+		return this;
 	};
 
-<span id='onix-method-value'>	/**
-</span>	 * Add new value
-	 * 
+<span id='$module-method-value'>	/**
+</span>	 * Add a new value
+	 *
+	 * @chainable
 	 * @param  {String} name
 	 * @param  {Object} param
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.value = function(name, obj) {
+	$module.prototype.value = function(name, obj) {
 		this._objects[name] = {
 			name: name,
 			cache: obj,
-			type: this._CONST.TYPE.VALUE
+			type: $module.CONST.TYPE.VALUE
 		};
+
+		return this;
 	};
 
-<span id='onix-method-config'>	/**
+<span id='$module-method-config'>	/**
 </span>	 * Add a new config
-	 * 
+	 *
+	 * @chainable
 	 * @param  {Array|Function} param With DI
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.config = function(param) {
-		var pp = this._parseParam(param);
+	$module.prototype.config = function(param) {
+		var pp = $module.parseParam(param);
 
 		this._configs.push({
 			fn: pp.fn,
 			inject: pp.inject,
-			type: this._CONST.TYPE.CONFIG
+			type: $module.CONST.TYPE.CONFIG
 		});
+
+		return this;
 	};
 
-<span id='onix-method-run'>	/**
+<span id='$module-method-run'>	/**
 </span>	 * Add a new run
 	 * 
 	 * @param  {Array|Function} param With DI
-	 * @member onix
+	 * @member $module
 	 */
-	onix.prototype.run = function(param) {
-		var pp = this._parseParam(param);
+	$module.prototype.run = function(param) {
+		var pp = $module.parseParam(param);
 
 		this._runs.push({
 			fn: pp.fn,
 			inject: pp.inject,
-			type: this._CONST.TYPE.RUN
+			type: $module.CONST.TYPE.RUN
 		});
+
+		return this;
+	};
+
+<span id='$modules'>	/**
+</span>	 * Modules object - handles all modules in the application; runs object
+	 *
+	 * @class $modules
+	 */
+	var $modules = {
+<span id='$modules-property-_modules'>		/**
+</span>		 * All modules array
+		 *
+		 * @private
+		 * @member $modules
+		 * @type {Array}
+		 */
+		_modules: [],
+
+<span id='$modules-property-_modulesObj'>		/**
+</span>		 * All modules object - quick access
+		 *
+		 * @private
+		 * @member $modules
+		 * @type {Object}
+		 */
+		_modulesObj: {},
+
+<span id='$modules-property-_CONST'>		/**
+</span>		 * Modules constants
+		 *
+		 * @private
+		 * @member $modules
+		 * @type {Ojbect}
+		 */
+		_CONST: {
+			MODULE_SEPARATOR: &quot;::&quot;,
+		},
+
+<span id='$modules-property-_noop'>		/**
+</span>		 * Function which does nothing
+		 *
+		 * @private
+		 * @property {Function}
+		 * @member $modules
+		 */
+		_noop: function() {
+
+		},
+
+<span id='$modules-property-domLoad'>		/**
+</span>		 * Event - Dom LOAD
+		 *
+		 * @property {Function}
+		 * @member $modules
+		 */
+		domLoad: function() {
+			var configs = [];
+			var runs = [];
+
+			this._modules.forEach(function(module) {
+				var error = false;
+				var dependencies = module.getDependencies();
+
+				dependencies.every(function(dep) {
+					if (!(dep in this._modulesObj)) {
+						console.error(&quot;Module &#39;&quot; + this._name + &quot;&#39; dependency &#39;&quot; + dep + &quot;&#39; not found!&quot;);
+						error = true;
+						return false;
+					}
+					else {
+						return true;
+					}
+				}, this);
+
+				if (!error) {
+					configs = configs.concat(module.getConfigs());
+					runs = runs.concat(module.getRuns());
+				}
+			}, this);
+
+			// promise -&gt; runs
+			configs.forEach(function(config) {
+				this._run(config, true);
+			}, this);
+
+			runs.forEach(function(run) {
+				this._run(run);
+			}, this);
+		},
+
+<span id='$modules-property-_getObject'>		/**
+</span>		 * Get object by his name
+		 *
+		 * @property {Function}
+		 * @param {String} name Object name
+		 * @member $modules
+		 * @return {Object} Object data
+		 * @private
+		 */
+		_getObject: function(name) {
+			var output = null;
+
+			var searchModuleName = &quot;&quot;;
+			var searchObjectName = &quot;&quot;;
+
+			if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
+				var parts = name.split(this._CONST.MODULE_SEPARATOR);
+
+				if (parts.length == 2) {
+					searchModuleName = parts[0];
+					searchObjectName = parts[1];
+				}
+				else {
+					console.error(&quot;Get object &quot; + name + &quot; error! Wrong module separator use.&quot;);
+					return null;
+				}
+			}
+			else {
+				searchObjectName = name;
+			}
+
+			this._modules.every(function(module) {
+				var moduleObjects = module.getObjects();
+
+				if (searchModuleName) {
+					if (module.getName() != searchModuleName) return true;
+
+					if (searchObjectName in moduleObjects) {
+						output = moduleObjects[searchObjectName];
+						return false;
+					}
+					else {
+						console.error(&quot;Get object &quot; + searchObjectName + &quot; error! Cannot find object in the module &quot; + searchModuleName + &quot;.&quot;);
+						return false;
+					}
+				}
+				else {
+					if (searchObjectName in moduleObjects) {
+						output = moduleObjects[searchObjectName];
+						return false;
+					}
+					else return true;
+				}
+			});
+
+			return output;
+		},
+
+<span id='$modules-property-_run'>		/**
+</span>		 * Run object configuration; returns his cache (data)
+		 *
+		 * @property {Function}
+		 * @param  {Object}  obj Object configuration
+		 * @param  {Boolean} [isConfig] Is config phase?
+		 * @param  {Array} [parent] Parent objects
+		 * @return {Object}
+		 * @member $modules
+		 * @private
+		 */
+		_run: function(obj, isConfig, parent) {
+			parent = parent || [];
+
+			if (parent.indexOf(obj.name) != -1) {
+				console.error(&quot;Circular dependency error! Object name: &quot; + obj.name + &quot;, parents: &quot; + parent.join(&quot;|&quot;));
+				return null;
+			}
+
+			var inject = [];
+
+			if (obj.provider) {
+				//var providerObj = this._objects[obj.provider];
+				var providerObj = this._getObject(obj.provider);
+
+				if (!providerObj.cache) {
+					var providerFn = providerObj.fn || this._noop;
+					providerObj.cache = new providerFn();
+				}
+
+				var getFn = providerObj.cache[&quot;$get&quot;] || this._noop;
+				var pp = $module.parseParam(getFn);
+
+				obj.fn = pp.fn;
+				obj.inject = pp.inject;
+
+				delete obj.provider;
+			}
+
+			if (obj.inject &amp;&amp; obj.inject.length) {
+				obj.inject.forEach(function(objName) {
+					//var injObj = this._objects[objName];
+					var injObj = this._getObject(objName);
+
+					inject.push(this._run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+				}, this);
+			}
+
+			// config phase
+			if (isConfig) {
+				switch (obj.type) {
+					case $module.CONST.TYPE.PROVIDER:
+						if (!obj.cache) {
+							var fn = obj.fn || this._noop;
+							obj.cache = new fn();
+						}
+
+						return obj.cache;
+						break;
+
+					case $module.CONST.TYPE.CONSTANT:
+						return obj.cache;
+						break;
+
+					case $module.CONST.TYPE.CONFIG:
+						var fn = obj.fn || this._noop;
+						obj.cache = fn.apply(fn, inject);
+						break;
+
+					default:
+						return null;
+				}
+			}
+			// run phase
+			else {
+				switch (obj.type) {
+					case $module.CONST.TYPE.FACTORY:
+						if (!obj.cache) {
+							var fn = obj.fn || this._noop;
+							obj.cache = fn.apply(fn, inject);
+						}
+
+						return obj.cache;
+						break;
+
+					case $module.CONST.TYPE.SERVICE:
+						if (!obj.cache) {
+							var fn = obj.fn || this._noop;
+							var serviceObj = Object.create(fn.prototype);
+							fn.apply(serviceObj, inject);
+							obj.cache = serviceObj;
+						}
+						
+						return obj.cache;
+						break;
+
+					case $module.CONST.TYPE.VALUE:
+						return obj.cache;
+						break;
+
+					case $module.CONST.TYPE.CONSTANT:
+						return obj.cache;
+						break;
+
+					case $module.CONST.TYPE.RUN:
+						var fn = obj.fn || this._noop;
+						obj.cache = fn.apply(fn, inject);
+						break;
+
+					default:
+						return null;
+				}
+			}
+		},
+
+<span id='$modules-method-addModule'>		/**
+</span>		 * Add a new module to the application
+		 * 
+		 * @param {String} name Module name
+		 * @param {Array} [dependencies] Module dependencies
+		 * @return {Object} Created module
+		 * @member $modules
+		 */
+		addModule: function(name, dependencies) {
+			var module = new $module(name, dependencies);
+
+			this._modulesObj[name] = module
+			this._modules.push(module);
+
+			return module;
+		}
+	};
+
+	// bind DOM ready
+	document.addEventListener(&quot;DOMContentLoaded&quot;, $modules.domLoad.bind($modules));
+
+<span id='onix'>	/**
+</span>	 * Main framework object, which is created like new module with name &#39;onix&#39;.
+	 * Module has addtional functions
+	 * 
+	 * @class onix
+	 */
+	var onix = $modules.addModule(&quot;onix&quot;);
+
+<span id='onix-method-module'>	/**
+</span>	 * Add a new module to the application
+	 * 
+	 * @param {String} name Module name
+	 * @param {Array} [dependencies] Module dependencies
+	 * @return {Object} Created module
+	 * @member onix
+	 */
+	onix.module = function(name, dependencies) {
+		return $modules.addModule(name, dependencies);
 	};
 
 <span id='onix-method-noop'>	/**
@@ -367,8 +628,7 @@
 	 *
 	 * @member onix
 	 */
-	onix.prototype.noop = function() {
-
+	onix.noop = function() {
 	};
 
 <span id='onix-method-info'>	/**
@@ -376,16 +636,16 @@
 	 *
 	 * @member onix
 	 */
-	onix.prototype.info = function() {
+	onix.info = function() {
 		console.log(
 			&quot;OnixJS framework\n&quot; +
-			&quot;2.2.3/27. 4. 2016\n&quot; +
+			&quot;2.3.0/28. 4. 2016\n&quot; +
 			&quot;source: https://gitlab.com/LorDOniX/onix\n&quot; +
 			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs&quot;
 		);
 	};
 
-	return new onix()
+	return onix;
 })();
 </pre>
 </body>

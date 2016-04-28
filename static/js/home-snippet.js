@@ -1,8 +1,12 @@
-onix.factory("HomeSnippet", [
+app.factory("HomeSnippet", [
 	"Snippet",
+	"TestFromModule",
 function(
-	Snippet
+	Snippet,
+	TestFromModule
 ) {
+
+	TestFromModule.test();
 
 	var HomeSnippet = Snippet.create();
 

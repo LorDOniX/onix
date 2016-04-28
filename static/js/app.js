@@ -1,4 +1,14 @@
-onix.value("Config", {
+myModule = onix.module("myModule", []);
+
+myModule.service("TestFromModule", function() {
+	this.test = function() {
+		console.log("TestFromModule - test function");
+	};
+});
+
+app = onix.module("app", ["myModule"]);
+
+app.value("Config", {
 	// app localization
 	LOCALIZATION: {
 		LANG: "en",
@@ -14,10 +24,10 @@ onix.value("Config", {
 	DETAIL_SEL: ".detail"
 });
 
-onix.config(["$templateProvider", function($templateProvider) {
+app.config(["$templateProvider", function($templateProvider) {
 }]);
 
-onix.run([
+app.run([
 	"$route",
 	"$template",
 	"Config",
