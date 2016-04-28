@@ -33,31 +33,30 @@ app.run([
 	"Config",
 	"$q",
 	"$i18n",
-	"HomePage",
 function(
 	$route,
 	$template,
 	Config,
 	$q,
-	$i18n,
-	HomePage
+	$i18n
 ) {
 	$i18n.setLanguage("en");
 
 	// application routes
 	$route
 		.when("/", {
-			controller: function() {
+			controller: ["HomePage", function(HomePage) {
 				HomePage.setConfig({});
 				HomePage.init();
-			},
-			templateUrl: "/js/test-templ.html"
+			}],
+			templateUrl: "/js/test-templ.html",
+			a: 5
 		})
 		.otherwise({
-			controller: function() {
+			controller: ["HomePage", function(HomePage) {
 				HomePage.setConfig({});
 				HomePage.init();
-			}
+			}]
 		});
 
 	// all dependencies before start

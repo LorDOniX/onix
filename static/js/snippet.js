@@ -174,7 +174,7 @@ function(
 		 * @return {Snippet}
 		 */
 		create: function() {
-			return $common.create(Snippet, $event);
+			return $common.merge(Snippet, $event);
 		}
 	};
 

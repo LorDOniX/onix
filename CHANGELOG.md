@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.3.1 (28. 4. 2016)
+
+* remove $common.create
+* add $dependency service which handles DI
+* $modules.run is public and accepts object for injection
+
 ## 2.3.0 (28. 4. 2016)
 
 * add module system

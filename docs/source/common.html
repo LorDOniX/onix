@@ -115,37 +115,6 @@ function(
 		return promise;
 	};
 
-<span id='$common-method-create'>	/**
-</span>	 * Create one object from arguments
-	 *
-	 * @param  {Object|Function} mainObj
-	 * @param  {Object|Function|Array} a data | dependicies
-	 * @param  {Object|Function} [b] data | dependicies
-	 * @return {Object}
-	 * @member $common
-	 */
-	this.create = function(mainObj, a, b) {
-		var args = [];
-
-		if (a &amp;&amp; b &amp;&amp; Array.isArray(a)) {
-			// a == dependicies
-			// b == data
-
-			// arguments
-			a.forEach(function(item) {
-				args.push(onix.getObject(item));
-			});
-		}
-
-		// data
-		args.push(mainObj);
-
-		// data override
-		args.push(b || a);
-
-		return this.merge.apply(this, args);
-	};
-
 <span id='$common-method-merge'>	/**
 </span>	 * Merge multiple objects into the single one
 	 *

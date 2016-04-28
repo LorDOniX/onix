@@ -99,37 +99,6 @@ function(
 	};
 
 	/**
-	 * Create one object from arguments
-	 *
-	 * @param  {Object|Function} mainObj
-	 * @param  {Object|Function|Array} a data | dependicies
-	 * @param  {Object|Function} [b] data | dependicies
-	 * @return {Object}
-	 * @member $common
-	 */
-	this.create = function(mainObj, a, b) {
-		var args = [];
-
-		if (a && b && Array.isArray(a)) {
-			// a == dependicies
-			// b == data
-
-			// arguments
-			a.forEach(function(item) {
-				args.push(onix.getObject(item));
-			});
-		}
-
-		// data
-		args.push(mainObj);
-
-		// data override
-		args.push(b || a);
-
-		return this.merge.apply(this, args);
-	};
-
-	/**
 	 * Merge multiple objects into the single one
 	 *
 	 * @return {Object}

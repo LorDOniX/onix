@@ -382,13 +382,12 @@ onix = (function() {
 				}
 			}, this);
 
-			// promise -> runs
 			configs.forEach(function(config) {
-				this._run(config, true);
+				this.run(config, true);
 			}, this);
 
 			runs.forEach(function(run) {
-				this._run(run);
+				this.run(run);
 			}, this);
 		},
 
@@ -459,9 +458,8 @@ onix = (function() {
 		 * @param  {Array} [parent] Parent objects
 		 * @return {Object}
 		 * @member $modules
-		 * @private
 		 */
-		_run: function(obj, isConfig, parent) {
+		run: function(obj, isConfig, parent) {
 			parent = parent || [];
 
 			if (parent.indexOf(obj.name) != -1) {
@@ -472,7 +470,6 @@ onix = (function() {
 			var inject = [];
 
 			if (obj.provider) {
-				//var providerObj = this._objects[obj.provider];
 				var providerObj = this._getObject(obj.provider);
 
 				if (!providerObj.cache) {
@@ -491,10 +488,14 @@ onix = (function() {
 
 			if (obj.inject && obj.inject.length) {
 				obj.inject.forEach(function(objName) {
-					//var injObj = this._objects[objName];
-					var injObj = this._getObject(objName);
+					if (typeof objName === "string") {
+						var injObj = this._getObject(objName);
 
-					inject.push(this._run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+					}
+					else if (typeof objName === "object") {
+						inject.push(objName);
+					}
 				}, this);
 			}
 
@@ -516,7 +517,7 @@ onix = (function() {
 
 					case $module.CONST.TYPE.CONFIG:
 						var fn = obj.fn || this._noop;
-						obj.cache = fn.apply(fn, inject);
+						return fn.apply(fn, inject);
 						break;
 
 					default:
@@ -556,7 +557,7 @@ onix = (function() {
 
 					case $module.CONST.TYPE.RUN:
 						var fn = obj.fn || this._noop;
-						obj.cache = fn.apply(fn, inject);
+						return fn.apply(fn, inject);
 						break;
 
 					default:
@@ -622,11 +623,40 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.0/28. 4. 2016\n" +
+			"2.3.1/28. 4. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);
 	};
+
+	/**
+	 * Help class for handle DI across application
+	 * 
+	 * @class $dependency
+	 */
+	onix.service("$dependency", function() {
+		/**
+		 * Run param with additional parameter; This method handles DI and can also add object, which is has no module
+		 * 
+		 * @param  {Function|Array} param DI or function
+		 * @param  {Object} addParam This additional parameter will be add to the DI at the last position
+		 * @member $dependency
+		 */
+		this.run = function(param, addParam) {
+			var pp = $module.parseParam(param);
+
+			if (addParam) {
+				pp.inject.push(addParam);
+			}
+
+			// Run like a run
+			$modules.run({
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.RUN
+			});
+		};
+	});
 
 	return onix;
 })();

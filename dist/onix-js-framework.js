@@ -1280,12 +1280,11 @@ onix = (function() {
 					runs = runs.concat(module.getRuns());
 				}
 			}, this);
-			// promise -> runs
 			configs.forEach(function(config) {
-				this._run(config, true);
+				this.run(config, true);
 			}, this);
 			runs.forEach(function(run) {
-				this._run(run);
+				this.run(run);
 			}, this);
 		},
 		/**
@@ -1347,9 +1346,8 @@ onix = (function() {
 		 * @param  {Array} [parent] Parent objects
 		 * @return {Object}
 		 * @member $modules
-		 * @private
 		 */
-		_run: function(obj, isConfig, parent) {
+		run: function(obj, isConfig, parent) {
 			parent = parent || [];
 			if (parent.indexOf(obj.name) != -1) {
 				console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
@@ -1357,7 +1355,6 @@ onix = (function() {
 			}
 			var inject = [];
 			if (obj.provider) {
-				//var providerObj = this._objects[obj.provider];
 				var providerObj = this._getObject(obj.provider);
 				if (!providerObj.cache) {
 					var providerFn = providerObj.fn || this._noop;
@@ -1371,9 +1368,13 @@ onix = (function() {
 			}
 			if (obj.inject && obj.inject.length) {
 				obj.inject.forEach(function(objName) {
-					//var injObj = this._objects[objName];
-					var injObj = this._getObject(objName);
-					inject.push(this._run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+					if (typeof objName === "string") {
+						var injObj = this._getObject(objName);
+						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+					}
+					else if (typeof objName === "object") {
+						inject.push(objName);
+					}
 				}, this);
 			}
 			// config phase
@@ -1391,7 +1392,7 @@ onix = (function() {
 						break;
 					case $module.CONST.TYPE.CONFIG:
 						var fn = obj.fn || this._noop;
-						obj.cache = fn.apply(fn, inject);
+						return fn.apply(fn, inject);
 						break;
 					default:
 						return null;
@@ -1424,7 +1425,7 @@ onix = (function() {
 						break;
 					case $module.CONST.TYPE.RUN:
 						var fn = obj.fn || this._noop;
-						obj.cache = fn.apply(fn, inject);
+						return fn.apply(fn, inject);
 						break;
 					default:
 						return null;
@@ -1481,11 +1482,37 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.0/28. 4. 2016\n" +
+			"2.3.1/28. 4. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);
 	};
+	/**
+	 * Help class for handle DI across application
+	 * 
+	 * @class $dependency
+	 */
+	onix.service("$dependency", function() {
+		/**
+		 * Run param with additional parameter; This method handles DI and can also add object, which is has no module
+		 * 
+		 * @param  {Function|Array} param DI or function
+		 * @param  {Object} addParam This additional parameter will be add to the DI at the last position
+		 * @member $dependency
+		 */
+		this.run = function(param, addParam) {
+			var pp = $module.parseParam(param);
+			if (addParam) {
+				pp.inject.push(addParam);
+			}
+			// Run like a run
+			$modules.run({
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.RUN
+			});
+		};
+	});
 	return onix;
 })();
 /**
@@ -2450,31 +2477,6 @@ function(
 			promise.reject();
 		}
 		return promise;
-	};
-	/**
-	 * Create one object from arguments
-	 *
-	 * @param  {Object|Function} mainObj
-	 * @param  {Object|Function|Array} a data | dependicies
-	 * @param  {Object|Function} [b] data | dependicies
-	 * @return {Object}
-	 * @member $common
-	 */
-	this.create = function(mainObj, a, b) {
-		var args = [];
-		if (a && b && Array.isArray(a)) {
-			// a == dependicies
-			// b == data
-			// arguments
-			a.forEach(function(item) {
-				args.push(onix.getObject(item));
-			});
-		}
-		// data
-		args.push(mainObj);
-		// data override
-		args.push(b || a);
-		return this.merge.apply(this, args);
 	};
 	/**
 	 * Merge multiple objects into the single one
@@ -3616,9 +3618,11 @@ onix.provider("$template", function() {
 onix.service("$route", [
 	"$location",
 	"$template",
+	"$dependency",
 function(
 	$location,
-	$template
+	$template,
+	$dependency
 ) {
 	/**
 	 * All routes
@@ -3673,20 +3677,12 @@ function(
 	 * Run controller from route path
 	 *
 	 * @private
-	 * @param  {String|Array|Function} contr
-	 * @param  {Object} [contrData] 
+	 * @param  {Array|Function} contr
+	 * @param  {Object} [contrData] Additonal data
+	 * @member $route
 	 */
 	this._runController = function(contr, contrData) {
-		if (typeof contr === "string") {
-			var param = onix.getObject(contr);
-			onix.bindDI(param, contrData)();
-		}
-		else if (Array.isArray(contr)) {
-			onix.bindDI(contr, contrData)();
-		}
-		else if (typeof contr === "function") {
-			contr.apply(contr, [contrData]);
-		}
+		$dependency.run(contr, contrData);
 	};
 	/**
 	 * Route GO. Walk through all routes, if there is match, route controller will be called

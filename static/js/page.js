@@ -94,7 +94,7 @@ function(
 		 * @return {Page}
 		 */
 		create: function() {
-			return $common.create(Page, $event);
+			return $common.merge(Page, $event);
 		}
 	};
 

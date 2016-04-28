@@ -23,9 +23,11 @@
 onix.service(&quot;$route&quot;, [
 	&quot;$location&quot;,
 	&quot;$template&quot;,
+	&quot;$dependency&quot;,
 function(
 	$location,
-	$template
+	$template,
+	$dependency
 ) {
 <span id='$route-property-_routes'>	/**
 </span>	 * All routes
@@ -87,21 +89,12 @@ function(
 </span>	 * Run controller from route path
 	 *
 	 * @private
-	 * @param  {String|Array|Function} contr
-	 * @param  {Object} [contrData] 
+	 * @param  {Array|Function} contr
+	 * @param  {Object} [contrData] Additonal data
+	 * @member $route
 	 */
 	this._runController = function(contr, contrData) {
-		if (typeof contr === &quot;string&quot;) {
-			var param = onix.getObject(contr);
-
-			onix.bindDI(param, contrData)();
-		}
-		else if (Array.isArray(contr)) {
-			onix.bindDI(contr, contrData)();
-		}
-		else if (typeof contr === &quot;function&quot;) {
-			contr.apply(contr, [contrData]);
-		}
+		$dependency.run(contr, contrData);
 	};
 
 <span id='$route-method-go'>	/**
