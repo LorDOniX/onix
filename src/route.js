@@ -6,11 +6,11 @@
 onix.service("$route", [
 	"$location",
 	"$template",
-	"$dependency",
+	"$di",
 function(
 	$location,
 	$template,
-	$dependency
+	$di
 ) {
 	/**
 	 * All routes
@@ -77,7 +77,16 @@ function(
 	 * @member $route
 	 */
 	this._runController = function(contr, contrData) {
-		$dependency.run(contr, contrData);
+		var pp = $di.parseParam(contr);
+
+		if (contrData) {
+			pp.inject.push(contrData);
+		}
+
+		$di.run({
+			fn: pp.fn,
+			inject: pp.inject
+		});
 	};
 
 	/**

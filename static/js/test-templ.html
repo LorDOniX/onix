@@ -2,4 +2,5 @@
 	<h1>Test template - {{ name }}</h1>
 	<button type="button" class="btn btn-success" data-click="tmplBtn()">Click on me</button>
 	<input type="text" data-keydown="onkd()" class="form control" />
+	{{ testObj | json }} | <pre>{{ testObj | json:4 }}</pre> | {{ name | lowercase | uppercase }} | {{ name | uppercase }} | {{ name | lowercase }}
 </div>

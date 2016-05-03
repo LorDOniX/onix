@@ -8,6 +8,7 @@ app.factory("HomePage", [
 	"HomeResource",
 	"HomeSnippet",
 	"myModule::TestFromModule",
+	"$filter",
 function(
 	Page,
 	$common,
@@ -17,7 +18,8 @@ function(
 	$q,
 	HomeResource,
 	HomeSnippet,
-	TestFromModule
+	TestFromModule,
+	$filter
 ) {
 	// test
 	HomeSnippet.dirTest();
@@ -25,6 +27,8 @@ function(
 	TestFromModule.test();
 
 	var HomePage = Page.create();
+
+	console.log("Test of filter 'lowercase' : HI, HOW ARE YOU? -> " + $filter("lowercase")("HI, HOW ARE YOU?"));
 	
 	// ------------------------ private ---------------------------------------
 	HomePage._afterInit = function() {
@@ -115,7 +119,11 @@ function(
 	 */
 	HomePage._loadTemplate = function() {
 		var el = onix.element(".placeholder").html($template.compile("testTempl", {
-			name: "Name from HP"
+			name: "Name from HP",
+			testObj: {
+				a: 5,
+				b: 6
+			}
 		}));
 
 		$template.bindTemplate(el.getEl(), this);

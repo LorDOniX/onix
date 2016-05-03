@@ -7,6 +7,11 @@
 		this.returnValue = false;
 	};
 })();
+if (!String.prototype.trim) {
+	String.prototype.trim = function () {
+		return this.replace(/^\s+|\s+$/g, '');
+	};
+}
 if(!Array.isArray) {
 	/**
 	 * Array.isArray dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
@@ -998,14 +1003,16 @@ onix = (function() {
 	 */
 	$module.CONST = {
 		PROVIDER_NAME: "Provider",
+		FILTER_NAME: "$filter",
 		TYPE: {
 			PROVIDER: 1,
 			SERVICE: 2,
 			FACTORY: 3,
 			CONSTANT: 4,
 			VALUE: 5,
-			CONFIG: 6,
-			RUN: 7
+			FILTER: 6,
+			CONFIG: 7,
+			RUN: 8
 		}
 	};
 	/**
@@ -1038,6 +1045,17 @@ onix = (function() {
 			fn: fn,
 			inject: inject
 		}
+	};
+	/**
+	 * Get filter name
+	 * 
+	 * @param  {String} name
+	 * @return {String}
+	 * @member $module
+	 */
+	$module.getFilterName = function(name) {
+		name = name || "";
+		return $module.CONST.FILTER_NAME + name[0].toUpperCase() + name.substr(1, name.length - 1);
 	};
 	/**
 	 * Get dependencies
@@ -1093,6 +1111,9 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.provider = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
 		var pp = $module.parseParam(param);
 		this._objects[name + $module.CONST.PROVIDER_NAME] = {
 			name: name + $module.CONST.PROVIDER_NAME,
@@ -1120,6 +1141,9 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.service = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
 		var pp = $module.parseParam(param);
 		this._objects[name] = {
 			name: name,
@@ -1139,6 +1163,9 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.factory = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
 		var pp = $module.parseParam(param);
 		this._objects[name] = {
 			name: name,
@@ -1158,6 +1185,9 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.constant = function(name, obj) {
+		if (!name || !obj) {
+			return this;
+		}
 		this._objects[name] = {
 			name: name,
 			cache: obj,
@@ -1174,10 +1204,35 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.value = function(name, obj) {
+		if (!name || !obj) {
+			return this;
+		}
 		this._objects[name] = {
 			name: name,
 			cache: obj,
 			type: $module.CONST.TYPE.VALUE
+		};
+		return this;
+	};
+	/**
+	 * Add filter to the application
+	 *
+	 * @chainable
+	 * @param  {String} name 
+	 * @param  {Function|Array} param
+	 * @member $module
+	 */
+	$module.prototype.filter = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+		var pp = $module.parseParam(param);
+		this._objects[$module.getFilterName(name)] = {
+			name: name,
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: $module.CONST.TYPE.FILTER
 		};
 		return this;
 	};
@@ -1189,6 +1244,9 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.config = function(param) {
+		if (!param) {
+			return this;
+		}
 		var pp = $module.parseParam(param);
 		this._configs.push({
 			fn: pp.fn,
@@ -1204,6 +1262,9 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.run = function(param) {
+		if (!param) {
+			return this;
+		}
 		var pp = $module.parseParam(param);
 		this._runs.push({
 			fn: pp.fn,
@@ -1248,7 +1309,6 @@ onix = (function() {
 		 * Function which does nothing
 		 *
 		 * @private
-		 * @property {Function}
 		 * @member $modules
 		 */
 		_noop: function() {
@@ -1256,7 +1316,6 @@ onix = (function() {
 		/**
 		 * Event - Dom LOAD
 		 *
-		 * @property {Function}
 		 * @member $modules
 		 */
 		domLoad: function() {
@@ -1290,10 +1349,9 @@ onix = (function() {
 		/**
 		 * Get object by his name
 		 *
-		 * @property {Function}
 		 * @param {String} name Object name
-		 * @member $modules
 		 * @return {Object} Object data
+		 * @member $modules
 		 * @private
 		 */
 		_getObject: function(name) {
@@ -1340,7 +1398,6 @@ onix = (function() {
 		/**
 		 * Run object configuration; returns his cache (data)
 		 *
-		 * @property {Function}
 		 * @param  {Object}  obj Object configuration
 		 * @param  {Boolean} [isConfig] Is config phase?
 		 * @param  {Array} [parent] Parent objects
@@ -1370,7 +1427,13 @@ onix = (function() {
 				obj.inject.forEach(function(objName) {
 					if (typeof objName === "string") {
 						var injObj = this._getObject(objName);
-						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						if (!injObj) {
+							console.error("Object name: " + objName + " not found!");
+							inject.push(null);
+						}
+						else {
+							inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						}
 					}
 					else if (typeof objName === "object") {
 						inject.push(objName);
@@ -1402,6 +1465,7 @@ onix = (function() {
 			else {
 				switch (obj.type) {
 					case $module.CONST.TYPE.FACTORY:
+					case $module.CONST.TYPE.FILTER:
 						if (!obj.cache) {
 							var fn = obj.fn || this._noop;
 							obj.cache = fn.apply(fn, inject);
@@ -1482,36 +1546,54 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.2/28. 4. 2016\n" +
+			"2.3.3/3. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);
 	};
-	/**
-	 * Help class for handle DI across application
-	 * 
-	 * @class $dependency
-	 */
-	onix.service("$dependency", function() {
+	onix.factory("$di", function() {
 		/**
-		 * Run param with additional parameter; This method handles DI and can also add object, which is has no module
-		 * 
-		 * @param  {Function|Array} param DI or function
-		 * @param  {Object} addParam This additional parameter will be add to the DI at the last position
-		 * @member $dependency
+		 * @class $di
+		 *
+		 * Helper factory for dependency injection and parsing function parameters
 		 */
-		this.run = function(param, addParam) {
-			var pp = $module.parseParam(param);
-			if (addParam) {
-				pp.inject.push(addParam);
+		return {
+			/**
+			 * Parse parameters. From param parse function and dependencies
+			 *
+			 * @property {Function}
+			 * @param  {Array|Function} param 
+			 * @return {Object} Parse object
+			 * @member $di
+			 */
+			parseParam: $module.parseParam,
+			/**
+			 * Get filter name
+			 * 
+			 * @param  {String} name
+			 * @return {String}
+			 * @member $di
+			 */
+			getFilterName: $module.getFilterName,
+			/**
+			 * Run function with possible inject - handles dependency injection
+			 * 
+			 * @param  {Object} runObj
+			 * @param  {Function} runObj.fn
+			 * @param  {Array} runObj.inject
+			 * @return {Object} Function output
+			 * @member $di
+			 */
+			run: function(runObj) {
+				if (!runObj) return null;
+				if (!runObj.fn) {
+					runObj.fn = function() {};
+				}
+				// def. type
+				runObj.type = $module.CONST.TYPE.RUN;
+				return $modules.run(runObj);
 			}
-			// Run like a run
-			$modules.run({
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.RUN
-			});
-		};
+		}
 	});
 	return onix;
 })();
@@ -1554,6 +1636,107 @@ onix.service("$localStorage", function() {
 	this.remove = function(key) {
 		if (this._disable || !key) return null;
 		return localStorage.removeItem(key);
+	};
+});
+/**
+ * Filter process input data and output can be used in template or in the code
+ *
+ * @class $filter
+ */
+onix.factory("$filter", [
+	"$di",
+function(
+	$di
+) {
+	var emptyFilter = function(value) {
+		return value || "";
+	};
+	/**
+	 * Return filter by his name or returns empty filter. Filter name is
+	 * concatenation of $filter + Filter name
+	 * 
+	 * @param  {String} filterName 
+	 * @return {Object}
+	 * @member $filter
+	 */
+	return function(filterName) {
+		if (!filterName) {
+			return emptyFilter;
+		}
+		// get filter name
+		filterName = $di.getFilterName(filterName);
+		return $di.run({
+			fn: function(moduleObj) {
+				return moduleObj || emptyFilter;
+			},
+			inject: [filterName]
+		});
+	};
+}]);
+/**
+ * Filter - lowercase functionality
+ *
+ * @class $filterLowercase
+ */
+onix.filter("lowercase", function() {
+	/**
+	 * Input is transformatted to lowercase
+	 * 
+	 * @param  {String} input
+	 * @return {String|Object}
+	 * @member $filterLowercase
+	 */
+	return function(input) {
+		if (typeof input === "string") {
+			return input.toLowerCase();
+		}
+		else return input;
+	};
+});
+/**
+ * Filter - uppercase functionality
+ *
+ * @class $filterUppercase
+ */
+onix.filter("uppercase", function() {
+	/**
+	 * Input is transformatted to uppercase
+	 * 
+	 * @param  {String} input
+	 * @return {String|Object}
+	 * @member $filterUppercase
+	 */
+	return function(input) {
+		if (typeof input === "string") {
+			return input.toUpperCase();
+		}
+		else return input;
+	};
+});
+/**
+ * Filter - json stringify functionality
+ *
+ * @class $filterJson
+ */
+onix.filter("json", function() {
+	/**
+	 * Input object is stringfied
+	 * 
+	 * @param {Object} obj Input object
+	 * @param {Number} [spacing] Number of spaces per indetation
+	 * @return {String}
+	 * @member $filterJson
+	 */
+	return function(obj, spacing) {
+		if (typeof obj === "object") {
+			var space = null;
+			if (spacing) {
+				spacing = parseInt(spacing, 10);
+				space = isNaN(spacing) ? null : spacing;
+			}
+			return JSON.stringify(obj, null, space);
+		}
+		else return obj;
 	};
 });
 onix.factory("$q", function() {
@@ -3394,8 +3577,8 @@ onix.provider("$template", function() {
 	 * Handle templates, binds events - syntax similar to moustache and angular template system.
 	 * $myQuery is used for cache record
 	 */
-	this.$get = ["$common", "$q", "$http", function(
-				$common, $q, $http) {
+	this.$get = ["$common", "$q", "$http", "$filter", function(
+				$common, $q, $http, $filter) {
 		var $template = {
 			/**
 			 * Template cache.
@@ -3418,6 +3601,17 @@ onix.provider("$template", function() {
 				STRINGS: /["'][^"']+["']/g,
 				JSONS: /[{][^}]+[}]/g,
 				ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+			},
+			/**
+			 * Constants
+			 * 
+			 * @type {Object}
+			 * @member $template
+			 * @private
+			 */
+			_CONST: {
+				FILTER_DELIMETER: "|",
+				FILTER_PARAM_DELIMETER: ":"
 			},
 			/**
 			 * Parse a function name from the string
@@ -3542,9 +3736,56 @@ onix.provider("$template", function() {
 			compile: function(key, data) {
 				var tmpl = this.get(key);
 				if (data) {
-					Object.keys(data).forEach(function(key) {
-						tmpl = tmpl.replace(new RegExp(conf.left + "[ ]*" + key + "[ ]*" + conf.right, "g"), data[key]);
-					});
+					var all = tmpl.match(new RegExp(conf.left + "(.*?)" + conf.right, "g"));
+					all.forEach(function(item) {
+						var itemSave = item;
+						item = item.replace(new RegExp("^" + conf.left), "").replace(new RegExp(conf.right + "$"), "");
+						if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
+							var filterValue;
+							// filters
+							item.split(this._CONST.FILTER_DELIMETER).forEach(function(filterItem, ind) {
+								filterItem = filterItem.trim();
+								if (!ind) {
+									// value
+									if (filterItem in data) {
+										filterValue = data[filterItem];
+									}
+								}
+								else {
+									// preprocessing by filter
+									var args = [filterValue];
+									var filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
+									var filterName = "";
+									if (filterParts.length == 1) {
+										filterName = filterParts[0].trim();
+									}
+									else {
+										filterParts.forEach(function(filterPartItem, filterPartInd) {
+											filterPartItem = filterPartItem.trim();
+											if (!filterPartInd) {
+												filterName = filterPartItem;
+											}
+											else {
+												args.push(filterPartItem);
+											}
+										});
+									}
+									var filter = $filter(filterName);
+									filterValue = filter.apply(filter, args);
+								}
+							}, this);
+							tmpl = tmpl.replace(itemSave, filterValue || "");
+						}
+						else {
+							// standard
+							var replaceValue = "";
+							item = item.trim();
+							if (item in data) {
+								replaceValue = data[item];
+							}
+							tmpl = tmpl.replace(itemSave, replaceValue);
+						}
+					}, this);
 				}
 				return tmpl;
 			},
@@ -3618,11 +3859,11 @@ onix.provider("$template", function() {
 onix.service("$route", [
 	"$location",
 	"$template",
-	"$dependency",
+	"$di",
 function(
 	$location,
 	$template,
-	$dependency
+	$di
 ) {
 	/**
 	 * All routes
@@ -3682,7 +3923,14 @@ function(
 	 * @member $route
 	 */
 	this._runController = function(contr, contrData) {
-		$dependency.run(contr, contrData);
+		var pp = $di.parseParam(contr);
+		if (contrData) {
+			pp.inject.push(contrData);
+		}
+		$di.run({
+			fn: pp.fn,
+			inject: pp.inject
+		});
 	};
 	/**
 	 * Route GO. Walk through all routes, if there is match, route controller will be called

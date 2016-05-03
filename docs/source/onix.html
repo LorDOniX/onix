@@ -78,14 +78,16 @@
 	 */
 	$module.CONST = {
 		PROVIDER_NAME: &quot;Provider&quot;,
+		FILTER_NAME: &quot;$filter&quot;,
 		TYPE: {
 			PROVIDER: 1,
 			SERVICE: 2,
 			FACTORY: 3,
 			CONSTANT: 4,
 			VALUE: 5,
-			CONFIG: 6,
-			RUN: 7
+			FILTER: 6,
+			CONFIG: 7,
+			RUN: 8
 		}
 	};
 
@@ -122,6 +124,19 @@
 			fn: fn,
 			inject: inject
 		}
+	};
+
+<span id='$module-method-getFilterName'>	/**
+</span>	 * Get filter name
+	 * 
+	 * @param  {String} name
+	 * @return {String}
+	 * @member $module
+	 */
+	$module.getFilterName = function(name) {
+		name = name || &quot;&quot;;
+
+		return $module.CONST.FILTER_NAME + name[0].toUpperCase() + name.substr(1, name.length - 1);
 	};
 
 <span id='$module-method-getDependencies'>	/**
@@ -183,6 +198,10 @@
 	 * @member $module
 	 */
 	$module.prototype.provider = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._objects[name + $module.CONST.PROVIDER_NAME] = {
@@ -214,6 +233,10 @@
 	 * @member $module
 	 */
 	$module.prototype.service = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._objects[name] = {
@@ -236,6 +259,10 @@
 	 * @member $module
 	 */
 	$module.prototype.factory = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._objects[name] = {
@@ -258,6 +285,10 @@
 	 * @member $module
 	 */
 	$module.prototype.constant = function(name, obj) {
+		if (!name || !obj) {
+			return this;
+		}
+
 		this._objects[name] = {
 			name: name,
 			cache: obj,
@@ -276,10 +307,40 @@
 	 * @member $module
 	 */
 	$module.prototype.value = function(name, obj) {
+		if (!name || !obj) {
+			return this;
+		}
+
 		this._objects[name] = {
 			name: name,
 			cache: obj,
 			type: $module.CONST.TYPE.VALUE
+		};
+
+		return this;
+	};
+
+<span id='$module-method-filter'>	/**
+</span>	 * Add filter to the application
+	 *
+	 * @chainable
+	 * @param  {String} name 
+	 * @param  {Function|Array} param
+	 * @member $module
+	 */
+	$module.prototype.filter = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
+		var pp = $module.parseParam(param);
+
+		this._objects[$module.getFilterName(name)] = {
+			name: name,
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: $module.CONST.TYPE.FILTER
 		};
 
 		return this;
@@ -293,6 +354,10 @@
 	 * @member $module
 	 */
 	$module.prototype.config = function(param) {
+		if (!param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._configs.push({
@@ -311,6 +376,10 @@
 	 * @member $module
 	 */
 	$module.prototype.run = function(param) {
+		if (!param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._runs.push({
@@ -357,21 +426,19 @@
 			MODULE_SEPARATOR: &quot;::&quot;,
 		},
 
-<span id='$modules-property-_noop'>		/**
+<span id='$modules-method-_noop'>		/**
 </span>		 * Function which does nothing
 		 *
 		 * @private
-		 * @property {Function}
 		 * @member $modules
 		 */
 		_noop: function() {
 
 		},
 
-<span id='$modules-property-domLoad'>		/**
+<span id='$modules-method-domLoad'>		/**
 </span>		 * Event - Dom LOAD
 		 *
-		 * @property {Function}
 		 * @member $modules
 		 */
 		domLoad: function() {
@@ -408,13 +475,12 @@
 			}, this);
 		},
 
-<span id='$modules-property-_getObject'>		/**
+<span id='$modules-method-_getObject'>		/**
 </span>		 * Get object by his name
 		 *
-		 * @property {Function}
 		 * @param {String} name Object name
-		 * @member $modules
 		 * @return {Object} Object data
+		 * @member $modules
 		 * @private
 		 */
 		_getObject: function(name) {
@@ -466,10 +532,9 @@
 			return output;
 		},
 
-<span id='$modules-property-run'>		/**
+<span id='$modules-method-run'>		/**
 </span>		 * Run object configuration; returns his cache (data)
 		 *
-		 * @property {Function}
 		 * @param  {Object}  obj Object configuration
 		 * @param  {Boolean} [isConfig] Is config phase?
 		 * @param  {Array} [parent] Parent objects
@@ -508,7 +573,13 @@
 					if (typeof objName === &quot;string&quot;) {
 						var injObj = this._getObject(objName);
 
-						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						if (!injObj) {
+							console.error(&quot;Object name: &quot; + objName + &quot; not found!&quot;);
+							inject.push(null);
+						}
+						else {
+							inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						}
 					}
 					else if (typeof objName === &quot;object&quot;) {
 						inject.push(objName);
@@ -545,6 +616,7 @@
 			else {
 				switch (obj.type) {
 					case $module.CONST.TYPE.FACTORY:
+					case $module.CONST.TYPE.FILTER:
 						if (!obj.cache) {
 							var fn = obj.fn || this._noop;
 							obj.cache = fn.apply(fn, inject);
@@ -640,39 +712,60 @@
 	onix.info = function() {
 		console.log(
 			&quot;OnixJS framework\n&quot; +
-			&quot;2.3.2/28. 4. 2016\n&quot; +
+			&quot;2.3.3/3. 5. 2016\n&quot; +
 			&quot;source: https://gitlab.com/LorDOniX/onix\n&quot; +
 			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs&quot;
 		);
 	};
 
-<span id='$dependency'>	/**
-</span>	 * Help class for handle DI across application
-	 * 
-	 * @class $dependency
-	 */
-	onix.service(&quot;$dependency&quot;, function() {
-<span id='$dependency-method-run'>		/**
-</span>		 * Run param with additional parameter; This method handles DI and can also add object, which is has no module
-		 * 
-		 * @param  {Function|Array} param DI or function
-		 * @param  {Object} addParam This additional parameter will be add to the DI at the last position
-		 * @member $dependency
+	onix.factory(&quot;$di&quot;, function() {
+<span id='$di'>		/**
+</span>		 * @class $di
+		 *
+		 * Helper factory for dependency injection and parsing function parameters
 		 */
-		this.run = function(param, addParam) {
-			var pp = $module.parseParam(param);
+		return {
+<span id='$di-property-parseParam'>			/**
+</span>			 * Parse parameters. From param parse function and dependencies
+			 *
+			 * @property {Function}
+			 * @param  {Array|Function} param 
+			 * @return {Object} Parse object
+			 * @member $di
+			 */
+			parseParam: $module.parseParam,
 
-			if (addParam) {
-				pp.inject.push(addParam);
+<span id='$di-method-getFilterName'>			/**
+</span>			 * Get filter name
+			 * 
+			 * @param  {String} name
+			 * @return {String}
+			 * @member $di
+			 */
+			getFilterName: $module.getFilterName,
+
+<span id='$di-method-run'>			/**
+</span>			 * Run function with possible inject - handles dependency injection
+			 * 
+			 * @param  {Object} runObj
+			 * @param  {Function} runObj.fn
+			 * @param  {Array} runObj.inject
+			 * @return {Object} Function output
+			 * @member $di
+			 */
+			run: function(runObj) {
+				if (!runObj) return null;
+				
+				if (!runObj.fn) {
+					runObj.fn = function() {};
+				}
+
+				// def. type
+				runObj.type = $module.CONST.TYPE.RUN;
+
+				return $modules.run(runObj);
 			}
-
-			// Run like a run
-			$modules.run({
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.RUN
-			});
-		};
+		}
 	});
 
 	return onix;

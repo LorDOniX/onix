@@ -39,8 +39,8 @@
 	 * Handle templates, binds events - syntax similar to moustache and angular template system.
 	 * $myQuery is used for cache record
 	 */
-	this.$get = [&quot;$common&quot;, &quot;$q&quot;, &quot;$http&quot;, function(
-				$common, $q, $http) {
+	this.$get = [&quot;$common&quot;, &quot;$q&quot;, &quot;$http&quot;, &quot;$filter&quot;, function(
+				$common, $q, $http, $filter) {
 
 		var $template = {
 <span id='$template-property-_cache'>			/**
@@ -65,6 +65,18 @@
 				STRINGS: /[&quot;&#39;][^&quot;&#39;]+[&quot;&#39;]/g,
 				JSONS: /[{][^}]+[}]/g,
 				ALL: /[-]?[0-9]+[.]?([0-9e]+)?|[&quot;&#39;][^&quot;&#39;]+[&quot;&#39;]|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+			},
+
+<span id='$template-property-_CONST'>			/**
+</span>			 * Constants
+			 * 
+			 * @type {Object}
+			 * @member $template
+			 * @private
+			 */
+			_CONST: {
+				FILTER_DELIMETER: &quot;|&quot;,
+				FILTER_PARAM_DELIMETER: &quot;:&quot;
 			},
 
 <span id='$template-method-_parseFnName'>			/**
@@ -206,9 +218,68 @@
 				var tmpl = this.get(key);
 
 				if (data) {
-					Object.keys(data).forEach(function(key) {
-						tmpl = tmpl.replace(new RegExp(conf.left + &quot;[ ]*&quot; + key + &quot;[ ]*&quot; + conf.right, &quot;g&quot;), data[key]);
-					});
+					var all = tmpl.match(new RegExp(conf.left + &quot;(.*?)&quot; + conf.right, &quot;g&quot;));
+
+					all.forEach(function(item) {
+						var itemSave = item;
+
+						item = item.replace(new RegExp(&quot;^&quot; + conf.left), &quot;&quot;).replace(new RegExp(conf.right + &quot;$&quot;), &quot;&quot;);
+
+						if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
+							var filterValue;
+
+							// filters
+							item.split(this._CONST.FILTER_DELIMETER).forEach(function(filterItem, ind) {
+								filterItem = filterItem.trim();
+
+								if (!ind) {
+									// value
+									if (filterItem in data) {
+										filterValue = data[filterItem];
+									}
+								}
+								else {
+									// preprocessing by filter
+									var args = [filterValue];
+									var filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
+									var filterName = &quot;&quot;;
+
+									if (filterParts.length == 1) {
+										filterName = filterParts[0].trim();
+									}
+									else {
+										filterParts.forEach(function(filterPartItem, filterPartInd) {
+											filterPartItem = filterPartItem.trim();
+
+											if (!filterPartInd) {
+												filterName = filterPartItem;
+											}
+											else {
+												args.push(filterPartItem);
+											}
+										});
+									}
+
+									var filter = $filter(filterName);
+									filterValue = filter.apply(filter, args);
+								}
+							}, this);
+
+							tmpl = tmpl.replace(itemSave, filterValue || &quot;&quot;);
+						}
+						else {
+							// standard
+							var replaceValue = &quot;&quot;;
+
+							item = item.trim();
+
+							if (item in data) {
+								replaceValue = data[item];
+							}
+
+							tmpl = tmpl.replace(itemSave, replaceValue);
+						}
+					}, this);
 				}
 
 				return tmpl;

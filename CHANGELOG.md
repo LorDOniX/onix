@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.3.3 (3. 5. 2016)
+
+* add $filter functionality in the angular way
+* add filter support to the template system (via "|")
+* built in filters: lowercase, uppercase, json
+
 ## 2.3.2 (28. 4. 2016)
 
 * upload images - set loading gif url

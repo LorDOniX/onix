@@ -251,6 +251,8 @@ class Bundler {
 				"src/exif.js",
 				"src/onix.js",
 				"src/local-storage.js",
+				"src/filter.js",
+				"src/filters.js",
 				"src/q.js",
 				"src/job.js",
 				"src/my-query.js",

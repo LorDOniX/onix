@@ -22,8 +22,8 @@ onix.provider("$template", function() {
 	 * Handle templates, binds events - syntax similar to moustache and angular template system.
 	 * $myQuery is used for cache record
 	 */
-	this.$get = ["$common", "$q", "$http", function(
-				$common, $q, $http) {
+	this.$get = ["$common", "$q", "$http", "$filter", function(
+				$common, $q, $http, $filter) {
 
 		var $template = {
 			/**
@@ -48,6 +48,18 @@ onix.provider("$template", function() {
 				STRINGS: /["'][^"']+["']/g,
 				JSONS: /[{][^}]+[}]/g,
 				ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+			},
+
+			/**
+			 * Constants
+			 * 
+			 * @type {Object}
+			 * @member $template
+			 * @private
+			 */
+			_CONST: {
+				FILTER_DELIMETER: "|",
+				FILTER_PARAM_DELIMETER: ":"
 			},
 
 			/**
@@ -189,9 +201,68 @@ onix.provider("$template", function() {
 				var tmpl = this.get(key);
 
 				if (data) {
-					Object.keys(data).forEach(function(key) {
-						tmpl = tmpl.replace(new RegExp(conf.left + "[ ]*" + key + "[ ]*" + conf.right, "g"), data[key]);
-					});
+					var all = tmpl.match(new RegExp(conf.left + "(.*?)" + conf.right, "g"));
+
+					all.forEach(function(item) {
+						var itemSave = item;
+
+						item = item.replace(new RegExp("^" + conf.left), "").replace(new RegExp(conf.right + "$"), "");
+
+						if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
+							var filterValue;
+
+							// filters
+							item.split(this._CONST.FILTER_DELIMETER).forEach(function(filterItem, ind) {
+								filterItem = filterItem.trim();
+
+								if (!ind) {
+									// value
+									if (filterItem in data) {
+										filterValue = data[filterItem];
+									}
+								}
+								else {
+									// preprocessing by filter
+									var args = [filterValue];
+									var filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
+									var filterName = "";
+
+									if (filterParts.length == 1) {
+										filterName = filterParts[0].trim();
+									}
+									else {
+										filterParts.forEach(function(filterPartItem, filterPartInd) {
+											filterPartItem = filterPartItem.trim();
+
+											if (!filterPartInd) {
+												filterName = filterPartItem;
+											}
+											else {
+												args.push(filterPartItem);
+											}
+										});
+									}
+
+									var filter = $filter(filterName);
+									filterValue = filter.apply(filter, args);
+								}
+							}, this);
+
+							tmpl = tmpl.replace(itemSave, filterValue || "");
+						}
+						else {
+							// standard
+							var replaceValue = "";
+
+							item = item.trim();
+
+							if (item in data) {
+								replaceValue = data[item];
+							}
+
+							tmpl = tmpl.replace(itemSave, replaceValue);
+						}
+					}, this);
 				}
 
 				return tmpl;

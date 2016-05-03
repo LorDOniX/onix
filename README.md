@@ -29,5 +29,4 @@ navigate to dist/ folder
 # Whats not the same like in Angular
 
 * controllers - not implemented
-* filters - not implemented
 * directives - not implemented

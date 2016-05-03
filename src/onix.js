@@ -61,14 +61,16 @@ onix = (function() {
 	 */
 	$module.CONST = {
 		PROVIDER_NAME: "Provider",
+		FILTER_NAME: "$filter",
 		TYPE: {
 			PROVIDER: 1,
 			SERVICE: 2,
 			FACTORY: 3,
 			CONSTANT: 4,
 			VALUE: 5,
-			CONFIG: 6,
-			RUN: 7
+			FILTER: 6,
+			CONFIG: 7,
+			RUN: 8
 		}
 	};
 
@@ -105,6 +107,19 @@ onix = (function() {
 			fn: fn,
 			inject: inject
 		}
+	};
+
+	/**
+	 * Get filter name
+	 * 
+	 * @param  {String} name
+	 * @return {String}
+	 * @member $module
+	 */
+	$module.getFilterName = function(name) {
+		name = name || "";
+
+		return $module.CONST.FILTER_NAME + name[0].toUpperCase() + name.substr(1, name.length - 1);
 	};
 
 	/**
@@ -166,6 +181,10 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.provider = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._objects[name + $module.CONST.PROVIDER_NAME] = {
@@ -197,6 +216,10 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.service = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._objects[name] = {
@@ -219,6 +242,10 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.factory = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._objects[name] = {
@@ -241,6 +268,10 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.constant = function(name, obj) {
+		if (!name || !obj) {
+			return this;
+		}
+
 		this._objects[name] = {
 			name: name,
 			cache: obj,
@@ -259,10 +290,40 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.value = function(name, obj) {
+		if (!name || !obj) {
+			return this;
+		}
+
 		this._objects[name] = {
 			name: name,
 			cache: obj,
 			type: $module.CONST.TYPE.VALUE
+		};
+
+		return this;
+	};
+
+	/**
+	 * Add filter to the application
+	 *
+	 * @chainable
+	 * @param  {String} name 
+	 * @param  {Function|Array} param
+	 * @member $module
+	 */
+	$module.prototype.filter = function(name, param) {
+		if (!name || !param) {
+			return this;
+		}
+
+		var pp = $module.parseParam(param);
+
+		this._objects[$module.getFilterName(name)] = {
+			name: name,
+			inject: pp.inject,
+			fn: pp.fn,
+			cache: null,
+			type: $module.CONST.TYPE.FILTER
 		};
 
 		return this;
@@ -276,6 +337,10 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.config = function(param) {
+		if (!param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._configs.push({
@@ -294,6 +359,10 @@ onix = (function() {
 	 * @member $module
 	 */
 	$module.prototype.run = function(param) {
+		if (!param) {
+			return this;
+		}
+
 		var pp = $module.parseParam(param);
 
 		this._runs.push({
@@ -344,7 +413,6 @@ onix = (function() {
 		 * Function which does nothing
 		 *
 		 * @private
-		 * @property {Function}
 		 * @member $modules
 		 */
 		_noop: function() {
@@ -354,7 +422,6 @@ onix = (function() {
 		/**
 		 * Event - Dom LOAD
 		 *
-		 * @property {Function}
 		 * @member $modules
 		 */
 		domLoad: function() {
@@ -394,10 +461,9 @@ onix = (function() {
 		/**
 		 * Get object by his name
 		 *
-		 * @property {Function}
 		 * @param {String} name Object name
-		 * @member $modules
 		 * @return {Object} Object data
+		 * @member $modules
 		 * @private
 		 */
 		_getObject: function(name) {
@@ -452,7 +518,6 @@ onix = (function() {
 		/**
 		 * Run object configuration; returns his cache (data)
 		 *
-		 * @property {Function}
 		 * @param  {Object}  obj Object configuration
 		 * @param  {Boolean} [isConfig] Is config phase?
 		 * @param  {Array} [parent] Parent objects
@@ -491,7 +556,13 @@ onix = (function() {
 					if (typeof objName === "string") {
 						var injObj = this._getObject(objName);
 
-						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						if (!injObj) {
+							console.error("Object name: " + objName + " not found!");
+							inject.push(null);
+						}
+						else {
+							inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+						}
 					}
 					else if (typeof objName === "object") {
 						inject.push(objName);
@@ -528,6 +599,7 @@ onix = (function() {
 			else {
 				switch (obj.type) {
 					case $module.CONST.TYPE.FACTORY:
+					case $module.CONST.TYPE.FILTER:
 						if (!obj.cache) {
 							var fn = obj.fn || this._noop;
 							obj.cache = fn.apply(fn, inject);
@@ -623,39 +695,60 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.2/28. 4. 2016\n" +
+			"2.3.3/3. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
 		);
 	};
 
-	/**
-	 * Help class for handle DI across application
-	 * 
-	 * @class $dependency
-	 */
-	onix.service("$dependency", function() {
+	onix.factory("$di", function() {
 		/**
-		 * Run param with additional parameter; This method handles DI and can also add object, which is has no module
-		 * 
-		 * @param  {Function|Array} param DI or function
-		 * @param  {Object} addParam This additional parameter will be add to the DI at the last position
-		 * @member $dependency
+		 * @class $di
+		 *
+		 * Helper factory for dependency injection and parsing function parameters
 		 */
-		this.run = function(param, addParam) {
-			var pp = $module.parseParam(param);
+		return {
+			/**
+			 * Parse parameters. From param parse function and dependencies
+			 *
+			 * @property {Function}
+			 * @param  {Array|Function} param 
+			 * @return {Object} Parse object
+			 * @member $di
+			 */
+			parseParam: $module.parseParam,
 
-			if (addParam) {
-				pp.inject.push(addParam);
+			/**
+			 * Get filter name
+			 * 
+			 * @param  {String} name
+			 * @return {String}
+			 * @member $di
+			 */
+			getFilterName: $module.getFilterName,
+
+			/**
+			 * Run function with possible inject - handles dependency injection
+			 * 
+			 * @param  {Object} runObj
+			 * @param  {Function} runObj.fn
+			 * @param  {Array} runObj.inject
+			 * @return {Object} Function output
+			 * @member $di
+			 */
+			run: function(runObj) {
+				if (!runObj) return null;
+				
+				if (!runObj.fn) {
+					runObj.fn = function() {};
+				}
+
+				// def. type
+				runObj.type = $module.CONST.TYPE.RUN;
+
+				return $modules.run(runObj);
 			}
-
-			// Run like a run
-			$modules.run({
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.RUN
-			});
-		};
+		}
 	});
 
 	return onix;

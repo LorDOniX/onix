@@ -23,11 +23,11 @@
 onix.service(&quot;$route&quot;, [
 	&quot;$location&quot;,
 	&quot;$template&quot;,
-	&quot;$dependency&quot;,
+	&quot;$di&quot;,
 function(
 	$location,
 	$template,
-	$dependency
+	$di
 ) {
 <span id='$route-property-_routes'>	/**
 </span>	 * All routes
@@ -94,7 +94,16 @@ function(
 	 * @member $route
 	 */
 	this._runController = function(contr, contrData) {
-		$dependency.run(contr, contrData);
+		var pp = $di.parseParam(contr);
+
+		if (contrData) {
+			pp.inject.push(contrData);
+		}
+
+		$di.run({
+			fn: pp.fn,
+			inject: pp.inject
+		});
 	};
 
 <span id='$route-method-go'>	/**
