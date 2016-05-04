@@ -10,6 +10,7 @@ app.factory("HomePage", [
 	"myModule::TestFromModule",
 	"$filter",
 	"$i18n",
+	"$routeParams",
 function(
 	Page,
 	$common,
@@ -21,7 +22,8 @@ function(
 	HomeSnippet,
 	TestFromModule,
 	$filter,
-	$i18n
+	$i18n,
+	$routeParams
 ) {
 
 	var HomePage = Page.create();
@@ -188,6 +190,11 @@ function(
 		});
 	};
 
+	HomePage.routeParams = function() {
+		console.log("routeParams");
+		console.log($routeParams);
+	};
+
 	HomePage.allTests = function() {
 		console.log("Running all tests...");
 
@@ -196,6 +203,7 @@ function(
 		this.moduleTest();
 		this.apiTest();
 		this.chp();
+		this.routeParams();
 	};
 
 	return HomePage;

@@ -34,14 +34,21 @@ app.run([
 	"Config",
 	"$q",
 	"$i18n",
+	"$i18nProvider",
+	"$filterUppercase",
 function(
 	$route,
 	$template,
 	Config,
 	$q,
-	$i18n
+	$i18n,
+	$i18nProvider,
+	$filterUppercase
 ) {
 	$i18n.setLanguage("en");
+
+	console.log("app run - test for provider during run");
+	console.log($i18nProvider);
 
 	// application routes
 	$route
@@ -51,13 +58,14 @@ function(
 				HomePage.init();
 			}],
 			templateUrl: "/templ/test-templ.html",
-			a: 5
+			id: "HomePage"
 		})
 		.otherwise({
 			controller: ["HomePage", function(HomePage) {
 				HomePage.setConfig({});
 				HomePage.init();
-			}]
+			}],
+			id: "HomePage"
 		});
 
 	// all dependencies before start

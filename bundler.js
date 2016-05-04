@@ -7,6 +7,42 @@ var fs = require("fs");
 var Less = require('less');
 var UglifyJS = require("uglify-js");
 
+const _CONST = {
+	WATCH_PATHS: [
+		"src/",
+		"less/"
+	],
+	JS_FILES: [
+		"src/polyfills.js",
+		"src/exif.js",
+		"src/onix.js",
+		"src/local-storage.js",
+		"src/routeParams.js",
+		"src/filter.js",
+		"src/filters.js",
+		"src/q.js",
+		"src/job.js",
+		"src/my-query.js",
+		"src/dom.js",
+		"src/location.js",
+		"src/common.js",
+		"src/notify.js",
+		"src/event.js",
+		"src/loader.js",
+		"src/http.js",
+		"src/i18n.js",
+		"src/template.js",
+		"src/route.js",
+		"src/select.js",
+		"src/upload-images.js"
+	],
+	JS_OUTPUT: "dist/onix-js-framework.js",
+	JS_OUTPUT_MIN: "dist/onix-js-framework.min.js",
+	HEADER_FILE: "HEADER",
+	LESS_FILE: "less/main.less",
+	CSS_FILE: "static/css/main.css"
+};
+
 class Common {
 	/**
 	 * Own console log
@@ -241,41 +277,6 @@ class Watcher {
 
 class Bundler {
 	constructor() {
-		this._CONST = {
-			WATCH_PATHS: [
-				"src/",
-				"less/"
-			],
-			JS_FILES: [
-				"src/polyfills.js",
-				"src/exif.js",
-				"src/onix.js",
-				"src/local-storage.js",
-				"src/filter.js",
-				"src/filters.js",
-				"src/q.js",
-				"src/job.js",
-				"src/my-query.js",
-				"src/dom.js",
-				"src/location.js",
-				"src/common.js",
-				"src/notify.js",
-				"src/event.js",
-				"src/loader.js",
-				"src/http.js",
-				"src/i18n.js",
-				"src/template.js",
-				"src/route.js",
-				"src/select.js",
-				"src/upload-images.js"
-			],
-			JS_OUTPUT: "dist/onix-js-framework.js",
-			JS_OUTPUT_MIN: "dist/onix-js-framework.min.js",
-			HEADER_FILE: "HEADER",
-			LESS_FILE: "less/main.less",
-			CSS_FILE: "static/css/main.css"
-		};
-
 		this._arg = this._getArg();
 
 		this._setupWatcher();
@@ -319,7 +320,7 @@ class Bundler {
 
 	_loadFiles() {
 		return new Promise((resolve, reject) => {
-			let c = this._CONST;
+			let c = _CONST;
 
 			Common.readFile(c.HEADER_FILE).then((data) => {
 				this._filesCache[c.HEADER_FILE] = data;
@@ -340,21 +341,21 @@ class Bundler {
 	_setupWatcher() {
 		this._watcher = new Watcher();
 
-		this._watcher.setWatchPaths(this._CONST.WATCH_PATHS);
+		this._watcher.setWatchPaths(_CONST.WATCH_PATHS);
 
 		this._watcher.setCallback((eventName, buffer) => {
 			if (buffer.length == 1) {
 				let path = buffer[0];
 
-				if (this._CONST.JS_FILES.indexOf(path) != -1) {
+				if (_CONST.JS_FILES.indexOf(path) != -1) {
 					Common.readFile(path).then((data) => {
 						this._filesCache[path] = data;
-						this._makeJS(this._CONST.JS_OUTPUT);
+						this._makeJS(_CONST.JS_OUTPUT);
 					});
 				}
 				else {
 					// less
-					this._makeLess(this._CONST.LESS_FILE, this._CONST.CSS_FILE, false);
+					this._makeLess(_CONST.LESS_FILE, _CONST.CSS_FILE, false);
 				}
 			}
 		});
@@ -377,7 +378,7 @@ class Bundler {
 		return new Promise((resolve, reject) => {
 			let output = [];
 
-			this._CONST.JS_FILES.forEach((file) => {
+			_CONST.JS_FILES.forEach((file) => {
 				output.push(this._filesCache[file] || "");
 			});
 
@@ -442,7 +443,7 @@ class Bundler {
 	_uglify(inputFiles, outputFile) {
 		return new Promise((resolve, reject) => {
 			let result = UglifyJS.minify(inputFiles);
-			let data = this._filesCache[this._CONST.HEADER_FILE] + result.code;
+			let data = this._filesCache[_CONST.HEADER_FILE] + result.code;
 
 			// write output
 			Common.writeFile(outputFile, data).then(() => {
@@ -476,7 +477,7 @@ class Bundler {
 	}
 
 	_dev(runType) {
-		let c = this._CONST;
+		let c = _CONST;
 
 		Common.chainPromises([{
 			method: "_makeJS",
@@ -499,7 +500,7 @@ class Bundler {
 
 	// dist js and compile css
 	_dist() {
-		let c = this._CONST;
+		let c = _CONST;
 
 		Common.chainPromises([{
 			method: "_makeJS",

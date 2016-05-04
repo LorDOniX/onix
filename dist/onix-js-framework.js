@@ -1659,6 +1659,14 @@ onix.service("$localStorage", function() {
 	};
 });
 /**
+ * @class $routeParams
+ *
+ * Data for controllers in the $route
+ */
+onix.factory("$routeParams", function() {
+	return {};
+});
+/**
  * Filter process input data and output can be used in template or in the code
  *
  * @class $filter
@@ -3988,10 +3996,12 @@ onix.service("$route", [
 	"$location",
 	"$template",
 	"$di",
+	"$routeParams",
 function(
 	$location,
 	$template,
-	$di
+	$di,
+	$routeParams
 ) {
 	/**
 	 * All routes
@@ -4009,6 +4019,23 @@ function(
 	 * @member $route
 	 */
 	this._otherwise = null;
+	/**
+	 * Set $routeParams object. First clear all old keys and add new ones, if the available
+	 *
+	 * @private
+	 * @param {Object} [routeParams] Route params object
+	 * @type {Object}
+	 * @member $route
+	 */
+	this._setRouteParams = function(routeParams) {
+		Object.keys($routeParams).forEach(function(key) {
+			delete $routeParams[key];
+		});
+		routeParams = routeParams || {};
+		Object.keys(routeParams).forEach(function(key) {
+			$routeParams[key] = routeParams[key];
+		});
+	};
 	/**
 	 * Add route to the router.
 	 *
@@ -4047,14 +4074,12 @@ function(
 	 *
 	 * @private
 	 * @param  {Array|Function} contr
-	 * @param  {Object} [contrData] Additonal data
+	 * @param  {Object} [routeParams] Additonal data
 	 * @member $route
 	 */
-	this._runController = function(contr, contrData) {
+	this._runController = function(contr, routeParams) {
 		var pp = $di.parseParam(contr);
-		if (contrData) {
-			pp.inject.push(contrData);
-		}
+		this._setRouteParams(routeParams);
 		$di.run({
 			fn: pp.fn,
 			inject: pp.inject
@@ -4086,7 +4111,7 @@ function(
 		if (config) {
 			var templateUrl = null;
 			var contr = null;
-			var contrData = {};
+			var routeParams = {};
 			Object.keys(config).forEach(function(key) {
 				var value = config[key];
 				switch (key) {
@@ -4097,19 +4122,19 @@ function(
 						contr = value;
 						break;
 					default:
-						contrData[key] = value;
+						routeParams[key] = value;
 				}
 			});
 			if (templateUrl) {
 				$template.load(config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
-						this._runController(contr, contrData);
+						this._runController(contr, routeParams);
 					}
 				}.bind(this));
 			}
 			else {
 				if (contr) {
-					this._runController(contr, contrData);
+					this._runController(contr, routeParams);
 				}
 			}
 		}

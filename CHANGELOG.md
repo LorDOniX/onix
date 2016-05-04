@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.4.0 (4. 5. 2016)
+
+* add language during config phase - i18n is now provider
+* disable options for _ underscore
+
 ## 2.3.3 (4. 5. 2016)
 
 * udate testing website
