@@ -16,7 +16,16 @@ app.value("Config", {
 	DETAIL_SEL: ".detail"
 });
 
-app.config(["$templateProvider", function($templateProvider) {
+app.config(["$i18nProvider", function($i18nProvider) {
+	// if you are using underscore -> uncomment line below
+	//$i18nProvider.disableGlobalTranslation();
+	
+	// add language during config phase
+	$i18nProvider.addLanguage("cs", {
+		"home_page": {
+			"title": "Onix framework - testovací stránka"
+		}
+	});
 }]);
 
 app.run([

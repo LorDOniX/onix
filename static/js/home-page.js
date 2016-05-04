@@ -9,6 +9,7 @@ app.factory("HomePage", [
 	"HomeSnippet",
 	"myModule::TestFromModule",
 	"$filter",
+	"$i18n",
 function(
 	Page,
 	$common,
@@ -19,7 +20,8 @@ function(
 	HomeResource,
 	HomeSnippet,
 	TestFromModule,
-	$filter
+	$filter,
+	$i18n
 ) {
 
 	var HomePage = Page.create();
@@ -88,6 +90,13 @@ function(
 			}
 		}));
 
+		var langTest = function() {
+			$i18n.setLanguage("cs");
+			this._getEl("title").innerHTML = _("home_page.title");
+			$i18n.setLanguage("en");
+			console.log("Website title has changed!");
+		}.bind(this);
+
 		$template.bindTemplate(el.getEl(), {
 			onkd: function() {
 				console.log("On key down");
@@ -98,7 +107,9 @@ function(
 			 */
 			tmplBtn: function() {
 				console.log("Dynamic template button click");
-			}
+			},
+
+			langTest: langTest
 		});
 	};
 

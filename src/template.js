@@ -1,5 +1,13 @@
 onix.provider("$template", function() {
-	var conf = {
+	/**
+	 * Configuration for template delimeters
+	 *
+	 * @private
+	 * @type {Object}
+	 * @member $templateProvider
+	 * @private
+	 */
+	var _conf = {
 		left: "{{",
 		right: "}}"
 	};
@@ -12,7 +20,7 @@ onix.provider("$template", function() {
 	 */
 	this.setConfig = function(confParam) {
 		Object.keys(confParam).forEach(function(confParamKey) {
-			conf[confParamKey] = confParam[confParamKey];
+			_conf[confParamKey] = confParam[confParamKey];
 		});
 	};
 
@@ -201,12 +209,12 @@ onix.provider("$template", function() {
 				var tmpl = this.get(key);
 
 				if (data) {
-					var all = tmpl.match(new RegExp(conf.left + "(.*?)" + conf.right, "g"));
+					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g"));
 
 					all.forEach(function(item) {
 						var itemSave = item;
 
-						item = item.replace(new RegExp("^" + conf.left), "").replace(new RegExp(conf.right + "$"), "");
+						item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
 
 						if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
 							var filterValue;

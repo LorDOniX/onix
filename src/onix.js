@@ -420,6 +420,27 @@ onix = (function() {
 		},
 
 		/**
+		 * Get post process config during config phase
+		 *
+		 * @private
+		 * @return {Object} Post process config object
+		 * @member $modules
+		 */
+		_getPostProcessConfig: function() {
+			var param = ["$i18nProvider", function($i18nProvider) {
+				$i18nProvider.postProcess();
+			}];
+
+			var pp = $module.parseParam(param);
+
+			return {
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.CONFIG
+			};
+		},
+
+		/**
 		 * Event - Dom LOAD
 		 *
 		 * @member $modules
@@ -448,6 +469,9 @@ onix = (function() {
 					runs = runs.concat(module.getRuns());
 				}
 			}, this);
+
+			// post process runs
+			configs.push(this._getPostProcessConfig());
 
 			configs.forEach(function(config) {
 				this.run(config, true);

@@ -1,5 +1,4 @@
 TODO:
-- add language during config phase
 - add aditional parameters to route controllers ($routeParams)
 - template - insert html instead of text
 
