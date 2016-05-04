@@ -21,11 +21,11 @@ function(
 	$common
 ) {
 <span id='$event'>	/**
-</span> 	 * @class $event
- 	 *
- 	 * This class is used for extending existing objects and brings signal functionality.
+</span>	 * This class is used for extending existing objects and brings signal functionality.
+	 * 
+ 	 * @class $event
  	 */
-	return {
+	var $event = {
 <span id='$event-property-_allEvents'>		/**
 </span>		 * All events. { name: name, event: function, scope, [once] }
 		 * 
@@ -108,7 +108,7 @@ function(
 		},
 
 <span id='$event-method-trigger'>		/**
-</span>		 * Trigger event with arguments 0..n
+</span>		 * Trigger event with arguments 0..n.
 		 * 
 		 * @param  {String} name
 		 * @member $event
@@ -133,6 +133,20 @@ function(
 			$common.reverseForEach(onceArray, function(pos) {
 				this._allEvents.splice(pos, 1);
 			}, this);
+		}
+	};
+
+	return {
+<span id='$event-method-bindEvents'>		/**
+</span>		 * Bind event functionality to the scope.
+		 *
+		 * @param {Object} scope
+		 * @member $event
+		 */
+		bindEvents: function(scope) {
+			if (!scope) return;
+
+			$common.extend(scope, $event);
 		}
 	};
 }]);

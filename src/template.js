@@ -1,6 +1,6 @@
 onix.provider("$template", function() {
 	/**
-	 * Configuration for template delimeters
+	 * Configuration for template delimeters.
 	 *
 	 * @private
 	 * @type {Object}
@@ -25,10 +25,10 @@ onix.provider("$template", function() {
 	};
 
 	/**
-	 * @class $template
-	 *
 	 * Handle templates, binds events - syntax similar to moustache and angular template system.
-	 * $myQuery is used for cache record
+	 * $myQuery is used for cache record.
+	 *
+	 * @class $template
 	 */
 	this.$get = ["$common", "$q", "$http", "$filter", function(
 				$common, $q, $http, $filter) {
@@ -44,7 +44,7 @@ onix.provider("$template", function() {
 			_cache: {},
 
 			/**
-			 * Regular expressions for handle template variables
+			 * Regular expressions for handle template variables.
 			 *
 			 * @type {Object}
 			 * @member $template
@@ -59,7 +59,7 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Constants
+			 * Constants.
 			 * 
 			 * @type {Object}
 			 * @member $template
@@ -67,11 +67,12 @@ onix.provider("$template", function() {
 			 */
 			_CONST: {
 				FILTER_DELIMETER: "|",
-				FILTER_PARAM_DELIMETER: ":"
+				FILTER_PARAM_DELIMETER: ":",
+				TEMPLATE_SCRIPT_SELECTOR: "script[type='text/template']"
 			},
 
 			/**
-			 * Parse a function name from the string
+			 * Parse a function name from the string.
 			 *
 			 * @param  {String} value
 			 * @return {String}
@@ -85,7 +86,7 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Parse arguments from the string -> makes array from them
+			 * Parse arguments from the string -> makes array from them.
 			 *
 			 * @param  {String} value
 			 * @param  {Object} config
@@ -150,7 +151,7 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Bind one single event to the element
+			 * Bind one single event to the element.
 			 * 
 			 * @param  {HTMLElement} el
 			 * @param  {String} eventName click, keydown...
@@ -175,19 +176,20 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Init - get all templates from the page. Uses 'text/template' script with template data
+			 * Init - get all templates from the page. Uses 'text/template' script with template data.
+			 * Each script has to have id and specifi type="text/template".
 			 *
 			 * @private
 			 * @member $template
 			 */
 			_init: function() {
-				onix.element("script[type='text/template']").forEach(function(item) {
-					this.add(item.id, item.innerHTML);
+				onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function(item) {
+					this.add(item.id || "", item.innerHTML);
 				}, this);
 			},
 			
 			/**
-			 * Add new item to the cachce
+			 * Add new item to the cache.
 			 *
 			 * @param {String} key 
 			 * @param {String} data
@@ -198,7 +200,7 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Compile one template - replaces all ocurances of {} by model
+			 * Compile one template - replaces all ocurances of {{ xxx }} by model.
 			 *
 			 * @param  {String} key Template key/name
 			 * @param  {Object} data Model
@@ -209,7 +211,7 @@ onix.provider("$template", function() {
 				var tmpl = this.get(key);
 
 				if (data) {
-					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g"));
+					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
 
 					all.forEach(function(item) {
 						var itemSave = item;
@@ -277,7 +279,7 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Get template from the cache
+			 * Get template from the cache.
 			 *
 			 * @param  {String} key Template key/name
 			 * @return {String}
@@ -289,13 +291,15 @@ onix.provider("$template", function() {
 
 			/**
 			 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
-			 * Supports: click, change, keydown, bind
+			 * For data-bind, scope has to have "addEls" function.
+			 * Supports: click, change, keydown, bind.
 			 *
-			 * @param  {HTMLElement} root
-			 * @param  {Object|Function} scope
+			 * @param  {HTMLElement} root Root element
+			 * @param  {Object} scope Scope which against will be binding used
+			 * @param  {Function} [addElsCb] Callback function with object with all data-bind objects
 			 * @member $template
 			 */
-			bindTemplate: function(root, scope) {
+			bindTemplate: function(root, scope, addElsCb) {
 				var allElements = onix.element("*[data-click], *[data-change], *[data-bind], *[data-keydown]", root);
 
 				if (allElements.len()) {
@@ -313,14 +317,14 @@ onix.provider("$template", function() {
 						}
 					}, this);
 
-					if ("addEls" in scope && typeof scope.addEls === "function") {
-						scope.addEls(newEls);
+					if (addElsCb && typeof addElsCb === "function") {
+						addElsCb(newEls);
 					}
 				}
 			},
 
 			/**
-			 * Load template from the path, returns promise after load
+			 * Load template from the path, returns promise after load.
 			 *
 			 * @param  {String} key
 			 * @param  {String} path

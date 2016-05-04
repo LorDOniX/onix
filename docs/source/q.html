@@ -17,13 +17,13 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">onix.factory(&quot;$q&quot;, function() {
 <span id='$q'>	/**
-</span>	 * @class $q
-	 *
-	 * Promise implementation which is similar to angular $q
+</span>	 * Promise implementation which is similar to angular $q.
+	 * 
+	 * @class $q
 	 */
 	var $promise = function() {
 <span id='$q-property-_E_STATES'>		/**
-</span>		 * Promise states
+</span>		 * Promise states.
 		 *
 		 * @member $q
 		 * @private
@@ -45,7 +45,7 @@
 	};
 
 <span id='$q-method-_resolveFuncs'>	/**
-</span>	 * Resolve all functions
+</span>	 * Resolve all functions.
 	 *
 	 * @param  {Boolean} isError
 	 * @member $q
@@ -77,7 +77,7 @@
 	};
 
 <span id='$q-method-resolve'>	/**
-</span>	 * Resolve promise using obj
+</span>	 * Resolve promise using obj.
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -88,7 +88,7 @@
 	};
 
 <span id='$q-method-reject'>	/**
-</span>	 * Reject promise using obj
+</span>	 * Reject promise using obj.
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -99,7 +99,7 @@
 	};
 
 <span id='$q-method-then'>	/**
-</span>	 * After promise resolve/reject call then (okFn, errorFn)
+</span>	 * After promise resolve/reject call then (okFn, errorFn).
 	 *
 	 * @chainable
 	 * @param {Function} [cbOk]
@@ -127,7 +127,7 @@
 	};
 
 <span id='$q-method-done'>	/**
-</span>	 * After promise resolve call then cbOk
+</span>	 * After promise resolve call then cbOk.
 	 *
 	 * @chainable
 	 * @param  {Function} cbOk
@@ -145,7 +145,7 @@
 	};
 
 <span id='$q-method-error'>	/**
-</span>	 * After promise reject call then cbError
+</span>	 * After promise reject call then cbError.
 	 *
 	 * @chainable
 	 * @param  {Function} cbError
@@ -163,7 +163,7 @@
 	};
 
 <span id='$q-method-prototype["finally"]'>	/**
-</span>	 * Finally for promise
+</span>	 * Finally for promise.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -182,7 +182,7 @@
 	
 	return {
 <span id='$q-method-all'>		/**
-</span>		 * Resolve all promises in the array
+</span>		 * Resolve all promises in the array.
 		 *
 		 * @param {$q[]} promises
 		 * @return {$q}
@@ -213,7 +213,7 @@
 		},
 
 <span id='$q-method-defer'>		/**
-</span>		 * Deferable object of the promise
+</span>		 * Deferable object of the promise.
 		 *
 		 * @return {$q}
 		 * @member $q

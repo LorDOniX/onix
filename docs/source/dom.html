@@ -16,9 +16,9 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$dom'>/**
-</span> * @class $dom
- *
- * Class for creating DOM elements and getting their references.
+</span> * Class for creating DOM elements and getting their references.
+ * 
+ * @class $dom
  */
 onix.service(&quot;$dom&quot;, function() {
 <span id='$dom-method-create'>	/**
@@ -88,7 +88,7 @@ onix.service(&quot;$dom&quot;, function() {
 <span id='$dom-method-get'>	/**
 </span>	 * Get element from the document.
 	 *
-	 * @param  {String|Array} els     els = &quot;&quot; -&gt; element; array [] -&gt; {...}
+	 * @param  {String|Array} els Els = &quot;&quot; -&gt; element; [x, y] -&gt; { x: el, y: el }; [{sel: &quot;div&quot;, name: &quot;xyz&quot;}] -&gt; { &quot;xyz&quot;: div el }
 	 * @param  {Object} [parent]
 	 * @return {Object}
 	 * @member $dom

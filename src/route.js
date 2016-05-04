@@ -1,7 +1,7 @@
 /**
+ * Simple router for the application.
+ * 
  * @class $route
- *
- * Simple router for the application
  */
 onix.service("$route", [
 	"$location",
@@ -15,7 +15,7 @@ function(
 	$routeParams
 ) {
 	/**
-	 * All routes
+	 * All routes.
 	 *
 	 * @private
 	 * @type {Array}
@@ -25,7 +25,7 @@ function(
 	this._routes = [];
 
 	/**
-	 * Otherwise route
+	 * Otherwise route.
 	 *
 	 * @private
 	 * @type {Object}
@@ -34,7 +34,7 @@ function(
 	this._otherwise = null;
 
 	/**
-	 * Set $routeParams object. First clear all old keys and add new ones, if the available
+	 * Set $routeParams object. First clear all old keys and add new ones, if the available.
 	 *
 	 * @private
 	 * @param {Object} [routeParams] Route params object
@@ -59,8 +59,10 @@ function(
 	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
 	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
 	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
 	 * @member $route
 	 */
 	this.when = function(url, config) {
@@ -78,8 +80,10 @@ function(
 	 * @chainable
 	 * @param  {String} page
 	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
 	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
 	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
 	 * @member $route
 	 */
 	this.otherwise = function(config) {
@@ -91,7 +95,7 @@ function(
 	};
 
 	/**
-	 * Run controller from route path
+	 * Run controller from route path.
 	 *
 	 * @private
 	 * @param  {Array|Function} contr
@@ -110,7 +114,7 @@ function(
 	};
 
 	/**
-	 * Route GO. Walk through all routes, if there is match, route controller will be called
+	 * Route GO. Walk through all routes, if there is match, route controller will be called.
 	 *
 	 * @member $route
 	 */
@@ -137,6 +141,7 @@ function(
 		}
 
 		if (config) {
+			var templateId = "";
 			var templateUrl = null;
 			var contr = null;
 			var routeParams = {};
@@ -145,6 +150,10 @@ function(
 				var value = config[key];
 
 				switch (key) {
+					case "templateId":
+						templateId = value;
+						break;
+
 					case "templateUrl":
 						templateUrl = value;
 						break;
@@ -159,7 +168,7 @@ function(
 			});
 
 			if (templateUrl) {
-				$template.load(config.templateUrl, config.templateUrl).done(function() {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
 						this._runController(contr, routeParams);
 					}

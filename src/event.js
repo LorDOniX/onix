@@ -4,11 +4,11 @@ function(
 	$common
 ) {
 	/**
+	 * This class is used for extending existing objects and brings signal functionality.
+	 * 
  	 * @class $event
- 	 *
- 	 * This class is used for extending existing objects and brings signal functionality.
  	 */
-	return {
+	var $event = {
 		/**
 		 * All events. { name: name, event: function, scope, [once] }
 		 * 
@@ -91,7 +91,7 @@ function(
 		},
 
 		/**
-		 * Trigger event with arguments 0..n
+		 * Trigger event with arguments 0..n.
 		 * 
 		 * @param  {String} name
 		 * @member $event
@@ -116,6 +116,20 @@ function(
 			$common.reverseForEach(onceArray, function(pos) {
 				this._allEvents.splice(pos, 1);
 			}, this);
+		}
+	};
+
+	return {
+		/**
+		 * Bind event functionality to the scope.
+		 *
+		 * @param {Object} scope
+		 * @member $event
+		 */
+		bindEvents: function(scope) {
+			if (!scope) return;
+
+			$common.extend(scope, $event);
 		}
 	};
 }]);

@@ -1,6 +1,6 @@
 onix.provider("$i18n", function() {
 	/**
-	 * All langs data
+	 * All langs data.
 	 *
 	 * @private
 	 * @type {Object}
@@ -10,7 +10,7 @@ onix.provider("$i18n", function() {
 	var _langs = {};
 
 	/**
-	 * Current language
+	 * Current language-
 	 *
 	 * @private
 	 * @type {String}
@@ -20,7 +20,7 @@ onix.provider("$i18n", function() {
 	var _currentLang = "";
 
 	/**
-	 * Bind global _ as translation function
+	 * Bind global _ as translation function-
 	 *
 	 * @private
 	 * @type {String}
@@ -30,7 +30,7 @@ onix.provider("$i18n", function() {
 	var _bindGlobalTranslation = true;
 
 	/**
-	 * Replace translated text by object. This functions is implementation of message format object replace inside the string
+	 * Replace translated text by object. This functions is implementation of message format object replace inside the string.
 	 *
 	 * @param  {String} translate
 	 * @param  {Object} [replace] Replace all {} in the string
@@ -144,7 +144,7 @@ onix.provider("$i18n", function() {
 	};
 
 	/**
-	 * Add a new language
+	 * Add a new language.
 	 *
 	 * @param {String} lang Language key
 	 * @param {Object} data
@@ -185,7 +185,7 @@ onix.provider("$i18n", function() {
 	};
 
 	/**
-	 * Add a new language
+	 * Add a new language.
 	 *
 	 * @param {String} lang Language key
 	 * @param {Object} data
@@ -206,7 +206,7 @@ onix.provider("$i18n", function() {
 	};
 
 	/**
-	 * Post process during config phase
+	 * Post process during config phase.
 	 *
 	 * @member $i18nProvider
 	 * @private
@@ -227,9 +227,9 @@ onix.provider("$i18n", function() {
 	};
 
 	/**
+	 * Language support, string translation with support for message format syntax.
+	 * 
 	 * @class $i18n
-	 *
-	 * Language support, string translation with support for message format syntax
 	 */
 	this.$get = ["$http", "$q", function(
 				$http, $q) {
@@ -248,7 +248,7 @@ onix.provider("$i18n", function() {
 			},
 
 			/**
-			 * Add a new language
+			 * Add a new language.
 			 *
 			 * @param {String} lang Language key
 			 * @param {Object} data
@@ -259,7 +259,7 @@ onix.provider("$i18n", function() {
 			},
 
 			/**
-			 * Set new language by his key
+			 * Set new language by his key.
 			 *
 			 * @param {String} lang Language key
 			 * @member $i18n
@@ -269,7 +269,7 @@ onix.provider("$i18n", function() {
 			},
 
 			/**
-			 * Get current language key
+			 * Get current language key.
 			 *
 			 * @return {String} Language key
 			 * @member $i18n
@@ -279,7 +279,7 @@ onix.provider("$i18n", function() {
 			},
 
 			/**
-			 * Get all languages keys
+			 * Get all languages keys.
 			 *
 			 * @return {Array[String]} Languages keys
 			 * @member $i18n
@@ -289,7 +289,7 @@ onix.provider("$i18n", function() {
 			},
 
 			/**
-			 * Load language from the file
+			 * Load language from the file.
 			 *
 			 * @param  {String} lang Language key
 			 * @param  {String} url  Path to the file

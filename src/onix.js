@@ -1,12 +1,13 @@
 onix = (function() {
 	/**
 	 * Module object - handles one module object with services, factories etc.
-	 *
+	 * This object cannot be used in dependency injection!
+	 * 
 	 * @class $module
 	 */
 	var $module = function(name, dependencies) {
 		/**
-		 * All objects
+		 * All objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -15,7 +16,7 @@ onix = (function() {
 		this._objects = {};
 
 		/**
-		 * All run objects
+		 * All run objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -24,7 +25,7 @@ onix = (function() {
 		this._runs = [];
 
 		/**
-		 * All config objects
+		 * All config objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -33,7 +34,7 @@ onix = (function() {
 		this._configs = [];
 
 		/**
-		 * Module name
+		 * Module name.
 		 * 
 		 * @type {String}
 		 * @member $module
@@ -42,7 +43,7 @@ onix = (function() {
 		this._name = name || "";
 
 		/**
-		 * Module dependencies
+		 * Module dependencies.
 		 * 
 		 * @type {Array}
 		 * @member $module
@@ -52,7 +53,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Module constants
+	 * Module constants.
 	 *
 	 * @property {Object}
 	 * @type {Object}
@@ -75,7 +76,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Parse parameters. From param parse function and dependencies
+	 * Parse parameters. From param parse function and dependencies.
 	 *
 	 * @property {Function}
 	 * @param  {Array|Function} param 
@@ -110,7 +111,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Get filter name
+	 * Get filter name.
 	 * 
 	 * @param  {String} name
 	 * @return {String}
@@ -123,7 +124,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Get dependencies
+	 * Get dependencies.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -133,7 +134,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Get module name
+	 * Get module name.
 	 * 
 	 * @return {String}
 	 * @member $module
@@ -143,7 +144,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Get module configs
+	 * Get module configs.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -153,7 +154,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Get module runs
+	 * Get module runs.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -163,7 +164,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Get module objects
+	 * Get module objects.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -173,7 +174,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add provider to the application
+	 * Add provider to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -208,7 +209,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add service to the application
+	 * Add service to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -234,7 +235,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add factory to the application
+	 * Add factory to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -260,7 +261,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add new constant
+	 * Add new constant.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -282,7 +283,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add a new value
+	 * Add a new value.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -304,7 +305,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add filter to the application
+	 * Add filter to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -330,7 +331,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add a new config
+	 * Add a new config.
 	 *
 	 * @chainable
 	 * @param  {Array|Function} param With DI
@@ -353,7 +354,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Add a new run
+	 * Add a new run.
 	 * 
 	 * @param  {Array|Function} param With DI
 	 * @member $module
@@ -375,13 +376,14 @@ onix = (function() {
 	};
 
 	/**
-	 * Modules object - handles all modules in the application; runs object
+	 * Modules object - handles all modules in the application; runs object.
+	 * This object cannot be used in dependency injection!
 	 *
 	 * @class $modules
 	 */
 	var $modules = {
 		/**
-		 * All modules array
+		 * All modules array.
 		 *
 		 * @private
 		 * @member $modules
@@ -390,7 +392,7 @@ onix = (function() {
 		_modules: [],
 
 		/**
-		 * All modules object - quick access
+		 * All modules object - quick access.
 		 *
 		 * @private
 		 * @member $modules
@@ -399,7 +401,7 @@ onix = (function() {
 		_modulesObj: {},
 
 		/**
-		 * Modules constants
+		 * Modules constants.
 		 *
 		 * @private
 		 * @member $modules
@@ -410,7 +412,7 @@ onix = (function() {
 		},
 
 		/**
-		 * Function which does nothing
+		 * Function which does nothing.
 		 *
 		 * @private
 		 * @member $modules
@@ -420,7 +422,7 @@ onix = (function() {
 		},
 
 		/**
-		 * Get post process config during config phase
+		 * Get post process config during config phase.
 		 *
 		 * @private
 		 * @return {Object} Post process config object
@@ -441,13 +443,33 @@ onix = (function() {
 		},
 
 		/**
-		 * Event - Dom LOAD
+		 * Get pre run config during run phase.
+		 *
+		 * @private
+		 * @return {Object} Pre run config object
+		 * @member $modules
+		 */
+		_getPreRunConfig: function() {
+			// $myQuery needs to be cached
+			var param = ["$myQuery", function($myQuery) {}];
+			var pp = $module.parseParam(param);
+
+			return {
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.RUN
+			};
+		},
+
+		/**
+		 * Event - Dom LOAD.
 		 *
 		 * @member $modules
 		 */
 		domLoad: function() {
 			var configs = [];
-			var runs = [];
+			// pre process run
+			var runs = [this._getPreRunConfig()];
 
 			this._modules.forEach(function(module) {
 				var error = false;
@@ -483,7 +505,7 @@ onix = (function() {
 		},
 
 		/**
-		 * Get object by his name
+		 * Get object by his name.
 		 *
 		 * @param {String} name Object name
 		 * @return {Object} Object data
@@ -540,7 +562,7 @@ onix = (function() {
 		},
 
 		/**
-		 * Run object configuration; returns his cache (data)
+		 * Run object configuration; returns his cache (data).
 		 *
 		 * @param  {Object}  obj Object configuration
 		 * @param  {Boolean} [isConfig] Is config phase?
@@ -663,7 +685,7 @@ onix = (function() {
 		},
 
 		/**
-		 * Add a new module to the application
+		 * Add a new module to the application.
 		 * 
 		 * @param {String} name Module name
 		 * @param {Array} [dependencies] Module dependencies
@@ -685,18 +707,18 @@ onix = (function() {
 
 	/**
 	 * Main framework object, which is created like new module with name 'onix'.
-	 * Module has addtional functions
+	 * Module has addtional functions.
 	 * 
 	 * @class onix
 	 */
 	var onix = $modules.addModule("onix");
 
 	/**
-	 * Add a new module to the application
+	 * Add a new module to the application.
 	 * 
 	 * @param {String} name Module name
 	 * @param {Array} [dependencies] Module dependencies
-	 * @return {Object} Created module
+	 * @return {$module} Created module
 	 * @member onix
 	 */
 	onix.module = function(name, dependencies) {
@@ -704,7 +726,7 @@ onix = (function() {
 	};
 
 	/**
-	 * Empty function
+	 * Empty function.
 	 *
 	 * @member onix
 	 */
@@ -719,21 +741,23 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.3/3. 5. 2016\n" +
+			"2.4.0/4. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
-			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
+			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
+			"@license MIT\n" +
+			"* - Free for use in both personal and commercial projects\n"
 		);
 	};
 
 	onix.factory("$di", function() {
 		/**
+		 * Helper factory for dependency injection and parsing function parameters.
+		 * 
 		 * @class $di
-		 *
-		 * Helper factory for dependency injection and parsing function parameters
 		 */
 		return {
 			/**
-			 * Parse parameters. From param parse function and dependencies
+			 * Parse parameters. From param parse function and dependencies.
 			 *
 			 * @property {Function}
 			 * @param  {Array|Function} param 
@@ -743,7 +767,7 @@ onix = (function() {
 			parseParam: $module.parseParam,
 
 			/**
-			 * Get filter name
+			 * Get filter name.
 			 * 
 			 * @param  {String} name
 			 * @return {String}
@@ -752,7 +776,7 @@ onix = (function() {
 			getFilterName: $module.getFilterName,
 
 			/**
-			 * Run function with possible inject - handles dependency injection
+			 * Run function with possible inject - handles dependency injection.
 			 * 
 			 * @param  {Object} runObj
 			 * @param  {Function} runObj.fn

@@ -4,9 +4,9 @@ function(
 	$q
 ) {
 	/**
+	 * Factory for manage multiple tasks.
+	 * 
  	 * @class $job
- 	 *
- 	 * Factory for manage multiple tasks
  	 */
 	var $job = function() {
 		this._donePromise = $q.defer();
@@ -18,7 +18,7 @@ function(
 	};
 
 	/**
-	 * Add task to JOB
+	 * Add task to JOB.
 	 * 
 	 * @param {Function} task 
 	 * @param {Function|Object} [scope]
@@ -65,7 +65,7 @@ function(
 	};
 
 	/**
-	 * Set progress function, which will be called after each task will be done
+	 * Set progress function, which will be called after each task will be done.
 	 * 
 	 * @param {Function} cb
 	 * @param {Function|Object} [scope]
@@ -106,7 +106,7 @@ function(
 
 	return {
 		/**
-		 * Factory for creating new Job
+		 * Factory for creating new Job.
 		 *
 		 * @member $job
 		 */

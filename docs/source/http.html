@@ -16,9 +16,9 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$http'>/**
-</span> * @class $http
- *
- * XMLHttpRequest cover class.
+</span> * XMLHttpRequest cover class.
+ * 
+ * @class $http
  */
 onix.service(&quot;$http&quot;, [
 	&quot;$q&quot;,
@@ -28,8 +28,8 @@ function(
 	$common
 ) {
 <span id='$http-method-_preparePostData'>	/**
-</span>	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
-	 * Prepare post data
+</span>	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects.
+	 * Prepare post data.
 	 *
 	 * @param  {Object|Array} data { name, value }
 	 * @return {Object}
@@ -81,7 +81,7 @@ function(
 	};
 
 <span id='$http-property-POST_TYPES'>	/**
-</span>	 * Request types
+</span>	 * Request types.
 	 *
 	 * @property {Object}
 	 * @param {Number} JSON

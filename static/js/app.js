@@ -10,10 +10,7 @@ app.value("Config", {
 	// app resource URLs
 	URLS: {
 		HOME: "/api/home/"
-	},
-
-	// for Page - detail css selector
-	DETAIL_SEL: ".detail"
+	}
 });
 
 app.config(["$i18nProvider", function($i18nProvider) {
@@ -50,23 +47,23 @@ function(
 	console.log("app run - test for provider during run");
 	console.log($i18nProvider);
 
+	// route for home page
+	var HomePage = {
+		controller: ["HomePage", function(HomePage) {
+			HomePage.setConfig({
+				templ: "detail"
+			});
+			HomePage.init();
+		}],
+		templateId: "detail",
+		templateUrl: "/templ/detail.html",
+		id: "HomePage"
+	};
+
 	// application routes
 	$route
-		.when("/", {
-			controller: ["HomePage", function(HomePage) {
-				HomePage.setConfig({});
-				HomePage.init();
-			}],
-			templateUrl: "/templ/test-templ.html",
-			id: "HomePage"
-		})
-		.otherwise({
-			controller: ["HomePage", function(HomePage) {
-				HomePage.setConfig({});
-				HomePage.init();
-			}],
-			id: "HomePage"
-		});
+		.when("/", HomePage)
+		.otherwise(HomePage);
 
 	// all dependencies before start
 	$q.all([

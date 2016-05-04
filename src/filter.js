@@ -1,5 +1,5 @@
 /**
- * Filter process input data and output can be used in template or in the code
+ * Filter process input data and output can be used in template or in the code.
  *
  * @class $filter
  */
@@ -13,8 +13,7 @@ function(
 	};
 
 	/**
-	 * Return filter by his name or returns empty filter. Filter name is
-	 * concatenation of $filter + Filter name
+	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
 	 * 
 	 * @param  {String} filterName 
 	 * @return {Object}

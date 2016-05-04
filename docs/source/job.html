@@ -21,9 +21,9 @@ function(
 	$q
 ) {
 <span id='$job'>	/**
-</span> 	 * @class $job
- 	 *
- 	 * Factory for manage multiple tasks
+</span>	 * Factory for manage multiple tasks.
+	 * 
+ 	 * @class $job
  	 */
 	var $job = function() {
 		this._donePromise = $q.defer();
@@ -35,7 +35,7 @@ function(
 	};
 
 <span id='$job-method-add'>	/**
-</span>	 * Add task to JOB
+</span>	 * Add task to JOB.
 	 * 
 	 * @param {Function} task 
 	 * @param {Function|Object} [scope]
@@ -82,7 +82,7 @@ function(
 	};
 
 <span id='$job-method-setTaskDone'>	/**
-</span>	 * Set progress function, which will be called after each task will be done
+</span>	 * Set progress function, which will be called after each task will be done.
 	 * 
 	 * @param {Function} cb
 	 * @param {Function|Object} [scope]
@@ -123,7 +123,7 @@ function(
 
 	return {
 <span id='$job-method-create'>		/**
-</span>		 * Factory for creating new Job
+</span>		 * Factory for creating new Job.
 		 *
 		 * @member $job
 		 */

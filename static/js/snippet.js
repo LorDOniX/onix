@@ -7,9 +7,16 @@ function(
 	$common,
 	$event
 ) {
-
-	// private Snippet obj
 	var Snippet = {
+		/**
+		 * Object for data-bind elements references
+		 * 
+		 * @type {Object}
+		 */
+		_els: {
+
+		},
+
 		/**
 		 * Get Snippet config.
 		 *
@@ -94,6 +101,19 @@ function(
 		},
 
 		/**
+		 * Add new els to this._els; this function can be called from $template
+		 *
+		 * @param {Object} newEls { key, value - node element}
+		 */
+		_addEls: function(newEls) {
+			newEls = newEls || {};
+
+			Object.keys(newEls).forEach(function(key) {
+				this._els[key] = newEls[key];
+			}, this);
+		},
+
+		/**
 		 * Init snippet
 		 *
 		 * @param  {Object} config
@@ -103,7 +123,6 @@ function(
 		init: function(config, parent) {
 			this._config = config || {};
 			this._parent = parent;
-			this._els = {};
 			this._name = "";
 			this._root = this._create(config);
 
@@ -111,23 +130,10 @@ function(
 		},
 
 		/**
-		 * Add new els to this._els; this function can be called from $template
-		 *
-		 * @param {Object} newEls { key, value - node element}
-		 */
-		addEls: function(newEls) {
-			newEls = newEls || {};
-
-			Object.keys(newEls).forEach(function(key) {
-				this._els[key] = newEls[key];
-			}, this);
-		},
-
-		/**
 		 * Setup snippet - is called after init. Runs _setup()
 		 */
 		setup: function() {
-			$template.bindTemplate(this._root, this);
+			$template.bindTemplate(this._root, this, this._addEls.bind(this));
 			
 			this._setup();
 		},
@@ -168,14 +174,16 @@ function(
 	// public
 	return {
 		/**
-		 * Create new page object from: Snippet and $event are merged together.
-		 * Priority from left to right.
+		 * Create new snippet object from Snippet
 		 * 
 		 * @return {Snippet}
 		 */
 		create: function() {
-			return $common.merge(Snippet, $event);
+			var snippet = $common.merge(Snippet);
+
+			$event.bindEvents(snippet);
+
+			return snippet;
 		}
 	};
-
 }]);

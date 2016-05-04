@@ -8,7 +8,7 @@ function(
 	$dom
 ) {
 	/**
-	 * $select uses bootstrap dropdown and provides additional functionality
+	 * $select uses bootstrap dropdown and provides additional functionality.
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class "dropdown"
@@ -18,7 +18,7 @@ function(
 	 */
 	var $select = function(el, opts) {
 		// extend our class
-		$common.extend(this, $event);
+		$event.bindEvents(this);
 
 		this._opts = {
 			addCaption: false
@@ -52,7 +52,7 @@ function(
 	};
 
 	/**
-	 * Bind clicks on the select
+	 * Bind clicks on the select.
 	 *
 	 * @member $select
 	 * @private
@@ -63,7 +63,7 @@ function(
 	};
 
 	/**
-	 * Bind caption el
+	 * Bind caption el.
 	 * 
 	 * @member $select
 	 * @private
@@ -96,7 +96,7 @@ function(
 	};
 
 	/**
-	 * Event - click on caption
+	 * Event - click on caption.
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -137,7 +137,7 @@ function(
 	};
 
 	/**
-	 * Bind choices inside select
+	 * Bind choices inside select.
 	 *
 	 * @member $select
 	 * @private
@@ -156,7 +156,7 @@ function(
 	};
 
 	/**
-	 * Event - click on option
+	 * Event - click on option.
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -192,7 +192,7 @@ function(
 	};
 
 	/**
-	 * Unbind choices
+	 * Unbind choices.
 	 *
 	 * @member $select
 	 */
@@ -207,7 +207,7 @@ function(
 	};
 
 	/**
-	 * Rebind choices
+	 * Rebind choices.
 	 *
 	 * @member $select
 	 */
@@ -217,7 +217,7 @@ function(
 	};
 
 	/**
-	 * Select option from the select
+	 * Select option from the select.
 	 * 
 	 * @param {Number} ind Position 0..n
 	 * @member $select
@@ -248,7 +248,7 @@ function(
 	};
 
 	/**
-	 * Set add caption from the current value
+	 * Set add caption from the current value.
 	 *
 	 * @member $select
 	 */

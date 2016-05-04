@@ -4,6 +4,12 @@
 
 * add language during config phase - i18n is now provider
 * disable options for _ underscore
+* add aditional parameters to the route controllers ($routeParams)
+* documentation update
+* $localStorage old browsers fix
+* $route controller update
+* $event has now public method "bindEvents"; cannot be inheritated by $event
+* udate testing website
 
 ## 2.3.3 (4. 5. 2016)
 

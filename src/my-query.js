@@ -13,6 +13,10 @@ onix.factory("$myQuery", function() {
 		parent = parent || document;
 
 		if (typeof value === "string") {
+			if (parent instanceof $myQuery) {
+				parent = parent.getEl();
+			}
+
 			this._els = parent.querySelectorAll(value);
 		}
 		else if (Array.isArray(value)) {
@@ -26,7 +30,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Operation on elements
+	 * Operation on elements.
 	 * 
 	 * @param  {Function} cb
 	 * @param  {Function} [scope]
@@ -99,7 +103,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get or set attribute
+	 * Get or set attribute.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -135,7 +139,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get or set src
+	 * Get or set src.
 	 * 
 	 * @param  {String} [newValue]
 	 * @return {String}
@@ -146,7 +150,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Hide element
+	 * Hide element.
 	 * 
 	 * @chainable
 	 * @member $myQuery
@@ -160,7 +164,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Show element
+	 * Show element.
 	 *
 	 * @chainable
 	 * @param  {String} [displayStyle]
@@ -175,7 +179,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get or set value
+	 * Get or set value.
 	 *
 	 * @chainable
 	 * @param  {String} [newValue]
@@ -187,7 +191,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get or set HTML
+	 * Get or set HTML.
 	 * 
 	 * @param  {String} [newValue]
 	 * @return {String}
@@ -198,7 +202,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Append another element to this one
+	 * Append another element to this one.
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -213,7 +217,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Add CSS class
+	 * Add CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -228,7 +232,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Remove CSS class
+	 * Remove CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -243,7 +247,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Toggle CSS class
+	 * Toggle CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -258,7 +262,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get width
+	 * Get width.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -274,7 +278,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get height
+	 * Get height.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -290,7 +294,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Click event
+	 * Click event.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -308,7 +312,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Change event
+	 * Change event.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -326,7 +330,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Foreach
+	 * Foreach.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -342,7 +346,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Remove element
+	 * Remove element.
 	 *
 	 * @chainable
 	 * @member $myQuery
@@ -356,7 +360,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Prepend element
+	 * Prepend element.
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -388,7 +392,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Get all elements length
+	 * Get all elements length.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -398,7 +402,7 @@ onix.factory("$myQuery", function() {
 	};
 
 	/**
-	 * Quick acces to myQuery and DOM manipulation
+	 * Quick acces to myQuery and DOM manipulation.
 	 *
 	 * @param  {String|HTMLElement|Array} value
 	 * @param {HTMLElement} [parent]
@@ -412,7 +416,7 @@ onix.factory("$myQuery", function() {
 
 	return {
 		 /**
-		 * Main cover function
+		 * Main cover function.
 		 * 
 		 * @param  {String|HTMLElement|Array} value
 		 * @param {HTMLElement} [parent]
@@ -424,6 +428,3 @@ onix.factory("$myQuery", function() {
 		}
 	};
 });
-
-// needs to be cached
-onix.run(["$myQuery", function($myQuery) {}]);

@@ -1,47 +1,66 @@
 /**
+ * Cover class for localStorage.
+ * 
  * @class $localStorage
- *
- * Cover class for localStorage
  */
-onix.service("$localStorage", function() {
-	this._disable = !("localStorage" in window);
+onix.factory("$localStorage", function() {
+	// localStorage provider
+	var provider = ("localStorage" in window) ? localStorage : {
+		_data: {},
 
-	/**
-	 * Set value to localStorage
-	 *
-	 * @param {String} key
-	 * @param {String} [value]
-	 * @member $localStorage
-	 */
-	this.set = function(key, value) {
-		if (this._disable || !key) return;
+		setItem: function(key, value) {
+			if (!key) return;
 
-		localStorage.setItem(key, value);
+			this._data[key] = value;
+		},
+
+		getItem: function(key) {
+			if (!key) return null;
+
+			return this._data[key];
+		},
+
+		removeItem: function(key) {
+			if (!key) return;
+
+			if (key in this._data) {
+				delete this._data[key];
+			}
+		}
 	};
 
-	/**
-	 * Get value from localStorage
-	 *
-	 * @param {String} key
-	 * @return {String}
-	 * @member $localStorage
-	 */
-	this.get = function(key) {
-		if (this._disable || !key) return null;
+	return {
+		/**
+		 * Set value to localStorage.
+		 *
+		 * @param {String} key
+		 * @param {String} [value]
+		 * @member $localStorage
+		 */
+		set: function(key, value) {
+			provider.setItem(key, value);
+		},
 
-		return localStorage.getItem(key);
-	};
+		/**
+		 * Get value from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {String}
+		 * @member $localStorage
+		 */
+		get: function(key) {
+			return provider.getItem(key);
+		},
 
-	/**
-	 * Remove key from localStorage
-	 *
-	 * @param {String} key
-	 * @return {Boolean}
-	 * @member $localStorage
-	 */
-	this.remove = function(key) {
-		if (this._disable || !key) return null;
-
-		return localStorage.removeItem(key);
+		/**
+		 * Remove key from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {Boolean}
+		 * @member $localStorage
+		 */
+		remove: function(key) {
+			provider.removeItem(key);
+		}
 	};
 });

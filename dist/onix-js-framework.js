@@ -948,12 +948,13 @@ if (!("classList" in document.documentElement) && window.Element) {
 onix = (function() {
 	/**
 	 * Module object - handles one module object with services, factories etc.
-	 *
+	 * This object cannot be used in dependency injection!
+	 * 
 	 * @class $module
 	 */
 	var $module = function(name, dependencies) {
 		/**
-		 * All objects
+		 * All objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -961,7 +962,7 @@ onix = (function() {
 		 */
 		this._objects = {};
 		/**
-		 * All run objects
+		 * All run objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -969,7 +970,7 @@ onix = (function() {
 		 */
 		this._runs = [];
 		/**
-		 * All config objects
+		 * All config objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -977,7 +978,7 @@ onix = (function() {
 		 */
 		this._configs = [];
 		/**
-		 * Module name
+		 * Module name.
 		 * 
 		 * @type {String}
 		 * @member $module
@@ -985,7 +986,7 @@ onix = (function() {
 		 */
 		this._name = name || "";
 		/**
-		 * Module dependencies
+		 * Module dependencies.
 		 * 
 		 * @type {Array}
 		 * @member $module
@@ -994,7 +995,7 @@ onix = (function() {
 		this._dependencies = dependencies || [];
 	};
 	/**
-	 * Module constants
+	 * Module constants.
 	 *
 	 * @property {Object}
 	 * @type {Object}
@@ -1016,7 +1017,7 @@ onix = (function() {
 		}
 	};
 	/**
-	 * Parse parameters. From param parse function and dependencies
+	 * Parse parameters. From param parse function and dependencies.
 	 *
 	 * @property {Function}
 	 * @param  {Array|Function} param 
@@ -1047,7 +1048,7 @@ onix = (function() {
 		}
 	};
 	/**
-	 * Get filter name
+	 * Get filter name.
 	 * 
 	 * @param  {String} name
 	 * @return {String}
@@ -1058,7 +1059,7 @@ onix = (function() {
 		return $module.CONST.FILTER_NAME + name[0].toUpperCase() + name.substr(1, name.length - 1);
 	};
 	/**
-	 * Get dependencies
+	 * Get dependencies.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -1067,7 +1068,7 @@ onix = (function() {
 		return this._dependencies;
 	};
 	/**
-	 * Get module name
+	 * Get module name.
 	 * 
 	 * @return {String}
 	 * @member $module
@@ -1076,7 +1077,7 @@ onix = (function() {
 		return this._name;
 	};
 	/**
-	 * Get module configs
+	 * Get module configs.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -1085,7 +1086,7 @@ onix = (function() {
 		return this._configs;
 	};
 	/**
-	 * Get module runs
+	 * Get module runs.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -1094,7 +1095,7 @@ onix = (function() {
 		return this._runs;
 	};
 	/**
-	 * Get module objects
+	 * Get module objects.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -1103,7 +1104,7 @@ onix = (function() {
 		return this._objects;
 	};
 	/**
-	 * Add provider to the application
+	 * Add provider to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -1133,7 +1134,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add service to the application
+	 * Add service to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -1155,7 +1156,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add factory to the application
+	 * Add factory to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -1177,7 +1178,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add new constant
+	 * Add new constant.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -1196,7 +1197,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add a new value
+	 * Add a new value.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -1215,7 +1216,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add filter to the application
+	 * Add filter to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -1237,7 +1238,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add a new config
+	 * Add a new config.
 	 *
 	 * @chainable
 	 * @param  {Array|Function} param With DI
@@ -1256,7 +1257,7 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Add a new run
+	 * Add a new run.
 	 * 
 	 * @param  {Array|Function} param With DI
 	 * @member $module
@@ -1274,13 +1275,14 @@ onix = (function() {
 		return this;
 	};
 	/**
-	 * Modules object - handles all modules in the application; runs object
+	 * Modules object - handles all modules in the application; runs object.
+	 * This object cannot be used in dependency injection!
 	 *
 	 * @class $modules
 	 */
 	var $modules = {
 		/**
-		 * All modules array
+		 * All modules array.
 		 *
 		 * @private
 		 * @member $modules
@@ -1288,7 +1290,7 @@ onix = (function() {
 		 */
 		_modules: [],
 		/**
-		 * All modules object - quick access
+		 * All modules object - quick access.
 		 *
 		 * @private
 		 * @member $modules
@@ -1296,7 +1298,7 @@ onix = (function() {
 		 */
 		_modulesObj: {},
 		/**
-		 * Modules constants
+		 * Modules constants.
 		 *
 		 * @private
 		 * @member $modules
@@ -1306,7 +1308,7 @@ onix = (function() {
 			MODULE_SEPARATOR: "::",
 		},
 		/**
-		 * Function which does nothing
+		 * Function which does nothing.
 		 *
 		 * @private
 		 * @member $modules
@@ -1314,7 +1316,7 @@ onix = (function() {
 		_noop: function() {
 		},
 		/**
-		 * Get post process config during config phase
+		 * Get post process config during config phase.
 		 *
 		 * @private
 		 * @return {Object} Post process config object
@@ -1332,13 +1334,31 @@ onix = (function() {
 			};
 		},
 		/**
-		 * Event - Dom LOAD
+		 * Get pre run config during run phase.
+		 *
+		 * @private
+		 * @return {Object} Pre run config object
+		 * @member $modules
+		 */
+		_getPreRunConfig: function() {
+			// $myQuery needs to be cached
+			var param = ["$myQuery", function($myQuery) {}];
+			var pp = $module.parseParam(param);
+			return {
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.RUN
+			};
+		},
+		/**
+		 * Event - Dom LOAD.
 		 *
 		 * @member $modules
 		 */
 		domLoad: function() {
 			var configs = [];
-			var runs = [];
+			// pre process run
+			var runs = [this._getPreRunConfig()];
 			this._modules.forEach(function(module) {
 				var error = false;
 				var dependencies = module.getDependencies();
@@ -1367,7 +1387,7 @@ onix = (function() {
 			}, this);
 		},
 		/**
-		 * Get object by his name
+		 * Get object by his name.
 		 *
 		 * @param {String} name Object name
 		 * @return {Object} Object data
@@ -1416,7 +1436,7 @@ onix = (function() {
 			return output;
 		},
 		/**
-		 * Run object configuration; returns his cache (data)
+		 * Run object configuration; returns his cache (data).
 		 *
 		 * @param  {Object}  obj Object configuration
 		 * @param  {Boolean} [isConfig] Is config phase?
@@ -1517,7 +1537,7 @@ onix = (function() {
 			}
 		},
 		/**
-		 * Add a new module to the application
+		 * Add a new module to the application.
 		 * 
 		 * @param {String} name Module name
 		 * @param {Array} [dependencies] Module dependencies
@@ -1535,24 +1555,24 @@ onix = (function() {
 	document.addEventListener("DOMContentLoaded", $modules.domLoad.bind($modules));
 	/**
 	 * Main framework object, which is created like new module with name 'onix'.
-	 * Module has addtional functions
+	 * Module has addtional functions.
 	 * 
 	 * @class onix
 	 */
 	var onix = $modules.addModule("onix");
 	/**
-	 * Add a new module to the application
+	 * Add a new module to the application.
 	 * 
 	 * @param {String} name Module name
 	 * @param {Array} [dependencies] Module dependencies
-	 * @return {Object} Created module
+	 * @return {$module} Created module
 	 * @member onix
 	 */
 	onix.module = function(name, dependencies) {
 		return $modules.addModule(name, dependencies);
 	};
 	/**
-	 * Empty function
+	 * Empty function.
 	 *
 	 * @member onix
 	 */
@@ -1566,20 +1586,22 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.3.3/3. 5. 2016\n" +
+			"2.4.0/4. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
-			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs"
+			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
+			"@license MIT\n" +
+			"* - Free for use in both personal and commercial projects\n"
 		);
 	};
 	onix.factory("$di", function() {
 		/**
+		 * Helper factory for dependency injection and parsing function parameters.
+		 * 
 		 * @class $di
-		 *
-		 * Helper factory for dependency injection and parsing function parameters
 		 */
 		return {
 			/**
-			 * Parse parameters. From param parse function and dependencies
+			 * Parse parameters. From param parse function and dependencies.
 			 *
 			 * @property {Function}
 			 * @param  {Array|Function} param 
@@ -1588,7 +1610,7 @@ onix = (function() {
 			 */
 			parseParam: $module.parseParam,
 			/**
-			 * Get filter name
+			 * Get filter name.
 			 * 
 			 * @param  {String} name
 			 * @return {String}
@@ -1596,7 +1618,7 @@ onix = (function() {
 			 */
 			getFilterName: $module.getFilterName,
 			/**
-			 * Run function with possible inject - handles dependency injection
+			 * Run function with possible inject - handles dependency injection.
 			 * 
 			 * @param  {Object} runObj
 			 * @param  {Function} runObj.fn
@@ -1618,56 +1640,72 @@ onix = (function() {
 	return onix;
 })();
 /**
+ * Cover class for localStorage.
+ * 
  * @class $localStorage
- *
- * Cover class for localStorage
  */
-onix.service("$localStorage", function() {
-	this._disable = !("localStorage" in window);
-	/**
-	 * Set value to localStorage
-	 *
-	 * @param {String} key
-	 * @param {String} [value]
-	 * @member $localStorage
-	 */
-	this.set = function(key, value) {
-		if (this._disable || !key) return;
-		localStorage.setItem(key, value);
+onix.factory("$localStorage", function() {
+	// localStorage provider
+	var provider = ("localStorage" in window) ? localStorage : {
+		_data: {},
+		setItem: function(key, value) {
+			if (!key) return;
+			this._data[key] = value;
+		},
+		getItem: function(key) {
+			if (!key) return null;
+			return this._data[key];
+		},
+		removeItem: function(key) {
+			if (!key) return;
+			if (key in this._data) {
+				delete this._data[key];
+			}
+		}
 	};
-	/**
-	 * Get value from localStorage
-	 *
-	 * @param {String} key
-	 * @return {String}
-	 * @member $localStorage
-	 */
-	this.get = function(key) {
-		if (this._disable || !key) return null;
-		return localStorage.getItem(key);
-	};
-	/**
-	 * Remove key from localStorage
-	 *
-	 * @param {String} key
-	 * @return {Boolean}
-	 * @member $localStorage
-	 */
-	this.remove = function(key) {
-		if (this._disable || !key) return null;
-		return localStorage.removeItem(key);
+	return {
+		/**
+		 * Set value to localStorage.
+		 *
+		 * @param {String} key
+		 * @param {String} [value]
+		 * @member $localStorage
+		 */
+		set: function(key, value) {
+			provider.setItem(key, value);
+		},
+		/**
+		 * Get value from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {String}
+		 * @member $localStorage
+		 */
+		get: function(key) {
+			return provider.getItem(key);
+		},
+		/**
+		 * Remove key from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {Boolean}
+		 * @member $localStorage
+		 */
+		remove: function(key) {
+			provider.removeItem(key);
+		}
 	};
 });
 /**
+ * Data for controllers in the $route.
+ * 
  * @class $routeParams
- *
- * Data for controllers in the $route
  */
 onix.factory("$routeParams", function() {
 	return {};
 });
 /**
- * Filter process input data and output can be used in template or in the code
+ * Filter process input data and output can be used in template or in the code.
  *
  * @class $filter
  */
@@ -1680,8 +1718,7 @@ function(
 		return value || "";
 	};
 	/**
-	 * Return filter by his name or returns empty filter. Filter name is
-	 * concatenation of $filter + Filter name
+	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
 	 * 
 	 * @param  {String} filterName 
 	 * @return {Object}
@@ -1702,13 +1739,13 @@ function(
 	};
 }]);
 /**
- * Filter - lowercase functionality
+ * Filter - lowercase functionality.
  *
  * @class $filterLowercase
  */
 onix.filter("lowercase", function() {
 	/**
-	 * Input is transformatted to lowercase
+	 * Input is transformatted to lowercase.
 	 * 
 	 * @param  {String} input
 	 * @return {String|Object}
@@ -1722,13 +1759,13 @@ onix.filter("lowercase", function() {
 	};
 });
 /**
- * Filter - uppercase functionality
+ * Filter - uppercase functionality.
  *
  * @class $filterUppercase
  */
 onix.filter("uppercase", function() {
 	/**
-	 * Input is transformatted to uppercase
+	 * Input is transformatted to uppercase.
 	 * 
 	 * @param  {String} input
 	 * @return {String|Object}
@@ -1742,13 +1779,13 @@ onix.filter("uppercase", function() {
 	};
 });
 /**
- * Filter - json stringify functionality
+ * Filter - json stringify functionality.
  *
  * @class $filterJson
  */
 onix.filter("json", function() {
 	/**
-	 * Input object is stringfied
+	 * Input object is stringfied.
 	 * 
 	 * @param {Object} obj Input object
 	 * @param {Number} [spacing] Number of spaces per indetation
@@ -1769,13 +1806,13 @@ onix.filter("json", function() {
 });
 onix.factory("$q", function() {
 	/**
+	 * Promise implementation which is similar to angular $q.
+	 * 
 	 * @class $q
-	 *
-	 * Promise implementation which is similar to angular $q
 	 */
 	var $promise = function() {
 		/**
-		 * Promise states
+		 * Promise states.
 		 *
 		 * @member $q
 		 * @private
@@ -1793,7 +1830,7 @@ onix.factory("$q", function() {
 		this._finishData = null;
 	};
 	/**
-	 * Resolve all functions
+	 * Resolve all functions.
 	 *
 	 * @param  {Boolean} isError
 	 * @member $q
@@ -1822,7 +1859,7 @@ onix.factory("$q", function() {
 		}
 	};
 	/**
-	 * Resolve promise using obj
+	 * Resolve promise using obj.
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -1832,7 +1869,7 @@ onix.factory("$q", function() {
 		this._resolveFuncs(false);
 	};
 	/**
-	 * Reject promise using obj
+	 * Reject promise using obj.
 	 *
 	 * @param  {Object} obj
 	 * @member $q
@@ -1842,7 +1879,7 @@ onix.factory("$q", function() {
 		this._resolveFuncs(true);
 	};
 	/**
-	 * After promise resolve/reject call then (okFn, errorFn)
+	 * After promise resolve/reject call then (okFn, errorFn).
 	 *
 	 * @chainable
 	 * @param {Function} [cbOk]
@@ -1866,7 +1903,7 @@ onix.factory("$q", function() {
 		return this;
 	};
 	/**
-	 * After promise resolve call then cbOk
+	 * After promise resolve call then cbOk.
 	 *
 	 * @chainable
 	 * @param  {Function} cbOk
@@ -1881,7 +1918,7 @@ onix.factory("$q", function() {
 		return this;
 	};
 	/**
-	 * After promise reject call then cbError
+	 * After promise reject call then cbError.
 	 *
 	 * @chainable
 	 * @param  {Function} cbError
@@ -1896,7 +1933,7 @@ onix.factory("$q", function() {
 		return this;
 	};
 	/**
-	 * Finally for promise
+	 * Finally for promise.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -1912,7 +1949,7 @@ onix.factory("$q", function() {
 	};
 	return {
 		/**
-		 * Resolve all promises in the array
+		 * Resolve all promises in the array.
 		 *
 		 * @param {$q[]} promises
 		 * @return {$q}
@@ -1938,7 +1975,7 @@ onix.factory("$q", function() {
 			return promise;
 		},
 		/**
-		 * Deferable object of the promise
+		 * Deferable object of the promise.
 		 *
 		 * @return {$q}
 		 * @member $q
@@ -1964,9 +2001,9 @@ function(
 	$q
 ) {
 	/**
+	 * Factory for manage multiple tasks.
+	 * 
  	 * @class $job
- 	 *
- 	 * Factory for manage multiple tasks
  	 */
 	var $job = function() {
 		this._donePromise = $q.defer();
@@ -1977,7 +2014,7 @@ function(
 		};
 	};
 	/**
-	 * Add task to JOB
+	 * Add task to JOB.
 	 * 
 	 * @param {Function} task 
 	 * @param {Function|Object} [scope]
@@ -2016,7 +2053,7 @@ function(
 		this._tasks = [];
 	};
 	/**
-	 * Set progress function, which will be called after each task will be done
+	 * Set progress function, which will be called after each task will be done.
 	 * 
 	 * @param {Function} cb
 	 * @param {Function|Object} [scope]
@@ -2050,7 +2087,7 @@ function(
 	};
 	return {
 		/**
-		 * Factory for creating new Job
+		 * Factory for creating new Job.
 		 *
 		 * @member $job
 		 */
@@ -2073,6 +2110,9 @@ onix.factory("$myQuery", function() {
 		this._els = [];
 		parent = parent || document;
 		if (typeof value === "string") {
+			if (parent instanceof $myQuery) {
+				parent = parent.getEl();
+			}
 			this._els = parent.querySelectorAll(value);
 		}
 		else if (Array.isArray(value)) {
@@ -2084,7 +2124,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Operation on elements
+	 * Operation on elements.
 	 * 
 	 * @param  {Function} cb
 	 * @param  {Function} [scope]
@@ -2149,7 +2189,7 @@ onix.factory("$myQuery", function() {
 		}
 	};
 	/**
-	 * Get or set attribute
+	 * Get or set attribute.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -2181,7 +2221,7 @@ onix.factory("$myQuery", function() {
 		}
 	};
 	/**
-	 * Get or set src
+	 * Get or set src.
 	 * 
 	 * @param  {String} [newValue]
 	 * @return {String}
@@ -2191,7 +2231,7 @@ onix.factory("$myQuery", function() {
 		return this._setGetAll(newValue, "src");
 	};
 	/**
-	 * Hide element
+	 * Hide element.
 	 * 
 	 * @chainable
 	 * @member $myQuery
@@ -2203,7 +2243,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Show element
+	 * Show element.
 	 *
 	 * @chainable
 	 * @param  {String} [displayStyle]
@@ -2216,7 +2256,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Get or set value
+	 * Get or set value.
 	 *
 	 * @chainable
 	 * @param  {String} [newValue]
@@ -2227,7 +2267,7 @@ onix.factory("$myQuery", function() {
 		return this._setGetAll(newValue, "value");
 	};
 	/**
-	 * Get or set HTML
+	 * Get or set HTML.
 	 * 
 	 * @param  {String} [newValue]
 	 * @return {String}
@@ -2237,7 +2277,7 @@ onix.factory("$myQuery", function() {
 		return this._setGetAll(newValue, "innerHTML");
 	};
 	/**
-	 * Append another element to this one
+	 * Append another element to this one.
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -2250,7 +2290,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Add CSS class
+	 * Add CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -2263,7 +2303,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Remove CSS class
+	 * Remove CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -2276,7 +2316,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Toggle CSS class
+	 * Toggle CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -2289,7 +2329,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Get width
+	 * Get width.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -2302,7 +2342,7 @@ onix.factory("$myQuery", function() {
 		return width;
 	};
 	/**
-	 * Get height
+	 * Get height.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -2315,7 +2355,7 @@ onix.factory("$myQuery", function() {
 		return height;
 	};
 	/**
-	 * Click event
+	 * Click event.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -2331,7 +2371,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Change event
+	 * Change event.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -2347,7 +2387,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Foreach
+	 * Foreach.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -2361,7 +2401,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Remove element
+	 * Remove element.
 	 *
 	 * @chainable
 	 * @member $myQuery
@@ -2373,7 +2413,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Prepend element
+	 * Prepend element.
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -2401,7 +2441,7 @@ onix.factory("$myQuery", function() {
 		return this;
 	};
 	/**
-	 * Get all elements length
+	 * Get all elements length.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -2410,7 +2450,7 @@ onix.factory("$myQuery", function() {
 		return this._els.length;
 	};
 	/**
-	 * Quick acces to myQuery and DOM manipulation
+	 * Quick acces to myQuery and DOM manipulation.
 	 *
 	 * @param  {String|HTMLElement|Array} value
 	 * @param {HTMLElement} [parent]
@@ -2423,7 +2463,7 @@ onix.factory("$myQuery", function() {
 	};
 	return {
 		 /**
-		 * Main cover function
+		 * Main cover function.
 		 * 
 		 * @param  {String|HTMLElement|Array} value
 		 * @param {HTMLElement} [parent]
@@ -2435,12 +2475,10 @@ onix.factory("$myQuery", function() {
 		}
 	};
 });
-// needs to be cached
-onix.run(["$myQuery", function($myQuery) {}]);
 /**
- * @class $dom
- *
  * Class for creating DOM elements and getting their references.
+ * 
+ * @class $dom
  */
 onix.service("$dom", function() {
 	/**
@@ -2500,7 +2538,7 @@ onix.service("$dom", function() {
 	/**
 	 * Get element from the document.
 	 *
-	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
+	 * @param  {String|Array} els Els = "" -> element; [x, y] -> { x: el, y: el }; [{sel: "div", name: "xyz"}] -> { "xyz": div el }
 	 * @param  {Object} [parent]
 	 * @return {Object}
 	 * @member $dom
@@ -2528,14 +2566,14 @@ onix.service("$dom", function() {
 	};
 });
 /**
- * @class $location
- *
  * Support class for location operations.
+ * 
+ * @class $location
  */
 onix.service("$location", function() {
 	// ------------------------ public ----------------------------------------
 	/**
-	 * Page refresh
+	 * Page refresh.
 	 *
 	 * @member $location
 	 */
@@ -2543,7 +2581,7 @@ onix.service("$location", function() {
 		window.location.reload();
 	};
 	/**
-	 * Create a new search url
+	 * Create a new search url.
 	 * 
 	 * @param  {Object} obj
 	 * @return {String}
@@ -2564,7 +2602,7 @@ onix.service("$location", function() {
 		else return "";
 	};
 	/**
-	 * Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url
+	 * Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url.
 	 *
 	 * @param  {Object} [obj]
 	 * @return {Object}
@@ -2593,7 +2631,7 @@ onix.service("$location", function() {
 		}
 	};
 	/**
-	 * Get current location
+	 * Get current location.
 	 *
 	 * @return {String}
 	 * @member $location
@@ -2603,9 +2641,9 @@ onix.service("$location", function() {
 	};
 });
 /**
- * @class $common
- *
  * Commom functions used in whole application.
+ *
+ * @class $common
  */
 onix.service("$common", [
 	"$q",
@@ -2613,7 +2651,7 @@ function(
 	$q
 ) {
 	/**
-	 * Object copy, from source to dest
+	 * Object copy, from source to dest.
 	 *
 	 * @param  {Object} dest
 	 * @param  {Object} source
@@ -2650,7 +2688,7 @@ function(
 		}.bind(this));
 	};
 	/**
-	 * Get cookie by her name
+	 * Get cookie by her name.
 	 *
 	 * @param  {String} name
 	 * @return {String}
@@ -2690,7 +2728,7 @@ function(
 		return promise;
 	};
 	/**
-	 * Merge multiple objects into the single one
+	 * Merge multiple objects into the single one.
 	 *
 	 * @return {Object}
 	 * @member $common
@@ -2719,7 +2757,7 @@ function(
 		this._objCopy(dest, source);
 	};
 	/**
-	 * Bind function arguments without scope
+	 * Bind function arguments without scope.
 	 *
 	 * @param  {Function} cb
 	 * @return {Function}
@@ -2750,9 +2788,9 @@ function(
 		}
 	};
 	/**
-	 * Reverse for each
+	 * Reverse for each.
 	 *
-	 * @param  {Array} arr 
+	 * @param  {Array} arr
 	 * @param {Function} cb
 	 * @param {Function} scope
 	 * @member $common
@@ -2765,7 +2803,7 @@ function(
 		}
 	};
 	/**
-	 * HEX value to DEC
+	 * HEX value to DEC.
 	 *
 	 * @param  {String} hex
 	 * @return {Number}
@@ -2791,7 +2829,7 @@ function(
 		}
 	};
 	/**
-	 * HEX value to RGB
+	 * HEX value to RGB.
 	 *
 	 * @param  {String} hexColor
 	 * @return {Object}
@@ -2841,7 +2879,7 @@ function(
 	};
 	/**
 	 * Cover function for console.log, which allows to replace {0..n} occurences inside string.
-	 * First argument is string, other arguments are for replace objects by key
+	 * First argument is string, other arguments are for replace objects by key.
 	 * 
 	 * @member $common
 	 */
@@ -2883,7 +2921,7 @@ function(
 		}
 	};
 	/**
-	 * Chaining multiple methods with promises, returns promise
+	 * Chaining multiple methods with promises, returns promise.
 	 * 
 	 * @param  {Object[]} opts
 	 * @param  {String|Function} opts.method Function or method name inside scope
@@ -2898,7 +2936,7 @@ function(
 		return promise;
 	};
 	/**
-	 * Inner method for chaining promises
+	 * Inner method for chaining promises.
 	 * 
 	 * @param  {Object[]} opts
 	 * @param  {String|Function} opts.method Function or method name inside scope
@@ -2951,9 +2989,9 @@ function(
 	};
 }]);
 /**
+ * $notify uses bootstrap alerts and provides additional functionality.
+ * 
  * @class $notify
- *
- * $notify uses bootstrap alerts and provides additional functionality
  */
 onix.service("$notify", [
 	"$common",
@@ -2963,7 +3001,7 @@ function(
 	$q
 ) {
 	/**
-	 * Create notification object from the element
+	 * Create notification object from the element.
 	 * 
 	 * @param {HTMLElement} el
 	 * @member $notify
@@ -2980,7 +3018,7 @@ function(
 		return this;
 	};
 	/**
-	 * Set value to the notify element
+	 * Set value to the notify element.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -2995,7 +3033,7 @@ function(
 		}
 	};
 	/**
-	 * Reset CSS classes
+	 * Reset CSS classes.
 	 *
 	 * @member $notify
 	 */
@@ -3006,7 +3044,7 @@ function(
 		return this;
 	};
 	/**
-	 * Show OK state
+	 * Show OK state.
 	 * 
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -3017,7 +3055,7 @@ function(
 		return this;
 	};
 	/**
-	 * Show ERROR state
+	 * Show ERROR state.
 	 * 
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -3028,7 +3066,7 @@ function(
 		return this;
 	};
 	/**
-	 * Show INFO state
+	 * Show INFO state.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -3039,7 +3077,7 @@ function(
 		return this;
 	};
 	/**
-	 * Show WARNING state
+	 * Show WARNING state.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -3050,7 +3088,7 @@ function(
 		return this;
 	};
 	/**
-	 * Hide alert after timeout and returns promise at the end of operation
+	 * Hide alert after timeout and returns promise at the end of operation.
 	 *
 	 * @return {$q}
 	 * @member $notify
@@ -3064,7 +3102,7 @@ function(
 		return promise;
 	};
 	/**
-	 * Main public access to the notify obj
+	 * Main public access to the notify obj.
 	 *
 	 * @param  {HTMLElement} el
 	 * @return {$notify}
@@ -3080,11 +3118,11 @@ function(
 	$common
 ) {
 	/**
+	 * This class is used for extending existing objects and brings signal functionality.
+	 * 
  	 * @class $event
- 	 *
- 	 * This class is used for extending existing objects and brings signal functionality.
  	 */
-	return {
+	var $event = {
 		/**
 		 * All events. { name: name, event: function, scope, [once] }
 		 * 
@@ -3159,7 +3197,7 @@ function(
 			});
 		},
 		/**
-		 * Trigger event with arguments 0..n
+		 * Trigger event with arguments 0..n.
 		 * 
 		 * @param  {String} name
 		 * @member $event
@@ -3182,11 +3220,23 @@ function(
 			}, this);
 		}
 	};
+	return {
+		/**
+		 * Bind event functionality to the scope.
+		 *
+		 * @param {Object} scope
+		 * @member $event
+		 */
+		bindEvents: function(scope) {
+			if (!scope) return;
+			$common.extend(scope, $event);
+		}
+	};
 }]);
 /**
+ * Progress loader in the application.
+ * 
  * @class $loader
- *
- * Progress loader in the application
  */
 onix.factory("$loader", [
 	"$dom",
@@ -3195,7 +3245,7 @@ function(
 ) {
 	var $loader = {
 		/**
-		 * Create loader
+		 * Create loader.
 		 *
 		 * @private
 		 * @member $loader
@@ -3209,7 +3259,7 @@ function(
 			document.body.insertBefore(this._el, document.body.firstChild);
 		},
 		/**
-		 * Loader init
+		 * Loader init.
 		 *
 		 * @private
 		 * @member $loader
@@ -3218,7 +3268,7 @@ function(
 			this._create();
 		},
 		/**
-		 * Start loader
+		 * Start loader.
 		 *
 		 * @member $loader
 		 */
@@ -3226,7 +3276,7 @@ function(
 			this._el.classList.add("start");
 		},
 		/**
-		 * End loader
+		 * End loader.
 		 *
 		 * @member $loader
 		 */
@@ -3247,9 +3297,9 @@ function(
 	return $loader;
 }]);
 /**
- * @class $http
- *
  * XMLHttpRequest cover class.
+ * 
+ * @class $http
  */
 onix.service("$http", [
 	"$q",
@@ -3259,8 +3309,8 @@ function(
 	$common
 ) {
 	/**
-	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
-	 * Prepare post data
+	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects.
+	 * Prepare post data.
 	 *
 	 * @param  {Object|Array} data { name, value }
 	 * @return {Object}
@@ -3305,7 +3355,7 @@ function(
 		return url;
 	};
 	/**
-	 * Request types
+	 * Request types.
 	 *
 	 * @property {Object}
 	 * @param {Number} JSON
@@ -3412,7 +3462,7 @@ function(
 }]);
 onix.provider("$i18n", function() {
 	/**
-	 * All langs data
+	 * All langs data.
 	 *
 	 * @private
 	 * @type {Object}
@@ -3421,7 +3471,7 @@ onix.provider("$i18n", function() {
 	 */
 	var _langs = {};
 	/**
-	 * Current language
+	 * Current language-
 	 *
 	 * @private
 	 * @type {String}
@@ -3430,7 +3480,7 @@ onix.provider("$i18n", function() {
 	 */
 	var _currentLang = "";
 	/**
-	 * Bind global _ as translation function
+	 * Bind global _ as translation function-
 	 *
 	 * @private
 	 * @type {String}
@@ -3439,7 +3489,7 @@ onix.provider("$i18n", function() {
 	 */
 	var _bindGlobalTranslation = true;
 	/**
-	 * Replace translated text by object. This functions is implementation of message format object replace inside the string
+	 * Replace translated text by object. This functions is implementation of message format object replace inside the string.
 	 *
 	 * @param  {String} translate
 	 * @param  {Object} [replace] Replace all {} in the string
@@ -3529,7 +3579,7 @@ onix.provider("$i18n", function() {
 		return _transReplace(translate, replace);
 	};
 	/**
-	 * Add a new language
+	 * Add a new language.
 	 *
 	 * @param {String} lang Language key
 	 * @param {Object} data
@@ -3565,7 +3615,7 @@ onix.provider("$i18n", function() {
 		_bindGlobalTranslation = false;
 	};
 	/**
-	 * Add a new language
+	 * Add a new language.
 	 *
 	 * @param {String} lang Language key
 	 * @param {Object} data
@@ -3584,7 +3634,7 @@ onix.provider("$i18n", function() {
 		_setLanguage(lang);
 	};
 	/**
-	 * Post process during config phase
+	 * Post process during config phase.
 	 *
 	 * @member $i18nProvider
 	 * @private
@@ -3604,9 +3654,9 @@ onix.provider("$i18n", function() {
 		}
 	};
 	/**
+	 * Language support, string translation with support for message format syntax.
+	 * 
 	 * @class $i18n
-	 *
-	 * Language support, string translation with support for message format syntax
 	 */
 	this.$get = ["$http", "$q", function(
 				$http, $q) {
@@ -3623,7 +3673,7 @@ onix.provider("$i18n", function() {
 				return _getText(key, replace);
 			},
 			/**
-			 * Add a new language
+			 * Add a new language.
 			 *
 			 * @param {String} lang Language key
 			 * @param {Object} data
@@ -3633,7 +3683,7 @@ onix.provider("$i18n", function() {
 				_addLanguage(lang, data);
 			},
 			/**
-			 * Set new language by his key
+			 * Set new language by his key.
 			 *
 			 * @param {String} lang Language key
 			 * @member $i18n
@@ -3642,7 +3692,7 @@ onix.provider("$i18n", function() {
 				_setLanguage(lang);
 			},
 			/**
-			 * Get current language key
+			 * Get current language key.
 			 *
 			 * @return {String} Language key
 			 * @member $i18n
@@ -3651,7 +3701,7 @@ onix.provider("$i18n", function() {
 				return _currentLang;
 			},
 			/**
-			 * Get all languages keys
+			 * Get all languages keys.
 			 *
 			 * @return {Array[String]} Languages keys
 			 * @member $i18n
@@ -3660,7 +3710,7 @@ onix.provider("$i18n", function() {
 				return Object.keys(_langs);
 			},
 			/**
-			 * Load language from the file
+			 * Load language from the file.
 			 *
 			 * @param  {String} lang Language key
 			 * @param  {String} url  Path to the file
@@ -3685,7 +3735,7 @@ onix.provider("$i18n", function() {
 });
 onix.provider("$template", function() {
 	/**
-	 * Configuration for template delimeters
+	 * Configuration for template delimeters.
 	 *
 	 * @private
 	 * @type {Object}
@@ -3708,10 +3758,10 @@ onix.provider("$template", function() {
 		});
 	};
 	/**
-	 * @class $template
-	 *
 	 * Handle templates, binds events - syntax similar to moustache and angular template system.
-	 * $myQuery is used for cache record
+	 * $myQuery is used for cache record.
+	 *
+	 * @class $template
 	 */
 	this.$get = ["$common", "$q", "$http", "$filter", function(
 				$common, $q, $http, $filter) {
@@ -3725,7 +3775,7 @@ onix.provider("$template", function() {
 			 */
 			_cache: {},
 			/**
-			 * Regular expressions for handle template variables
+			 * Regular expressions for handle template variables.
 			 *
 			 * @type {Object}
 			 * @member $template
@@ -3739,7 +3789,7 @@ onix.provider("$template", function() {
 				ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
 			},
 			/**
-			 * Constants
+			 * Constants.
 			 * 
 			 * @type {Object}
 			 * @member $template
@@ -3747,10 +3797,11 @@ onix.provider("$template", function() {
 			 */
 			_CONST: {
 				FILTER_DELIMETER: "|",
-				FILTER_PARAM_DELIMETER: ":"
+				FILTER_PARAM_DELIMETER: ":",
+				TEMPLATE_SCRIPT_SELECTOR: "script[type='text/template']"
 			},
 			/**
-			 * Parse a function name from the string
+			 * Parse a function name from the string.
 			 *
 			 * @param  {String} value
 			 * @return {String}
@@ -3762,7 +3813,7 @@ onix.provider("$template", function() {
 				return value.match(/[a-zA-Z0-9_]+/)[0];
 			},
 			/**
-			 * Parse arguments from the string -> makes array from them
+			 * Parse arguments from the string -> makes array from them.
 			 *
 			 * @param  {String} value
 			 * @param  {Object} config
@@ -3818,7 +3869,7 @@ onix.provider("$template", function() {
 				return args;
 			},
 			/**
-			 * Bind one single event to the element
+			 * Bind one single event to the element.
 			 * 
 			 * @param  {HTMLElement} el
 			 * @param  {String} eventName click, keydown...
@@ -3841,18 +3892,19 @@ onix.provider("$template", function() {
 				}
 			},
 			/**
-			 * Init - get all templates from the page. Uses 'text/template' script with template data
+			 * Init - get all templates from the page. Uses 'text/template' script with template data.
+			 * Each script has to have id and specifi type="text/template".
 			 *
 			 * @private
 			 * @member $template
 			 */
 			_init: function() {
-				onix.element("script[type='text/template']").forEach(function(item) {
-					this.add(item.id, item.innerHTML);
+				onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function(item) {
+					this.add(item.id || "", item.innerHTML);
 				}, this);
 			},
 			/**
-			 * Add new item to the cachce
+			 * Add new item to the cache.
 			 *
 			 * @param {String} key 
 			 * @param {String} data
@@ -3862,7 +3914,7 @@ onix.provider("$template", function() {
 				this._cache[key] = data;
 			},
 			/**
-			 * Compile one template - replaces all ocurances of {} by model
+			 * Compile one template - replaces all ocurances of {{ xxx }} by model.
 			 *
 			 * @param  {String} key Template key/name
 			 * @param  {Object} data Model
@@ -3872,7 +3924,7 @@ onix.provider("$template", function() {
 			compile: function(key, data) {
 				var tmpl = this.get(key);
 				if (data) {
-					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g"));
+					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
 					all.forEach(function(item) {
 						var itemSave = item;
 						item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
@@ -3926,7 +3978,7 @@ onix.provider("$template", function() {
 				return tmpl;
 			},
 			/**
-			 * Get template from the cache
+			 * Get template from the cache.
 			 *
 			 * @param  {String} key Template key/name
 			 * @return {String}
@@ -3937,13 +3989,15 @@ onix.provider("$template", function() {
 			},
 			/**
 			 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
-			 * Supports: click, change, keydown, bind
+			 * For data-bind, scope has to have "addEls" function.
+			 * Supports: click, change, keydown, bind.
 			 *
-			 * @param  {HTMLElement} root
-			 * @param  {Object|Function} scope
+			 * @param  {HTMLElement} root Root element
+			 * @param  {Object} scope Scope which against will be binding used
+			 * @param  {Function} [addElsCb] Callback function with object with all data-bind objects
 			 * @member $template
 			 */
-			bindTemplate: function(root, scope) {
+			bindTemplate: function(root, scope, addElsCb) {
 				var allElements = onix.element("*[data-click], *[data-change], *[data-bind], *[data-keydown]", root);
 				if (allElements.len()) {
 					var newEls = {};
@@ -3956,13 +4010,13 @@ onix.provider("$template", function() {
 							newEls[dataBind] = item;
 						}
 					}, this);
-					if ("addEls" in scope && typeof scope.addEls === "function") {
-						scope.addEls(newEls);
+					if (addElsCb && typeof addElsCb === "function") {
+						addElsCb(newEls);
 					}
 				}
 			},
 			/**
-			 * Load template from the path, returns promise after load
+			 * Load template from the path, returns promise after load.
 			 *
 			 * @param  {String} key
 			 * @param  {String} path
@@ -3988,9 +4042,9 @@ onix.provider("$template", function() {
 	}];
 });
 /**
+ * Simple router for the application.
+ * 
  * @class $route
- *
- * Simple router for the application
  */
 onix.service("$route", [
 	"$location",
@@ -4004,7 +4058,7 @@ function(
 	$routeParams
 ) {
 	/**
-	 * All routes
+	 * All routes.
 	 *
 	 * @private
 	 * @type {Array}
@@ -4012,7 +4066,7 @@ function(
 	 */
 	this._routes = [];
 	/**
-	 * Otherwise route
+	 * Otherwise route.
 	 *
 	 * @private
 	 * @type {Object}
@@ -4020,7 +4074,7 @@ function(
 	 */
 	this._otherwise = null;
 	/**
-	 * Set $routeParams object. First clear all old keys and add new ones, if the available
+	 * Set $routeParams object. First clear all old keys and add new ones, if the available.
 	 *
 	 * @private
 	 * @param {Object} [routeParams] Route params object
@@ -4042,8 +4096,10 @@ function(
 	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
 	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
 	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
 	 * @member $route
 	 */
 	this.when = function(url, config) {
@@ -4059,8 +4115,10 @@ function(
 	 * @chainable
 	 * @param  {String} page
 	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
 	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
 	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
 	 * @member $route
 	 */
 	this.otherwise = function(config) {
@@ -4070,7 +4128,7 @@ function(
 		return this;
 	};
 	/**
-	 * Run controller from route path
+	 * Run controller from route path.
 	 *
 	 * @private
 	 * @param  {Array|Function} contr
@@ -4086,7 +4144,7 @@ function(
 		});
 	};
 	/**
-	 * Route GO. Walk through all routes, if there is match, route controller will be called
+	 * Route GO. Walk through all routes, if there is match, route controller will be called.
 	 *
 	 * @member $route
 	 */
@@ -4109,12 +4167,16 @@ function(
 			config = this._otherwise.config;
 		}
 		if (config) {
+			var templateId = "";
 			var templateUrl = null;
 			var contr = null;
 			var routeParams = {};
 			Object.keys(config).forEach(function(key) {
 				var value = config[key];
 				switch (key) {
+					case "templateId":
+						templateId = value;
+						break;
 					case "templateUrl":
 						templateUrl = value;
 						break;
@@ -4126,7 +4188,7 @@ function(
 				}
 			});
 			if (templateUrl) {
-				$template.load(config.templateUrl, config.templateUrl).done(function() {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
 						this._runController(contr, routeParams);
 					}
@@ -4150,7 +4212,7 @@ function(
 	$dom
 ) {
 	/**
-	 * $select uses bootstrap dropdown and provides additional functionality
+	 * $select uses bootstrap dropdown and provides additional functionality.
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class "dropdown"
@@ -4160,7 +4222,7 @@ function(
 	 */
 	var $select = function(el, opts) {
 		// extend our class
-		$common.extend(this, $event);
+		$event.bindEvents(this);
 		this._opts = {
 			addCaption: false
 		};
@@ -4186,7 +4248,7 @@ function(
 		this._bind();
 	};
 	/**
-	 * Bind clicks on the select
+	 * Bind clicks on the select.
 	 *
 	 * @member $select
 	 * @private
@@ -4196,7 +4258,7 @@ function(
 		this._bindChoices();
 	};
 	/**
-	 * Bind caption el
+	 * Bind caption el.
 	 * 
 	 * @member $select
 	 * @private
@@ -4222,7 +4284,7 @@ function(
 		this._captionEl = captionEl;
 	};
 	/**
-	 * Event - click on caption
+	 * Event - click on caption.
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -4255,7 +4317,7 @@ function(
 		}
 	};
 	/**
-	 * Bind choices inside select
+	 * Bind choices inside select.
 	 *
 	 * @member $select
 	 * @private
@@ -4272,7 +4334,7 @@ function(
 		}, this);
 	};
 	/**
-	 * Event - click on option
+	 * Event - click on option.
 	 * 
 	 * @param  {Event} e 
 	 * @param  {Object} scope
@@ -4300,7 +4362,7 @@ function(
 		}
 	};
 	/**
-	 * Unbind choices
+	 * Unbind choices.
 	 *
 	 * @member $select
 	 */
@@ -4313,7 +4375,7 @@ function(
 		}
 	};
 	/**
-	 * Rebind choices
+	 * Rebind choices.
 	 *
 	 * @member $select
 	 */
@@ -4322,7 +4384,7 @@ function(
 		this._bindChoices();
 	};
 	/**
-	 * Select option from the select
+	 * Select option from the select.
 	 * 
 	 * @param {Number} ind Position 0..n
 	 * @member $select
@@ -4347,7 +4409,7 @@ function(
 		}
 	};
 	/**
-	 * Set add caption from the current value
+	 * Set add caption from the current value.
 	 *
 	 * @member $select
 	 */
@@ -4365,9 +4427,9 @@ function(
 	return $select;
 }]);
 /**
+ * Class for creating img previews from File[] variable.
+ * 
  * @class $uploadImages
- *
- * Class for creating img previews from File[] variable
  */
 onix.service("$uploadImages", [
 	"$job",
@@ -4387,7 +4449,7 @@ function(
 	 */
 	this._disable = !("FileReader" in window);
 	/**
-	 * Max preview image height
+	 * Max preview image height.
 	 *
 	 * @private
 	 * @member $uploadImages
@@ -4397,13 +4459,13 @@ function(
 		PREVIEW_MAX_SIZE: 180
 	};
 	/**
-	 * Loading gif URL path
+	 * Loading gif URL path.
 	 * 
 	 * @type {String}
 	 */
 	this._loadingGifUrl = "/img/loading.gif";
 	/**
-	 * Do jobs for processing all images
+	 * Do jobs for processing all images.
 	 *
 	 * @private
 	 * @param  {Array} dataArray Array of files with images
@@ -4447,7 +4509,7 @@ function(
 		else return false;
 	};
 	/**
-	 * Read one file, create one preview
+	 * Read one file, create one preview.
 	 *
 	 * @private
 	 * @param  {Object} fileObj
@@ -4496,7 +4558,7 @@ function(
 		reader.readAsArrayBuffer(file);
 	};
 	/**
-	 * Create one image preview
+	 * Create one image preview.
 	 *
 	 * @private
 	 * @param  {File} file
@@ -4529,7 +4591,7 @@ function(
 		};
 	};
 	/**
-	 * Counts image dimension; if maxSize is available, new dimension is calculated
+	 * Counts image dimension; if maxSize is available, new dimension is calculated.
 	 *
 	 * @private
 	 * @param  {Image} img
@@ -4569,7 +4631,7 @@ function(
 		return output;
 	};
 	/**
-	 * Process image: rotate by exif, decrase size according to MAX SIZE
+	 * Process image: rotate by exif, decrase size according to MAX SIZE.
 	 *
 	 * @private
 	 * @param  {Image} img
@@ -4664,7 +4726,7 @@ function(
 		return canvas;
 	};
 	/**
-	 * Binary data to base64
+	 * Binary data to base64.
 	 *
 	 * @private
 	 * @param  {String} fileType
@@ -4755,7 +4817,7 @@ function(
 		}
 	};
 	/**
-	 * Get picture files from array of files
+	 * Get picture files from array of files.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
@@ -4774,7 +4836,7 @@ function(
 		return pictureFiles;
 	};
 	/**
-	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'
+	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}
@@ -4784,7 +4846,7 @@ function(
 		return this.getPictureFiles(files).length;
 	};
 	/**
-	 * Set loading gif URL
+	 * Set loading gif URL.
 	 * 
 	 * @param {String} lgu URL path
 	 * @member $uploadImages

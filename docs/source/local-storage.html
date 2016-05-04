@@ -16,50 +16,69 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$localStorage'>/**
-</span> * @class $localStorage
- *
- * Cover class for localStorage
+</span> * Cover class for localStorage.
+ * 
+ * @class $localStorage
  */
-onix.service(&quot;$localStorage&quot;, function() {
-	this._disable = !(&quot;localStorage&quot; in window);
+onix.factory(&quot;$localStorage&quot;, function() {
+	// localStorage provider
+	var provider = (&quot;localStorage&quot; in window) ? localStorage : {
+		_data: {},
 
-<span id='$localStorage-method-set'>	/**
-</span>	 * Set value to localStorage
-	 *
-	 * @param {String} key
-	 * @param {String} [value]
-	 * @member $localStorage
-	 */
-	this.set = function(key, value) {
-		if (this._disable || !key) return;
+		setItem: function(key, value) {
+			if (!key) return;
 
-		localStorage.setItem(key, value);
+			this._data[key] = value;
+		},
+
+		getItem: function(key) {
+			if (!key) return null;
+
+			return this._data[key];
+		},
+
+		removeItem: function(key) {
+			if (!key) return;
+
+			if (key in this._data) {
+				delete this._data[key];
+			}
+		}
 	};
 
-<span id='$localStorage-method-get'>	/**
-</span>	 * Get value from localStorage
-	 *
-	 * @param {String} key
-	 * @return {String}
-	 * @member $localStorage
-	 */
-	this.get = function(key) {
-		if (this._disable || !key) return null;
+	return {
+<span id='$localStorage-method-set'>		/**
+</span>		 * Set value to localStorage.
+		 *
+		 * @param {String} key
+		 * @param {String} [value]
+		 * @member $localStorage
+		 */
+		set: function(key, value) {
+			provider.setItem(key, value);
+		},
 
-		return localStorage.getItem(key);
-	};
+<span id='$localStorage-method-get'>		/**
+</span>		 * Get value from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {String}
+		 * @member $localStorage
+		 */
+		get: function(key) {
+			return provider.getItem(key);
+		},
 
-<span id='$localStorage-method-remove'>	/**
-</span>	 * Remove key from localStorage
-	 *
-	 * @param {String} key
-	 * @return {Boolean}
-	 * @member $localStorage
-	 */
-	this.remove = function(key) {
-		if (this._disable || !key) return null;
-
-		return localStorage.removeItem(key);
+<span id='$localStorage-method-remove'>		/**
+</span>		 * Remove key from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {Boolean}
+		 * @member $localStorage
+		 */
+		remove: function(key) {
+			provider.removeItem(key);
+		}
 	};
 });
 </pre>

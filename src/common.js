@@ -1,7 +1,7 @@
 /**
- * @class $common
- *
  * Commom functions used in whole application.
+ *
+ * @class $common
  */
 onix.service("$common", [
 	"$q",
@@ -9,7 +9,7 @@ function(
 	$q
 ) {
 	/**
-	 * Object copy, from source to dest
+	 * Object copy, from source to dest.
 	 *
 	 * @param  {Object} dest
 	 * @param  {Object} source
@@ -51,7 +51,7 @@ function(
 	};
 
 	/**
-	 * Get cookie by her name
+	 * Get cookie by her name.
 	 *
 	 * @param  {String} name
 	 * @return {String}
@@ -99,7 +99,7 @@ function(
 	};
 
 	/**
-	 * Merge multiple objects into the single one
+	 * Merge multiple objects into the single one.
 	 *
 	 * @return {Object}
 	 * @member $common
@@ -134,7 +134,7 @@ function(
 	};
 
 	/**
-	 * Bind function arguments without scope
+	 * Bind function arguments without scope.
 	 *
 	 * @param  {Function} cb
 	 * @return {Function}
@@ -169,9 +169,9 @@ function(
 	};
 
 	/**
-	 * Reverse for each
+	 * Reverse for each.
 	 *
-	 * @param  {Array} arr 
+	 * @param  {Array} arr
 	 * @param {Function} cb
 	 * @param {Function} scope
 	 * @member $common
@@ -186,7 +186,7 @@ function(
 	};
 
 	/**
-	 * HEX value to DEC
+	 * HEX value to DEC.
 	 *
 	 * @param  {String} hex
 	 * @return {Number}
@@ -214,7 +214,7 @@ function(
 	};
 
 	/**
-	 * HEX value to RGB
+	 * HEX value to RGB.
 	 *
 	 * @param  {String} hexColor
 	 * @return {Object}
@@ -269,7 +269,7 @@ function(
 
 	/**
 	 * Cover function for console.log, which allows to replace {0..n} occurences inside string.
-	 * First argument is string, other arguments are for replace objects by key
+	 * First argument is string, other arguments are for replace objects by key.
 	 * 
 	 * @member $common
 	 */
@@ -319,7 +319,7 @@ function(
 
 
 	/**
-	 * Chaining multiple methods with promises, returns promise
+	 * Chaining multiple methods with promises, returns promise.
 	 * 
 	 * @param  {Object[]} opts
 	 * @param  {String|Function} opts.method Function or method name inside scope
@@ -337,7 +337,7 @@ function(
 	};
 
 	/**
-	 * Inner method for chaining promises
+	 * Inner method for chaining promises.
 	 * 
 	 * @param  {Object[]} opts
 	 * @param  {String|Function} opts.method Function or method name inside scope

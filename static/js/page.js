@@ -3,54 +3,43 @@ app.factory("Page", [
 	"$template",
 	"$common",
 	"$event",
-	"Config",
 function(
 	$dom,
 	$template,
 	$common,
-	$event,
-	Config
+	$event
 ) {
-
-	// private Page obj
 	var Page = {
 		/**
-		 * Set config.
-		 *
-		 * @param {Object} config
-		 */
-		setConfig: function(config) {
-			this._config = config;
-		},
-
-		/**
-		 * Init page - called from App; runs _afterInit
+		 * Object for data-bind elements references
 		 * 
+		 * @type {Object}
 		 */
-		init: function() {
-			var config = this._getConfig();
-			this._els = {};
+		_els: {
 
-			// each page contanins only one detail div
-			var rootEl = $dom.get(Config.DETAIL_SEL);
-
-			if (config.els) {
-				this._els = $dom.get(config.els, rootEl);
-			}
-
-			$template.bindTemplate(rootEl, this);
-
-			this._afterInit();
 		},
 
 		/**
 		 * Get page element by his name.
 		 *
 		 * @param  {String} name
-		 * @return {NodeElemetn}     
+		 * @return {NodeElemetn}
 		 */
 		_getEl: function(name) {
 			return this._els[name];
+		},
+
+		/**
+		 * Add new elements to this._els; this function can be called from $template
+		 *
+		 * @param {Object} newEls
+		 */
+		_addEls: function(newEls) {
+			newEls = newEls || {};
+
+			Object.keys(newEls).forEach(function(key) {
+				this._els[key] = newEls[key];
+			}, this);
 		},
 
 		/**
@@ -72,30 +61,45 @@ function(
 		},
 
 		/**
-		 * Add new els to this._els; this function can be called from $template
+		 * Set config.
 		 *
-		 * @param {Object} newEls
+		 * @param {Object} config
 		 */
-		addEls: function(newEls) {
-			newEls = newEls || {};
+		setConfig: function(config) {
+			this._config = config;
+		},
 
-			Object.keys(newEls).forEach(function(key) {
-				this._els[key] = newEls[key];
-			}, this);
+		/**
+		 * Init page - called from App; runs _afterInit
+		 * 
+		 */
+		init: function() {
+			var config = this._getConfig();
+			var root = onix.element("body").html($template.compile(config.templ || "", this));
+
+			if (config.els) {
+				this._addEls($dom.get(config.els, root));
+			}
+
+			$template.bindTemplate(root, this, this._addEls.bind(this));
+
+			this._afterInit();
 		}
 	};
 
 	// public
 	return {
 		/**
-		 * Create new page object from: Page and $event are merged together.
-		 * Priority from left to right.
+		 * Create new page object from Page
 		 * 
 		 * @return {Page}
 		 */
 		create: function() {
-			return $common.merge(Page, $event);
+			var page = $common.merge(Page);
+
+			$event.bindEvents(page);
+
+			return page;
 		}
 	};
-
 }]);

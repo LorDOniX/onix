@@ -1,11 +1,11 @@
 /**
- * Filter - lowercase functionality
+ * Filter - lowercase functionality.
  *
  * @class $filterLowercase
  */
 onix.filter("lowercase", function() {
 	/**
-	 * Input is transformatted to lowercase
+	 * Input is transformatted to lowercase.
 	 * 
 	 * @param  {String} input
 	 * @return {String|Object}
@@ -20,13 +20,13 @@ onix.filter("lowercase", function() {
 });
 
 /**
- * Filter - uppercase functionality
+ * Filter - uppercase functionality.
  *
  * @class $filterUppercase
  */
 onix.filter("uppercase", function() {
 	/**
-	 * Input is transformatted to uppercase
+	 * Input is transformatted to uppercase.
 	 * 
 	 * @param  {String} input
 	 * @return {String|Object}
@@ -41,13 +41,13 @@ onix.filter("uppercase", function() {
 });
 
 /**
- * Filter - json stringify functionality
+ * Filter - json stringify functionality.
  *
  * @class $filterJson
  */
 onix.filter("json", function() {
 	/**
-	 * Input object is stringfied
+	 * Input object is stringfied.
 	 * 
 	 * @param {Object} obj Input object
 	 * @param {Number} [spacing] Number of spaces per indetation

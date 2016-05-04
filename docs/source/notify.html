@@ -16,9 +16,9 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$notify'>/**
-</span> * @class $notify
- *
- * $notify uses bootstrap alerts and provides additional functionality
+</span> * $notify uses bootstrap alerts and provides additional functionality.
+ * 
+ * @class $notify
  */
 onix.service(&quot;$notify&quot;, [
 	&quot;$common&quot;,
@@ -28,7 +28,7 @@ function(
 	$q
 ) {
 <span id='$notify-method-S-notify'>	/**
-</span>	 * Create notification object from the element
+</span>	 * Create notification object from the element.
 	 * 
 	 * @param {HTMLElement} el
 	 * @member $notify
@@ -49,7 +49,7 @@ function(
 	};
 
 <span id='$notify-method-_setValue'>	/**
-</span>	 * Set value to the notify element
+</span>	 * Set value to the notify element.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -65,7 +65,7 @@ function(
 	};
 
 <span id='$notify-method-reset'>	/**
-</span>	 * Reset CSS classes
+</span>	 * Reset CSS classes.
 	 *
 	 * @member $notify
 	 */
@@ -78,7 +78,7 @@ function(
 	};
 
 <span id='$notify-method-ok'>	/**
-</span>	 * Show OK state
+</span>	 * Show OK state.
 	 * 
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -92,7 +92,7 @@ function(
 	};
 
 <span id='$notify-method-error'>	/**
-</span>	 * Show ERROR state
+</span>	 * Show ERROR state.
 	 * 
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -106,7 +106,7 @@ function(
 	};
 
 <span id='$notify-method-info'>	/**
-</span>	 * Show INFO state
+</span>	 * Show INFO state.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -120,7 +120,7 @@ function(
 	};
 
 <span id='$notify-method-warn'>	/**
-</span>	 * Show WARNING state
+</span>	 * Show WARNING state.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -134,7 +134,7 @@ function(
 	};
 
 <span id='$notify-method-hide'>	/**
-</span>	 * Hide alert after timeout and returns promise at the end of operation
+</span>	 * Hide alert after timeout and returns promise at the end of operation.
 	 *
 	 * @return {$q}
 	 * @member $notify
@@ -152,7 +152,7 @@ function(
 	};
 
 <span id='$notify-method-get'>	/**
-</span>	 * Main public access to the notify obj
+</span>	 * Main public access to the notify obj.
 	 *
 	 * @param  {HTMLElement} el
 	 * @return {$notify}

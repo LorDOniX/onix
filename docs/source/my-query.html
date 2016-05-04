@@ -30,6 +30,10 @@
 		parent = parent || document;
 
 		if (typeof value === &quot;string&quot;) {
+			if (parent instanceof $myQuery) {
+				parent = parent.getEl();
+			}
+
 			this._els = parent.querySelectorAll(value);
 		}
 		else if (Array.isArray(value)) {
@@ -43,7 +47,7 @@
 	};
 
 <span id='$myQuery-method-_operation'>	/**
-</span>	 * Operation on elements
+</span>	 * Operation on elements.
 	 * 
 	 * @param  {Function} cb
 	 * @param  {Function} [scope]
@@ -116,7 +120,7 @@
 	};
 
 <span id='$myQuery-method-attr'>	/**
-</span>	 * Get or set attribute
+</span>	 * Get or set attribute.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -152,7 +156,7 @@
 	};
 
 <span id='$myQuery-method-src'>	/**
-</span>	 * Get or set src
+</span>	 * Get or set src.
 	 * 
 	 * @param  {String} [newValue]
 	 * @return {String}
@@ -163,7 +167,7 @@
 	};
 
 <span id='$myQuery-method-hide'>	/**
-</span>	 * Hide element
+</span>	 * Hide element.
 	 * 
 	 * @chainable
 	 * @member $myQuery
@@ -177,7 +181,7 @@
 	};
 
 <span id='$myQuery-method-show'>	/**
-</span>	 * Show element
+</span>	 * Show element.
 	 *
 	 * @chainable
 	 * @param  {String} [displayStyle]
@@ -192,7 +196,7 @@
 	};
 
 <span id='$myQuery-method-val'>	/**
-</span>	 * Get or set value
+</span>	 * Get or set value.
 	 *
 	 * @chainable
 	 * @param  {String} [newValue]
@@ -204,7 +208,7 @@
 	};
 
 <span id='$myQuery-method-html'>	/**
-</span>	 * Get or set HTML
+</span>	 * Get or set HTML.
 	 * 
 	 * @param  {String} [newValue]
 	 * @return {String}
@@ -215,7 +219,7 @@
 	};
 
 <span id='$myQuery-method-append'>	/**
-</span>	 * Append another element to this one
+</span>	 * Append another element to this one.
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -230,7 +234,7 @@
 	};
 
 <span id='$myQuery-method-addClass'>	/**
-</span>	 * Add CSS class
+</span>	 * Add CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -245,7 +249,7 @@
 	};
 
 <span id='$myQuery-method-removeClass'>	/**
-</span>	 * Remove CSS class
+</span>	 * Remove CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -260,7 +264,7 @@
 	};
 
 <span id='$myQuery-method-toggleClass'>	/**
-</span>	 * Toggle CSS class
+</span>	 * Toggle CSS class.
 	 *
 	 * @chainable
 	 * @param  {String} className
@@ -275,7 +279,7 @@
 	};
 
 <span id='$myQuery-method-width'>	/**
-</span>	 * Get width
+</span>	 * Get width.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -291,7 +295,7 @@
 	};
 
 <span id='$myQuery-method-height'>	/**
-</span>	 * Get height
+</span>	 * Get height.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -307,7 +311,7 @@
 	};
 
 <span id='$myQuery-method-click'>	/**
-</span>	 * Click event
+</span>	 * Click event.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -325,7 +329,7 @@
 	};
 
 <span id='$myQuery-method-change'>	/**
-</span>	 * Change event
+</span>	 * Change event.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -343,7 +347,7 @@
 	};
 
 <span id='$myQuery-method-forEach'>	/**
-</span>	 * Foreach
+</span>	 * Foreach.
 	 *
 	 * @chainable
 	 * @param  {Function} cb
@@ -359,7 +363,7 @@
 	};
 
 <span id='$myQuery-method-remove'>	/**
-</span>	 * Remove element
+</span>	 * Remove element.
 	 *
 	 * @chainable
 	 * @member $myQuery
@@ -373,7 +377,7 @@
 	};
 
 <span id='$myQuery-method-prepend'>	/**
-</span>	 * Prepend element
+</span>	 * Prepend element.
 	 *
 	 * @chainable
 	 * @param  {HTMLElement} child
@@ -405,7 +409,7 @@
 	};
 
 <span id='$myQuery-method-len'>	/**
-</span>	 * Get all elements length
+</span>	 * Get all elements length.
 	 * 
 	 * @return {Number}
 	 * @member $myQuery
@@ -415,7 +419,7 @@
 	};
 
 <span id='onix-property-element'>	/**
-</span>	 * Quick acces to myQuery and DOM manipulation
+</span>	 * Quick acces to myQuery and DOM manipulation.
 	 *
 	 * @param  {String|HTMLElement|Array} value
 	 * @param {HTMLElement} [parent]
@@ -429,7 +433,7 @@
 
 	return {
 <span id='$myQuery-method-get'>		 /**
-</span>		 * Main cover function
+</span>		 * Main cover function.
 		 * 
 		 * @param  {String|HTMLElement|Array} value
 		 * @param {HTMLElement} [parent]
@@ -441,9 +445,6 @@
 		}
 	};
 });
-
-// needs to be cached
-onix.run([&quot;$myQuery&quot;, function($myQuery) {}]);
 </pre>
 </body>
 </html>

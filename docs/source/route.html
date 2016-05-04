@@ -16,21 +16,23 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$route'>/**
-</span> * @class $route
- *
- * Simple router for the application
+</span> * Simple router for the application.
+ * 
+ * @class $route
  */
 onix.service(&quot;$route&quot;, [
 	&quot;$location&quot;,
 	&quot;$template&quot;,
 	&quot;$di&quot;,
+	&quot;$routeParams&quot;,
 function(
 	$location,
 	$template,
-	$di
+	$di,
+	$routeParams
 ) {
 <span id='$route-property-_routes'>	/**
-</span>	 * All routes
+</span>	 * All routes.
 	 *
 	 * @private
 	 * @type {Array}
@@ -40,7 +42,7 @@ function(
 	this._routes = [];
 
 <span id='$route-property-_otherwise'>	/**
-</span>	 * Otherwise route
+</span>	 * Otherwise route.
 	 *
 	 * @private
 	 * @type {Object}
@@ -48,14 +50,36 @@ function(
 	 */
 	this._otherwise = null;
 
+<span id='$route-property-_setRouteParams'>	/**
+</span>	 * Set $routeParams object. First clear all old keys and add new ones, if the available.
+	 *
+	 * @private
+	 * @param {Object} [routeParams] Route params object
+	 * @type {Object}
+	 * @member $route
+	 */
+	this._setRouteParams = function(routeParams) {
+		Object.keys($routeParams).forEach(function(key) {
+			delete $routeParams[key];
+		});
+
+		routeParams = routeParams || {};
+
+		Object.keys(routeParams).forEach(function(key) {
+			$routeParams[key] = routeParams[key];
+		});
+	};
+
 <span id='$route-method-when'>	/**
 </span>	 * Add route to the router.
 	 *
 	 * @chainable
 	 * @param  {String} url 
 	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
 	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
 	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
 	 * @member $route
 	 */
 	this.when = function(url, config) {
@@ -73,8 +97,10 @@ function(
 	 * @chainable
 	 * @param  {String} page
 	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
 	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
 	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
 	 * @member $route
 	 */
 	this.otherwise = function(config) {
@@ -86,19 +112,17 @@ function(
 	};
 
 <span id='$route-method-_runController'>	/**
-</span>	 * Run controller from route path
+</span>	 * Run controller from route path.
 	 *
 	 * @private
 	 * @param  {Array|Function} contr
-	 * @param  {Object} [contrData] Additonal data
+	 * @param  {Object} [routeParams] Additonal data
 	 * @member $route
 	 */
-	this._runController = function(contr, contrData) {
+	this._runController = function(contr, routeParams) {
 		var pp = $di.parseParam(contr);
 
-		if (contrData) {
-			pp.inject.push(contrData);
-		}
+		this._setRouteParams(routeParams);
 
 		$di.run({
 			fn: pp.fn,
@@ -107,7 +131,7 @@ function(
 	};
 
 <span id='$route-method-go'>	/**
-</span>	 * Route GO. Walk through all routes, if there is match, route controller will be called
+</span>	 * Route GO. Walk through all routes, if there is match, route controller will be called.
 	 *
 	 * @member $route
 	 */
@@ -134,14 +158,19 @@ function(
 		}
 
 		if (config) {
+			var templateId = &quot;&quot;;
 			var templateUrl = null;
 			var contr = null;
-			var contrData = {};
+			var routeParams = {};
 
 			Object.keys(config).forEach(function(key) {
 				var value = config[key];
 
 				switch (key) {
+					case &quot;templateId&quot;:
+						templateId = value;
+						break;
+
 					case &quot;templateUrl&quot;:
 						templateUrl = value;
 						break;
@@ -151,20 +180,20 @@ function(
 						break;
 
 					default:
-						contrData[key] = value;
+						routeParams[key] = value;
 				}
 			});
 
 			if (templateUrl) {
-				$template.load(config.templateUrl, config.templateUrl).done(function() {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
 					if (contr) {
-						this._runController(contr, contrData);
+						this._runController(contr, routeParams);
 					}
 				}.bind(this));
 			}
 			else {
 				if (contr) {
-					this._runController(contr, contrData);
+					this._runController(contr, routeParams);
 				}
 			}
 		}

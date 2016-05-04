@@ -16,9 +16,9 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$uploadImages'>/**
-</span> * @class $uploadImages
- *
- * Class for creating img previews from File[] variable
+</span> * Class for creating img previews from File[] variable.
+ * 
+ * @class $uploadImages
  */
 onix.service(&quot;$uploadImages&quot;, [
 	&quot;$job&quot;,
@@ -39,7 +39,7 @@ function(
 	this._disable = !(&quot;FileReader&quot; in window);
 
 <span id='$uploadImages-property-_const'>	/**
-</span>	 * Max preview image height
+</span>	 * Max preview image height.
 	 *
 	 * @private
 	 * @member $uploadImages
@@ -50,14 +50,14 @@ function(
 	};
 
 <span id='$uploadImages-property-_loadingGifUrl'>	/**
-</span>	 * Loading gif URL path
+</span>	 * Loading gif URL path.
 	 * 
 	 * @type {String}
 	 */
 	this._loadingGifUrl = &quot;/img/loading.gif&quot;;
 
 <span id='$uploadImages-method-_doJobs'>	/**
-</span>	 * Do jobs for processing all images
+</span>	 * Do jobs for processing all images.
 	 *
 	 * @private
 	 * @param  {Array} dataArray Array of files with images
@@ -110,7 +110,7 @@ function(
 	};
 
 <span id='$uploadImages-method-_readFile'>	/**
-</span>	 * Read one file, create one preview
+</span>	 * Read one file, create one preview.
 	 *
 	 * @private
 	 * @param  {Object} fileObj
@@ -172,7 +172,7 @@ function(
 	};
 
 <span id='$uploadImages-method-_createPreview'>	/**
-</span>	 * Create one image preview
+</span>	 * Create one image preview.
 	 *
 	 * @private
 	 * @param  {File} file
@@ -208,7 +208,7 @@ function(
 	};
 
 <span id='$uploadImages-method-_getImageDim'>	/**
-</span>	 * Counts image dimension; if maxSize is available, new dimension is calculated
+</span>	 * Counts image dimension; if maxSize is available, new dimension is calculated.
 	 *
 	 * @private
 	 * @param  {Image} img
@@ -254,7 +254,7 @@ function(
 	};
 
 <span id='$uploadImages-method-_processInputImage'>	/**
-</span>	 * Process image: rotate by exif, decrase size according to MAX SIZE
+</span>	 * Process image: rotate by exif, decrase size according to MAX SIZE.
 	 *
 	 * @private
 	 * @param  {Image} img
@@ -365,7 +365,7 @@ function(
 	};
 
 <span id='$uploadImages-method-_fileToBase64'>	/**
-</span>	 * Binary data to base64
+</span>	 * Binary data to base64.
 	 *
 	 * @private
 	 * @param  {String} fileType
@@ -473,7 +473,7 @@ function(
 	};
 
 <span id='$uploadImages-method-getPictureFiles'>	/**
-</span>	 * Get picture files from array of files
+</span>	 * Get picture files from array of files.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
@@ -496,7 +496,7 @@ function(
 	};
 
 <span id='$uploadImages-method-getPicturesCount'>	/**
-</span>	 * Get picture files count from the array of Files. This function uses &#39;getPictureFiles&#39;
+</span>	 * Get picture files count from the array of Files. This function uses &#39;getPictureFiles&#39;.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}
@@ -507,7 +507,7 @@ function(
 	};
 
 <span id='$uploadImages-method-setLoadingGifUrl'>	/**
-</span>	 * Set loading gif URL
+</span>	 * Set loading gif URL.
 	 * 
 	 * @param {String} lgu URL path
 	 * @member $uploadImages

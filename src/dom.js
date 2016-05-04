@@ -1,7 +1,7 @@
 /**
- * @class $dom
- *
  * Class for creating DOM elements and getting their references.
+ * 
+ * @class $dom
  */
 onix.service("$dom", function() {
 	/**
@@ -71,7 +71,7 @@ onix.service("$dom", function() {
 	/**
 	 * Get element from the document.
 	 *
-	 * @param  {String|Array} els     els = "" -> element; array [] -> {...}
+	 * @param  {String|Array} els Els = "" -> element; [x, y] -> { x: el, y: el }; [{sel: "div", name: "xyz"}] -> { "xyz": div el }
 	 * @param  {Object} [parent]
 	 * @return {Object}
 	 * @member $dom

@@ -16,9 +16,9 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$common'>/**
-</span> * @class $common
+</span> * Commom functions used in whole application.
  *
- * Commom functions used in whole application.
+ * @class $common
  */
 onix.service(&quot;$common&quot;, [
 	&quot;$q&quot;,
@@ -26,7 +26,7 @@ function(
 	$q
 ) {
 <span id='$common-method-_objCopy'>	/**
-</span>	 * Object copy, from source to dest
+</span>	 * Object copy, from source to dest.
 	 *
 	 * @param  {Object} dest
 	 * @param  {Object} source
@@ -68,7 +68,7 @@ function(
 	};
 
 <span id='$common-method-getCookie'>	/**
-</span>	 * Get cookie by her name
+</span>	 * Get cookie by her name.
 	 *
 	 * @param  {String} name
 	 * @return {String}
@@ -116,7 +116,7 @@ function(
 	};
 
 <span id='$common-method-merge'>	/**
-</span>	 * Merge multiple objects into the single one
+</span>	 * Merge multiple objects into the single one.
 	 *
 	 * @return {Object}
 	 * @member $common
@@ -151,7 +151,7 @@ function(
 	};
 
 <span id='$common-method-bindWithoutScope'>	/**
-</span>	 * Bind function arguments without scope
+</span>	 * Bind function arguments without scope.
 	 *
 	 * @param  {Function} cb
 	 * @return {Function}
@@ -186,9 +186,9 @@ function(
 	};
 
 <span id='$common-method-reverseForEach'>	/**
-</span>	 * Reverse for each
+</span>	 * Reverse for each.
 	 *
-	 * @param  {Array} arr 
+	 * @param  {Array} arr
 	 * @param {Function} cb
 	 * @param {Function} scope
 	 * @member $common
@@ -203,7 +203,7 @@ function(
 	};
 
 <span id='$common-method-hxToDe'>	/**
-</span>	 * HEX value to DEC
+</span>	 * HEX value to DEC.
 	 *
 	 * @param  {String} hex
 	 * @return {Number}
@@ -231,7 +231,7 @@ function(
 	};
 
 <span id='$common-method-hexToRGB'>	/**
-</span>	 * HEX value to RGB
+</span>	 * HEX value to RGB.
 	 *
 	 * @param  {String} hexColor
 	 * @return {Object}
@@ -286,7 +286,7 @@ function(
 
 <span id='$common-method-col'>	/**
 </span>	 * Cover function for console.log, which allows to replace {0..n} occurences inside string.
-	 * First argument is string, other arguments are for replace objects by key
+	 * First argument is string, other arguments are for replace objects by key.
 	 * 
 	 * @member $common
 	 */
@@ -336,7 +336,7 @@ function(
 
 
 <span id='$common-method-chainPromises'>	/**
-</span>	 * Chaining multiple methods with promises, returns promise
+</span>	 * Chaining multiple methods with promises, returns promise.
 	 * 
 	 * @param  {Object[]} opts
 	 * @param  {String|Function} opts.method Function or method name inside scope
@@ -354,7 +354,7 @@ function(
 	};
 
 <span id='$common-method-_chainPromisesInner'>	/**
-</span>	 * Inner method for chaining promises
+</span>	 * Inner method for chaining promises.
 	 * 
 	 * @param  {Object[]} opts
 	 * @param  {String|Function} opts.method Function or method name inside scope

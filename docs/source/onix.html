@@ -18,12 +18,13 @@
   <pre class="prettyprint lang-js">onix = (function() {
 <span id='$module'>	/**
 </span>	 * Module object - handles one module object with services, factories etc.
-	 *
+	 * This object cannot be used in dependency injection!
+	 * 
 	 * @class $module
 	 */
 	var $module = function(name, dependencies) {
 <span id='$module-property-_objects'>		/**
-</span>		 * All objects
+</span>		 * All objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -32,7 +33,7 @@
 		this._objects = {};
 
 <span id='$module-property-_runs'>		/**
-</span>		 * All run objects
+</span>		 * All run objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -41,7 +42,7 @@
 		this._runs = [];
 
 <span id='$module-property-_configs'>		/**
-</span>		 * All config objects
+</span>		 * All config objects.
 		 *
 		 * @type {Object}
 		 * @member $module
@@ -50,7 +51,7 @@
 		this._configs = [];
 
 <span id='$module-property-_name'>		/**
-</span>		 * Module name
+</span>		 * Module name.
 		 * 
 		 * @type {String}
 		 * @member $module
@@ -59,7 +60,7 @@
 		this._name = name || &quot;&quot;;
 
 <span id='$module-property-_dependencies'>		/**
-</span>		 * Module dependencies
+</span>		 * Module dependencies.
 		 * 
 		 * @type {Array}
 		 * @member $module
@@ -69,7 +70,7 @@
 	};
 
 <span id='$module-property-CONST'>	/**
-</span>	 * Module constants
+</span>	 * Module constants.
 	 *
 	 * @property {Object}
 	 * @type {Object}
@@ -92,7 +93,7 @@
 	};
 
 <span id='$module-property-parseParam'>	/**
-</span>	 * Parse parameters. From param parse function and dependencies
+</span>	 * Parse parameters. From param parse function and dependencies.
 	 *
 	 * @property {Function}
 	 * @param  {Array|Function} param 
@@ -127,7 +128,7 @@
 	};
 
 <span id='$module-method-getFilterName'>	/**
-</span>	 * Get filter name
+</span>	 * Get filter name.
 	 * 
 	 * @param  {String} name
 	 * @return {String}
@@ -140,7 +141,7 @@
 	};
 
 <span id='$module-method-getDependencies'>	/**
-</span>	 * Get dependencies
+</span>	 * Get dependencies.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -150,7 +151,7 @@
 	};
 
 <span id='$module-method-getName'>	/**
-</span>	 * Get module name
+</span>	 * Get module name.
 	 * 
 	 * @return {String}
 	 * @member $module
@@ -160,7 +161,7 @@
 	};
 
 <span id='$module-method-getConfigs'>	/**
-</span>	 * Get module configs
+</span>	 * Get module configs.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -170,7 +171,7 @@
 	};
 
 <span id='$module-method-getRuns'>	/**
-</span>	 * Get module runs
+</span>	 * Get module runs.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -180,7 +181,7 @@
 	};
 
 <span id='$module-method-getObjects'>	/**
-</span>	 * Get module objects
+</span>	 * Get module objects.
 	 * 
 	 * @return {Array}
 	 * @member $module
@@ -190,7 +191,7 @@
 	};
 
 <span id='$module-method-provider'>	/**
-</span>	 * Add provider to the application
+</span>	 * Add provider to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -225,7 +226,7 @@
 	};
 
 <span id='$module-method-service'>	/**
-</span>	 * Add service to the application
+</span>	 * Add service to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -251,7 +252,7 @@
 	};
 
 <span id='$module-method-factory'>	/**
-</span>	 * Add factory to the application
+</span>	 * Add factory to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -277,7 +278,7 @@
 	};
 
 <span id='$module-method-constant'>	/**
-</span>	 * Add new constant
+</span>	 * Add new constant.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -299,7 +300,7 @@
 	};
 
 <span id='$module-method-value'>	/**
-</span>	 * Add a new value
+</span>	 * Add a new value.
 	 *
 	 * @chainable
 	 * @param  {String} name
@@ -321,7 +322,7 @@
 	};
 
 <span id='$module-method-filter'>	/**
-</span>	 * Add filter to the application
+</span>	 * Add filter to the application.
 	 *
 	 * @chainable
 	 * @param  {String} name 
@@ -347,7 +348,7 @@
 	};
 
 <span id='$module-method-config'>	/**
-</span>	 * Add a new config
+</span>	 * Add a new config.
 	 *
 	 * @chainable
 	 * @param  {Array|Function} param With DI
@@ -370,7 +371,7 @@
 	};
 
 <span id='$module-method-run'>	/**
-</span>	 * Add a new run
+</span>	 * Add a new run.
 	 * 
 	 * @param  {Array|Function} param With DI
 	 * @member $module
@@ -392,13 +393,14 @@
 	};
 
 <span id='$modules'>	/**
-</span>	 * Modules object - handles all modules in the application; runs object
+</span>	 * Modules object - handles all modules in the application; runs object.
+	 * This object cannot be used in dependency injection!
 	 *
 	 * @class $modules
 	 */
 	var $modules = {
 <span id='$modules-property-_modules'>		/**
-</span>		 * All modules array
+</span>		 * All modules array.
 		 *
 		 * @private
 		 * @member $modules
@@ -407,7 +409,7 @@
 		_modules: [],
 
 <span id='$modules-property-_modulesObj'>		/**
-</span>		 * All modules object - quick access
+</span>		 * All modules object - quick access.
 		 *
 		 * @private
 		 * @member $modules
@@ -416,7 +418,7 @@
 		_modulesObj: {},
 
 <span id='$modules-property-_CONST'>		/**
-</span>		 * Modules constants
+</span>		 * Modules constants.
 		 *
 		 * @private
 		 * @member $modules
@@ -427,7 +429,7 @@
 		},
 
 <span id='$modules-method-_noop'>		/**
-</span>		 * Function which does nothing
+</span>		 * Function which does nothing.
 		 *
 		 * @private
 		 * @member $modules
@@ -436,14 +438,55 @@
 
 		},
 
+<span id='$modules-method-_getPostProcessConfig'>		/**
+</span>		 * Get post process config during config phase.
+		 *
+		 * @private
+		 * @return {Object} Post process config object
+		 * @member $modules
+		 */
+		_getPostProcessConfig: function() {
+			var param = [&quot;$i18nProvider&quot;, function($i18nProvider) {
+				$i18nProvider.postProcess();
+			}];
+
+			var pp = $module.parseParam(param);
+
+			return {
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.CONFIG
+			};
+		},
+
+<span id='$modules-method-_getPreRunConfig'>		/**
+</span>		 * Get pre run config during run phase.
+		 *
+		 * @private
+		 * @return {Object} Pre run config object
+		 * @member $modules
+		 */
+		_getPreRunConfig: function() {
+			// $myQuery needs to be cached
+			var param = [&quot;$myQuery&quot;, function($myQuery) {}];
+			var pp = $module.parseParam(param);
+
+			return {
+				fn: pp.fn,
+				inject: pp.inject,
+				type: $module.CONST.TYPE.RUN
+			};
+		},
+
 <span id='$modules-method-domLoad'>		/**
-</span>		 * Event - Dom LOAD
+</span>		 * Event - Dom LOAD.
 		 *
 		 * @member $modules
 		 */
 		domLoad: function() {
 			var configs = [];
-			var runs = [];
+			// pre process run
+			var runs = [this._getPreRunConfig()];
 
 			this._modules.forEach(function(module) {
 				var error = false;
@@ -466,6 +509,9 @@
 				}
 			}, this);
 
+			// post process runs
+			configs.push(this._getPostProcessConfig());
+
 			configs.forEach(function(config) {
 				this.run(config, true);
 			}, this);
@@ -476,7 +522,7 @@
 		},
 
 <span id='$modules-method-_getObject'>		/**
-</span>		 * Get object by his name
+</span>		 * Get object by his name.
 		 *
 		 * @param {String} name Object name
 		 * @return {Object} Object data
@@ -533,7 +579,7 @@
 		},
 
 <span id='$modules-method-run'>		/**
-</span>		 * Run object configuration; returns his cache (data)
+</span>		 * Run object configuration; returns his cache (data).
 		 *
 		 * @param  {Object}  obj Object configuration
 		 * @param  {Boolean} [isConfig] Is config phase?
@@ -656,7 +702,7 @@
 		},
 
 <span id='$modules-method-addModule'>		/**
-</span>		 * Add a new module to the application
+</span>		 * Add a new module to the application.
 		 * 
 		 * @param {String} name Module name
 		 * @param {Array} [dependencies] Module dependencies
@@ -678,18 +724,18 @@
 
 <span id='onix'>	/**
 </span>	 * Main framework object, which is created like new module with name &#39;onix&#39;.
-	 * Module has addtional functions
+	 * Module has addtional functions.
 	 * 
 	 * @class onix
 	 */
 	var onix = $modules.addModule(&quot;onix&quot;);
 
 <span id='onix-method-module'>	/**
-</span>	 * Add a new module to the application
+</span>	 * Add a new module to the application.
 	 * 
 	 * @param {String} name Module name
 	 * @param {Array} [dependencies] Module dependencies
-	 * @return {Object} Created module
+	 * @return {$module} Created module
 	 * @member onix
 	 */
 	onix.module = function(name, dependencies) {
@@ -697,7 +743,7 @@
 	};
 
 <span id='onix-method-noop'>	/**
-</span>	 * Empty function
+</span>	 * Empty function.
 	 *
 	 * @member onix
 	 */
@@ -712,21 +758,23 @@
 	onix.info = function() {
 		console.log(
 			&quot;OnixJS framework\n&quot; +
-			&quot;2.3.3/3. 5. 2016\n&quot; +
+			&quot;2.4.0/4. 5. 2016\n&quot; +
 			&quot;source: https://gitlab.com/LorDOniX/onix\n&quot; +
-			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs&quot;
+			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&quot; +
+			&quot;@license MIT\n&quot; +
+			&quot;* - Free for use in both personal and commercial projects\n&quot;
 		);
 	};
 
 	onix.factory(&quot;$di&quot;, function() {
 <span id='$di'>		/**
-</span>		 * @class $di
-		 *
-		 * Helper factory for dependency injection and parsing function parameters
+</span>		 * Helper factory for dependency injection and parsing function parameters.
+		 * 
+		 * @class $di
 		 */
 		return {
 <span id='$di-property-parseParam'>			/**
-</span>			 * Parse parameters. From param parse function and dependencies
+</span>			 * Parse parameters. From param parse function and dependencies.
 			 *
 			 * @property {Function}
 			 * @param  {Array|Function} param 
@@ -736,7 +784,7 @@
 			parseParam: $module.parseParam,
 
 <span id='$di-method-getFilterName'>			/**
-</span>			 * Get filter name
+</span>			 * Get filter name.
 			 * 
 			 * @param  {String} name
 			 * @return {String}
@@ -745,7 +793,7 @@
 			getFilterName: $module.getFilterName,
 
 <span id='$di-method-run'>			/**
-</span>			 * Run function with possible inject - handles dependency injection
+</span>			 * Run function with possible inject - handles dependency injection.
 			 * 
 			 * @param  {Object} runObj
 			 * @param  {Function} runObj.fn

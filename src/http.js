@@ -1,7 +1,7 @@
 /**
- * @class $http
- *
  * XMLHttpRequest cover class.
+ * 
+ * @class $http
  */
 onix.service("$http", [
 	"$q",
@@ -11,8 +11,8 @@ function(
 	$common
 ) {
 	/**
-	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
-	 * Prepare post data
+	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects.
+	 * Prepare post data.
 	 *
 	 * @param  {Object|Array} data { name, value }
 	 * @return {Object}
@@ -64,7 +64,7 @@ function(
 	};
 
 	/**
-	 * Request types
+	 * Request types.
 	 *
 	 * @property {Object}
 	 * @param {Number} JSON

@@ -1,7 +1,7 @@
 /**
+ * Progress loader in the application.
+ * 
  * @class $loader
- *
- * Progress loader in the application
  */
 onix.factory("$loader", [
 	"$dom",
@@ -10,7 +10,7 @@ function(
 ) {
 	var $loader = {
 		/**
-		 * Create loader
+		 * Create loader.
 		 *
 		 * @private
 		 * @member $loader
@@ -26,7 +26,7 @@ function(
 		},
 		
 		/**
-		 * Loader init
+		 * Loader init.
 		 *
 		 * @private
 		 * @member $loader
@@ -36,7 +36,7 @@ function(
 		},
 
 		/**
-		 * Start loader
+		 * Start loader.
 		 *
 		 * @member $loader
 		 */
@@ -45,7 +45,7 @@ function(
 		},
 
 		/**
-		 * End loader
+		 * End loader.
 		 *
 		 * @member $loader
 		 */

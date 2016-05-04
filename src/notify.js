@@ -1,7 +1,7 @@
 /**
+ * $notify uses bootstrap alerts and provides additional functionality.
+ * 
  * @class $notify
- *
- * $notify uses bootstrap alerts and provides additional functionality
  */
 onix.service("$notify", [
 	"$common",
@@ -11,7 +11,7 @@ function(
 	$q
 ) {
 	/**
-	 * Create notification object from the element
+	 * Create notification object from the element.
 	 * 
 	 * @param {HTMLElement} el
 	 * @member $notify
@@ -32,7 +32,7 @@ function(
 	};
 
 	/**
-	 * Set value to the notify element
+	 * Set value to the notify element.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -48,7 +48,7 @@ function(
 	};
 
 	/**
-	 * Reset CSS classes
+	 * Reset CSS classes.
 	 *
 	 * @member $notify
 	 */
@@ -61,7 +61,7 @@ function(
 	};
 
 	/**
-	 * Show OK state
+	 * Show OK state.
 	 * 
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -75,7 +75,7 @@ function(
 	};
 
 	/**
-	 * Show ERROR state
+	 * Show ERROR state.
 	 * 
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -89,7 +89,7 @@ function(
 	};
 
 	/**
-	 * Show INFO state
+	 * Show INFO state.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -103,7 +103,7 @@ function(
 	};
 
 	/**
-	 * Show WARNING state
+	 * Show WARNING state.
 	 *
 	 * @param  {String|HTMLElement} txt
 	 * @member $notify
@@ -117,7 +117,7 @@ function(
 	};
 
 	/**
-	 * Hide alert after timeout and returns promise at the end of operation
+	 * Hide alert after timeout and returns promise at the end of operation.
 	 *
 	 * @return {$q}
 	 * @member $notify
@@ -135,7 +135,7 @@ function(
 	};
 
 	/**
-	 * Main public access to the notify obj
+	 * Main public access to the notify obj.
 	 *
 	 * @param  {HTMLElement} el
 	 * @return {$notify}

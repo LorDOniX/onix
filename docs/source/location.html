@@ -16,15 +16,15 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='$location'>/**
-</span> * @class $location
- *
- * Support class for location operations.
+</span> * Support class for location operations.
+ * 
+ * @class $location
  */
 onix.service(&quot;$location&quot;, function() {
 	// ------------------------ public ----------------------------------------
 	
 <span id='$location-method-refresh'>	/**
-</span>	 * Page refresh
+</span>	 * Page refresh.
 	 *
 	 * @member $location
 	 */
@@ -33,7 +33,7 @@ onix.service(&quot;$location&quot;, function() {
 	};
 
 <span id='$location-method-createSearchURL'>	/**
-</span>	 * Create a new search url
+</span>	 * Create a new search url.
 	 * 
 	 * @param  {Object} obj
 	 * @return {String}
@@ -58,7 +58,7 @@ onix.service(&quot;$location&quot;, function() {
 	};
 
 <span id='$location-method-search'>	/**
-</span>	 * Get or set new url search. obj -&gt; set new url from obj; !obj -&gt; create obj from search part of url
+</span>	 * Get or set new url search. obj -&gt; set new url from obj; !obj -&gt; create obj from search part of url.
 	 *
 	 * @param  {Object} [obj]
 	 * @return {Object}
@@ -93,7 +93,7 @@ onix.service(&quot;$location&quot;, function() {
 	};
 
 <span id='$location-method-get'>	/**
-</span>	 * Get current location
+</span>	 * Get current location.
 	 *
 	 * @return {String}
 	 * @member $location

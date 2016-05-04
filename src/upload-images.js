@@ -1,7 +1,7 @@
 /**
+ * Class for creating img previews from File[] variable.
+ * 
  * @class $uploadImages
- *
- * Class for creating img previews from File[] variable
  */
 onix.service("$uploadImages", [
 	"$job",
@@ -22,7 +22,7 @@ function(
 	this._disable = !("FileReader" in window);
 
 	/**
-	 * Max preview image height
+	 * Max preview image height.
 	 *
 	 * @private
 	 * @member $uploadImages
@@ -33,14 +33,14 @@ function(
 	};
 
 	/**
-	 * Loading gif URL path
+	 * Loading gif URL path.
 	 * 
 	 * @type {String}
 	 */
 	this._loadingGifUrl = "/img/loading.gif";
 
 	/**
-	 * Do jobs for processing all images
+	 * Do jobs for processing all images.
 	 *
 	 * @private
 	 * @param  {Array} dataArray Array of files with images
@@ -93,7 +93,7 @@ function(
 	};
 
 	/**
-	 * Read one file, create one preview
+	 * Read one file, create one preview.
 	 *
 	 * @private
 	 * @param  {Object} fileObj
@@ -155,7 +155,7 @@ function(
 	};
 
 	/**
-	 * Create one image preview
+	 * Create one image preview.
 	 *
 	 * @private
 	 * @param  {File} file
@@ -191,7 +191,7 @@ function(
 	};
 
 	/**
-	 * Counts image dimension; if maxSize is available, new dimension is calculated
+	 * Counts image dimension; if maxSize is available, new dimension is calculated.
 	 *
 	 * @private
 	 * @param  {Image} img
@@ -237,7 +237,7 @@ function(
 	};
 
 	/**
-	 * Process image: rotate by exif, decrase size according to MAX SIZE
+	 * Process image: rotate by exif, decrase size according to MAX SIZE.
 	 *
 	 * @private
 	 * @param  {Image} img
@@ -348,7 +348,7 @@ function(
 	};
 
 	/**
-	 * Binary data to base64
+	 * Binary data to base64.
 	 *
 	 * @private
 	 * @param  {String} fileType
@@ -456,7 +456,7 @@ function(
 	};
 
 	/**
-	 * Get picture files from array of files
+	 * Get picture files from array of files.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
@@ -479,7 +479,7 @@ function(
 	};
 
 	/**
-	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'
+	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}
@@ -490,7 +490,7 @@ function(
 	};
 
 	/**
-	 * Set loading gif URL
+	 * Set loading gif URL.
 	 * 
 	 * @param {String} lgu URL path
 	 * @member $uploadImages
