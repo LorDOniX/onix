@@ -15,8 +15,9 @@
 	<script src="/dist/onix-js-framework.js"></script>
 	<!--<script src="/dist/onix-js-framework.min.js"></script>-->
 
-	<script src="/js/app.js"></script><!-- testApp -->
-
+	<!-- testApp -->
+	<script src="/js/my-module.js"></script>
+	<script src="/js/app.js"></script>
 	<script src="/js/page.js"></script>
 	<script src="/js/snippet.js"></script>
 	<script src="/js/home-resource.js"></script>
@@ -45,14 +46,22 @@
 				</div>
 				<br />
 				<div class="row">
-					<div class="col-md-4">
-						<button type="button" class="btn btn-success" data-click="test($element, $event)">Test</button>
+					<div class="col-md-12">
+						<h3>Individual tests</h3>
+						<button type="button" class="btn btn-success" data-click="buttonClick($element, $event)">Button click test</button>
+						<button type="button" class="btn btn-success" data-click="filterTest()">$filter("xyz") test</button>
+						<button type="button" class="btn btn-success" data-click="snippetTest()">snippet test</button>
+						<button type="button" class="btn btn-success" data-click="moduleTest()">module test</button>
+						<button type="button" class="btn btn-success" data-click="apiTest()">API test</button>
+						<button type="button" class="btn btn-success" data-click="chp()">Chaining promises test</button>
 					</div>
-					<div class="col-md-4">
-						<button type="button" class="btn btn-success" data-click="test2()">Test2</button>
+					<div class="col-md-12">
+						<h3>All tests</h3>
+						<button type="button" class="btn btn-success" data-click="allTests()">Run all tests</button>
 					</div>
-					<div class="col-md-4">
-						<ul class="nav nav-pills">
+					<div class="col-md-12">
+						<h3>$select test</h3>
+						<ul class="nav nav-pills my-dropdown">
 							<li class="dropdown" data-bind="dropdown">
 								<a href="javascript:void(0)" class="dropdown-toggle">
 									Dropdown title
@@ -72,6 +81,32 @@
 									<li>
 										<a href="javascript:void(0)" data-value="val3">
 											Value 3
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+
+						<ul class="nav nav-pills my-dropdown">
+							<li class="dropdown" data-bind="dropdown2">
+								<a href="javascript:void(0)" class="dropdown-toggle">
+									Choose character
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<li class="active">
+										<a href="javascript:void(0)" data-value="val1">
+											Lee Adama
+										</a>
+									</li>
+									<li>
+										<a href="javascript:void(0)" data-value="val2">
+											Number six
+										</a>
+									</li>
+									<li>
+										<a href="javascript:void(0)" data-value="val3">
+											Gaius Baltar
 										</a>
 									</li>
 								</ul>

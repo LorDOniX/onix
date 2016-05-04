@@ -1,0 +1,11 @@
+TODO:
+- add language during config phase
+- add aditional parameters to route controllers ($routeParams)
+- template - insert html instead of text
+
+NICE TO HAVE:
+- controller
+	- data-controller="xyz"
+	- bind using DI
+	- handle controller can have multiple controllers
+- directive

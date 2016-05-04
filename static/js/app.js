@@ -1,18 +1,10 @@
-myModule = onix.module("myModule", []);
-
-myModule.service("TestFromModule", function() {
-	this.test = function() {
-		console.log("TestFromModule - test function");
-	};
-});
-
 app = onix.module("app", ["myModule"]);
 
 app.value("Config", {
 	// app localization
 	LOCALIZATION: {
 		LANG: "en",
-		PATH: "/js/locale/en.json"
+		PATH: "/locale/en.json"
 	},
 
 	// app resource URLs
@@ -49,7 +41,7 @@ function(
 				HomePage.setConfig({});
 				HomePage.init();
 			}],
-			templateUrl: "/js/test-templ.html",
+			templateUrl: "/templ/test-templ.html",
 			a: 5
 		})
 		.otherwise({
@@ -61,7 +53,7 @@ function(
 
 	// all dependencies before start
 	$q.all([
-		$template.load("testTempl", "/js/test-templ.html"),
+		$template.load("testTempl", "/templ/test-templ.html"),
 		$i18n.loadLanguage(Config.LOCALIZATION.LANG, Config.LOCALIZATION.PATH)
 	]).then(function() {
 		$route.go();

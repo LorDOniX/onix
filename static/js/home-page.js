@@ -21,26 +21,21 @@ function(
 	TestFromModule,
 	$filter
 ) {
-	// test
-	HomeSnippet.dirTest();
-
-	TestFromModule.test();
 
 	var HomePage = Page.create();
-
-	console.log("Test of filter 'lowercase' : HI, HOW ARE YOU? -> " + $filter("lowercase")("HI, HOW ARE YOU?"));
 	
 	// ------------------------ private ---------------------------------------
 	HomePage._afterInit = function() {
 		// set title - using i18n get text _ function
 		this._getEl("title").innerHTML = _("home_page.title");
 
-		// this._testRequest();
-
 		this._loadTemplate();
 
 		// dropdowns
 		var dropdown = new $select(this._getEl("dropdown"));
+		var dropdown2 = new $select(this._getEl("dropdown2"), {
+			addCaption: true
+		});
 
 		dropdown.on("change", function(value) {
 			console.log("dropdown change - " + value);
@@ -57,30 +52,6 @@ function(
 
 		this.once("onceEvent", function() {
 			console.log("onceEvent - another function");
-		});
-
-		// test for chaining promises
-		$common.chainPromises([{
-			method: "_testPromise1",
-			scope: this,
-			args: [5]
-		}, {
-			method: "_testPromise2",
-			scope: this,
-			args: [10]
-		}, {
-			method: function() {
-				var promise = $q.defer();
-
-				setTimeout(function() {
-					promise.resolve("test promise 3 - " + $common.humanLength(123456789));
-				}, 1000);
-
-				return promise; 
-			}
-		}]).done(function(output) {
-			console.log("All done");
-			console.log(output);
 		});
 	};
 
@@ -105,15 +76,6 @@ function(
 	};
 
 	/**
-	 * Test request to API on express server.
-	 */
-	HomePage._testRequest = function() {
-		HomeResource.get().then(function(data) {
-			console.log(data);
-		});
-	};
-
-	/**
 	 * Load template to main template in index.html
 	 * Compile against data object; bind to HomePage page
 	 */
@@ -126,18 +88,18 @@ function(
 			}
 		}));
 
-		$template.bindTemplate(el.getEl(), this);
-	};
+		$template.bindTemplate(el.getEl(), {
+			onkd: function() {
+				console.log("On key down");
+			},
 
-	HomePage.ed = function() {
-		var el = document.elementFromPoint(6,316);
-
-		var event = new MouseEvent('click', {
-			'bubbles': true,
-			'cancelable': true
+			/**
+			 * Bind click from the dynamic template to our page.
+			 */
+			tmplBtn: function() {
+				console.log("Dynamic template button click");
+			}
 		});
-
-		el.dispatchEvent(event);
 	};
 
 	// ------------------------ public ----------------------------------------
@@ -148,7 +110,7 @@ function(
 	 * @param  {ButtonElement} el
 	 * @param  {MouseEvent} event
 	 */
-	HomePage.test = function(el, event) {
+	HomePage.buttonClick = function(el, event) {
 		console.log(el, event);
 
 		// loader
@@ -166,31 +128,64 @@ function(
 		}, 500);
 	};
 
-	/**
-	 * Another test button for testing purpose.
-	 */
-	HomePage.test2 = function() {
-		var expr = 10*5+2;
+	HomePage.filterTest = function() {
+		console.log("Test of filter 'lowercase' : HI, HOW ARE YOU? -> " + $filter("lowercase")("HI, HOW ARE YOU?"));
+	};
 
-		if (expr) {
-			console.log(expr);
-		}
+	HomePage.snippetTest = function() {
+		HomeSnippet.dirTest();
+	};
+
+	HomePage.moduleTest = function() {
+		TestFromModule.test();
 	};
 
 	/**
-	 * Bind click from the dynamic template to our page.
+	 * Test request to API on express server.
 	 */
-	HomePage.tmplBtn = function() {
-		console.log("tmplBtn click");
+	HomePage.apiTest = function() {
+		HomeResource.get().then(function(data) {
+			console.log(data);
+		});
 	};
 
-	/**
-	 * Onkey down
-	 */
-	HomePage.onkd = function() {
-		console.log("onkd");
+	HomePage.chp = function() {
+		// test for chaining promises
+		console.log("chainPromises start...");
+
+		$common.chainPromises([{
+			method: "_testPromise1",
+			scope: this,
+			args: [5]
+		}, {
+			method: "_testPromise2",
+			scope: this,
+			args: [10]
+		}, {
+			method: function() {
+				var promise = $q.defer();
+
+				setTimeout(function() {
+					promise.resolve("test promise 3 - " + $common.humanLength(123456789));
+				}, 1000);
+
+				return promise; 
+			}
+		}]).done(function(output) {
+			console.log("All done");
+			console.log(output);
+		});
+	};
+
+	HomePage.allTests = function() {
+		console.log("Running all tests...");
+
+		this.filterTest();
+		this.snippetTest();
+		this.moduleTest();
+		this.apiTest();
+		this.chp();
 	};
 
 	return HomePage;
-
 }]);

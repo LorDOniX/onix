@@ -5,8 +5,6 @@ function(
 	$http,
 	Config
 ) {
-	console.log($http)
-	console.log(Config)
 	
 	// ------------------------ private ---------------------------------------
 	/**

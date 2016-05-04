@@ -1,0 +1,13 @@
+<div>
+	<h1>Test template - {{ name }}</h1>
+	<p>- Dynamic template bind</p>
+	<p>- keydown event</p>
+	<button type="button" class="btn btn-success" data-click="tmplBtn()">Click on me</button>
+	<input type="text" data-keydown="onkd()" class="form control" />
+	<h2>Filters test</h2>
+	<p>- Using filters in the template</p>
+	<p>- chaining filters</p>
+	<p>- filters with additional parameters</p>
+	<p>{{ testObj | json }} | {{ name | lowercase | uppercase }} | {{ name | uppercase }} | {{ name | lowercase }}</p>
+	<pre>{{ testObj | json:4 }}</pre>
+</div>

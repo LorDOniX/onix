@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.3.3 (4. 5. 2016)
+
+* udate testing website
+* add TODO
+
 ## 2.3.3 (3. 5. 2016)
 
 * add $filter functionality in the angular way
