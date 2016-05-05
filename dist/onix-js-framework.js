@@ -1810,20 +1810,20 @@ onix.factory("$q", function() {
 	 * 
 	 * @class $q
 	 */
-	var $promise = function() {
+	var $q = function() {
 		/**
 		 * Promise states.
 		 *
 		 * @member $q
 		 * @private
 		 */
-		this._E_STATES = {
+		this._STATES = {
 			IDLE: 0,
 			RESOLVED: 1,
 			REJECTED: 2
 		};
 		// current state
-		this._state = this._E_STATES.IDLE;
+		this._state = this._STATES.IDLE;
 		// all funcs
 		this._funcs = [];
 		// done data
@@ -1836,7 +1836,7 @@ onix.factory("$q", function() {
 	 * @member $q
 	 * @private
 	 */
-	$promise.prototype._resolveFuncs = function(isError) {
+	$q.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
 			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
@@ -1844,7 +1844,7 @@ onix.factory("$q", function() {
 		}, this);
 		// clear array
 		this._funcs.length = 0;
-		this._state = isError ? this._E_STATES.REJECTED : this._E_STATES.RESOLVED;
+		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
 	};
 	/**
 	 * Is promise already finished?
@@ -1853,9 +1853,9 @@ onix.factory("$q", function() {
 	 * @member $q
 	 * @private
 	 */
-	$promise.prototype._isAlreadyFinished = function() {
-		if (this._state != this._E_STATES.IDLE) {
-			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
+	$q.prototype._isAlreadyFinished = function() {
+		if (this._state != this._STATES.IDLE) {
+			this._resolveFuncs(this._state == this._STATES.REJECTED);
 		}
 	};
 	/**
@@ -1864,7 +1864,7 @@ onix.factory("$q", function() {
 	 * @param  {Object} obj
 	 * @member $q
 	 */
-	$promise.prototype.resolve = function(obj) {
+	$q.prototype.resolve = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(false);
 	};
@@ -1874,7 +1874,7 @@ onix.factory("$q", function() {
 	 * @param  {Object} obj
 	 * @member $q
 	 */
-	$promise.prototype.reject = function(obj) {
+	$q.prototype.reject = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(true);
 	};
@@ -1886,7 +1886,7 @@ onix.factory("$q", function() {
 	 * @param {Function} [cbError]
 	 * @member $q
 	 */
-	$promise.prototype.then = function(cbOk, cbError) {
+	$q.prototype.then = function(cbOk, cbError) {
 		if (cbOk && typeof cbOk === "function") {
 			this._funcs.push({
 				fn: cbOk,
@@ -1909,7 +1909,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cbOk
 	 * @member $q
 	 */
-	$promise.prototype.done = function(cbOk) {
+	$q.prototype.done = function(cbOk) {
 		this._funcs.push({
 			fn: cbOk,
 			isError: false
@@ -1924,7 +1924,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cbError
 	 * @member $q
 	 */
-	$promise.prototype.error = function(cbError) {
+	$q.prototype.error = function(cbError) {
 		this._funcs.push({
 			fn: cbError,
 			isError: true
@@ -1939,7 +1939,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cb
 	 * @member $q
 	 */
-	$promise.prototype["finally"] = function(cb) {
+	$q.prototype["finally"] = function(cb) {
 		this._funcs.push({
 			fn: cb,
 			"finally": true
@@ -1956,7 +1956,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		all: function(promises) {
-			var promise = new $promise();
+			var promise = new $q();
 			if (Array.isArray(promises)) {
 				var count = promises.length;
 				var test = function() {
@@ -1981,7 +1981,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		defer: function() {
-			return new $promise();
+			return new $q();
 		},
 		/**
 		 * Is object promise?
@@ -1991,7 +1991,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		isPromise: function(obj) {
-			return obj instanceof $promise;
+			return obj instanceof $q;
 		}
 	};
 });
@@ -2014,7 +2014,7 @@ function(
 		};
 	};
 	/**
-	 * Add task to JOB.
+	 * Add task to job.
 	 * 
 	 * @param {Function} task 
 	 * @param {Function|Object} [scope]
@@ -2087,7 +2087,7 @@ function(
 	};
 	return {
 		/**
-		 * Factory for creating new Job.
+		 * Factory for creating new job.
 		 *
 		 * @member $job
 		 */
@@ -3089,16 +3089,18 @@ function(
 	};
 	/**
 	 * Hide alert after timeout and returns promise at the end of operation.
+	 * Default timeout is 1500 ms.
 	 *
+	 * @param {Number} [timeout] Hide timeout in [ms]
 	 * @return {$q}
 	 * @member $notify
 	 */
-	$notify.prototype.hide = function() {
+	$notify.prototype.hide = function(timeout) {
 		var promise = $q.defer();
 		setTimeout(function() {
 			this.reset();
 			promise.resolve();
-		}.bind(this), this._HIDE_TIMEOUT);
+		}.bind(this), timeout || this._HIDE_TIMEOUT);
 		return promise;
 	};
 	/**
@@ -4243,7 +4245,9 @@ function(
 		this.captionTextEl = null;
 		this._binds = {
 			captionClick: $common.bindWithoutScope(this._captionClick, this),
-			choiceClick: $common.bindWithoutScope(this._choiceClick, this)
+			choiceClick: $common.bindWithoutScope(this._choiceClick, this),
+			removeAllOpened: this._removeAllOpened.bind(this),
+			click: this._click.bind(this)
 		};
 		this._bind();
 	};
@@ -4284,6 +4288,28 @@ function(
 		this._captionEl = captionEl;
 	};
 	/**
+	 * Remove all opened selectors -> close all.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._removeAllOpened = function() {
+		// remove all
+		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+			item.classList.remove(this._const.OPEN_CLASS);
+		}, this);
+	};
+	/**
+	 * Outside click.
+	 * 
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._click = function() {
+		removeAllOpened();
+		window.removeEventListener("click", this._binds.click);
+	};
+	/**
 	 * Event - click on caption.
 	 * 
 	 * @param  {Event} e 
@@ -4292,27 +4318,17 @@ function(
 	 * @private
 	 */
 	$select.prototype._captionClick = function(e, scope) {
-		var con = scope._const;
 		e.stopPropagation();
+		scope.binds.removeAllOpened();
+		var con = scope._const;
 		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
-		var removeAllOpened = function() {
-			// remove all
-			onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-				item.classList.remove("open");
-			});
-		};
-		var clickFn = function() {
-			removeAllOpened();
-			window.removeEventListener("click", clickFn);
-		};
-		removeAllOpened();
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", clickFn);
+			window.removeEventListener("click", scope.binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", clickFn);
+			window.addEventListener("click", scope.binds.click);
 			scope._el.classList.add(con.OPEN_CLASS);
 		}
 	};
@@ -4390,9 +4406,7 @@ function(
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
-		if (typeof ind === "undefined") {
-			ind = 0;
-		}
+		ind = ind || 0;
 		var optionsCount = this._optinsRef.length;
 		if (optionsCount > 0 && ind >= 0 && ind < optionsCount) {
 			var el = this._optinsRef[ind].el;

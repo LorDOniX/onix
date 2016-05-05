@@ -18,7 +18,7 @@ function(
 	};
 
 	/**
-	 * Add task to JOB.
+	 * Add task to job.
 	 * 
 	 * @param {Function} task 
 	 * @param {Function|Object} [scope]
@@ -106,7 +106,7 @@ function(
 
 	return {
 		/**
-		 * Factory for creating new Job.
+		 * Factory for creating new job.
 		 *
 		 * @member $job
 		 */

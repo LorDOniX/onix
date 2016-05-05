@@ -1,10 +1,13 @@
-onix.factory("$q", function() {
+onix.factory("$promise", function() {
 	/**
 	 * Promise implementation which is similar to angular $q.
 	 * 
 	 * @class $q
 	 */
-	var $q = function() {
+	var $promise = function(cbFn) {
+
+		resolve, reject
+nodejs
 		/**
 		 * Promise states.
 		 *
@@ -25,6 +28,28 @@ onix.factory("$q", function() {
 
 		// done data
 		this._finishData = null;
+
+		/**
+		 * Resolve promise using obj.
+		 *
+		 * @param  {Object} obj
+		 * @member $q
+		 */
+		$promise.prototype.resolve = function(obj) {
+			this._finishData = obj;
+			this._resolveFuncs(false);
+		};
+
+		/**
+		 * Reject promise using obj.
+		 *
+		 * @param  {Object} obj
+		 * @member $q
+		 */
+		$promise.prototype.reject = function(obj) {
+			this._finishData = obj;
+			this._resolveFuncs(true);
+		};
 	};
 
 	/**
@@ -34,7 +59,7 @@ onix.factory("$q", function() {
 	 * @member $q
 	 * @private
 	 */
-	$q.prototype._resolveFuncs = function(isError) {
+	$promise.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
 			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
@@ -53,32 +78,10 @@ onix.factory("$q", function() {
 	 * @member $q
 	 * @private
 	 */
-	$q.prototype._isAlreadyFinished = function() {
+	$promise.prototype._isAlreadyFinished = function() {
 		if (this._state != this._STATES.IDLE) {
 			this._resolveFuncs(this._state == this._STATES.REJECTED);
 		}
-	};
-
-	/**
-	 * Resolve promise using obj.
-	 *
-	 * @param  {Object} obj
-	 * @member $q
-	 */
-	$q.prototype.resolve = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(false);
-	};
-
-	/**
-	 * Reject promise using obj.
-	 *
-	 * @param  {Object} obj
-	 * @member $q
-	 */
-	$q.prototype.reject = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(true);
 	};
 
 	/**
@@ -89,7 +92,7 @@ onix.factory("$q", function() {
 	 * @param {Function} [cbError]
 	 * @member $q
 	 */
-	$q.prototype.then = function(cbOk, cbError) {
+	$promise.prototype.then = function(cbOk, cbError) {
 		if (cbOk && typeof cbOk === "function") {
 			this._funcs.push({
 				fn: cbOk,
@@ -116,7 +119,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cbOk
 	 * @member $q
 	 */
-	$q.prototype.done = function(cbOk) {
+	$promise.prototype.done = function(cbOk) {
 		this._funcs.push({
 			fn: cbOk,
 			isError: false
@@ -134,7 +137,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cbError
 	 * @member $q
 	 */
-	$q.prototype.error = function(cbError) {
+	$promise.prototype.error = function(cbError) {
 		this._funcs.push({
 			fn: cbError,
 			isError: true
@@ -152,7 +155,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cb
 	 * @member $q
 	 */
-	$q.prototype["finally"] = function(cb) {
+	$promise.prototype["finally"] = function(cb) {
 		this._funcs.push({
 			fn: cb,
 			"finally": true
@@ -162,8 +165,12 @@ onix.factory("$q", function() {
 
 		return this;
 	};
-	
-	return {
+
+	return $promise;
+});
+
+/**
+return {
 		/**
 		 * Resolve all promises in the array.
 		 *
@@ -172,7 +179,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		all: function(promises) {
-			var promise = new $q();
+			var promise = new $promise();
 
 			if (Array.isArray(promises)) {
 				var count = promises.length;
@@ -202,7 +209,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		defer: function() {
-			return new $q();
+			return new $promise();
 		},
 
 		/**
@@ -213,7 +220,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		isPromise: function(obj) {
-			return obj instanceof $q;
+			return obj instanceof $promise;
 		}
 	};
-});
+ */
