@@ -35,7 +35,7 @@ const _CONST = {
 		"src/template.js",
 		"src/route.js",
 		"src/select.js",
-		"src/upload-images.js"
+		"src/image.js"
 	],
 	JS_OUTPUT: "dist/onix-js-framework.js",
 	JS_OUTPUT_MIN: "dist/onix-js-framework.min.js",

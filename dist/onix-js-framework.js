@@ -2219,9 +2219,9 @@ function(
 	/**
 	 * Add task to job.
 	 * 
-	 * @param {Function} task 
-	 * @param {Function|Object} [scope]
-	 * @param {Object} [args] Add params
+	 * @param {Function} task Job function
+	 * @param {Function|Object} [scope] Variable function scope
+	 * @param {Object} [args] Add params to the function
 	 * @member $job
 	 */
 	$job.prototype.add = function(task, scope, args) {
@@ -2850,8 +2850,10 @@ onix.service("$location", function() {
  */
 onix.service("$common", [
 	"$q",
+	"$job",
 function(
-	$q
+	$q,
+	$job
 ) {
 	/**
 	 * Object copy, from source to dest.
@@ -3189,6 +3191,42 @@ function(
 		else {
 			promise.resolve(outArray);
 		}
+	};
+	/**
+	 * Run jobs array with count for how many functions will be processed simultinously.
+	 *
+	 * @param  {Object[]} jobsArray Array with jobs objects
+	 * @param  {Function} jobsArray.task Job function
+	 * @param  {Function} [jobsArray.scope] Variable function scope
+	 * @param  {Function} [jobsArray.args] Add params to the function
+	 * @param  {Number} count How many functions processed simultinously
+	 * @param  {Object} taskDoneObj Callback after one task have been done
+	 * @param  {Object} taskDoneObj.cb Function
+	 * @param  {Object} [taskDoneObj.scope] Function scope
+	 * @return {$q} Callback after all jobs are done
+	 * @member $common
+	 */
+	this.doJobs = function(jobsArray, count, taskDoneObj) {
+		count = count || 1;
+		var len = jobsArray.length;
+		var jobs = [];
+		for (var i = 0; i < len; i++) {
+			var jp = i % count;
+			var jobItem = jobsArray[i];
+			if (!jobs[jp]) {
+				jobs[jp] = $job.create();
+				if (taskDoneObj) {
+					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
+				}
+			}
+			// add one job
+			jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
+		}
+		var jobPromises = [];
+		jobs.forEach(function(job) {
+			jobPromises.push(job.start());
+		});
+		return $q.all(jobPromises);
 	};
 }]);
 /**
@@ -4646,248 +4684,167 @@ function(
 /**
  * Class for creating img previews from File[] variable.
  * 
- * @class $uploadImages
+ * @class $image
  */
-onix.service("$uploadImages", [
-	"$job",
+onix.service("$image", [
 	"$q",
-	"$dom",
 function(
-	$job,
-	$q,
-	$dom
+	$q
 ) {
 	/**
-	 * Disable?
+	 * FileReader is available.
 	 *
 	 * @private
-	 * @member $uploadImages
+	 * @member $image
 	 * @type {Boolean}
 	 */
-	this._disable = !("FileReader" in window);
+	this._hasFileReader = "FileReader" in window;
 	/**
-	 * Max preview image height.
+	 * Canvas is available.
 	 *
 	 * @private
-	 * @member $uploadImages
-	 * @type {Object}
+	 * @member $image
+	 * @type {Boolean}
 	 */
-	this._const = {
-		PREVIEW_MAX_SIZE: 180
-	};
+	this._hasCanvas = !!document.createElement("canvas").getContext;
 	/**
-	 * Loading gif URL path.
-	 * 
-	 * @type {String}
-	 */
-	this._loadingGifUrl = "/img/loading.gif";
-	/**
-	 * Do jobs for processing all images.
+	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
 	 *
-	 * @private
-	 * @param  {Array} dataArray Array of files with images
-	 * @param  {Function} fn Job task
-	 * @param  {Number} count How many functions processed simultinously
-	 * @param  {Function} taskDoneObj Callback after one task have been done
-	 * @return {$q} Callback after all job is done
-	 * @member $uploadImages
+	 * @param  {Object} file Input file
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {$q} Promise with output object
+	 * @member $image
 	 */
-	this._doJobs = function(dataArray, fn, count, taskDoneObj) {
-		var len = dataArray.length;
-		var jobs = [];
-		for (var i = 0; i < len; i++) {
-			var jp = i % count;
-			if (!jobs[jp]) {
-				jobs[jp] = $job.create();
-				if (taskDoneObj) {
-					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
-				}
-			}
-			jobs[jp].add(fn, this, dataArray[i]);
-		}
-		var jobPromises = [];
-		jobs.forEach(function(job) {
-			jobPromises.push(job.start());
-		});
-		return $q.all(jobPromises);
-	};
-	/**
-	 * Is file a picture?
-	 *
-	 * @private
-	 * @param  {File}  file
-	 * @return {Boolean}
-	 * @member $uploadImages
-	 */
-	this._isPicture = function(file) {
-		if (file) {
-			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
-		}
-		else return false;
-	};
-	/**
-	 * Read one file, create one preview.
-	 *
-	 * @private
-	 * @param  {Object} fileObj
-	 * @param  {Object} fileObj.file File reference
-	 * @param  {String} fileObj.previewID Preview ID for DOM position
-	 * @param  {Function} doneFn Callback, after one preview is loaded and drawed to canvas
-	 * @member $uploadImages
-	 */
-	this._readFile = function(fileObj, doneFn) {
-		var file = fileObj.file;
-		var previewID = fileObj.previewID;
-		var fileObj = {
-			file: file,
-			exif: null,
-			img: null
-		};
-		var preview = this._createPreview(file);
-		// append
-		if (previewID in this._dom) {
-			this._dom[previewID].appendChild(preview.cont);
-		}
-		else {
-			this._dom.previewItems.appendChild(preview.cont);
+	this.readFile = function(file, maxSize) {
+		var promise = $q.defer();
+		if (!this._hasFileReader) {
+			promise.reject();
+			return promise;
 		}
 		var reader = new FileReader();
+		var output = {
+			img: null,
+			exif: null,
+			canvas: null
+		};
 		reader.onload = function(e) {
 			var binaryData = reader.result;
 			var binaryDataArray = new Uint8Array(binaryData);
 			var exif = null;
+			// exif only for jpeg
 			if (file.type != "png") {
 				exif = EXIF.readFromBinaryFile(binaryData);
 			}
 			var img = new Image();
 			img.onload = function() {
-				var imd = this._getImageDim(img);
-				var canvas = this._processInputImage(img, imd, exif.Orientation);
-				preview.cont.classList.remove("preview-loading");
-				preview.canvasCover.innerHTML = "";
-				preview.canvasCover.appendChild(canvas);
-				fileObj.exif = exif;
-				fileObj.img = img;
-				doneFn();
+				var imd = this.getImageDim(img, maxSize);
+				var canvas = this.getCanvas(img, {
+					width: imd.width,
+					height: imd.height,
+					orientation: exif ? exif.Orientation : 0,
+					scaled: imd.scale != 1
+				});
+				output.img = img;
+				output.exif = exif;
+				output.canvas = canvas;
+				promise.resolve(output);
 			}.bind(this);
-			img.src = this._fileToBase64(file.type, binaryDataArray);
+			img.src = this.fileToBase64(file.type, binaryDataArray);
 		}.bind(this);
 		reader.readAsArrayBuffer(file);
-	};
-	/**
-	 * Create one image preview.
-	 *
-	 * @private
-	 * @param  {File} file
-	 * @return {Object} dom references
-	 * @member $uploadImages
-	 */
-	this._createPreview = function(file) {
-		var exported = {};
-		var cont = $dom.create({
-			el: "span",
-			"class": ["preview-item", "preview-loading"],
-			child: [{
-				el: "span",
-				"class": "canvas-cover",
-				child: [{
-					el: "img",
-					"class": "preview-loader",
-					src: this._loadingGifUrl
-				}],
-				_exported: "canvasCover"
-			}, {
-				el: "span",
-				"class": "title",
-				innerHTML: file.name.replace(/\..*/g, "")
-			}]
-		}, exported);
-		return {
-			cont: cont,
-			canvasCover: exported.canvasCover
-		};
+		return promise;
 	};
 	/**
 	 * Counts image dimension; if maxSize is available, new dimension is calculated.
 	 *
-	 * @private
 	 * @param  {Image} img
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
 	 * @return {Object}
-	 * @member $uploadImages
+	 * @member $image
 	 */
-	this._getImageDim = function(img) {
-		var maxSize = this._const.PREVIEW_MAX_SIZE;
+	this.getImageDim = function(img, maxSize) {
+		var maxSize = maxSize || 0;
 		var largeWidth = img.width > maxSize;
 		var largeHeight = img.height > maxSize;
 		var output = {
 			width: img.width,
 			height: img.height,
-			scale: 1,
-			large: false
+			scale: 1
 		};
 		if (largeWidth || largeHeight) {
-			// resizneme obrazek
+			// resize picture
 			var imgWidth = img.width;
 			var imgHeight = img.height;
-			// vybereme vetsi ze stran
+			// portrait x landscape
 			if (img.width > img.height) {
-				// sirka
+				// landscape
 				imgHeight = maxSize * imgHeight / imgWidth;
 				imgWidth = maxSize;
 			}
 			else {
-				// vyska
+				// portrait
 				imgWidth = maxSize * imgWidth / imgHeight;
 				imgHeight = maxSize;
 			}
-			output.scale = img.width / imgWidth; // pomer orig. a zmenseneho obrazku
+			output.scale = img.width / imgWidth; // ratio between original x scaled image
 			output.width = imgWidth;
 			output.height = imgHeight;
-			output.large = true;
 		}
 		return output;
 	};
 	/**
-	 * Process image: rotate by exif, decrase size according to MAX SIZE.
+	 * Get image canvas - read input img, create canvas with it.
 	 *
-	 * @private
 	 * @param  {Image} img
-	 * @param  {Object} imd object dimension
-	 * @param  {Number} orientation EXIF orientation
+	 * @param  {Object} [optsArg] Variable options
+	 * @param  {Number} [optsArg.width] Output canvas width
+	 * @param  {Number} [optsArg.height] Output canvas height
+	 * @param  {Number} [optsArg.orientation] EXIF orientation
+	 * @param  {Boolean} [optsArg.scaled = false]
 	 * @return {Canvas}
-	 * @member $uploadImages
+	 * @member $image
 	 */
-	this._processInputImage = function(img, imd, orientation) {
+	this.getCanvas = function(img, optsArg) {
+		var opts = {
+			width: img.width || 0,
+			height: img.height || 0,
+			orientation: 0,
+			scaled: false
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+		if (!this._hasCanvas) return null;
 		var canvas = document.createElement("canvas");
 		var ctx = canvas.getContext("2d");
 		var draw = true;
-		canvas.width = imd.width;
-		canvas.height = imd.height;
+		canvas.width = opts.width;
+		canvas.height = opts.height;
 		// rotate
-		if (orientation) {
-			switch (orientation) {
+		if (opts.orientation) {
+			switch (opts.orientation) {
 				case 2:
 					// horizontal flip
-					ctx.translate(imd.width, 0);
+					ctx.translate(opts.width, 0);
 					ctx.scale(-1, 1);
 					break;
 				case 3:
 					// 180° rotate left
-					ctx.translate(imd.width, imd.height);
+					ctx.translate(opts.width, opts.height);
 					ctx.rotate(Math.PI);
 					break;
 				case 4:
 					// vertical flip
-					ctx.translate(0, imd.height);
+					ctx.translate(0, opts.height);
 					ctx.scale(1, -1);
 					break;
 				case 5:
 					// vertical flip + 90 rotate right
-					canvas.width = imd.height;
-					canvas.height = imd.width;
+					canvas.width = opts.height;
+					canvas.height = opts.width;
 					ctx.rotate(0.5 * Math.PI);
 					ctx.scale(1, -1);
-					if (imd.large) {
+					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
@@ -4895,11 +4852,11 @@ function(
 					break;
 				case 6:
 					// 90° rotate right
-					canvas.width = imd.height;
-					canvas.height = imd.width;
+					canvas.width = opts.height;
+					canvas.height = opts.width;
 					ctx.rotate(0.5 * Math.PI);
-					ctx.translate(0, -imd.height);
-					if (imd.large) {
+					ctx.translate(0, -opts.height);
+					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
@@ -4907,12 +4864,12 @@ function(
 					break;
 				case 7:
 					// horizontal flip + 90 rotate right
-					canvas.width = imd.height;
-					canvas.height = imd.width;
+					canvas.width = opts.height;
+					canvas.height = opts.width;
 					ctx.rotate(0.5 * Math.PI);
-					ctx.translate(imd.width, -imd.height);
+					ctx.translate(opts.width, -opts.height);
 					ctx.scale(-1, 1);
-					if (imd.large) {
+					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
@@ -4920,11 +4877,11 @@ function(
 					break;
 				case 8:
 					// 90° rotate left
-					canvas.width = imd.height;
-					canvas.height = imd.width;
+					canvas.width = opts.height;
+					canvas.height = opts.width;
 					ctx.rotate(-0.5 * Math.PI);
-					ctx.translate(-imd.width, 0);
-					if (imd.large) {
+					ctx.translate(-opts.width, 0);
+					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
@@ -4933,7 +4890,7 @@ function(
 		}
 		if (draw) {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			if (imd.large) {
+			if (opts.scaled) {
 				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
 			}
 			else {
@@ -4945,14 +4902,13 @@ function(
 	/**
 	 * Binary data to base64.
 	 *
-	 * @private
 	 * @param  {String} fileType
 	 * @param  {Array} binaryData
 	 * @return {String}
-	 * @member $uploadImages
+	 * @member $image
 	 */
-	this._fileToBase64 = function(fileType, binaryData) {
-		var length = binaryData.length
+	this.fileToBase64 = function(fileType, binaryData) {
+		var length = binaryData.length;
 		var output = "";
 		for (var i = 0; i < length; i += 1) {
 			output += String.fromCharCode(binaryData[i]);
@@ -4960,92 +4916,31 @@ function(
 		return 'data:' + fileType + ';base64,' + btoa(output);
 	};
 	/**
-	 * Create preview holders.
+	 * Is file a picture?
 	 *
-	 * @private
-	 * @param {HTMLElement} el
-	 * @param {Number} count
-	 * @member $uploadImages
+	 * @param  {File}  file
+	 * @return {Boolean}
+	 * @member $image
 	 */
-	this._createPreviewHolders = function(el, count) {
-		if (!el || (count != 4 && count != 7)) return;
-		var exported = {};
-		// placeholder for panorama
-		if (count == 7) {
-			// ceiling line
-			el.appendChild($dom.create({
-				el: "div",
-				child: [{
-					el: "span",
-					_exported: "img_06"
-				}]
-			}, exported));
+	this.isPicture = function(file) {
+		if (file) {
+			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
 		}
-		var child = [];
-		var childCount = count == 7 ? 6 : 4;
-		for (var i = 0; i < childCount; i++) {
-			child.push({
-				el: "span",
-				_exported: "img_0" + i
-			});
-		}
-		// rest line
-		el.appendChild($dom.create({
-			el: "div",
-			child: child
-		}, exported));
-		for (var i = 0; i < count; i++) {
-			this._dom["img_0" + i] = exported["img_0" + i];
-		}
-	};
-	/**
-	 * Main function for showing img previews.
-	 * 
-	 * @param  {HTMLElement} el
-	 * @param  {File[]} files
-	 * @member $uploadImages
-	 */
-	this.show = function(el, files) {
-		if (this._disable || !el || !files) return;
-		// clear previous
-		el.innerHTML = "";
-		this._dom = {
-			previewItems: el
-		};
-		var pictureFiles = this.getPictureFiles(files);
-		var count = pictureFiles.length;
-		if (count) {
-			this._createPreviewHolders(el, count);
-			// sort by name, make previewID - only for 7 pictures
-			pictureFiles = pictureFiles.sort(function(a, b) {
-				if (a.name < b.name)
-					return -1;
-				else if (a.name > b.name)
-					return 1;
-				else 
-					return 0;
-			}).map(function(file, ind) {
-				return {
-					file: file,
-					previewID: "img_0" + ind
-				};
-			});
-			this._doJobs(pictureFiles, this._readFile, 2);
-		}
+		else return false;
 	};
 	/**
 	 * Get picture files from array of files.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
-	 * @member $uploadImages
+	 * @member $image
 	 */
 	this.getPictureFiles = function(files) {
 		var pictureFiles = [];
 		if (files && files.length) {
 			for (var i = 0; i < files.length; i++) {
 				var item = files[i];
-				if (this._isPicture(item)) {
+				if (this.isPicture(item)) {
 					pictureFiles.push(item);
 				}
 			}
@@ -5057,18 +4952,9 @@ function(
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}
-	 * @member $uploadImages
+	 * @member $image
 	 */
 	this.getPicturesCount = function(files) {
 		return this.getPictureFiles(files).length;
-	};
-	/**
-	 * Set loading gif URL.
-	 * 
-	 * @param {String} lgu URL path
-	 * @member $uploadImages
-	 */
-	this.setLoadingGifUrl = function(lgu) {
-		this._loadingGifUrl = lgu || "";
 	};
 }]);

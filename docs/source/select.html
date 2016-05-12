@@ -62,7 +62,9 @@ function(
 
 		this._binds = {
 			captionClick: $common.bindWithoutScope(this._captionClick, this),
-			choiceClick: $common.bindWithoutScope(this._choiceClick, this)
+			choiceClick: $common.bindWithoutScope(this._choiceClick, this),
+			removeAllOpened: this._removeAllOpened.bind(this),
+			click: this._click.bind(this)
 		};
 
 		this._bind();
@@ -112,6 +114,30 @@ function(
 		this._captionEl = captionEl;
 	};
 
+<span id='$select-method-_removeAllOpened'>	/**
+</span>	 * Remove all opened selectors -&gt; close all.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._removeAllOpened = function() {
+		// remove all
+		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+			item.classList.remove(this._const.OPEN_CLASS);
+		}, this);
+	};
+
+<span id='$select-method-_click'>	/**
+</span>	 * Outside click.
+	 * 
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._click = function() {
+		removeAllOpened();
+		window.removeEventListener(&quot;click&quot;, this._binds.click);
+	};
+
 <span id='$select-method-_captionClick'>	/**
 </span>	 * Event - click on caption.
 	 * 
@@ -121,33 +147,20 @@ function(
 	 * @private
 	 */
 	$select.prototype._captionClick = function(e, scope) {
-		var con = scope._const;
-
 		e.stopPropagation();
 
+		scope.binds.removeAllOpened();
+
+		var con = scope._const;
 		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
-
-		var removeAllOpened = function() {
-			// remove all
-			onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-				item.classList.remove(&quot;open&quot;);
-			});
-		};
-
-		var clickFn = function() {
-			removeAllOpened();
-			window.removeEventListener(&quot;click&quot;, clickFn);
-		};
-
-		removeAllOpened();
 
 		if (isOpen) {
 			// outside click
-			window.removeEventListener(&quot;click&quot;, clickFn);
+			window.removeEventListener(&quot;click&quot;, scope.binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener(&quot;click&quot;, clickFn);
+			window.addEventListener(&quot;click&quot;, scope.binds.click);
 
 			scope._el.classList.add(con.OPEN_CLASS);
 		}
@@ -240,9 +253,7 @@ function(
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
-		if (typeof ind === &quot;undefined&quot;) {
-			ind = 0;
-		}
+		ind = ind || 0;
 
 		var optionsCount = this._optinsRef.length;
 

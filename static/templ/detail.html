@@ -12,6 +12,14 @@
 			<br />
 			<div class="row">
 				<div class="col-md-12">
+					<h3>Image preview</h3>
+					<div>
+						<label for="uploadInput">Files to upload:</label>
+						<input type="file" name="pano" id="uploadInput" data-bind="uploadInput" data-change="uploadChange" multiple="">
+					</div>
+					<div data-bind="uploadPreview">SELECT IMAGES FOR THEIRS PREVIEWS</div>
+				</div>
+				<div class="col-md-12">
 					<h3>Individual tests</h3>
 					<button type="button" class="btn btn-success" data-click="buttonClick($element, $event)">Button click test</button>
 					<button type="button" class="btn btn-success" data-click="filterTest()">$filter("xyz") test</button>

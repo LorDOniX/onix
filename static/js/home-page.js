@@ -12,6 +12,8 @@ app.factory("HomePage", [
 	"$filter",
 	"$i18n",
 	"$routeParams",
+	"$image",
+	"PreviewImages",
 function(
 	Page,
 	$common,
@@ -25,7 +27,9 @@ function(
 	TestFromModule,
 	$filter,
 	$i18n,
-	$routeParams
+	$routeParams,
+	$image,
+	PreviewImages
 ) {
 
 	var HomePage = Page.create();
@@ -217,6 +221,13 @@ function(
 		$promise.reject().then(function() {}, function() {
 			console.log("$promise rejected");
 		});
+	};
+
+	HomePage.uploadChange = function() {
+		var uploadPreview = this._getEl("uploadPreview");
+		var filesInput = this._getEl("uploadInput");
+
+		PreviewImages.show(uploadPreview, filesInput.files);
 	};
 
 	HomePage.allTests = function() {

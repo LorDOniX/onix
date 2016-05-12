@@ -53,3 +53,38 @@
 .my-dropdown {
   display: inline-block;
 }
+.preview-item {
+  display: inline-block;
+  position: relative;
+  border: 1px solid #ccc;
+  margin: 5px 0;
+  vertical-align: top;
+  border-radius: 3px;
+}
+.preview-item .canvas-cover {
+  display: block;
+  height: auto;
+  background: #eee;
+  text-align: center;
+}
+.preview-item .canvas-cover .preview-loader {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.preview-item .title {
+  text-align: center;
+  display: block;
+  padding: 5px 0;
+  overflow: hidden;
+}
+.preview-item.preview-loading .canvas-cover {
+  height: 100px;
+  padding: 0 25px;
+}
+.preview-item.preview-loading .title {
+  color: #fff;
+}

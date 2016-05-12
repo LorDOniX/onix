@@ -20,9 +20,9 @@ function(
 	/**
 	 * Add task to job.
 	 * 
-	 * @param {Function} task 
-	 * @param {Function|Object} [scope]
-	 * @param {Object} [args] Add params
+	 * @param {Function} task Job function
+	 * @param {Function|Object} [scope] Variable function scope
+	 * @param {Object} [args] Add params to the function
 	 * @member $job
 	 */
 	$job.prototype.add = function(task, scope, args) {
