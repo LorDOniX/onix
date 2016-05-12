@@ -21,6 +21,7 @@ const _CONST = {
 		"src/filter.js",
 		"src/filters.js",
 		"src/q.js",
+		"src/promise.js",
 		"src/job.js",
 		"src/my-query.js",
 		"src/dom.js",

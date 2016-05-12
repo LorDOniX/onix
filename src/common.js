@@ -343,7 +343,7 @@ function(
 	 * @param  {String|Function} opts.method Function or method name inside scope
 	 * @param  {Object} opts.scope Scope for method function
 	 * @param  {Array} opts.args Additional arguments for function
-	 * @param  {promise} promise Done promise
+	 * @param  {promise} promise Done promise $q
 	 * @param  {Array} outArray Array for output from all executed promises
 	 * @member $common
 	 */

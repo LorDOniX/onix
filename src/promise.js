@@ -1,17 +1,14 @@
 onix.factory("$promise", function() {
 	/**
-	 * Promise implementation which is similar to angular $q.
+	 * ES6 promise implementation.
 	 * 
-	 * @class $q
+	 * @class $promise
 	 */
 	var $promise = function(cbFn) {
-
-		resolve, reject
-nodejs
 		/**
 		 * Promise states.
 		 *
-		 * @member $q
+		 * @member $promise
 		 * @private
 		 */
 		this._STATES = {
@@ -29,34 +26,42 @@ nodejs
 		// done data
 		this._finishData = null;
 
-		/**
-		 * Resolve promise using obj.
-		 *
-		 * @param  {Object} obj
-		 * @member $q
-		 */
-		$promise.prototype.resolve = function(obj) {
-			this._finishData = obj;
-			this._resolveFuncs(false);
-		};
+		// call promise cb function
+		if (cbFn && typeof cbFn === "function") {
+			cbFn.apply(cbFn, [
+				this._resolve.bind(this),
+				this._reject.bind(this)
+			]);
+		}
+	};
 
-		/**
-		 * Reject promise using obj.
-		 *
-		 * @param  {Object} obj
-		 * @member $q
-		 */
-		$promise.prototype.reject = function(obj) {
-			this._finishData = obj;
-			this._resolveFuncs(true);
-		};
+	/**
+	 * Resolve promise using obj.
+	 *
+	 * @param  {Object} obj
+	 * @member $promise
+	 */
+	$promise.prototype._resolve = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(false);
+	};
+
+	/**
+	 * Reject promise using obj.
+	 *
+	 * @param  {Object} obj
+	 * @member $promise
+	 */
+	$promise.prototype._reject = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(true);
 	};
 
 	/**
 	 * Resolve all functions.
 	 *
 	 * @param  {Boolean} isError
-	 * @member $q
+	 * @member $promise
 	 * @private
 	 */
 	$promise.prototype._resolveFuncs = function(isError) {
@@ -75,7 +80,7 @@ nodejs
 	 * Is promise already finished?
 	 *
 	 * @return {Boolean}
-	 * @member $q
+	 * @member $promise
 	 * @private
 	 */
 	$promise.prototype._isAlreadyFinished = function() {
@@ -90,7 +95,7 @@ nodejs
 	 * @chainable
 	 * @param {Function} [cbOk]
 	 * @param {Function} [cbError]
-	 * @member $q
+	 * @member $promise
 	 */
 	$promise.prototype.then = function(cbOk, cbError) {
 		if (cbOk && typeof cbOk === "function") {
@@ -117,7 +122,7 @@ nodejs
 	 *
 	 * @chainable
 	 * @param  {Function} cbOk
-	 * @member $q
+	 * @member $promise
 	 */
 	$promise.prototype.done = function(cbOk) {
 		this._funcs.push({
@@ -135,7 +140,7 @@ nodejs
 	 *
 	 * @chainable
 	 * @param  {Function} cbError
-	 * @member $q
+	 * @member $promise
 	 */
 	$promise.prototype.error = function(cbError) {
 		this._funcs.push({
@@ -153,7 +158,7 @@ nodejs
 	 *
 	 * @chainable
 	 * @param  {Function} cb
-	 * @member $q
+	 * @member $promise
 	 */
 	$promise.prototype["finally"] = function(cb) {
 		this._funcs.push({
@@ -166,28 +171,24 @@ nodejs
 		return this;
 	};
 
-	return $promise;
-});
+	// static methods
 
-/**
-return {
-		/**
-		 * Resolve all promises in the array.
-		 *
-		 * @param {$q[]} promises
-		 * @return {$q}
-		 * @member $q
-		 */
-		all: function(promises) {
-			var promise = new $promise();
-
+	/**
+	 * Resolve all promises in the array.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.all = function(promises) {
+		return new $promise(function(resolve) {
 			if (Array.isArray(promises)) {
 				var count = promises.length;
 				var test = function() {
 					count--;
 
 					if (count == 0) {
-						promise.resolve();
+						resolve();
 					}
 				};
 
@@ -196,31 +197,36 @@ return {
 				});
 			}
 			else {
-				promise.resolve();
+				resolve();
 			}
-
-			return promise;
-		},
-
-		/**
-		 * Deferable object of the promise.
-		 *
-		 * @return {$q}
-		 * @member $q
-		 */
-		defer: function() {
-			return new $promise();
-		},
-
-		/**
-		 * Is object promise?
-		 * 
-		 * @param  {Object}  obj Tested object
-		 * @return {Boolean}
-		 * @member $q
-		 */
-		isPromise: function(obj) {
-			return obj instanceof $promise;
-		}
+		});
 	};
- */
+
+	/**
+	 * Resolve promise with variable object.
+	 *
+	 * @param {Object} [obj] Resolved object
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.resolve = function(obj) {
+		return new $promise(function(resolve) {
+			resolve(obj);
+		});
+	};
+
+	/**
+	 * Reject promise with variable object.
+	 *
+	 * @param {Object} [obj] Rejected object
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.reject = function(obj) {
+		return new $promise(function(resolve, reject) {
+			reject(obj);
+		});
+	};
+
+	return $promise;
+});

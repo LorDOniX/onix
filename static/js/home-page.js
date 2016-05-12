@@ -5,6 +5,7 @@ app.factory("HomePage", [
 	"$loader",
 	"$select",
 	"$q",
+	"$promise",
 	"HomeResource",
 	"HomeSnippet",
 	"myModule::TestFromModule",
@@ -18,6 +19,7 @@ function(
 	$loader,
 	$select,
 	$q,
+	$promise,
 	HomeResource,
 	HomeSnippet,
 	TestFromModule,
@@ -195,6 +197,28 @@ function(
 		console.log($routeParams);
 	};
 
+	HomePage.promiseTest = function() {
+		var promise1 = new $promise(function(resolve) {
+			setTimeout(function() {
+				resolve();
+			}, 500);
+		});
+
+		var promise2 = new $promise(function(resolve, reject) {
+			setTimeout(function() {
+				reject();
+			}, 300);
+		});
+
+		$promise.all([promise1, promise2]).then(function() {
+			console.log("$promise all done");
+		});
+
+		$promise.reject().then(function() {}, function() {
+			console.log("$promise rejected");
+		});
+	};
+
 	HomePage.allTests = function() {
 		console.log("Running all tests...");
 
@@ -204,6 +228,7 @@ function(
 		this.apiTest();
 		this.chp();
 		this.routeParams();
+		this.promiseTest();
 	};
 
 	return HomePage;
