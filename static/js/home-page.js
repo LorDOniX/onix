@@ -5,12 +5,15 @@ app.factory("HomePage", [
 	"$loader",
 	"$select",
 	"$q",
+	"$promise",
 	"HomeResource",
 	"HomeSnippet",
 	"myModule::TestFromModule",
 	"$filter",
 	"$i18n",
 	"$routeParams",
+	"$image",
+	"$previewImages",
 function(
 	Page,
 	$common,
@@ -18,12 +21,15 @@ function(
 	$loader,
 	$select,
 	$q,
+	$promise,
 	HomeResource,
 	HomeSnippet,
 	TestFromModule,
 	$filter,
 	$i18n,
-	$routeParams
+	$routeParams,
+	$image,
+	$previewImages
 ) {
 
 	var HomePage = Page.create();
@@ -195,6 +201,39 @@ function(
 		console.log($routeParams);
 	};
 
+	HomePage.promiseTest = function() {
+		var promise1 = new $promise(function(resolve) {
+			setTimeout(function() {
+				resolve();
+			}, 500);
+		});
+
+		var promise2 = new $promise(function(resolve, reject) {
+			setTimeout(function() {
+				reject();
+			}, 300);
+		});
+
+		$promise.all([promise1, promise2]).then(function() {
+			console.log("$promise all done");
+		});
+
+		$promise.reject().then(function() {}, function() {
+			console.log("$promise rejected");
+		});
+	};
+
+	HomePage.uploadChange = function() {
+		var uploadPreview = this._getEl("uploadPreview");
+		var filesInput = this._getEl("uploadInput");
+
+		$previewImages.show(uploadPreview, filesInput.files, {
+			maxSize: 180,
+			count: 2,
+			createHolder: true
+		});
+	};
+
 	HomePage.allTests = function() {
 		console.log("Running all tests...");
 
@@ -204,6 +243,7 @@ function(
 		this.apiTest();
 		this.chp();
 		this.routeParams();
+		this.promiseTest();
 	};
 
 	return HomePage;

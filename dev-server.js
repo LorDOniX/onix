@@ -9,7 +9,6 @@ var MAIN_PATH = "static";
 // paths
 app.use("/css", express.static(path.join(__dirname, MAIN_PATH + '/css')));
 app.use("/js", express.static(path.join(__dirname, MAIN_PATH + '/js')));
-app.use("/img", express.static(path.join(__dirname, MAIN_PATH + '/img')));
 app.use("/templ", express.static(path.join(__dirname, MAIN_PATH + '/templ')));
 app.use("/locale", express.static(path.join(__dirname, MAIN_PATH + '/locale')));
 app.use("/dist", express.static(path.join(__dirname, 'dist')));

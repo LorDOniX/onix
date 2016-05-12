@@ -21,6 +21,7 @@ const _CONST = {
 		"src/filter.js",
 		"src/filters.js",
 		"src/q.js",
+		"src/promise.js",
 		"src/job.js",
 		"src/my-query.js",
 		"src/dom.js",
@@ -34,13 +35,14 @@ const _CONST = {
 		"src/template.js",
 		"src/route.js",
 		"src/select.js",
-		"src/upload-images.js"
+		"src/image.js",
+		"src/preview-images.js"
 	],
 	JS_OUTPUT: "dist/onix-js-framework.js",
 	JS_OUTPUT_MIN: "dist/onix-js-framework.min.js",
 	HEADER_FILE: "HEADER",
-	LESS_FILE: "less/main.less",
-	CSS_FILE: "static/css/main.css"
+	LESS_FILE: "less/onix.less",
+	CSS_FILE: "dist/onix.css"
 };
 
 class Common {

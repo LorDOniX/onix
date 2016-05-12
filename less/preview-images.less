@@ -1,0 +1,46 @@
+.preview-images {
+	text-align: center;
+	padding: 10px;
+	
+	.preview-item {
+		display: inline-block;
+		position: relative;
+		border: 1px solid #ccc;
+		margin: 5px 0;
+		vertical-align: top;
+		border-radius: 3px;
+
+		.canvas-cover {
+			display: block;
+			height: auto;
+			background: #eee;
+			text-align: center;
+
+			.spinner {
+				position: relative;
+				top: 50%;
+				transform: translateY(-50%);
+				width: auto;
+				
+				& > div {
+					margin: 0 2px;
+					background-color: #543E3E;
+				}
+			}
+		}
+
+		.title {
+			text-align: center;
+			display: block;
+			padding: 5px 0;
+			overflow: hidden;
+		}
+
+		&.preview-loading {
+			.canvas-cover {
+				padding: 0 25px;
+			}
+		}
+	}
+}
+

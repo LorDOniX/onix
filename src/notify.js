@@ -118,18 +118,20 @@ function(
 
 	/**
 	 * Hide alert after timeout and returns promise at the end of operation.
+	 * Default timeout is 1500 ms.
 	 *
+	 * @param {Number} [timeout] Hide timeout in [ms]
 	 * @return {$q}
 	 * @member $notify
 	 */
-	$notify.prototype.hide = function() {
+	$notify.prototype.hide = function(timeout) {
 		var promise = $q.defer();
 
 		setTimeout(function() {
 			this.reset();
 			
 			promise.resolve();
-		}.bind(this), this._HIDE_TIMEOUT);
+		}.bind(this), timeout || this._HIDE_TIMEOUT);
 
 		return promise;
 	};

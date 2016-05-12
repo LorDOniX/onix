@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.5.0 (12. 5. 2016)
+
+* onix.css - separated css file for framework
+* $promise - es6 implementation of Promise functionality
+* removed $uploadImages
+* add $image - image functions (getCanvas, readFromFile...)
+* add $previewImages - this service can show you image previews with EXIF rotation
+* removed git loader
+* add css3 loader - spinner
+* $common doJobs method
+
 ## 2.4.0 (4. 5. 2016)
 
 * add language during config phase - i18n is now provider

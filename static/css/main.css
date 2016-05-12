@@ -1,1 +1,23 @@
-.center{text-align:center}.align-right{text-align:right}.align-middle{vertical-align:middle !important}.float-right{float:right}.float-left{float:left}.loader{width:0;height:3px;background:#C01;-webkit-box-shadow:1px 1px #ccc;-moz-box-shadow:1px 1px #ccc;box-shadow:1px 1px #ccc;position:fixed;left:0;top:0;-webkit-transition:width 2s;-moz-transition:width 2s;-o-transition:width 2s;transition:width 2s;opacity:0;z-index:10}.loader.start{opacity:1;width:75%}.loader.end{width:100%;opacity:1;-webkit-transition:width 0.1s;-moz-transition:width 0.1s;-o-transition:width 0.1s;transition:width 0.1s}.loader.hide{width:100%;-webkit-transition:opacity 0.3s;-moz-transition:opacity 0.3s;-o-transition:opacity 0.3s;transition:opacity 0.3s;opacity:0}.my-dropdown{display:inline-block}
+.center {
+	text-align: center;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.align-middle {
+	vertical-align: middle !important;
+}
+
+.float-right {
+	float: right;
+}
+
+.float-left {
+	float: left;
+}
+
+.my-dropdown {
+	display: inline-block;
+}

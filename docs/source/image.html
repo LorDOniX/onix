@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$image'>/**
+</span> * Class for creating img previews from File[] variable.
+ * 
+ * @class $image
+ */
+onix.service(&quot;$image&quot;, [
+	&quot;$q&quot;,
+function(
+	$q
+) {
+<span id='$image-property-_hasFileReader'>	/**
+</span>	 * FileReader is available.
+	 *
+	 * @private
+	 * @member $image
+	 * @type {Boolean}
+	 */
+	this._hasFileReader = &quot;FileReader&quot; in window;
+
+<span id='$image-property-_hasCanvas'>	/**
+</span>	 * Canvas is available.
+	 *
+	 * @private
+	 * @member $image
+	 * @type {Boolean}
+	 */
+	this._hasCanvas = !!document.createElement(&quot;canvas&quot;).getContext;
+
+<span id='$image-method-readFromFile'>	/**
+</span>	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
+	 *
+	 * @param  {Object} file Input file
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {$q} Promise with output object
+	 * @member $image
+	 */
+	this.readFromFile = function(file, maxSize) {
+		var promise = $q.defer();
+
+		if (!this._hasFileReader) {
+			promise.reject();
+			return promise;
+		}
+
+		var reader = new FileReader();
+		var output = {
+			img: null,
+			exif: null,
+			canvas: null
+		};
+
+		reader.onload = function(e) {
+			var binaryData = reader.result;
+			var binaryDataArray = new Uint8Array(binaryData);
+			var exif = null;
+
+			// exif only for jpeg
+			if (file.type != &quot;png&quot;) {
+				exif = this.getEXIF(binaryData);
+			}
+
+			var img = new Image();
+
+			img.onload = function() {
+				var imd = this.getImageDim(img, maxSize);
+				var canvas = this.getCanvas(img, {
+					width: imd.width,
+					height: imd.height,
+					orientation: exif ? exif.Orientation : 0,
+					scaled: imd.scale != 1
+				});
+
+				output.img = img;
+				output.exif = exif;
+				output.canvas = canvas;
+
+				promise.resolve(output);
+			}.bind(this);
+
+			img.src = this.fileToBase64(file.type, binaryDataArray);
+		}.bind(this);
+
+		reader.readAsArrayBuffer(file);
+
+		return promise;
+	};
+
+<span id='$image-method-getImageDim'>	/**
+</span>	 * Counts image dimension; if maxSize is available, new dimension is calculated.
+	 *
+	 * @param  {Image} img
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {Object}
+	 * @member $image
+	 */
+	this.getImageDim = function(img, maxSize) {
+		var maxSize = maxSize || 0;
+		var largeWidth = maxSize &gt; 0 &amp;&amp; img.width &gt; maxSize;
+		var largeHeight = maxSize &gt; 0 &amp;&amp; img.height &gt; maxSize;
+
+		var output = {
+			width: img.width,
+			height: img.height,
+			scale: 1
+		};
+
+		if (largeWidth || largeHeight) {
+			// resize picture
+			var imgWidth = img.width;
+			var imgHeight = img.height;
+
+			// portrait x landscape
+			if (img.width &gt; img.height) {
+				// landscape
+				imgHeight = maxSize * imgHeight / imgWidth;
+				imgWidth = maxSize;
+			}
+			else {
+				// portrait
+				imgWidth = maxSize * imgWidth / imgHeight;
+				imgHeight = maxSize;
+			}
+
+			output.scale = img.width / imgWidth; // ratio between original x scaled image
+			output.width = imgWidth;
+			output.height = imgHeight;
+		}
+
+		return output;
+	};
+
+<span id='$image-method-getCanvas'>	/**
+</span>	 * Get image canvas - read input img, create canvas with it.
+	 *
+	 * @param  {Image} img
+	 * @param  {Object} [optsArg] Variable options
+	 * @param  {Number} [optsArg.width] Output canvas width
+	 * @param  {Number} [optsArg.height] Output canvas height
+	 * @param  {Number} [optsArg.orientation] EXIF orientation
+	 * @param  {Boolean} [optsArg.scaled = false]
+	 * @return {Canvas}
+	 * @member $image
+	 */
+	this.getCanvas = function(img, optsArg) {
+		var opts = {
+			width: img.width || 0,
+			height: img.height || 0,
+			orientation: 0,
+			scaled: false
+		};
+
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+
+		if (!this._hasCanvas) return null;
+
+		var canvas = document.createElement(&quot;canvas&quot;);
+		var ctx = canvas.getContext(&quot;2d&quot;);
+		var draw = true;
+
+		canvas.width = opts.width;
+		canvas.height = opts.height;
+
+		// rotate
+		if (opts.orientation) {
+			switch (opts.orientation) {
+				case 2:
+					// horizontal flip
+					ctx.translate(opts.width, 0);
+					ctx.scale(-1, 1);
+					break;
+
+				case 3:
+					// 180° rotate left
+					ctx.translate(opts.width, opts.height);
+					ctx.rotate(Math.PI);
+					break;
+
+				case 4:
+					// vertical flip
+					ctx.translate(0, opts.height);
+					ctx.scale(1, -1);
+					break;
+
+				case 5:
+					// vertical flip + 90 rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.scale(1, -1);
+
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+
+				case 6:
+					// 90° rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(0, -opts.height);
+					
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+
+				case 7:
+					// horizontal flip + 90 rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(opts.width, -opts.height);
+					ctx.scale(-1, 1);
+
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+
+				case 8:
+					// 90° rotate left
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(-0.5 * Math.PI);
+					ctx.translate(-opts.width, 0);
+
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+			}
+		}
+
+		if (draw) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			if (opts.scaled) {
+				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+			}
+			else {
+				ctx.drawImage(img, 0, 0);
+			}
+		}
+
+		return canvas;
+	};
+
+<span id='$image-method-fileToBase64'>	/**
+</span>	 * Binary data to base64.
+	 *
+	 * @param  {String} fileType
+	 * @param  {Array} binaryData
+	 * @return {String}
+	 * @member $image
+	 */
+	this.fileToBase64 = function(fileType, binaryData) {
+		var length = binaryData.length;
+		var output = &quot;&quot;;
+
+		for (var i = 0; i &lt; length; i += 1) {
+			output += String.fromCharCode(binaryData[i]);
+		}
+
+		return &#39;data:&#39; + fileType + &#39;;base64,&#39; + btoa(output);
+	};
+
+<span id='$image-method-isPicture'>	/**
+</span>	 * Is file a picture?
+	 *
+	 * @param  {File}  file
+	 * @return {Boolean}
+	 * @member $image
+	 */
+	this.isPicture = function(file) {
+		if (file) {
+			return (file.type == &quot;image/jpeg&quot; || file.type == &quot;image/pjpeg&quot; || file.type == &quot;image/png&quot;);
+		}
+		else return false;
+	};
+
+<span id='$image-method-getPictureFiles'>	/**
+</span>	 * Get picture files from array of files.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Array}
+	 * @member $image
+	 */
+	this.getPictureFiles = function(files) {
+		var pictureFiles = [];
+
+		if (files &amp;&amp; files.length) {
+			for (var i = 0; i &lt; files.length; i++) {
+				var item = files[i];
+
+				if (this.isPicture(item)) {
+					pictureFiles.push(item);
+				}
+			}
+		}
+
+		return pictureFiles;
+	};
+
+<span id='$image-method-getPicturesCount'>	/**
+</span>	 * Get picture files count from the array of Files. This function uses &#39;getPictureFiles&#39;.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Boolean}
+	 * @member $image
+	 */
+	this.getPicturesCount = function(files) {
+		return this.getPictureFiles(files).length;
+	};
+
+<span id='$image-method-getEXIF'>	/**
+</span>	 * Get image EXIF information.
+	 * 
+	 * @param  {Binary[]} imgData Binary img data
+	 * @return {Object}
+	 * @member $image
+	 */
+	this.getEXIF = function(imgData) {
+		if (&quot;EXIF&quot; in window) {
+			return EXIF.readFromBinaryFile(imgData);
+		}
+		else {
+			return {};
+		}
+	};
+}]);
+</pre>
+</body>
+</html>

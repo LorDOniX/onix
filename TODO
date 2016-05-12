@@ -1,4 +1,5 @@
 TODO:
+- nothing
 
 NICE TO HAVE:
 - controller
@@ -7,5 +8,8 @@ NICE TO HAVE:
 	- handle controller can have multiple controllers
 - directive
 
+JSDUCK:
+- https://github.com/senchalabs/jsduck/wiki
+
 SHADOW DOM COMMIT:
-6c6af59d43aaa0fc1f074a4f7374eb1ec1dee577
+- 6c6af59d43aaa0fc1f074a4f7374eb1ec1dee577

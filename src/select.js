@@ -45,7 +45,9 @@ function(
 
 		this._binds = {
 			captionClick: $common.bindWithoutScope(this._captionClick, this),
-			choiceClick: $common.bindWithoutScope(this._choiceClick, this)
+			choiceClick: $common.bindWithoutScope(this._choiceClick, this),
+			removeAllOpened: this._removeAllOpened.bind(this),
+			click: this._click.bind(this)
 		};
 
 		this._bind();
@@ -96,6 +98,32 @@ function(
 	};
 
 	/**
+	 * Remove all opened selectors -> close all.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._removeAllOpened = function() {
+		var con = this._const;
+		
+		// remove all
+		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+			item.classList.remove(con.OPEN_CLASS);
+		});
+	};
+
+	/**
+	 * Outside click.
+	 * 
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._click = function() {
+		this._removeAllOpened();
+		window.removeEventListener("click", this._binds.click);
+	};
+
+	/**
 	 * Event - click on caption.
 	 * 
 	 * @param  {Event} e 
@@ -104,35 +132,21 @@ function(
 	 * @private
 	 */
 	$select.prototype._captionClick = function(e, scope) {
-		var con = scope._const;
-
 		e.stopPropagation();
 
-		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
+		scope._binds.removeAllOpened();
 
-		var removeAllOpened = function() {
-			// remove all
-			onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-				item.classList.remove("open");
-			});
-		};
-
-		var clickFn = function() {
-			removeAllOpened();
-			window.removeEventListener("click", clickFn);
-		};
-
-		removeAllOpened();
+		var isOpen = scope._el.classList.contains(scope._const.OPEN_CLASS);
 
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", clickFn);
+			window.removeEventListener("click", scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", clickFn);
+			window.addEventListener("click", scope._binds.click);
 
-			scope._el.classList.add(con.OPEN_CLASS);
+			scope._el.classList.add(scope._const.OPEN_CLASS);
 		}
 	};
 
@@ -223,9 +237,7 @@ function(
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
-		if (typeof ind === "undefined") {
-			ind = 0;
-		}
+		ind = ind || 0;
 
 		var optionsCount = this._optinsRef.length;
 

@@ -1586,7 +1586,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.4.0/4. 5. 2016\n" +
+			"2.5.0/12. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
 			"@license MIT\n" +
@@ -1810,20 +1810,20 @@ onix.factory("$q", function() {
 	 * 
 	 * @class $q
 	 */
-	var $promise = function() {
+	var $q = function() {
 		/**
 		 * Promise states.
 		 *
 		 * @member $q
 		 * @private
 		 */
-		this._E_STATES = {
+		this._STATES = {
 			IDLE: 0,
 			RESOLVED: 1,
 			REJECTED: 2
 		};
 		// current state
-		this._state = this._E_STATES.IDLE;
+		this._state = this._STATES.IDLE;
 		// all funcs
 		this._funcs = [];
 		// done data
@@ -1836,7 +1836,7 @@ onix.factory("$q", function() {
 	 * @member $q
 	 * @private
 	 */
-	$promise.prototype._resolveFuncs = function(isError) {
+	$q.prototype._resolveFuncs = function(isError) {
 		this._funcs.forEach(function(fnItem) {
 			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
 				(fnItem.fn)(this._finishData);
@@ -1844,7 +1844,7 @@ onix.factory("$q", function() {
 		}, this);
 		// clear array
 		this._funcs.length = 0;
-		this._state = isError ? this._E_STATES.REJECTED : this._E_STATES.RESOLVED;
+		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
 	};
 	/**
 	 * Is promise already finished?
@@ -1853,9 +1853,9 @@ onix.factory("$q", function() {
 	 * @member $q
 	 * @private
 	 */
-	$promise.prototype._isAlreadyFinished = function() {
-		if (this._state != this._E_STATES.IDLE) {
-			this._resolveFuncs(this._state == this._E_STATES.REJECTED);
+	$q.prototype._isAlreadyFinished = function() {
+		if (this._state != this._STATES.IDLE) {
+			this._resolveFuncs(this._state == this._STATES.REJECTED);
 		}
 	};
 	/**
@@ -1864,7 +1864,7 @@ onix.factory("$q", function() {
 	 * @param  {Object} obj
 	 * @member $q
 	 */
-	$promise.prototype.resolve = function(obj) {
+	$q.prototype.resolve = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(false);
 	};
@@ -1874,7 +1874,7 @@ onix.factory("$q", function() {
 	 * @param  {Object} obj
 	 * @member $q
 	 */
-	$promise.prototype.reject = function(obj) {
+	$q.prototype.reject = function(obj) {
 		this._finishData = obj;
 		this._resolveFuncs(true);
 	};
@@ -1886,7 +1886,7 @@ onix.factory("$q", function() {
 	 * @param {Function} [cbError]
 	 * @member $q
 	 */
-	$promise.prototype.then = function(cbOk, cbError) {
+	$q.prototype.then = function(cbOk, cbError) {
 		if (cbOk && typeof cbOk === "function") {
 			this._funcs.push({
 				fn: cbOk,
@@ -1909,7 +1909,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cbOk
 	 * @member $q
 	 */
-	$promise.prototype.done = function(cbOk) {
+	$q.prototype.done = function(cbOk) {
 		this._funcs.push({
 			fn: cbOk,
 			isError: false
@@ -1924,7 +1924,7 @@ onix.factory("$q", function() {
 	 * @param  {Function} cbError
 	 * @member $q
 	 */
-	$promise.prototype.error = function(cbError) {
+	$q.prototype.error = function(cbError) {
 		this._funcs.push({
 			fn: cbError,
 			isError: true
@@ -1935,11 +1935,12 @@ onix.factory("$q", function() {
 	/**
 	 * Finally for promise.
 	 *
+	 * @method finally
 	 * @chainable
 	 * @param  {Function} cb
 	 * @member $q
 	 */
-	$promise.prototype["finally"] = function(cb) {
+	$q.prototype["finally"] = function(cb) {
 		this._funcs.push({
 			fn: cb,
 			"finally": true
@@ -1956,7 +1957,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		all: function(promises) {
-			var promise = new $promise();
+			var promise = new $q();
 			if (Array.isArray(promises)) {
 				var count = promises.length;
 				var test = function() {
@@ -1981,7 +1982,7 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		defer: function() {
-			return new $promise();
+			return new $q();
 		},
 		/**
 		 * Is object promise?
@@ -1991,9 +1992,215 @@ onix.factory("$q", function() {
 		 * @member $q
 		 */
 		isPromise: function(obj) {
-			return obj instanceof $promise;
+			return obj instanceof $q;
 		}
 	};
+});
+onix.factory("$promise", function() {
+	/**
+	 * ES6 promise implementation.
+	 * 
+	 * @class $promise
+	 */
+	var $promise = function(cbFn) {
+		/**
+		 * Promise states.
+		 *
+		 * @member $promise
+		 * @private
+		 */
+		this._STATES = {
+			IDLE: 0,
+			RESOLVED: 1,
+			REJECTED: 2
+		};
+		// current state
+		this._state = this._STATES.IDLE;
+		// all funcs
+		this._funcs = [];
+		// done data
+		this._finishData = null;
+		// call promise cb function
+		if (cbFn && typeof cbFn === "function") {
+			cbFn.apply(cbFn, [
+				this._resolve.bind(this),
+				this._reject.bind(this)
+			]);
+		}
+	};
+	/**
+	 * Resolve promise using obj.
+	 *
+	 * @private
+	 * @param  {Object} obj
+	 * @member $promise
+	 */
+	$promise.prototype._resolve = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(false);
+	};
+	/**
+	 * Reject promise using obj.
+	 *
+	 * @private
+	 * @param  {Object} obj
+	 * @member $promise
+	 */
+	$promise.prototype._reject = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(true);
+	};
+	/**
+	 * Resolve all functions.
+	 *
+	 * @param  {Boolean} isError
+	 * @member $promise
+	 * @private
+	 */
+	$promise.prototype._resolveFuncs = function(isError) {
+		this._funcs.forEach(function(fnItem) {
+			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
+				(fnItem.fn)(this._finishData);
+			}
+		}, this);
+		// clear array
+		this._funcs.length = 0;
+		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
+	};
+	/**
+	 * Is promise already finished?
+	 *
+	 * @return {Boolean}
+	 * @member $promise
+	 * @private
+	 */
+	$promise.prototype._isAlreadyFinished = function() {
+		if (this._state != this._STATES.IDLE) {
+			this._resolveFuncs(this._state == this._STATES.REJECTED);
+		}
+	};
+	/**
+	 * After promise resolve/reject call then (okFn, errorFn).
+	 *
+	 * @chainable
+	 * @param {Function} [cbOk]
+	 * @param {Function} [cbError]
+	 * @member $promise
+	 */
+	$promise.prototype.then = function(cbOk, cbError) {
+		if (cbOk && typeof cbOk === "function") {
+			this._funcs.push({
+				fn: cbOk,
+				isError: false
+			});
+		}
+		if (cbError && typeof cbError === "function") {
+			this._funcs.push({
+				fn: cbError,
+				isError: true
+			});
+		}
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * After promise resolve call then cbOk.
+	 *
+	 * @chainable
+	 * @param  {Function} cbOk
+	 * @member $promise
+	 */
+	$promise.prototype.done = function(cbOk) {
+		this._funcs.push({
+			fn: cbOk,
+			isError: false
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * After promise reject call then cbError.
+	 *
+	 * @chainable
+	 * @param  {Function} cbError
+	 * @member $promise
+	 */
+	$promise.prototype.error = function(cbError) {
+		this._funcs.push({
+			fn: cbError,
+			isError: true
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * Finally for promise.
+	 *
+	 * @method finally
+	 * @chainable
+	 * @param  {Function} cb
+	 * @member $promise
+	 */
+	$promise.prototype["finally"] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			"finally": true
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	// static methods
+	/**
+	 * Resolve all promises in the array.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.all = function(promises) {
+		return new $promise(function(resolve) {
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+					if (count == 0) {
+						resolve();
+					}
+				};
+				promises.forEach(function(item) {
+					item["finally"](test);
+				});
+			}
+			else {
+				resolve();
+			}
+		});
+	};
+	/**
+	 * Resolve promise with variable object.
+	 *
+	 * @param {Object} [obj] Resolved object
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.resolve = function(obj) {
+		return new $promise(function(resolve) {
+			resolve(obj);
+		});
+	};
+	/**
+	 * Reject promise with variable object.
+	 *
+	 * @param {Object} [obj] Rejected object
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.reject = function(obj) {
+		return new $promise(function(resolve, reject) {
+			reject(obj);
+		});
+	};
+	return $promise;
 });
 onix.factory("$job", [
 	"$q",
@@ -2014,11 +2221,11 @@ function(
 		};
 	};
 	/**
-	 * Add task to JOB.
+	 * Add task to job. Every job task needs to call doneFn(), which is added to the last argument position.
 	 * 
-	 * @param {Function} task 
-	 * @param {Function|Object} [scope]
-	 * @param {Object} [args] Add params
+	 * @param {Function} task Job function
+	 * @param {Function|Object} [scope] Variable function scope
+	 * @param {Object} [args] Add params to the function
 	 * @member $job
 	 */
 	$job.prototype.add = function(task, scope, args) {
@@ -2039,7 +2246,7 @@ function(
 	 */
 	$job.prototype.start = function() {
 		if (!this._tasks.length) return;
-		// kvuli pop
+		// because of pop
 		this._tasks.reverse();
 		this._doJob();
 		return this._donePromise;
@@ -2087,7 +2294,7 @@ function(
 	};
 	return {
 		/**
-		 * Factory for creating new Job.
+		 * Factory for creating new job.
 		 *
 		 * @member $job
 		 */
@@ -2647,8 +2854,10 @@ onix.service("$location", function() {
  */
 onix.service("$common", [
 	"$q",
+	"$job",
 function(
-	$q
+	$q,
+	$job
 ) {
 	/**
 	 * Object copy, from source to dest.
@@ -2942,7 +3151,7 @@ function(
 	 * @param  {String|Function} opts.method Function or method name inside scope
 	 * @param  {Object} opts.scope Scope for method function
 	 * @param  {Array} opts.args Additional arguments for function
-	 * @param  {promise} promise Done promise
+	 * @param  {promise} promise Done promise $q
 	 * @param  {Array} outArray Array for output from all executed promises
 	 * @member $common
 	 */
@@ -2986,6 +3195,41 @@ function(
 		else {
 			promise.resolve(outArray);
 		}
+	};
+	/**
+	 * Run jobs array with count for how many functions will be processed simultinously.
+	 *
+	 * @param  {Object[]} jobsArray Array with jobs objects
+	 * @param  {Function} jobsArray.task Job function
+	 * @param  {Function} [jobsArray.scope] Variable function scope
+	 * @param  {Function} [jobsArray.args] Add params to the function
+	 * @param  {Number} count How many functions processed simultinously
+	 * @param  {Object} taskDoneObj Callback after one task have been done
+	 * @param  {Object} taskDoneObj.cb Function
+	 * @param  {Object} [taskDoneObj.scope] Function scope
+	 * @return {$q} Callback after all jobs are done
+	 * @member $common
+	 */
+	this.doJobs = function(jobsArray, count, taskDoneObj) {
+		var len = jobsArray.length;
+		var jobs = [];
+		for (var i = 0; i < len; i++) {
+			var jp = count > 0 ? i % count : i;
+			var jobItem = jobsArray[i];
+			if (!jobs[jp]) {
+				jobs[jp] = $job.create();
+				if (taskDoneObj) {
+					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
+				}
+			}
+			// add one job
+			jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
+		}
+		var jobPromises = [];
+		jobs.forEach(function(job) {
+			jobPromises.push(job.start());
+		});
+		return $q.all(jobPromises);
 	};
 }]);
 /**
@@ -3089,16 +3333,18 @@ function(
 	};
 	/**
 	 * Hide alert after timeout and returns promise at the end of operation.
+	 * Default timeout is 1500 ms.
 	 *
+	 * @param {Number} [timeout] Hide timeout in [ms]
 	 * @return {$q}
 	 * @member $notify
 	 */
-	$notify.prototype.hide = function() {
+	$notify.prototype.hide = function(timeout) {
 		var promise = $q.defer();
 		setTimeout(function() {
 			this.reset();
 			promise.resolve();
-		}.bind(this), this._HIDE_TIMEOUT);
+		}.bind(this), timeout || this._HIDE_TIMEOUT);
 		return promise;
 	};
 	/**
@@ -4243,7 +4489,9 @@ function(
 		this.captionTextEl = null;
 		this._binds = {
 			captionClick: $common.bindWithoutScope(this._captionClick, this),
-			choiceClick: $common.bindWithoutScope(this._choiceClick, this)
+			choiceClick: $common.bindWithoutScope(this._choiceClick, this),
+			removeAllOpened: this._removeAllOpened.bind(this),
+			click: this._click.bind(this)
 		};
 		this._bind();
 	};
@@ -4284,6 +4532,29 @@ function(
 		this._captionEl = captionEl;
 	};
 	/**
+	 * Remove all opened selectors -> close all.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._removeAllOpened = function() {
+		var con = this._const;
+		// remove all
+		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+			item.classList.remove(con.OPEN_CLASS);
+		});
+	};
+	/**
+	 * Outside click.
+	 * 
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._click = function() {
+		this._removeAllOpened();
+		window.removeEventListener("click", this._binds.click);
+	};
+	/**
 	 * Event - click on caption.
 	 * 
 	 * @param  {Event} e 
@@ -4292,28 +4563,17 @@ function(
 	 * @private
 	 */
 	$select.prototype._captionClick = function(e, scope) {
-		var con = scope._const;
 		e.stopPropagation();
-		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
-		var removeAllOpened = function() {
-			// remove all
-			onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-				item.classList.remove("open");
-			});
-		};
-		var clickFn = function() {
-			removeAllOpened();
-			window.removeEventListener("click", clickFn);
-		};
-		removeAllOpened();
+		scope._binds.removeAllOpened();
+		var isOpen = scope._el.classList.contains(scope._const.OPEN_CLASS);
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", clickFn);
+			window.removeEventListener("click", scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", clickFn);
-			scope._el.classList.add(con.OPEN_CLASS);
+			window.addEventListener("click", scope._binds.click);
+			scope._el.classList.add(scope._const.OPEN_CLASS);
 		}
 	};
 	/**
@@ -4390,9 +4650,7 @@ function(
 	 * @member $select
 	 */
 	$select.prototype.selectOption = function(ind) {
-		if (typeof ind === "undefined") {
-			ind = 0;
-		}
+		ind = ind || 0;
 		var optionsCount = this._optinsRef.length;
 		if (optionsCount > 0 && ind >= 0 && ind < optionsCount) {
 			var el = this._optinsRef[ind].el;
@@ -4429,143 +4687,321 @@ function(
 /**
  * Class for creating img previews from File[] variable.
  * 
- * @class $uploadImages
+ * @class $image
  */
-onix.service("$uploadImages", [
-	"$job",
+onix.service("$image", [
 	"$q",
-	"$dom",
 function(
-	$job,
-	$q,
-	$dom
+	$q
 ) {
 	/**
-	 * Disable?
+	 * FileReader is available.
 	 *
 	 * @private
-	 * @member $uploadImages
+	 * @member $image
 	 * @type {Boolean}
 	 */
-	this._disable = !("FileReader" in window);
+	this._hasFileReader = "FileReader" in window;
 	/**
-	 * Max preview image height.
+	 * Canvas is available.
 	 *
 	 * @private
-	 * @member $uploadImages
-	 * @type {Object}
+	 * @member $image
+	 * @type {Boolean}
 	 */
-	this._const = {
-		PREVIEW_MAX_SIZE: 180
+	this._hasCanvas = !!document.createElement("canvas").getContext;
+	/**
+	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
+	 *
+	 * @param  {Object} file Input file
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {$q} Promise with output object
+	 * @member $image
+	 */
+	this.readFromFile = function(file, maxSize) {
+		var promise = $q.defer();
+		if (!this._hasFileReader) {
+			promise.reject();
+			return promise;
+		}
+		var reader = new FileReader();
+		var output = {
+			img: null,
+			exif: null,
+			canvas: null
+		};
+		reader.onload = function(e) {
+			var binaryData = reader.result;
+			var binaryDataArray = new Uint8Array(binaryData);
+			var exif = null;
+			// exif only for jpeg
+			if (file.type != "png") {
+				exif = this.getEXIF(binaryData);
+			}
+			var img = new Image();
+			img.onload = function() {
+				var imd = this.getImageDim(img, maxSize);
+				var canvas = this.getCanvas(img, {
+					width: imd.width,
+					height: imd.height,
+					orientation: exif ? exif.Orientation : 0,
+					scaled: imd.scale != 1
+				});
+				output.img = img;
+				output.exif = exif;
+				output.canvas = canvas;
+				promise.resolve(output);
+			}.bind(this);
+			img.src = this.fileToBase64(file.type, binaryDataArray);
+		}.bind(this);
+		reader.readAsArrayBuffer(file);
+		return promise;
 	};
 	/**
-	 * Loading gif URL path.
-	 * 
-	 * @type {String}
-	 */
-	this._loadingGifUrl = "/img/loading.gif";
-	/**
-	 * Do jobs for processing all images.
+	 * Counts image dimension; if maxSize is available, new dimension is calculated.
 	 *
-	 * @private
-	 * @param  {Array} dataArray Array of files with images
-	 * @param  {Function} fn Job task
-	 * @param  {Number} count How many functions processed simultinously
-	 * @param  {Function} taskDoneObj Callback after one task have been done
-	 * @return {$q} Callback after all job is done
-	 * @member $uploadImages
+	 * @param  {Image} img
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {Object}
+	 * @member $image
 	 */
-	this._doJobs = function(dataArray, fn, count, taskDoneObj) {
-		var len = dataArray.length;
-		var jobs = [];
-		for (var i = 0; i < len; i++) {
-			var jp = i % count;
-			if (!jobs[jp]) {
-				jobs[jp] = $job.create();
-				if (taskDoneObj) {
-					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
-				}
+	this.getImageDim = function(img, maxSize) {
+		var maxSize = maxSize || 0;
+		var largeWidth = maxSize > 0 && img.width > maxSize;
+		var largeHeight = maxSize > 0 && img.height > maxSize;
+		var output = {
+			width: img.width,
+			height: img.height,
+			scale: 1
+		};
+		if (largeWidth || largeHeight) {
+			// resize picture
+			var imgWidth = img.width;
+			var imgHeight = img.height;
+			// portrait x landscape
+			if (img.width > img.height) {
+				// landscape
+				imgHeight = maxSize * imgHeight / imgWidth;
+				imgWidth = maxSize;
 			}
-			jobs[jp].add(fn, this, dataArray[i]);
+			else {
+				// portrait
+				imgWidth = maxSize * imgWidth / imgHeight;
+				imgHeight = maxSize;
+			}
+			output.scale = img.width / imgWidth; // ratio between original x scaled image
+			output.width = imgWidth;
+			output.height = imgHeight;
 		}
-		var jobPromises = [];
-		jobs.forEach(function(job) {
-			jobPromises.push(job.start());
-		});
-		return $q.all(jobPromises);
+		return output;
+	};
+	/**
+	 * Get image canvas - read input img, create canvas with it.
+	 *
+	 * @param  {Image} img
+	 * @param  {Object} [optsArg] Variable options
+	 * @param  {Number} [optsArg.width] Output canvas width
+	 * @param  {Number} [optsArg.height] Output canvas height
+	 * @param  {Number} [optsArg.orientation] EXIF orientation
+	 * @param  {Boolean} [optsArg.scaled = false]
+	 * @return {Canvas}
+	 * @member $image
+	 */
+	this.getCanvas = function(img, optsArg) {
+		var opts = {
+			width: img.width || 0,
+			height: img.height || 0,
+			orientation: 0,
+			scaled: false
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+		if (!this._hasCanvas) return null;
+		var canvas = document.createElement("canvas");
+		var ctx = canvas.getContext("2d");
+		var draw = true;
+		canvas.width = opts.width;
+		canvas.height = opts.height;
+		// rotate
+		if (opts.orientation) {
+			switch (opts.orientation) {
+				case 2:
+					// horizontal flip
+					ctx.translate(opts.width, 0);
+					ctx.scale(-1, 1);
+					break;
+				case 3:
+					// 180° rotate left
+					ctx.translate(opts.width, opts.height);
+					ctx.rotate(Math.PI);
+					break;
+				case 4:
+					// vertical flip
+					ctx.translate(0, opts.height);
+					ctx.scale(1, -1);
+					break;
+				case 5:
+					// vertical flip + 90 rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.scale(1, -1);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+				case 6:
+					// 90° rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(0, -opts.height);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+				case 7:
+					// horizontal flip + 90 rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(opts.width, -opts.height);
+					ctx.scale(-1, 1);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+				case 8:
+					// 90° rotate left
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(-0.5 * Math.PI);
+					ctx.translate(-opts.width, 0);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+			}
+		}
+		if (draw) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			if (opts.scaled) {
+				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+			}
+			else {
+				ctx.drawImage(img, 0, 0);
+			}
+		}
+		return canvas;
+	};
+	/**
+	 * Binary data to base64.
+	 *
+	 * @param  {String} fileType
+	 * @param  {Array} binaryData
+	 * @return {String}
+	 * @member $image
+	 */
+	this.fileToBase64 = function(fileType, binaryData) {
+		var length = binaryData.length;
+		var output = "";
+		for (var i = 0; i < length; i += 1) {
+			output += String.fromCharCode(binaryData[i]);
+		}
+		return 'data:' + fileType + ';base64,' + btoa(output);
 	};
 	/**
 	 * Is file a picture?
 	 *
-	 * @private
 	 * @param  {File}  file
 	 * @return {Boolean}
-	 * @member $uploadImages
+	 * @member $image
 	 */
-	this._isPicture = function(file) {
+	this.isPicture = function(file) {
 		if (file) {
 			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
 		}
 		else return false;
 	};
 	/**
-	 * Read one file, create one preview.
-	 *
-	 * @private
-	 * @param  {Object} fileObj
-	 * @param  {Object} fileObj.file File reference
-	 * @param  {String} fileObj.previewID Preview ID for DOM position
-	 * @param  {Function} doneFn Callback, after one preview is loaded and drawed to canvas
-	 * @member $uploadImages
+	 * Get picture files from array of files.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Array}
+	 * @member $image
 	 */
-	this._readFile = function(fileObj, doneFn) {
-		var file = fileObj.file;
-		var previewID = fileObj.previewID;
-		var fileObj = {
-			file: file,
-			exif: null,
-			img: null
-		};
-		var preview = this._createPreview(file);
-		// append
-		if (previewID in this._dom) {
-			this._dom[previewID].appendChild(preview.cont);
+	this.getPictureFiles = function(files) {
+		var pictureFiles = [];
+		if (files && files.length) {
+			for (var i = 0; i < files.length; i++) {
+				var item = files[i];
+				if (this.isPicture(item)) {
+					pictureFiles.push(item);
+				}
+			}
+		}
+		return pictureFiles;
+	};
+	/**
+	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Boolean}
+	 * @member $image
+	 */
+	this.getPicturesCount = function(files) {
+		return this.getPictureFiles(files).length;
+	};
+	/**
+	 * Get image EXIF information.
+	 * 
+	 * @param  {Binary[]} imgData Binary img data
+	 * @return {Object}
+	 * @member $image
+	 */
+	this.getEXIF = function(imgData) {
+		if ("EXIF" in window) {
+			return EXIF.readFromBinaryFile(imgData);
 		}
 		else {
-			this._dom.previewItems.appendChild(preview.cont);
+			return {};
 		}
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			var binaryData = reader.result;
-			var binaryDataArray = new Uint8Array(binaryData);
-			var exif = null;
-			if (file.type != "png") {
-				exif = EXIF.readFromBinaryFile(binaryData);
-			}
-			var img = new Image();
-			img.onload = function() {
-				var imd = this._getImageDim(img);
-				var canvas = this._processInputImage(img, imd, exif.Orientation);
-				preview.cont.classList.remove("preview-loading");
-				preview.canvasCover.innerHTML = "";
-				preview.canvasCover.appendChild(canvas);
-				fileObj.exif = exif;
-				fileObj.img = img;
-				doneFn();
-			}.bind(this);
-			img.src = this._fileToBase64(file.type, binaryDataArray);
-		}.bind(this);
-		reader.readAsArrayBuffer(file);
 	};
+}]);
+/**
+ * Class for creating img previews from File[] variable.
+ * 
+ * @class $previewImages
+ */
+onix.service("$previewImages", [
+	"$q",
+	"$image",
+	"$dom",
+	"$common",
+function(
+	$q,
+	$image,
+	$dom,
+	$common
+) {
 	/**
 	 * Create one image preview.
 	 *
 	 * @private
 	 * @param  {File} file
+	 * @param  {Number} [maxSize] Max image size
 	 * @return {Object} dom references
-	 * @member $uploadImages
+	 * @member $previewImages
 	 */
-	this._createPreview = function(file) {
+	this._createPreview = function(file, maxSize) {
 		var exported = {};
 		var cont = $dom.create({
 			el: "span",
@@ -4573,11 +5009,8 @@ function(
 			child: [{
 				el: "span",
 				"class": "canvas-cover",
-				child: [{
-					el: "img",
-					"class": "preview-loader",
-					src: this._loadingGifUrl
-				}],
+				child: [this._getSpinner()],
+				style: "height: " + (maxSize || 100) + "px",
 				_exported: "canvasCover"
 			}, {
 				el: "span",
@@ -4591,169 +5024,39 @@ function(
 		};
 	};
 	/**
-	 * Counts image dimension; if maxSize is available, new dimension is calculated.
+	 * Create spinner for image load.
 	 *
 	 * @private
-	 * @param  {Image} img
-	 * @return {Object}
-	 * @member $uploadImages
+	 * @return {Object} DOM configuration
+	 * @member $previewImages
 	 */
-	this._getImageDim = function(img) {
-		var maxSize = this._const.PREVIEW_MAX_SIZE;
-		var largeWidth = img.width > maxSize;
-		var largeHeight = img.height > maxSize;
-		var output = {
-			width: img.width,
-			height: img.height,
-			scale: 1,
-			large: false
+	this._getSpinner = function() {
+		var children = [];
+		for (var i = 1; i < 6; i++) {
+			children.push({
+				el: "div",
+				"class": "rect" + i
+			});
+		}
+		return {
+			el: "div",
+			"class": "spinner",
+			child: children
 		};
-		if (largeWidth || largeHeight) {
-			// resizneme obrazek
-			var imgWidth = img.width;
-			var imgHeight = img.height;
-			// vybereme vetsi ze stran
-			if (img.width > img.height) {
-				// sirka
-				imgHeight = maxSize * imgHeight / imgWidth;
-				imgWidth = maxSize;
-			}
-			else {
-				// vyska
-				imgWidth = maxSize * imgWidth / imgHeight;
-				imgHeight = maxSize;
-			}
-			output.scale = img.width / imgWidth; // pomer orig. a zmenseneho obrazku
-			output.width = imgWidth;
-			output.height = imgHeight;
-			output.large = true;
-		}
-		return output;
 	};
 	/**
-	 * Process image: rotate by exif, decrase size according to MAX SIZE.
-	 *
-	 * @private
-	 * @param  {Image} img
-	 * @param  {Object} imd object dimension
-	 * @param  {Number} orientation EXIF orientation
-	 * @return {Canvas}
-	 * @member $uploadImages
-	 */
-	this._processInputImage = function(img, imd, orientation) {
-		var canvas = document.createElement("canvas");
-		var ctx = canvas.getContext("2d");
-		var draw = true;
-		canvas.width = imd.width;
-		canvas.height = imd.height;
-		// rotate
-		if (orientation) {
-			switch (orientation) {
-				case 2:
-					// horizontal flip
-					ctx.translate(imd.width, 0);
-					ctx.scale(-1, 1);
-					break;
-				case 3:
-					// 180° rotate left
-					ctx.translate(imd.width, imd.height);
-					ctx.rotate(Math.PI);
-					break;
-				case 4:
-					// vertical flip
-					ctx.translate(0, imd.height);
-					ctx.scale(1, -1);
-					break;
-				case 5:
-					// vertical flip + 90 rotate right
-					canvas.width = imd.height;
-					canvas.height = imd.width;
-					ctx.rotate(0.5 * Math.PI);
-					ctx.scale(1, -1);
-					if (imd.large) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-					break;
-				case 6:
-					// 90° rotate right
-					canvas.width = imd.height;
-					canvas.height = imd.width;
-					ctx.rotate(0.5 * Math.PI);
-					ctx.translate(0, -imd.height);
-					if (imd.large) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-					break;
-				case 7:
-					// horizontal flip + 90 rotate right
-					canvas.width = imd.height;
-					canvas.height = imd.width;
-					ctx.rotate(0.5 * Math.PI);
-					ctx.translate(imd.width, -imd.height);
-					ctx.scale(-1, 1);
-					if (imd.large) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-					break;
-				case 8:
-					// 90° rotate left
-					canvas.width = imd.height;
-					canvas.height = imd.width;
-					ctx.rotate(-0.5 * Math.PI);
-					ctx.translate(-imd.width, 0);
-					if (imd.large) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-			}
-		}
-		if (draw) {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			if (imd.large) {
-				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
-			}
-			else {
-				ctx.drawImage(img, 0, 0);
-			}
-		}
-		return canvas;
-	};
-	/**
-	 * Binary data to base64.
-	 *
-	 * @private
-	 * @param  {String} fileType
-	 * @param  {Array} binaryData
-	 * @return {String}
-	 * @member $uploadImages
-	 */
-	this._fileToBase64 = function(fileType, binaryData) {
-		var length = binaryData.length
-		var output = "";
-		for (var i = 0; i < length; i += 1) {
-			output += String.fromCharCode(binaryData[i]);
-		}
-		return 'data:' + fileType + ';base64,' + btoa(output);
-	};
-	/**
-	 * Create preview holders.
+	 * Create preview holders. Only for images count 4 and 7.
+	 * Four images are in the one row, seven images has the last one above them.
 	 *
 	 * @private
 	 * @param {HTMLElement} el
 	 * @param {Number} count
-	 * @member $uploadImages
+	 * @member $previewImages
 	 */
 	this._createPreviewHolders = function(el, count) {
 		if (!el || (count != 4 && count != 7)) return;
 		var exported = {};
-		// placeholder for panorama
+		// placeholder for 7 images
 		if (count == 7) {
 			// ceiling line
 			el.appendChild($dom.create({
@@ -4782,23 +5085,64 @@ function(
 		}
 	};
 	/**
+	 * One job task
+	 *
+	 * @private
+	 * @param  {Object} previewObj Object with file and preview ID
+	 * @param  {Number} [maxSize] Max image size in px
+	 * @param  {Function} jobDone Function which indicates that job is done
+	 */
+	this._jobTask = function(previewObj, maxSize, jobDone) {
+		var file = previewObj.file;
+		var previewID = previewObj.previewID;
+		var preview = this._createPreview(file, maxSize);
+		// append
+		if (previewID in this._dom) {
+			this._dom[previewID].appendChild(preview.cont);
+		}
+		else {
+			this._dom.previewItems.appendChild(preview.cont);
+		}
+		$image.readFromFile(file, maxSize).then(function(readFileObj) {
+			preview.cont.classList.remove("preview-loading");
+			preview.canvasCover.innerHTML = "";
+			preview.canvasCover.appendChild(readFileObj.canvas);
+			jobDone();
+		});
+	};
+	/**
 	 * Main function for showing img previews.
 	 * 
-	 * @param  {HTMLElement} el
+	 * @param  {HTMLElement} el Placeholder element
 	 * @param  {File[]} files
-	 * @member $uploadImages
+	 * @param  {Object} [opts] Configuration
+	 * @param  {Number} [opts.maxSize] Max image size in px; the size is used for image scale
+	 * @param  {Number} [opts.count] How many images are processed simultinously
+	 * @param  {Boolean} [opts.createHolder] Create placeholder, see _createPreviewHolders function
+	 * @member $previewImages
 	 */
-	this.show = function(el, files) {
-		if (this._disable || !el || !files) return;
+	this.show = function(el, files, optsArg) {
 		// clear previous
 		el.innerHTML = "";
+		var opts = {
+			maxSize: 0,
+			count: 0,
+			createHolder: false
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
 		this._dom = {
 			previewItems: el
 		};
-		var pictureFiles = this.getPictureFiles(files);
+		var pictureFiles = $image.getPictureFiles(files);
 		var count = pictureFiles.length;
 		if (count) {
-			this._createPreviewHolders(el, count);
+			// create placeholder?
+			if (opts.createHolder) {
+				this._createPreviewHolders(el, count);
+			}
+			var jobsArray = [];
 			// sort by name, make previewID - only for 7 pictures
 			pictureFiles = pictureFiles.sort(function(a, b) {
 				if (a.name < b.name)
@@ -4807,51 +5151,18 @@ function(
 					return 1;
 				else 
 					return 0;
-			}).map(function(file, ind) {
-				return {
-					file: file,
-					previewID: "img_0" + ind
-				};
-			});
-			this._doJobs(pictureFiles, this._readFile, 2);
+			}).forEach(function(pf, ind) {
+				jobsArray.push({
+					task: this._jobTask,
+					scope: this,
+					args: [{
+						file: pf,
+						previewID: "img_0" + ind
+					}, opts.maxSize]
+				});
+			}, this);
+			// run jobs
+			$common.doJobs(jobsArray, opts.count);
 		}
-	};
-	/**
-	 * Get picture files from array of files.
-	 * 
-	 * @param  {Array} array of files
-	 * @return {Array}
-	 * @member $uploadImages
-	 */
-	this.getPictureFiles = function(files) {
-		var pictureFiles = [];
-		if (files && files.length) {
-			for (var i = 0; i < files.length; i++) {
-				var item = files[i];
-				if (this._isPicture(item)) {
-					pictureFiles.push(item);
-				}
-			}
-		}
-		return pictureFiles;
-	};
-	/**
-	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
-	 * 
-	 * @param  {Array} array of files
-	 * @return {Boolean}
-	 * @member $uploadImages
-	 */
-	this.getPicturesCount = function(files) {
-		return this.getPictureFiles(files).length;
-	};
-	/**
-	 * Set loading gif URL.
-	 * 
-	 * @param {String} lgu URL path
-	 * @member $uploadImages
-	 */
-	this.setLoadingGifUrl = function(lgu) {
-		this._loadingGifUrl = lgu || "";
 	};
 }]);
