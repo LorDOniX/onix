@@ -18,7 +18,7 @@ function(
 	};
 
 	/**
-	 * Add task to job.
+	 * Add task to job. Every job task needs to call doneFn(), which is added to the last argument position.
 	 * 
 	 * @param {Function} task Job function
 	 * @param {Function|Object} [scope] Variable function scope
@@ -47,7 +47,7 @@ function(
 	$job.prototype.start = function() {
 		if (!this._tasks.length) return;
 
-		// kvuli pop
+		// because of pop
 		this._tasks.reverse();
 
 		this._doJob();

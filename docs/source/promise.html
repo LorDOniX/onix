@@ -55,6 +55,7 @@
 <span id='$promise-method-_resolve'>	/**
 </span>	 * Resolve promise using obj.
 	 *
+	 * @private
 	 * @param  {Object} obj
 	 * @member $promise
 	 */
@@ -66,6 +67,7 @@
 <span id='$promise-method-_reject'>	/**
 </span>	 * Reject promise using obj.
 	 *
+	 * @private
 	 * @param  {Object} obj
 	 * @member $promise
 	 */
@@ -170,9 +172,10 @@
 		return this;
 	};
 
-<span id='$promise-method-prototype["finally"]'>	/**
+<span id='$promise-method-finally'>	/**
 </span>	 * Finally for promise.
 	 *
+	 * @method finally
 	 * @chainable
 	 * @param  {Function} cb
 	 * @member $promise

@@ -104,10 +104,12 @@ function(
 	 * @private
 	 */
 	$select.prototype._removeAllOpened = function() {
+		var con = this._const;
+		
 		// remove all
 		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-			item.classList.remove(this._const.OPEN_CLASS);
-		}, this);
+			item.classList.remove(con.OPEN_CLASS);
+		});
 	};
 
 	/**
@@ -117,7 +119,7 @@ function(
 	 * @private
 	 */
 	$select.prototype._click = function() {
-		removeAllOpened();
+		this._removeAllOpened();
 		window.removeEventListener("click", this._binds.click);
 	};
 
@@ -132,20 +134,19 @@ function(
 	$select.prototype._captionClick = function(e, scope) {
 		e.stopPropagation();
 
-		scope.binds.removeAllOpened();
+		scope._binds.removeAllOpened();
 
-		var con = scope._const;
-		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
+		var isOpen = scope._el.classList.contains(scope._const.OPEN_CLASS);
 
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", scope.binds.click);
+			window.removeEventListener("click", scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", scope.binds.click);
+			window.addEventListener("click", scope._binds.click);
 
-			scope._el.classList.add(con.OPEN_CLASS);
+			scope._el.classList.add(scope._const.OPEN_CLASS);
 		}
 	};
 

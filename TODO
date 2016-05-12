@@ -1,6 +1,4 @@
 TODO:
-- upload images - vykostění
-- přejmenovat na image-preview, exif metoda do common
 
 NICE TO HAVE:
 - controller
@@ -8,3 +6,6 @@ NICE TO HAVE:
 	- bind using DI
 	- handle controller can have multiple controllers
 - directive
+
+JSDUCK:
+- https://github.com/senchalabs/jsduck/wiki

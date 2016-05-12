@@ -148,6 +148,7 @@ onix.factory("$q", function() {
 	/**
 	 * Finally for promise.
 	 *
+	 * @method finally
 	 * @chainable
 	 * @param  {Function} cb
 	 * @member $q

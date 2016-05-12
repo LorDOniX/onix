@@ -1586,7 +1586,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.4.0/4. 5. 2016\n" +
+			"2.5.0/12. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
 			"@license MIT\n" +
@@ -1935,6 +1935,7 @@ onix.factory("$q", function() {
 	/**
 	 * Finally for promise.
 	 *
+	 * @method finally
 	 * @chainable
 	 * @param  {Function} cb
 	 * @member $q
@@ -2030,6 +2031,7 @@ onix.factory("$promise", function() {
 	/**
 	 * Resolve promise using obj.
 	 *
+	 * @private
 	 * @param  {Object} obj
 	 * @member $promise
 	 */
@@ -2040,6 +2042,7 @@ onix.factory("$promise", function() {
 	/**
 	 * Reject promise using obj.
 	 *
+	 * @private
 	 * @param  {Object} obj
 	 * @member $promise
 	 */
@@ -2133,6 +2136,7 @@ onix.factory("$promise", function() {
 	/**
 	 * Finally for promise.
 	 *
+	 * @method finally
 	 * @chainable
 	 * @param  {Function} cb
 	 * @member $promise
@@ -2217,7 +2221,7 @@ function(
 		};
 	};
 	/**
-	 * Add task to job.
+	 * Add task to job. Every job task needs to call doneFn(), which is added to the last argument position.
 	 * 
 	 * @param {Function} task Job function
 	 * @param {Function|Object} [scope] Variable function scope
@@ -2242,7 +2246,7 @@ function(
 	 */
 	$job.prototype.start = function() {
 		if (!this._tasks.length) return;
-		// kvuli pop
+		// because of pop
 		this._tasks.reverse();
 		this._doJob();
 		return this._donePromise;
@@ -3207,11 +3211,10 @@ function(
 	 * @member $common
 	 */
 	this.doJobs = function(jobsArray, count, taskDoneObj) {
-		count = count || 1;
 		var len = jobsArray.length;
 		var jobs = [];
 		for (var i = 0; i < len; i++) {
-			var jp = i % count;
+			var jp = count > 0 ? i % count : i;
 			var jobItem = jobsArray[i];
 			if (!jobs[jp]) {
 				jobs[jp] = $job.create();
@@ -4535,10 +4538,11 @@ function(
 	 * @private
 	 */
 	$select.prototype._removeAllOpened = function() {
+		var con = this._const;
 		// remove all
 		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-			item.classList.remove(this._const.OPEN_CLASS);
-		}, this);
+			item.classList.remove(con.OPEN_CLASS);
+		});
 	};
 	/**
 	 * Outside click.
@@ -4547,7 +4551,7 @@ function(
 	 * @private
 	 */
 	$select.prototype._click = function() {
-		removeAllOpened();
+		this._removeAllOpened();
 		window.removeEventListener("click", this._binds.click);
 	};
 	/**
@@ -4560,17 +4564,16 @@ function(
 	 */
 	$select.prototype._captionClick = function(e, scope) {
 		e.stopPropagation();
-		scope.binds.removeAllOpened();
-		var con = scope._const;
-		var isOpen = scope._el.classList.contains(con.OPEN_CLASS);
+		scope._binds.removeAllOpened();
+		var isOpen = scope._el.classList.contains(scope._const.OPEN_CLASS);
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", scope.binds.click);
+			window.removeEventListener("click", scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", scope.binds.click);
-			scope._el.classList.add(con.OPEN_CLASS);
+			window.addEventListener("click", scope._binds.click);
+			scope._el.classList.add(scope._const.OPEN_CLASS);
 		}
 	};
 	/**
@@ -4715,7 +4718,7 @@ function(
 	 * @return {$q} Promise with output object
 	 * @member $image
 	 */
-	this.readFile = function(file, maxSize) {
+	this.readFromFile = function(file, maxSize) {
 		var promise = $q.defer();
 		if (!this._hasFileReader) {
 			promise.reject();
@@ -4733,7 +4736,7 @@ function(
 			var exif = null;
 			// exif only for jpeg
 			if (file.type != "png") {
-				exif = EXIF.readFromBinaryFile(binaryData);
+				exif = this.getEXIF(binaryData);
 			}
 			var img = new Image();
 			img.onload = function() {
@@ -4764,8 +4767,8 @@ function(
 	 */
 	this.getImageDim = function(img, maxSize) {
 		var maxSize = maxSize || 0;
-		var largeWidth = img.width > maxSize;
-		var largeHeight = img.height > maxSize;
+		var largeWidth = maxSize > 0 && img.width > maxSize;
+		var largeHeight = maxSize > 0 && img.height > maxSize;
 		var output = {
 			width: img.width,
 			height: img.height,
@@ -4956,5 +4959,210 @@ function(
 	 */
 	this.getPicturesCount = function(files) {
 		return this.getPictureFiles(files).length;
+	};
+	/**
+	 * Get image EXIF information.
+	 * 
+	 * @param  {Binary[]} imgData Binary img data
+	 * @return {Object}
+	 * @member $image
+	 */
+	this.getEXIF = function(imgData) {
+		if ("EXIF" in window) {
+			return EXIF.readFromBinaryFile(imgData);
+		}
+		else {
+			return {};
+		}
+	};
+}]);
+/**
+ * Class for creating img previews from File[] variable.
+ * 
+ * @class $previewImages
+ */
+onix.service("$previewImages", [
+	"$q",
+	"$image",
+	"$dom",
+	"$common",
+function(
+	$q,
+	$image,
+	$dom,
+	$common
+) {
+	/**
+	 * Create one image preview.
+	 *
+	 * @private
+	 * @param  {File} file
+	 * @param  {Number} [maxSize] Max image size
+	 * @return {Object} dom references
+	 * @member $previewImages
+	 */
+	this._createPreview = function(file, maxSize) {
+		var exported = {};
+		var cont = $dom.create({
+			el: "span",
+			"class": ["preview-item", "preview-loading"],
+			child: [{
+				el: "span",
+				"class": "canvas-cover",
+				child: [this._getSpinner()],
+				style: "height: " + (maxSize || 100) + "px",
+				_exported: "canvasCover"
+			}, {
+				el: "span",
+				"class": "title",
+				innerHTML: file.name.replace(/\..*/g, "")
+			}]
+		}, exported);
+		return {
+			cont: cont,
+			canvasCover: exported.canvasCover
+		};
+	};
+	/**
+	 * Create spinner for image load.
+	 *
+	 * @private
+	 * @return {Object} DOM configuration
+	 * @member $previewImages
+	 */
+	this._getSpinner = function() {
+		var children = [];
+		for (var i = 1; i < 6; i++) {
+			children.push({
+				el: "div",
+				"class": "rect" + i
+			});
+		}
+		return {
+			el: "div",
+			"class": "spinner",
+			child: children
+		};
+	};
+	/**
+	 * Create preview holders. Only for images count 4 and 7.
+	 * Four images are in the one row, seven images has the last one above them.
+	 *
+	 * @private
+	 * @param {HTMLElement} el
+	 * @param {Number} count
+	 * @member $previewImages
+	 */
+	this._createPreviewHolders = function(el, count) {
+		if (!el || (count != 4 && count != 7)) return;
+		var exported = {};
+		// placeholder for 7 images
+		if (count == 7) {
+			// ceiling line
+			el.appendChild($dom.create({
+				el: "div",
+				child: [{
+					el: "span",
+					_exported: "img_06"
+				}]
+			}, exported));
+		}
+		var child = [];
+		var childCount = count == 7 ? 6 : 4;
+		for (var i = 0; i < childCount; i++) {
+			child.push({
+				el: "span",
+				_exported: "img_0" + i
+			});
+		}
+		// rest line
+		el.appendChild($dom.create({
+			el: "div",
+			child: child
+		}, exported));
+		for (var i = 0; i < count; i++) {
+			this._dom["img_0" + i] = exported["img_0" + i];
+		}
+	};
+	/**
+	 * One job task
+	 *
+	 * @private
+	 * @param  {Object} previewObj Object with file and preview ID
+	 * @param  {Number} [maxSize] Max image size in px
+	 * @param  {Function} jobDone Function which indicates that job is done
+	 */
+	this._jobTask = function(previewObj, maxSize, jobDone) {
+		var file = previewObj.file;
+		var previewID = previewObj.previewID;
+		var preview = this._createPreview(file, maxSize);
+		// append
+		if (previewID in this._dom) {
+			this._dom[previewID].appendChild(preview.cont);
+		}
+		else {
+			this._dom.previewItems.appendChild(preview.cont);
+		}
+		$image.readFromFile(file, maxSize).then(function(readFileObj) {
+			preview.cont.classList.remove("preview-loading");
+			preview.canvasCover.innerHTML = "";
+			preview.canvasCover.appendChild(readFileObj.canvas);
+			jobDone();
+		});
+	};
+	/**
+	 * Main function for showing img previews.
+	 * 
+	 * @param  {HTMLElement} el Placeholder element
+	 * @param  {File[]} files
+	 * @param  {Object} [opts] Configuration
+	 * @param  {Number} [opts.maxSize] Max image size in px; the size is used for image scale
+	 * @param  {Number} [opts.count] How many images are processed simultinously
+	 * @param  {Boolean} [opts.createHolder] Create placeholder, see _createPreviewHolders function
+	 * @member $previewImages
+	 */
+	this.show = function(el, files, optsArg) {
+		// clear previous
+		el.innerHTML = "";
+		var opts = {
+			maxSize: 0,
+			count: 0,
+			createHolder: false
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+		this._dom = {
+			previewItems: el
+		};
+		var pictureFiles = $image.getPictureFiles(files);
+		var count = pictureFiles.length;
+		if (count) {
+			// create placeholder?
+			if (opts.createHolder) {
+				this._createPreviewHolders(el, count);
+			}
+			var jobsArray = [];
+			// sort by name, make previewID - only for 7 pictures
+			pictureFiles = pictureFiles.sort(function(a, b) {
+				if (a.name < b.name)
+					return -1;
+				else if (a.name > b.name)
+					return 1;
+				else 
+					return 0;
+			}).forEach(function(pf, ind) {
+				jobsArray.push({
+					task: this._jobTask,
+					scope: this,
+					args: [{
+						file: pf,
+						previewID: "img_0" + ind
+					}, opts.maxSize]
+				});
+			}, this);
+			// run jobs
+			$common.doJobs(jobsArray, opts.count);
+		}
 	};
 }]);

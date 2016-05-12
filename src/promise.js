@@ -38,6 +38,7 @@ onix.factory("$promise", function() {
 	/**
 	 * Resolve promise using obj.
 	 *
+	 * @private
 	 * @param  {Object} obj
 	 * @member $promise
 	 */
@@ -49,6 +50,7 @@ onix.factory("$promise", function() {
 	/**
 	 * Reject promise using obj.
 	 *
+	 * @private
 	 * @param  {Object} obj
 	 * @member $promise
 	 */
@@ -156,6 +158,7 @@ onix.factory("$promise", function() {
 	/**
 	 * Finally for promise.
 	 *
+	 * @method finally
 	 * @chainable
 	 * @param  {Function} cb
 	 * @member $promise

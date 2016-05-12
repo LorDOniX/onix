@@ -13,7 +13,7 @@ app.factory("HomePage", [
 	"$i18n",
 	"$routeParams",
 	"$image",
-	"PreviewImages",
+	"$previewImages",
 function(
 	Page,
 	$common,
@@ -29,7 +29,7 @@ function(
 	$i18n,
 	$routeParams,
 	$image,
-	PreviewImages
+	$previewImages
 ) {
 
 	var HomePage = Page.create();
@@ -227,7 +227,11 @@ function(
 		var uploadPreview = this._getEl("uploadPreview");
 		var filesInput = this._getEl("uploadInput");
 
-		PreviewImages.show(uploadPreview, filesInput.files);
+		$previewImages.show(uploadPreview, filesInput.files, {
+			maxSize: 180,
+			count: 2,
+			createHolder: true
+		});
 	};
 
 	HomePage.allTests = function() {

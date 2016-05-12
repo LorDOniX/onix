@@ -1,33 +1,50 @@
-/**
- * Class for creating img previews from File[] variable.
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$image'>/**
+</span> * Class for creating img previews from File[] variable.
  * 
  * @class $image
  */
-onix.service("$image", [
-	"$q",
+onix.service(&quot;$image&quot;, [
+	&quot;$q&quot;,
 function(
 	$q
 ) {
-	/**
-	 * FileReader is available.
+<span id='$image-property-_hasFileReader'>	/**
+</span>	 * FileReader is available.
 	 *
 	 * @private
 	 * @member $image
 	 * @type {Boolean}
 	 */
-	this._hasFileReader = "FileReader" in window;
+	this._hasFileReader = &quot;FileReader&quot; in window;
 
-	/**
-	 * Canvas is available.
+<span id='$image-property-_hasCanvas'>	/**
+</span>	 * Canvas is available.
 	 *
 	 * @private
 	 * @member $image
 	 * @type {Boolean}
 	 */
-	this._hasCanvas = !!document.createElement("canvas").getContext;
+	this._hasCanvas = !!document.createElement(&quot;canvas&quot;).getContext;
 
-	/**
-	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
+<span id='$image-method-readFromFile'>	/**
+</span>	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
 	 *
 	 * @param  {Object} file Input file
 	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
@@ -55,7 +72,7 @@ function(
 			var exif = null;
 
 			// exif only for jpeg
-			if (file.type != "png") {
+			if (file.type != &quot;png&quot;) {
 				exif = this.getEXIF(binaryData);
 			}
 
@@ -85,8 +102,8 @@ function(
 		return promise;
 	};
 
-	/**
-	 * Counts image dimension; if maxSize is available, new dimension is calculated.
+<span id='$image-method-getImageDim'>	/**
+</span>	 * Counts image dimension; if maxSize is available, new dimension is calculated.
 	 *
 	 * @param  {Image} img
 	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
@@ -95,8 +112,8 @@ function(
 	 */
 	this.getImageDim = function(img, maxSize) {
 		var maxSize = maxSize || 0;
-		var largeWidth = maxSize > 0 && img.width > maxSize;
-		var largeHeight = maxSize > 0 && img.height > maxSize;
+		var largeWidth = maxSize &gt; 0 &amp;&amp; img.width &gt; maxSize;
+		var largeHeight = maxSize &gt; 0 &amp;&amp; img.height &gt; maxSize;
 
 		var output = {
 			width: img.width,
@@ -110,7 +127,7 @@ function(
 			var imgHeight = img.height;
 
 			// portrait x landscape
-			if (img.width > img.height) {
+			if (img.width &gt; img.height) {
 				// landscape
 				imgHeight = maxSize * imgHeight / imgWidth;
 				imgWidth = maxSize;
@@ -129,8 +146,8 @@ function(
 		return output;
 	};
 
-	/**
-	 * Get image canvas - read input img, create canvas with it.
+<span id='$image-method-getCanvas'>	/**
+</span>	 * Get image canvas - read input img, create canvas with it.
 	 *
 	 * @param  {Image} img
 	 * @param  {Object} [optsArg] Variable options
@@ -155,8 +172,8 @@ function(
 
 		if (!this._hasCanvas) return null;
 
-		var canvas = document.createElement("canvas");
-		var ctx = canvas.getContext("2d");
+		var canvas = document.createElement(&quot;canvas&quot;);
+		var ctx = canvas.getContext(&quot;2d&quot;);
 		var draw = true;
 
 		canvas.width = opts.width;
@@ -255,8 +272,8 @@ function(
 		return canvas;
 	};
 
-	/**
-	 * Binary data to base64.
+<span id='$image-method-fileToBase64'>	/**
+</span>	 * Binary data to base64.
 	 *
 	 * @param  {String} fileType
 	 * @param  {Array} binaryData
@@ -265,17 +282,17 @@ function(
 	 */
 	this.fileToBase64 = function(fileType, binaryData) {
 		var length = binaryData.length;
-		var output = "";
+		var output = &quot;&quot;;
 
-		for (var i = 0; i < length; i += 1) {
+		for (var i = 0; i &lt; length; i += 1) {
 			output += String.fromCharCode(binaryData[i]);
 		}
 
-		return 'data:' + fileType + ';base64,' + btoa(output);
+		return &#39;data:&#39; + fileType + &#39;;base64,&#39; + btoa(output);
 	};
 
-	/**
-	 * Is file a picture?
+<span id='$image-method-isPicture'>	/**
+</span>	 * Is file a picture?
 	 *
 	 * @param  {File}  file
 	 * @return {Boolean}
@@ -283,13 +300,13 @@ function(
 	 */
 	this.isPicture = function(file) {
 		if (file) {
-			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
+			return (file.type == &quot;image/jpeg&quot; || file.type == &quot;image/pjpeg&quot; || file.type == &quot;image/png&quot;);
 		}
 		else return false;
 	};
 
-	/**
-	 * Get picture files from array of files.
+<span id='$image-method-getPictureFiles'>	/**
+</span>	 * Get picture files from array of files.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Array}
@@ -298,8 +315,8 @@ function(
 	this.getPictureFiles = function(files) {
 		var pictureFiles = [];
 
-		if (files && files.length) {
-			for (var i = 0; i < files.length; i++) {
+		if (files &amp;&amp; files.length) {
+			for (var i = 0; i &lt; files.length; i++) {
 				var item = files[i];
 
 				if (this.isPicture(item)) {
@@ -311,8 +328,8 @@ function(
 		return pictureFiles;
 	};
 
-	/**
-	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
+<span id='$image-method-getPicturesCount'>	/**
+</span>	 * Get picture files count from the array of Files. This function uses &#39;getPictureFiles&#39;.
 	 * 
 	 * @param  {Array} array of files
 	 * @return {Boolean}
@@ -322,15 +339,15 @@ function(
 		return this.getPictureFiles(files).length;
 	};
 
-	/**
-	 * Get image EXIF information.
+<span id='$image-method-getEXIF'>	/**
+</span>	 * Get image EXIF information.
 	 * 
 	 * @param  {Binary[]} imgData Binary img data
 	 * @return {Object}
 	 * @member $image
 	 */
 	this.getEXIF = function(imgData) {
-		if ("EXIF" in window) {
+		if (&quot;EXIF&quot; in window) {
 			return EXIF.readFromBinaryFile(imgData);
 		}
 		else {
@@ -338,3 +355,6 @@ function(
 		}
 	};
 }]);
+</pre>
+</body>
+</html>

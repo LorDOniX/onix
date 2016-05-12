@@ -410,13 +410,11 @@ function(
 	 * @member $common
 	 */
 	this.doJobs = function(jobsArray, count, taskDoneObj) {
-		count = count || 1;
-		
 		var len = jobsArray.length;
 		var jobs = [];
 
 		for (var i = 0; i < len; i++) {
-			var jp = i % count;
+			var jp = count > 0 ? i % count : i;
 			var jobItem = jobsArray[i];
 
 			if (!jobs[jp]) {
