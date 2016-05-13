@@ -24,12 +24,12 @@ onix.service(&quot;$previewImages&quot;, [
 	&quot;$q&quot;,
 	&quot;$image&quot;,
 	&quot;$dom&quot;,
-	&quot;$common&quot;,
+	&quot;$job&quot;,
 function(
 	$q,
 	$image,
 	$dom,
-	$common
+	$job
 ) {
 <span id='$previewImages-method-_createPreview'>	/**
 </span>	 * Create one image preview.
@@ -225,8 +225,8 @@ function(
 				});
 			}, this);
 
-			// run jobs
-			$common.doJobs(jobsArray, opts.count);
+			// run jobs array
+			$job.multipleJobs(jobsArray, opts.count);
 		}
 	};
 }]);

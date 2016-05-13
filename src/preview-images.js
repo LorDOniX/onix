@@ -7,12 +7,12 @@ onix.service("$previewImages", [
 	"$q",
 	"$image",
 	"$dom",
-	"$common",
+	"$job",
 function(
 	$q,
 	$image,
 	$dom,
-	$common
+	$job
 ) {
 	/**
 	 * Create one image preview.
@@ -208,8 +208,8 @@ function(
 				});
 			}, this);
 
-			// run jobs
-			$common.doJobs(jobsArray, opts.count);
+			// run jobs array
+			$job.multipleJobs(jobsArray, opts.count);
 		}
 	};
 }]);

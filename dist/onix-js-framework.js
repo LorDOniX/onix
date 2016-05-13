@@ -1586,7 +1586,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.5.0/12. 5. 2016\n" +
+			"2.5.1/13. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
 			"@license MIT\n" +
@@ -2300,6 +2300,41 @@ function(
 		 */
 		create: function() {
 			return new $job();
+		},
+		/**
+		 * Run jobs array with count for how many functions will be processed simultinously.
+		 *
+		 * @param  {Object[]} jobsArray Array with jobs objects
+		 * @param  {Function} jobsArray.task Job function
+		 * @param  {Function} [jobsArray.scope] Variable function scope
+		 * @param  {Function} [jobsArray.args] Add params to the function
+		 * @param  {Number} count How many functions processed simultinously
+		 * @param  {Object} taskDoneObj Callback after one task have been done
+		 * @param  {Object} taskDoneObj.cb Function
+		 * @param  {Object} [taskDoneObj.scope] Function scope
+		 * @return {$q} Callback after all jobs are done
+		 * @member $job
+		 */
+		multipleJobs: function(jobsArray, count, taskDoneObj) {
+			var len = jobsArray.length;
+			var jobs = [];
+			for (var i = 0; i < len; i++) {
+				var jp = count > 0 ? i % count : i;
+				var jobItem = jobsArray[i];
+				if (!jobs[jp]) {
+					jobs[jp] = this.create();
+					if (taskDoneObj) {
+						jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
+					}
+				}
+				// add one job
+				jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
+			}
+			var jobPromises = [];
+			jobs.forEach(function(job) {
+				jobPromises.push(job.start());
+			});
+			return $q.all(jobPromises);
 		}
 	};
 }]);
@@ -3195,41 +3230,6 @@ function(
 		else {
 			promise.resolve(outArray);
 		}
-	};
-	/**
-	 * Run jobs array with count for how many functions will be processed simultinously.
-	 *
-	 * @param  {Object[]} jobsArray Array with jobs objects
-	 * @param  {Function} jobsArray.task Job function
-	 * @param  {Function} [jobsArray.scope] Variable function scope
-	 * @param  {Function} [jobsArray.args] Add params to the function
-	 * @param  {Number} count How many functions processed simultinously
-	 * @param  {Object} taskDoneObj Callback after one task have been done
-	 * @param  {Object} taskDoneObj.cb Function
-	 * @param  {Object} [taskDoneObj.scope] Function scope
-	 * @return {$q} Callback after all jobs are done
-	 * @member $common
-	 */
-	this.doJobs = function(jobsArray, count, taskDoneObj) {
-		var len = jobsArray.length;
-		var jobs = [];
-		for (var i = 0; i < len; i++) {
-			var jp = count > 0 ? i % count : i;
-			var jobItem = jobsArray[i];
-			if (!jobs[jp]) {
-				jobs[jp] = $job.create();
-				if (taskDoneObj) {
-					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
-				}
-			}
-			// add one job
-			jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
-		}
-		var jobPromises = [];
-		jobs.forEach(function(job) {
-			jobPromises.push(job.start());
-		});
-		return $q.all(jobPromises);
 	};
 }]);
 /**
@@ -4985,12 +4985,12 @@ onix.service("$previewImages", [
 	"$q",
 	"$image",
 	"$dom",
-	"$common",
+	"$job",
 function(
 	$q,
 	$image,
 	$dom,
-	$common
+	$job
 ) {
 	/**
 	 * Create one image preview.
@@ -5161,8 +5161,8 @@ function(
 					}, opts.maxSize]
 				});
 			}, this);
-			// run jobs
-			$common.doJobs(jobsArray, opts.count);
+			// run jobs array
+			$job.multipleJobs(jobsArray, opts.count);
 		}
 	};
 }]);

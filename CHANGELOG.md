@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.1 (13. 5. 2016)
+
+* $common doJobs moved to $job.multipleJobs
+
 ## 2.5.0 (12. 5. 2016)
 
 * onix.css - separated css file for framework

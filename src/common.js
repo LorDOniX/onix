@@ -394,47 +394,4 @@ function(
 			promise.resolve(outArray);
 		}
 	};
-
-	/**
-	 * Run jobs array with count for how many functions will be processed simultinously.
-	 *
-	 * @param  {Object[]} jobsArray Array with jobs objects
-	 * @param  {Function} jobsArray.task Job function
-	 * @param  {Function} [jobsArray.scope] Variable function scope
-	 * @param  {Function} [jobsArray.args] Add params to the function
-	 * @param  {Number} count How many functions processed simultinously
-	 * @param  {Object} taskDoneObj Callback after one task have been done
-	 * @param  {Object} taskDoneObj.cb Function
-	 * @param  {Object} [taskDoneObj.scope] Function scope
-	 * @return {$q} Callback after all jobs are done
-	 * @member $common
-	 */
-	this.doJobs = function(jobsArray, count, taskDoneObj) {
-		var len = jobsArray.length;
-		var jobs = [];
-
-		for (var i = 0; i < len; i++) {
-			var jp = count > 0 ? i % count : i;
-			var jobItem = jobsArray[i];
-
-			if (!jobs[jp]) {
-				jobs[jp] = $job.create();
-
-				if (taskDoneObj) {
-					jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
-				}
-			}
-
-			// add one job
-			jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
-		}
-
-		var jobPromises = [];
-
-		jobs.forEach(function(job) {
-			jobPromises.push(job.start());
-		});
-
-		return $q.all(jobPromises);
-	};
 }]);
