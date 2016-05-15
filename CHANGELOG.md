@@ -4,6 +4,7 @@
 
 * add minimal framework version
 * add $math service - different mathematical alghoritms
+* add $date service - date converts
 
 ## 2.5.1 (13. 5. 2016)
 
