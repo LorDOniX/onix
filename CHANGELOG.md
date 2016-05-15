@@ -3,6 +3,7 @@
 ## 2.5.2 (16. 5. 2016)
 
 * add minimal framework version
+* add $math service - different mathematical alghoritms
 
 ## 2.5.1 (13. 5. 2016)
 
