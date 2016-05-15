@@ -438,46 +438,6 @@
 
 		},
 
-<span id='$modules-method-_getPostProcessConfig'>		/**
-</span>		 * Get post process config during config phase.
-		 *
-		 * @private
-		 * @return {Object} Post process config object
-		 * @member $modules
-		 */
-		_getPostProcessConfig: function() {
-			var param = [&quot;$i18nProvider&quot;, function($i18nProvider) {
-				$i18nProvider.postProcess();
-			}];
-
-			var pp = $module.parseParam(param);
-
-			return {
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.CONFIG
-			};
-		},
-
-<span id='$modules-method-_getPreRunConfig'>		/**
-</span>		 * Get pre run config during run phase.
-		 *
-		 * @private
-		 * @return {Object} Pre run config object
-		 * @member $modules
-		 */
-		_getPreRunConfig: function() {
-			// $myQuery needs to be cached
-			var param = [&quot;$myQuery&quot;, function($myQuery) {}];
-			var pp = $module.parseParam(param);
-
-			return {
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.RUN
-			};
-		},
-
 <span id='$modules-method-domLoad'>		/**
 </span>		 * Event - Dom LOAD.
 		 *
@@ -485,8 +445,7 @@
 		 */
 		domLoad: function() {
 			var configs = [];
-			// pre process run
-			var runs = [this._getPreRunConfig()];
+			var runs = [];
 
 			this._modules.forEach(function(module) {
 				var error = false;
@@ -509,13 +468,12 @@
 				}
 			}, this);
 
-			// post process runs
-			configs.push(this._getPostProcessConfig());
-
+			// run all configs
 			configs.forEach(function(config) {
 				this.run(config, true);
 			}, this);
 
+			// run all runs
 			runs.forEach(function(run) {
 				this.run(run);
 			}, this);
@@ -758,7 +716,7 @@
 	onix.info = function() {
 		console.log(
 			&quot;OnixJS framework\n&quot; +
-			&quot;2.5.1/13. 5. 2016\n&quot; +
+			&quot;2.5.2/16. 5. 2016\n&quot; +
 			&quot;source: https://gitlab.com/LorDOniX/onix\n&quot; +
 			&quot;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&quot; +
 			&quot;@license MIT\n&quot; +

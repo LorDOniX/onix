@@ -428,3 +428,10 @@ onix.factory("$myQuery", function() {
 		}
 	};
 });
+
+/**
+ * Run for cache $myQuery object.
+ */
+onix.run(["$myQuery", function() {
+
+}]);

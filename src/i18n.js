@@ -315,3 +315,10 @@ onix.provider("$i18n", function() {
 		return $i18n;
 	}];
 });
+
+/**
+ * Provider for registering _ translate object.
+ */
+onix.config(["$i18nProvider", function($i18nProvider) {
+	$i18nProvider.postProcess();
+}]);

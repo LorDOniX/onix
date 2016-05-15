@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.2 (16. 5. 2016)
+
+* add minimal framework version
+
 ## 2.5.1 (13. 5. 2016)
 
 * $common doJobs moved to $job.multipleJobs

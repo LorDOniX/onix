@@ -3,6 +3,7 @@
  * 2.5.2/16. 5. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
+ * minimal version: contains [polyfills, onix, filter, q, my-query, common]
  * @license MIT
  * - Free for use in both personal and commercial projects
  */

@@ -332,6 +332,13 @@
 		return $i18n;
 	}];
 });
+
+<span id='$i18n-property-'>/**
+</span> * Provider for registering _ translate object.
+ */
+onix.config([&quot;$i18nProvider&quot;, function($i18nProvider) {
+	$i18nProvider.postProcess();
+}]);
 </pre>
 </body>
 </html>

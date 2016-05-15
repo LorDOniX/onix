@@ -12,6 +12,14 @@ const _CONST = {
 		"src/",
 		"less/"
 	],
+	JS_MINIMAL_FILES: [
+		"src/polyfills.js",
+		"src/onix.js",
+		"src/filter.js",
+		"src/q.js",
+		"src/my-query.js",
+		"src/common.js"
+	],
 	JS_FILES: [
 		"src/polyfills.js",
 		"src/exif.js",
@@ -39,8 +47,11 @@ const _CONST = {
 		"src/preview-images.js"
 	],
 	JS_OUTPUT: "dist/onix-js-framework.js",
+	JS_MINIMAL_OUTPUT: "dist/onix-js-minimal-framework.js",
 	JS_OUTPUT_MIN: "dist/onix-js-framework.min.js",
+	JS_MINIMAL_OUTPUT_MIN: "dist/onix-js-minimal-framework.min.js",
 	HEADER_FILE: "HEADER",
+	HEADER_MINIMAL_FILE: "HEADER_MINIMAL",
 	LESS_FILE: "less/onix.less",
 	CSS_FILE: "dist/onix.css"
 };
@@ -323,17 +334,14 @@ class Bundler {
 	_loadFiles() {
 		return new Promise((resolve, reject) => {
 			let c = _CONST;
+			let allFiles = [c.HEADER_FILE, c.HEADER_MINIMAL_FILE].concat(c.JS_FILES);
 
-			Common.readFile(c.HEADER_FILE).then((data) => {
-				this._filesCache[c.HEADER_FILE] = data;
-
-				Common.readFiles(c.JS_FILES).then((all) => {
-					all.forEach((file) => {
-						this._filesCache[file.path] = file.data;
-					});
-
-					resolve();
+			Common.readFiles(allFiles).then((all) => {
+				all.forEach((file) => {
+					this._filesCache[file.path] = file.data;
 				});
+
+				resolve();
 			}, (err) => {
 				reject(err);
 			});
@@ -352,7 +360,8 @@ class Bundler {
 				if (_CONST.JS_FILES.indexOf(path) != -1) {
 					Common.readFile(path).then((data) => {
 						this._filesCache[path] = data;
-						this._makeJS(_CONST.JS_OUTPUT);
+						this._makeJS(_CONST.JS_FILES, _CONST.JS_OUTPUT);
+						this._makeJS(_CONST.JS_MINIMAL_FILES, _CONST.JS_MINIMAL_OUTPUT);
 					});
 				}
 				else {
@@ -376,11 +385,11 @@ class Bundler {
 		else return "";
 	}
 
-	_makeJS(outputFile) {
+	_makeJS(inputFiles, outputFile) {
 		return new Promise((resolve, reject) => {
 			let output = [];
 
-			_CONST.JS_FILES.forEach((file) => {
+			inputFiles.forEach((file) => {
 				output.push(this._filesCache[file] || "");
 			});
 
@@ -439,13 +448,14 @@ class Bundler {
 	
 	/**
 	 * @param  {String[]} inputFiles
-	 * @param  {String} outputFile [description]
+	 * @param  {String} headerFile
+	 * @param  {String} outputFile
 	 * @return {Promise}
 	 */
-	_uglify(inputFiles, outputFile) {
+	_uglify(inputFiles, headerFile, outputFile) {
 		return new Promise((resolve, reject) => {
 			let result = UglifyJS.minify(inputFiles);
-			let data = this._filesCache[_CONST.HEADER_FILE] + result.code;
+			let data = this._filesCache[headerFile] + result.code;
 
 			// write output
 			Common.writeFile(outputFile, data).then(() => {
@@ -483,7 +493,11 @@ class Bundler {
 
 		Common.chainPromises([{
 			method: "_makeJS",
-			args: [c.JS_OUTPUT],
+			args: [c.JS_FILES, c.JS_OUTPUT],
+			scope: this
+		}, {
+			method: "_makeJS",
+			args: [c.JS_MINIMAL_FILES, c.JS_MINIMAL_OUTPUT],
 			scope: this
 		}, {
 			method: "_makeLess",
@@ -506,7 +520,11 @@ class Bundler {
 
 		Common.chainPromises([{
 			method: "_makeJS",
-			args: [c.JS_OUTPUT],
+			args: [c.JS_FILES, c.JS_OUTPUT],
+			scope: this
+		}, {
+			method: "_makeJS",
+			args: [c.JS_MINIMAL_FILES, c.JS_MINIMAL_OUTPUT],
 			scope: this
 		}, {
 			method: "_makeLess",
@@ -514,7 +532,11 @@ class Bundler {
 			scope: this
 		}, {
 			method: "_uglify",
-			args: [[c.JS_OUTPUT], c.JS_OUTPUT_MIN],
+			args: [[c.JS_OUTPUT], c.HEADER_FILE, c.JS_OUTPUT_MIN],
+			scope: this
+		}, {
+			method: "_uglify",
+			args: [[c.JS_MINIMAL_OUTPUT], c.HEADER_MINIMAL_FILE, c.JS_MINIMAL_OUTPUT_MIN],
 			scope: this
 		}, {
 			method: "_jsduck",

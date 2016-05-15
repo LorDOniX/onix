@@ -5,10 +5,8 @@
  */
 onix.service("$common", [
 	"$q",
-	"$job",
 function(
-	$q,
-	$job
+	$q
 ) {
 	/**
 	 * Object copy, from source to dest.

@@ -1316,49 +1316,13 @@ onix = (function() {
 		_noop: function() {
 		},
 		/**
-		 * Get post process config during config phase.
-		 *
-		 * @private
-		 * @return {Object} Post process config object
-		 * @member $modules
-		 */
-		_getPostProcessConfig: function() {
-			var param = ["$i18nProvider", function($i18nProvider) {
-				$i18nProvider.postProcess();
-			}];
-			var pp = $module.parseParam(param);
-			return {
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.CONFIG
-			};
-		},
-		/**
-		 * Get pre run config during run phase.
-		 *
-		 * @private
-		 * @return {Object} Pre run config object
-		 * @member $modules
-		 */
-		_getPreRunConfig: function() {
-			// $myQuery needs to be cached
-			var param = ["$myQuery", function($myQuery) {}];
-			var pp = $module.parseParam(param);
-			return {
-				fn: pp.fn,
-				inject: pp.inject,
-				type: $module.CONST.TYPE.RUN
-			};
-		},
-		/**
 		 * Event - Dom LOAD.
 		 *
 		 * @member $modules
 		 */
 		domLoad: function() {
 			var configs = [];
-			// pre process run
-			var runs = [this._getPreRunConfig()];
+			var runs = [];
 			this._modules.forEach(function(module) {
 				var error = false;
 				var dependencies = module.getDependencies();
@@ -1377,11 +1341,11 @@ onix = (function() {
 					runs = runs.concat(module.getRuns());
 				}
 			}, this);
-			// post process runs
-			configs.push(this._getPostProcessConfig());
+			// run all configs
 			configs.forEach(function(config) {
 				this.run(config, true);
 			}, this);
+			// run all runs
 			runs.forEach(function(run) {
 				this.run(run);
 			}, this);
@@ -1586,7 +1550,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.5.1/13. 5. 2016\n" +
+			"2.5.2/16. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
 			"@license MIT\n" +
@@ -2718,6 +2682,11 @@ onix.factory("$myQuery", function() {
 	};
 });
 /**
+ * Run for cache $myQuery object.
+ */
+onix.run(["$myQuery", function() {
+}]);
+/**
  * Class for creating DOM elements and getting their references.
  * 
  * @class $dom
@@ -2889,10 +2858,8 @@ onix.service("$location", function() {
  */
 onix.service("$common", [
 	"$q",
-	"$job",
 function(
-	$q,
-	$job
+	$q
 ) {
 	/**
 	 * Object copy, from source to dest.
@@ -3979,6 +3946,12 @@ onix.provider("$i18n", function() {
 		return $i18n;
 	}];
 });
+/**
+ * Provider for registering _ translate object.
+ */
+onix.config(["$i18nProvider", function($i18nProvider) {
+	$i18nProvider.postProcess();
+}]);
 onix.provider("$template", function() {
 	/**
 	 * Configuration for template delimeters.
