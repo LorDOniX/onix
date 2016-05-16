@@ -19,7 +19,6 @@
 <span id='$i18nProvider-property-_langs'>	/**
 </span>	 * All langs data.
 	 *
-	 * @private
 	 * @type {Object}
 	 * @member $i18nProvider
 	 * @private
@@ -29,7 +28,6 @@
 <span id='$i18nProvider-property-_currentLang'>	/**
 </span>	 * Current language-
 	 *
-	 * @private
 	 * @type {String}
 	 * @member $i18nProvider
 	 * @private
@@ -39,7 +37,6 @@
 <span id='$i18nProvider-property-_bindGlobalTranslation'>	/**
 </span>	 * Bind global _ as translation function-
 	 *
-	 * @private
 	 * @type {String}
 	 * @member $i18nProvider
 	 * @private
@@ -131,6 +128,7 @@
 	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18nProvider
+	 * @private
 	 */
 	var _getText = function(key, replace) {
 		key = key || &quot;&quot;;
@@ -226,7 +224,6 @@
 </span>	 * Post process during config phase.
 	 *
 	 * @member $i18nProvider
-	 * @private
 	 */
 	this.postProcess = function() {
 		if (_bindGlobalTranslation) {
@@ -333,8 +330,11 @@
 	}];
 });
 
-<span id='$i18n-property-'>/**
+<span id='onix-property-'>/**
 </span> * Provider for registering _ translate object.
+ *
+ * @private
+ * @member onix
  */
 onix.config([&quot;$i18nProvider&quot;, function($i18nProvider) {
 	$i18nProvider.postProcess();

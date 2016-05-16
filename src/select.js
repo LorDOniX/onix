@@ -28,7 +28,7 @@ function(
 			this._opts[key] = opts[key];
 		}
 
-		this._const = {
+		this._CONST = {
 			CAPTION_SEL: ".dropdown-toggle",
 			OPTIONS_SEL: ".dropdown-menu a",
 			CARET_SEL: ".caret",
@@ -71,7 +71,7 @@ function(
 	 * @private
 	 */
 	$select.prototype._bindCaption = function() {
-		var captionEl = this._el.querySelector(this._const.CAPTION_SEL);
+		var captionEl = this._el.querySelector(this._CONST.CAPTION_SEL);
 
 		if (captionEl) {
 			// click on the caption
@@ -79,7 +79,7 @@ function(
 
 			// insert span placeholder for caption
 			if (this._opts.addCaption) {
-				var caretEl = captionEl.querySelector(this._const.CARET_SEL);
+				var caretEl = captionEl.querySelector(this._CONST.CARET_SEL);
 
 				if (caretEl) {
 					var captionTextEl = $dom.create({
@@ -104,7 +104,7 @@ function(
 	 * @private
 	 */
 	$select.prototype._removeAllOpened = function() {
-		var con = this._const;
+		var con = this._CONST;
 		
 		// remove all
 		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
@@ -136,7 +136,7 @@ function(
 
 		scope._binds.removeAllOpened();
 
-		var isOpen = scope._el.classList.contains(scope._const.OPEN_CLASS);
+		var isOpen = scope._el.classList.contains(scope._CONST.OPEN_CLASS);
 
 		if (isOpen) {
 			// outside click
@@ -146,7 +146,7 @@ function(
 			// outside click
 			window.addEventListener("click", scope._binds.click);
 
-			scope._el.classList.add(scope._const.OPEN_CLASS);
+			scope._el.classList.add(scope._CONST.OPEN_CLASS);
 		}
 	};
 
@@ -157,7 +157,7 @@ function(
 	 * @private
 	 */
 	$select.prototype._bindChoices = function() {
-		onix.element(this._const.OPTIONS_SEL, this._el).forEach(function(option) {
+		onix.element(this._CONST.OPTIONS_SEL, this._el).forEach(function(option) {
 			option.addEventListener("click", this._binds.choiceClick);
 
 			// event ref
@@ -178,7 +178,7 @@ function(
 	 * @private
 	 */
 	$select.prototype._choiceClick = function(e, scope) {
-		var con = scope._const;
+		var con = scope._CONST;
 
 		e.stopPropagation();
 
@@ -245,8 +245,8 @@ function(
 			var el = this._optinsRef[ind].el;
 			var parent = this._optinsRef[ind].el.parentNode;
 
-			if (!parent.classList.contains(this._const.ACTIVE_CLASS)) {
-				parent.classList.add(this._const.ACTIVE_CLASS);
+			if (!parent.classList.contains(this._CONST.ACTIVE_CLASS)) {
+				parent.classList.add(this._CONST.ACTIVE_CLASS);
 
 				if (this._opts.addCaption && this._captionTextEl) {
 					this._captionTextEl.innerHTML = el.innerHTML;
@@ -270,7 +270,7 @@ function(
 		this._optinsRef.every(function(item) {
 			var parent = item.el.parentNode;
 
-			if (parent.classList.contains(this._const.ACTIVE_CLASS)) {
+			if (parent.classList.contains(this._CONST.ACTIVE_CLASS)) {
 				this._captionTextEl.innerHTML = item.el.innerHTML;
 				return false;
 			}

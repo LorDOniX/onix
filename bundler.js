@@ -26,6 +26,8 @@ const _CONST = {
 		"src/onix.js",
 		"src/local-storage.js",
 		"src/routeParams.js",
+		"src/math.js",
+		"src/date.js",
 		"src/filter.js",
 		"src/filters.js",
 		"src/q.js",

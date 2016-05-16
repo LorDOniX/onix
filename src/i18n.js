@@ -2,7 +2,6 @@ onix.provider("$i18n", function() {
 	/**
 	 * All langs data.
 	 *
-	 * @private
 	 * @type {Object}
 	 * @member $i18nProvider
 	 * @private
@@ -12,7 +11,6 @@ onix.provider("$i18n", function() {
 	/**
 	 * Current language-
 	 *
-	 * @private
 	 * @type {String}
 	 * @member $i18nProvider
 	 * @private
@@ -22,7 +20,6 @@ onix.provider("$i18n", function() {
 	/**
 	 * Bind global _ as translation function-
 	 *
-	 * @private
 	 * @type {String}
 	 * @member $i18nProvider
 	 * @private
@@ -114,6 +111,7 @@ onix.provider("$i18n", function() {
 	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18nProvider
+	 * @private
 	 */
 	var _getText = function(key, replace) {
 		key = key || "";
@@ -209,7 +207,6 @@ onix.provider("$i18n", function() {
 	 * Post process during config phase.
 	 *
 	 * @member $i18nProvider
-	 * @private
 	 */
 	this.postProcess = function() {
 		if (_bindGlobalTranslation) {
@@ -318,6 +315,9 @@ onix.provider("$i18n", function() {
 
 /**
  * Provider for registering _ translate object.
+ *
+ * @private
+ * @member onix
  */
 onix.config(["$i18nProvider", function($i18nProvider) {
 	$i18nProvider.postProcess();

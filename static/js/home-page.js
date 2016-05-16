@@ -14,6 +14,8 @@ app.factory("HomePage", [
 	"$routeParams",
 	"$image",
 	"$previewImages",
+	"$math",
+	"$date",
 function(
 	Page,
 	$common,
@@ -29,7 +31,9 @@ function(
 	$i18n,
 	$routeParams,
 	$image,
-	$previewImages
+	$previewImages,
+	$math,
+	$date
 ) {
 
 	var HomePage = Page.create();
@@ -234,6 +238,55 @@ function(
 		});
 	};
 
+	HomePage.mathAndDate = function() {
+		$common.col("2016-06-31 to CS date = {0}", $date.dateENtoCS("2016-06-31"));
+		$common.col("2016-06-31 is CS date? {0}",  $date.isCSdate("2016-06-31") ? "yes" : "no");
+		$common.col("zoomToDistance = {0}", $math.zoomToDistance(15, 45, 1024));
+
+		var p = { 
+			x: 0,
+			y: 10
+		};
+
+		$math.movePointByAngle(p, 90);
+
+		$common.col("movePointByAngle <0,10> by angle 90 degrees: x = {0}, y = {1}", Math.round(p.x), Math.round(p.y));
+
+		var line1 = {
+			x1: 0,
+			y1: 0,
+			x2: 10,
+			y2: 0
+		};
+
+		var line2 = {
+			x1: 5,
+			y1: -5,
+			x2: 5,
+			y2: 5
+		};
+
+		var line3 = {
+			x1: 0,
+			y1: 1,
+			x2: 10,
+			y2: 1
+		};
+
+		var inter = $math.linesIntersection(line1, line2);
+
+		if (inter) {
+			$common.col("linesIntersection in point: x = {0}, y = {1}", Math.round(inter.x), Math.round(inter.y));
+		}
+
+		// parallel
+		inter = $math.linesIntersection(line1, line3);
+
+		if (!inter) {
+			$common.col("there is no intersection!");
+		}
+	};
+
 	HomePage.allTests = function() {
 		console.log("Running all tests...");
 
@@ -244,6 +297,7 @@ function(
 		this.chp();
 		this.routeParams();
 		this.promiseTest();
+		this.mathAndDate();
 	};
 
 	return HomePage;

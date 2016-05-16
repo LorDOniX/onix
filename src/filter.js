@@ -14,7 +14,8 @@ function(
 
 	/**
 	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
-	 * 
+	 *
+	 * @method filter
 	 * @param  {String} filterName 
 	 * @return {Object}
 	 * @member $filter

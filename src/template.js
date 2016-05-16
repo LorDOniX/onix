@@ -2,7 +2,6 @@ onix.provider("$template", function() {
 	/**
 	 * Configuration for template delimeters.
 	 *
-	 * @private
 	 * @type {Object}
 	 * @member $templateProvider
 	 * @private

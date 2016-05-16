@@ -52,7 +52,7 @@ onix.factory("$myQuery", function() {
 	 * Set or get all - cover function.
 	 * 
 	 * @chainable
-	 * @param  {String} [newValue]
+	 * @param  {String} newValue
 	 * @param  {String} attr
 	 * @member $myQuery
 	 * @private
@@ -431,6 +431,9 @@ onix.factory("$myQuery", function() {
 
 /**
  * Run for cache $myQuery object.
+ *
+ * @private
+ * @member onix
  */
 onix.run(["$myQuery", function() {
 

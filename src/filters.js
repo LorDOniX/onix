@@ -6,7 +6,8 @@
 onix.filter("lowercase", function() {
 	/**
 	 * Input is transformatted to lowercase.
-	 * 
+	 *
+	 * @method lowercase
 	 * @param  {String} input
 	 * @return {String|Object}
 	 * @member $filterLowercase
@@ -27,7 +28,8 @@ onix.filter("lowercase", function() {
 onix.filter("uppercase", function() {
 	/**
 	 * Input is transformatted to uppercase.
-	 * 
+	 *
+	 * @method uppercase
 	 * @param  {String} input
 	 * @return {String|Object}
 	 * @member $filterUppercase
@@ -48,7 +50,8 @@ onix.filter("uppercase", function() {
 onix.filter("json", function() {
 	/**
 	 * Input object is stringfied.
-	 * 
+	 *
+	 * @method json
 	 * @param {Object} obj Input object
 	 * @param {Number} [spacing] Number of spaces per indetation
 	 * @return {String}

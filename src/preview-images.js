@@ -124,7 +124,7 @@ function(
 	 *
 	 * @private
 	 * @param  {Object} previewObj Object with file and preview ID
-	 * @param  {Number} [maxSize] Max image size in px
+	 * @param  {Number} maxSize Max image size in px
 	 * @param  {Function} jobDone Function which indicates that job is done
 	 */
 	this._jobTask = function(previewObj, maxSize, jobDone) {

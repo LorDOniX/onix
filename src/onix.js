@@ -405,7 +405,7 @@ onix = (function() {
 		 *
 		 * @private
 		 * @member $modules
-		 * @type {Ojbect}
+		 * @type {Object}
 		 */
 		_CONST: {
 			MODULE_SEPARATOR: "::",
