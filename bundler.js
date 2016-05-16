@@ -17,7 +17,6 @@ const _CONST = {
 		"src/onix.js",
 		"src/filter.js",
 		"src/q.js",
-		"src/my-query.js",
 		"src/common.js"
 	],
 	JS_FILES: [

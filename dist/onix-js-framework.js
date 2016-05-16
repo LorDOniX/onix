@@ -1302,7 +1302,7 @@ onix = (function() {
 		 *
 		 * @private
 		 * @member $modules
-		 * @type {Ojbect}
+		 * @type {Object}
 		 */
 		_CONST: {
 			MODULE_SEPARATOR: "::",
@@ -1820,9 +1820,9 @@ onix.service("$math", function() {
 	 * Map zoom in mercator projection to distance in meters.
 	 * 
 	 * @param  {Number} zoom   Mercator zoom - 2..n
-	 * @param  {Float} horFOV Horizontal field of view
+	 * @param  {Number} horFOV Horizontal field of view
 	 * @param  {Number} height Screen height size
-	 * @return {Float} Distance in meters
+	 * @return {Number} Distance in meters
 	 * @member $math
 	 */
 	this.zoomToDistance = function(zoom, horFOV, height) {
@@ -1836,8 +1836,8 @@ onix.service("$math", function() {
 	/**
 	 * Reverse function for zoomToDistance - distance in meters to zoom in mercator projection.
 	 * 
-	 * @param  {Float} distance Distance in meters
-	 * @param  {Float} horFOV Horizontal field of view
+	 * @param  {Number} distance Distance in meters
+	 * @param  {Number} horFOV Horizontal field of view
 	 * @param  {Number} height Screen height size
 	 * @return {Number} Mercator zoom
 	 * @member $math
@@ -1961,7 +1961,8 @@ function(
 	};
 	/**
 	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
-	 * 
+	 *
+	 * @method filter
 	 * @param  {String} filterName 
 	 * @return {Object}
 	 * @member $filter
@@ -1988,7 +1989,8 @@ function(
 onix.filter("lowercase", function() {
 	/**
 	 * Input is transformatted to lowercase.
-	 * 
+	 *
+	 * @method lowercase
 	 * @param  {String} input
 	 * @return {String|Object}
 	 * @member $filterLowercase
@@ -2008,7 +2010,8 @@ onix.filter("lowercase", function() {
 onix.filter("uppercase", function() {
 	/**
 	 * Input is transformatted to uppercase.
-	 * 
+	 *
+	 * @method uppercase
 	 * @param  {String} input
 	 * @return {String|Object}
 	 * @member $filterUppercase
@@ -2028,7 +2031,8 @@ onix.filter("uppercase", function() {
 onix.filter("json", function() {
 	/**
 	 * Input object is stringfied.
-	 * 
+	 *
+	 * @method json
 	 * @param {Object} obj Input object
 	 * @param {Number} [spacing] Number of spaces per indetation
 	 * @return {String}
@@ -2628,7 +2632,7 @@ onix.factory("$myQuery", function() {
 	 * Set or get all - cover function.
 	 * 
 	 * @chainable
-	 * @param  {String} [newValue]
+	 * @param  {String} newValue
 	 * @param  {String} attr
 	 * @member $myQuery
 	 * @private
@@ -2961,6 +2965,9 @@ onix.factory("$myQuery", function() {
 });
 /**
  * Run for cache $myQuery object.
+ *
+ * @private
+ * @member onix
  */
 onix.run(["$myQuery", function() {
 }]);
@@ -3431,7 +3438,7 @@ function(
 	 * @param  {String|Function} opts.method Function or method name inside scope
 	 * @param  {Object} opts.scope Scope for method function
 	 * @param  {Array} opts.args Additional arguments for function
-	 * @param  {promise} promise Done promise $q
+	 * @param  {$q} promise Done promise $q
 	 * @param  {Array} outArray Array for output from all executed promises
 	 * @member $common
 	 */
@@ -3955,7 +3962,6 @@ onix.provider("$i18n", function() {
 	/**
 	 * All langs data.
 	 *
-	 * @private
 	 * @type {Object}
 	 * @member $i18nProvider
 	 * @private
@@ -3964,7 +3970,6 @@ onix.provider("$i18n", function() {
 	/**
 	 * Current language-
 	 *
-	 * @private
 	 * @type {String}
 	 * @member $i18nProvider
 	 * @private
@@ -3973,7 +3978,6 @@ onix.provider("$i18n", function() {
 	/**
 	 * Bind global _ as translation function-
 	 *
-	 * @private
 	 * @type {String}
 	 * @member $i18nProvider
 	 * @private
@@ -4046,6 +4050,7 @@ onix.provider("$i18n", function() {
 	 * @param  {Object} [replace] Replace all {} in the string
 	 * @return {String}
 	 * @member $i18nProvider
+	 * @private
 	 */
 	var _getText = function(key, replace) {
 		key = key || "";
@@ -4128,7 +4133,6 @@ onix.provider("$i18n", function() {
 	 * Post process during config phase.
 	 *
 	 * @member $i18nProvider
-	 * @private
 	 */
 	this.postProcess = function() {
 		if (_bindGlobalTranslation) {
@@ -4226,6 +4230,9 @@ onix.provider("$i18n", function() {
 });
 /**
  * Provider for registering _ translate object.
+ *
+ * @private
+ * @member onix
  */
 onix.config(["$i18nProvider", function($i18nProvider) {
 	$i18nProvider.postProcess();
@@ -4234,7 +4241,6 @@ onix.provider("$template", function() {
 	/**
 	 * Configuration for template delimeters.
 	 *
-	 * @private
 	 * @type {Object}
 	 * @member $templateProvider
 	 * @private
@@ -5340,7 +5346,7 @@ function(
 	 *
 	 * @private
 	 * @param  {Object} previewObj Object with file and preview ID
-	 * @param  {Number} [maxSize] Max image size in px
+	 * @param  {Number} maxSize Max image size in px
 	 * @param  {Function} jobDone Function which indicates that job is done
 	 */
 	this._jobTask = function(previewObj, maxSize, jobDone) {
