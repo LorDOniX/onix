@@ -1,0 +1,32 @@
+.anonymizer {
+	position: relative;
+
+	.spinner {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		height: 100px;
+		margin-left: -25px;
+		margin-top: -50px;
+		
+		& > div {
+			margin: 0 2px;
+		}
+		
+		&.hide {
+			display: none;
+		}
+	}
+
+	canvas {
+		&.is-dragged {
+			cursor: move;
+		}
+
+		&.line-canvas {
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+	}
+}

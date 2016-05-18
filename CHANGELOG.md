@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.5.3 (18. 5. 2016)
+
+* move $common getCookies -> $cookies service
+* move $common chainPromises -> $q
+* add $slider - selector for number within the range
+* add $anonymizer - canvas for image preview with posibility for add geometries
+* change test website
+* $loader add getSpinner method
+
 ## 2.5.2 (16. 5. 2016)
 
 * add minimal framework version

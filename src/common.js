@@ -51,34 +51,6 @@ function(
 	};
 
 	/**
-	 * Get cookie by her name.
-	 *
-	 * @param  {String} name
-	 * @return {String}
-	 * @member $common
-	 * @private
-	 */
-	this.getCookie = function(name) {
-		var cookieValue = null;
-
-		if (document.cookie && document.cookie != '') {
-			var cookies = document.cookie.split(';');
-
-			cookies.every(function(cookie) {
-				cookie = cookie.trim();
-
-				if (cookie.substring(0, name.length + 1) == (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					return false;
-				}
-				else return true;
-			});
-		}
-
-		return cookieValue;
-	};
-
-	/**
 	 * Confirm window, returns promise.
 	 *
 	 * @param  {String} txt
@@ -314,82 +286,6 @@ function(
 		}
 		else {
 			return sizeMB.toFixed(2) + " MB";
-		}
-	};
-
-
-	/**
-	 * Chaining multiple methods with promises, returns promise.
-	 * 
-	 * @param  {Object[]} opts
-	 * @param  {String|Function} opts.method Function or method name inside scope
-	 * @param  {Object} opts.scope Scope for method function
-	 * @param  {Array} opts.args Additional arguments for function
-	 * @return {$q}
-	 * @member $common
-	 */
-	this.chainPromises = function(opts) {
-		var promise = $q.defer();
-
-		this._chainPromisesInner(opts, promise, []);
-
-		return promise;
-	};
-
-	/**
-	 * Inner method for chaining promises.
-	 * 
-	 * @param  {Object[]} opts
-	 * @param  {String|Function} opts.method Function or method name inside scope
-	 * @param  {Object} opts.scope Scope for method function
-	 * @param  {Array} opts.args Additional arguments for function
-	 * @param  {$q} promise Done promise $q
-	 * @param  {Array} outArray Array for output from all executed promises
-	 * @member $common
-	 */
-	this._chainPromisesInner = function(opts, promise, outArray) {
-		var firstItem = opts.shift();
-
-		if (firstItem) {
-			// string or function itself
-			var fn;
-			var error = false;
-
-			switch (typeof firstItem.method) {
-				case "string":
-					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
-						error = true;
-					}
-					else {
-						fn = firstItem.scope[firstItem.method];
-
-						if (typeof fn !== "function") {
-							error = true;
-						}
-					}
-					break;
-				case "function":
-					fn = firstItem.method;
-					break;
-				default:
-					error = true;
-			}
-
-			if (!error) {
-				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
-					outArray.push(data);
-					this._chainPromisesInner(opts, promise, outArray);
-				}.bind(this), function(err) {
-					outArray.push(err);
-					this._chainPromisesInner(opts, promise, outArray);
-				}.bind(this));
-			}
-			else {
-				promise.resolve(outArray);
-			}
-		}
-		else {
-			promise.resolve(outArray);
 		}
 	};
 }]);

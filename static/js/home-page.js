@@ -176,7 +176,7 @@ function(
 		// test for chaining promises
 		console.log("chainPromises start...");
 
-		$common.chainPromises([{
+		$q.chainPromises([{
 			method: "_testPromise1",
 			scope: this,
 			args: [5]

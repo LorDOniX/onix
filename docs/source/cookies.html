@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$cookies'>/**
+</span> * Functionality over browser cookies.
+ *
+ * @class $cookies
+ */
+onix.service(&quot;$cookies&quot;, function() {
+<span id='$cookies-method-get'>	/**
+</span>	 * Get cookies by her name.
+	 *
+	 * @param  {String} name
+	 * @return {String}
+	 * @member $cookies
+	 * @private
+	 */
+	this.get = function(name) {
+		var cookieValue = null;
+
+		if (document.cookie &amp;&amp; document.cookie != &#39;&#39;) {
+			var cookies = document.cookie.split(&#39;;&#39;);
+
+			cookies.every(function(cookie) {
+				cookie = cookie.trim();
+
+				if (cookie.substring(0, name.length + 1) == (name + &#39;=&#39;)) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					return false;
+				}
+				else return true;
+			});
+		}
+
+		return cookieValue;
+	};
+});
+</pre>
+</body>
+</html>

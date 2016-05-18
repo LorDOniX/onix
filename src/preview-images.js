@@ -8,11 +8,13 @@ onix.service("$previewImages", [
 	"$image",
 	"$dom",
 	"$job",
+	"$loader",
 function(
 	$q,
 	$image,
 	$dom,
-	$job
+	$job,
+	$loader
 ) {
 	/**
 	 * Create one image preview.
@@ -32,7 +34,7 @@ function(
 			child: [{
 				el: "span",
 				"class": "canvas-cover",
-				child: [this._getSpinner()],
+				child: [$loader.getSpinner(true)],
 				style: "height: " + (maxSize || 100) + "px",
 				_exported: "canvasCover"
 			}, {
@@ -45,30 +47,6 @@ function(
 		return {
 			cont: cont,
 			canvasCover: exported.canvasCover
-		};
-	};
-
-	/**
-	 * Create spinner for image load.
-	 *
-	 * @private
-	 * @return {Object} DOM configuration
-	 * @member $previewImages
-	 */
-	this._getSpinner = function() {
-		var children = [];
-
-		for (var i = 1; i < 6; i++) {
-			children.push({
-				el: "div",
-				"class": "rect" + i
-			});
-		}
-
-		return {
-			el: "div",
-			"class": "spinner",
-			child: children
 		};
 	};
 

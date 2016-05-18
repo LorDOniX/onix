@@ -1,0 +1,54 @@
+.slider {
+	display: inline-block;
+	
+	input {
+		display: inline-block;
+		vertical-align: middle;
+		width: 50px;
+		padding: 3px 10px;
+		border: 1px solid gray;
+		border-radius: 3px;
+		background: transparent;
+		text-align: center;
+		
+		&.error {
+			background: red;
+		}
+	}
+
+	.line-holder {
+		position: relative;
+		margin-left: 15px;
+		display: inline-block;
+		vertical-align: middle;
+		width: 200px;
+		height: 50px;
+		
+		.lh-tube {
+			position: absolute;
+			z-index: 1;
+			left: 0;
+			top: 50%;
+			width: 100%;
+			height: 10px;
+			margin-top: -5px;
+			cursor: default;
+			border: 1px solid gray;
+			background-color: lightgray;
+		}
+
+		.lh-caret {
+			position: absolute;
+			z-index: 2;
+			left: 0;
+			top: 50%;
+			width: 10px;
+			height: 18px;
+			margin-left: -5px;
+			margin-top: -9px;
+			cursor: w-resize;
+			border: 1px solid black;
+			background-color: darkgray;
+		}
+	}
+}

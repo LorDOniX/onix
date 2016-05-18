@@ -24,6 +24,7 @@ const _CONST = {
 		"src/exif.js",
 		"src/onix.js",
 		"src/local-storage.js",
+		"src/cookies.js",
 		"src/routeParams.js",
 		"src/math.js",
 		"src/date.js",
@@ -45,7 +46,9 @@ const _CONST = {
 		"src/route.js",
 		"src/select.js",
 		"src/image.js",
-		"src/preview-images.js"
+		"src/preview-images.js",
+		"src/slider.js",
+		"src/anonymizer.js"
 	],
 	JS_OUTPUT: "dist/onix-js-framework.js",
 	JS_MINIMAL_OUTPUT: "dist/onix-js-minimal-framework.js",

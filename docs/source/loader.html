@@ -78,6 +78,32 @@ function(
 					this._el.classList.remove(&quot;hide&quot;);
 				}.bind(this), 350);
 			}.bind(this), 150);
+		},
+
+<span id='$loader-method-getSpinner'>		/**
+</span>		 * Get spinner - DOM or object.
+		 *
+		 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
+		 * @return {HTMLElement|Object}
+		 * @member $loader
+		 */
+		getSpinner: function(getObject) {
+			var children = [];
+
+			for (var i = 1; i &lt; 6; i++) {
+				children.push({
+					el: &quot;div&quot;,
+					&quot;class&quot;: &quot;rect&quot; + i
+				});
+			}
+
+			var domConf = {
+				el: &quot;div&quot;,
+				&quot;class&quot;: &quot;spinner&quot;,
+				child: children
+			};
+
+			return (getObject ? domConf : $dom.create(domConf));
 		}
 	};
 

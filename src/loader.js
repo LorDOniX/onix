@@ -61,6 +61,32 @@ function(
 					this._el.classList.remove("hide");
 				}.bind(this), 350);
 			}.bind(this), 150);
+		},
+
+		/**
+		 * Get spinner - DOM or object.
+		 *
+		 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
+		 * @return {HTMLElement|Object}
+		 * @member $loader
+		 */
+		getSpinner: function(getObject) {
+			var children = [];
+
+			for (var i = 1; i < 6; i++) {
+				children.push({
+					el: "div",
+					"class": "rect" + i
+				});
+			}
+
+			var domConf = {
+				el: "div",
+				"class": "spinner",
+				child: children
+			};
+
+			return (getObject ? domConf : $dom.create(domConf));
 		}
 	};
 
