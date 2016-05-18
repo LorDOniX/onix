@@ -1550,7 +1550,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.5.2/16. 5. 2016\n" +
+			"2.5.3/18. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
 			"@license MIT\n" +
@@ -5444,13 +5444,12 @@ function(
 	/**
 	 * Slider - slider with input for selecting numbers from the range.
 	 * 
-	 * @signal change {Number} Signal with value change
 	 * @param {HTMLElement} parent Where is canvas appended
 	 * @param {Object} [optsArg] Configuration
 	 * @param {Number} [optsArg.min] Min value
 	 * @param {Number} [optsArg.max] Max value
 	 * @param {Number} [optsArg.timeout] Timeout for signal fire (keydown, move)
-	 * @member $slider
+	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
 		$event.bindEvents(this);
@@ -5747,23 +5746,22 @@ function(
 	/**
 	 * Anonymizer - canvas for image preview with posibility for add geometries.
 	 *
-	 * @signal zoom {Number} Zoom change event
 	 * @param {HTMLElement} parent Where is canvas appended
 	 * @param {Object} [optsArg] Configuration
 	 * @param {Number} [optsArg.canWidth] Canvas width
 	 * @param {Number} [optsArg.canHeight] Canvas height
-	 * @param {Number} [optsArg.zoom] start zoom in [%]
-	 * @param {Number} [optsArg.minZoom] min zoom in [%]
-	 * @param {Number} [optsArg.maxZoom] max zoom in [%]
-	 * @param {Number} [optsArg.zoomStep] o kolik [%] How many [%] add/dec with zoom change
-	 * @param {Number} [optsArg.zoomMoveStep] Under 100% multiplier for faster image movement
-	 * @param {Object} [optsArg.curEntity] Start entity from $anonymizer.ENTITES
+	 * @param {Number} [optsArg.zoom = 100] start zoom in [%]
+	 * @param {Number} [optsArg.minZoom = 20] min zoom in [%]
+	 * @param {Number} [optsArg.maxZoom = 100] max zoom in [%]
+	 * @param {Number} [optsArg.zoomStep = 10] o kolik [%] How many [%] add/dec with zoom change
+	 * @param {Number} [optsArg.zoomMoveStep = 0] Under 100% multiplier for faster image movement
+	 * @param {Object} [optsArg.curEntity = $anonymizer.ENTITES.CIRCLE] Start entity from $anonymizer.ENTITES
 	 * @param {Number} [optsArg.showPreview = true] Show preview - image overview
 	 * @param {Number} [optsArg.previewLeft = 17] Preview location from left top corner, axe x [px]
 	 * @param {Number} [optsArg.previewTop = 17] Preview location from left top corner, axe y [px]
 	 * @param {Number} [optsArg.previewWidth = 200] Preview image width [px]
-	 * @param {HTMLElement} [optsArg.entityPreview] Create entity preview? Parent for append.
-	 * @member $anonymizer
+	 * @param {HTMLElement} [optsArg.entityPreview = null] Create entity preview? Parent for append.
+	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
 		$event.bindEvents(this);
@@ -5875,6 +5873,8 @@ function(
 	 * List of entites.
 	 * 
 	 * @type {Object}
+	 * @param {Object} CIRCLE Circle entity
+	 * @param {Object} LINE Line entity
 	 * @member $anonymizer
 	 * @static
 	 */
@@ -6252,6 +6252,7 @@ function(
 		// circle
 		if (this._opts.curEntity == $anonymizer.ENTITES.CIRCLE) {
 			this._mouse.wasImgMove = false;
+			this._mouse.wasPreview = false;
 			this._canvas.addEventListener("mousemove", this._binds.mouseMove);
 			this._canvas.addEventListener("mouseup", this._binds.mouseUp);
 			this._canvas.addEventListener("mouseleave", this._binds.mouseUp);
@@ -6316,12 +6317,14 @@ function(
 		// mouse move over the preview?
 		var isPreview = this._isPreview(e.offsetX, e.offsetY);
 		if (!this._mouse.wasRightClick && !this._mouse.wasImgMove && isPreview) {
+			// set preview flag
+			this._mouse.wasPreview = true;
 			// image move over the preview
 			this._setPosition(isPreview.xRatio, isPreview.yRatio);
 			this._alignImgToCanvas();
 			this._redraw();
 		}
-		else {
+		else if (!this._mouse.wasPreview) {
 			// image move - flag
 			this._mouse.wasImgMove = true;
 			// image move

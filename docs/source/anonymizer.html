@@ -609,6 +609,7 @@ function(
 		// circle
 		if (this._opts.curEntity == $anonymizer.ENTITES.CIRCLE) {
 			this._mouse.wasImgMove = false;
+			this._mouse.wasPreview = false;
 
 			this._canvas.addEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
 			this._canvas.addEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
@@ -689,13 +690,16 @@ function(
 		var isPreview = this._isPreview(e.offsetX, e.offsetY);
 
 		if (!this._mouse.wasRightClick &amp;&amp; !this._mouse.wasImgMove &amp;&amp; isPreview) {
+			// set preview flag
+			this._mouse.wasPreview = true;
+
 			// image move over the preview
 			this._setPosition(isPreview.xRatio, isPreview.yRatio);
 
 			this._alignImgToCanvas();
 			this._redraw();
 		}
-		else {
+		else if (!this._mouse.wasPreview) {
 			// image move - flag
 			this._mouse.wasImgMove = true;
 
