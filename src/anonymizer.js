@@ -159,16 +159,12 @@ function(
 	 * List of entites.
 	 * 
 	 * @type {Object}
+	 * @param {Object} CIRCLE Circle entity
+	 * @param {Object} LINE Line entity
 	 * @member $anonymizer
 	 * @static
 	 */
 	$anonymizer.ENTITES = {
-		/**
-		 * Circle entity.
-		 * 
-		 * @property CIRCLE
-		 * @member $anonymizer.ENTITES
-		 */
 		CIRCLE: {
 			min: 10,
 			value: 50,
@@ -177,12 +173,6 @@ function(
 			fillStyle: "rgba(0, 0, 255, 0.5)",
 			priority: 1
 		},
-		/**
-		 * Line entity.
-		 * 
-		 * @property LINE
-		 * @member $anonymizer.ENTITES
-		 */
 		LINE: {
 			min: 10,
 			value: 20,
