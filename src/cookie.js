@@ -1,15 +1,15 @@
 /**
  * Functionality over browser cookies.
  *
- * @class $cookies
+ * @class $cookie
  */
-onix.service("$cookies", function() {
+onix.service("$cookie", function() {
 	/**
 	 * Get cookies by her name.
 	 *
 	 * @param  {String} name
 	 * @return {String}
-	 * @member $cookies
+	 * @member $cookie
 	 * @private
 	 */
 	this.get = function(name) {

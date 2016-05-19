@@ -24,7 +24,7 @@ const _CONST = {
 		"src/exif.js",
 		"src/onix.js",
 		"src/local-storage.js",
-		"src/cookies.js",
+		"src/cookie.js",
 		"src/routeParams.js",
 		"src/math.js",
 		"src/date.js",

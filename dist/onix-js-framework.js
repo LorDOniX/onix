@@ -1663,15 +1663,15 @@ onix.factory("$localStorage", function() {
 /**
  * Functionality over browser cookies.
  *
- * @class $cookies
+ * @class $cookie
  */
-onix.service("$cookies", function() {
+onix.service("$cookie", function() {
 	/**
 	 * Get cookies by her name.
 	 *
 	 * @param  {String} name
 	 * @return {String}
-	 * @member $cookies
+	 * @member $cookie
 	 * @private
 	 */
 	this.get = function(name) {
@@ -5832,7 +5832,9 @@ function(
 			startXSave: 0,
 			startYSave: 0,
 			startX: 0,
-			startY: 0,
+			startY: 0
+		};
+		this._flags = {
 			wasRightClick: false,
 			wasMove: false,
 			wasPreview: false,
@@ -6247,12 +6249,12 @@ function(
 		this._mouse.startYSave = e.offsetY;
 		this._mouse.startX = e.offsetX;
 		this._mouse.startY = e.offsetY;
-		this._mouse.wasMove = false;
-		this._mouse.wasRightClick = this._isRightClick(e);
+		this._flags.wasMove = false;
+		this._flags.wasRightClick = this._isRightClick(e);
 		// circle
 		if (this._opts.curEntity == $anonymizer.ENTITES.CIRCLE) {
-			this._mouse.wasImgMove = false;
-			this._mouse.wasPreview = false;
+			this._flags.wasImgMove = false;
+			this._flags.wasPreview = false;
 			this._canvas.addEventListener("mousemove", this._binds.mouseMove);
 			this._canvas.addEventListener("mouseup", this._binds.mouseUp);
 			this._canvas.addEventListener("mouseleave", this._binds.mouseUp);
@@ -6264,13 +6266,13 @@ function(
 			lineCanvas.width = this._opts.canWidth;
 			lineCanvas.height = this._opts.canHeight;
 			lineCanvas.classList.add("line-canvas");
-			this._mouse.wasPreview = false;
-			this._mouse.wasLine = false;
+			this._flags.wasPreview = false;
+			this._flags.wasLine = false;
 			this._lineCanvas = lineCanvas;
 			this._lineCanvas.addEventListener("mousemove", this._binds.mouseMoveLine);
 			this._lineCanvas.addEventListener("mouseup", this._binds.mouseUpLine);
 			this._lineCanvas.addEventListener("contextmenu", this._binds.contextMenu);
-			if (this._mouse.wasRightClick) {
+			if (this._flags.wasRightClick) {
 				this._lineCanvas.classList.add("is-dragged");
 			}
 			document.addEventListener("mouseup", this._binds.mouseUpDocument);
@@ -6309,24 +6311,24 @@ function(
 	 */
 	$anonymizer.prototype._mouseMove = function(e) {
 		// mouse cursor
-		if (!this._mouse.wasMove) {
+		if (!this._flags.wasMove) {
 			this._canvas.classList.add("is-dragged");
 		}
 		// mouse move flag
-		this._mouse.wasMove = true;
+		this._flags.wasMove = true;
 		// mouse move over the preview?
 		var isPreview = this._isPreview(e.offsetX, e.offsetY);
-		if (!this._mouse.wasRightClick && !this._mouse.wasImgMove && isPreview) {
+		if (!this._flags.wasRightClick && !this._flags.wasImgMove && isPreview) {
 			// set preview flag
-			this._mouse.wasPreview = true;
+			this._flags.wasPreview = true;
 			// image move over the preview
 			this._setPosition(isPreview.xRatio, isPreview.yRatio);
 			this._alignImgToCanvas();
 			this._redraw();
 		}
-		else if (!this._mouse.wasPreview) {
+		else if (!this._flags.wasPreview) {
 			// image move - flag
-			this._mouse.wasImgMove = true;
+			this._flags.wasImgMove = true;
 			// image move
 			this._imgMove(e.offsetX, e.offsetY);
 		}
@@ -6374,7 +6376,7 @@ function(
 	$anonymizer.prototype._mouseUp = function(e) {
 		var thresholdTest = false;
 		// only it was move
-		if (this._mouse.wasMove) {
+		if (this._flags.wasMove) {
 			// difference towards start click
 			var diffX = this._mouse.startXSave - e.offsetX;
 			var diffY = this._mouse.startYSave - e.offsetY;
@@ -6384,7 +6386,7 @@ function(
 			}
 		}
 		// click - there was no move, threshold test, it is disabled for right mouse click
-		if (!this._mouse.wasRightClick && (!this._mouse.wasMove || thresholdTest)) {
+		if (!this._flags.wasRightClick && (!this._flags.wasMove || thresholdTest)) {
 			var isPreview = this._isPreview(e.offsetX, e.offsetY);
 			if (isPreview) {
 				// preview click - click coordinates on the canvas center
@@ -6420,9 +6422,9 @@ function(
 	 */
 	$anonymizer.prototype._mouseMoveLine = function(e) {
 		// mouse move
-		this._mouse.wasMove = true;
+		this._flags.wasMove = true;
 		// right mouse click
-		if (this._mouse.wasRightClick) {
+		if (this._flags.wasRightClick) {
 			// image move
 			this._imgMove(e.offsetX, e.offsetY);
 			// save
@@ -6432,16 +6434,16 @@ function(
 		// left mouse click
 		else {
 			var isPreview = this._isPreview(e.offsetX, e.offsetY);
-			var wasPreview = this._mouse.wasPreview;
-			if (!this._mouse.wasLine && isPreview) {
-				this._mouse.wasPreview = true;
+			var wasPreview = this._flags.wasPreview;
+			if (!this._flags.wasLine && isPreview) {
+				this._flags.wasPreview = true;
 				// move over preview
 				this._setPosition(isPreview.xRatio, isPreview.yRatio);
 				this._alignImgToCanvas();
 				this._redraw();
 			}
-			else if (!this._mouse.wasPreview) {
-				this._mouse.wasLine = true;
+			else if (!this._flags.wasPreview) {
+				this._flags.wasLine = true;
 				// line width
 				var lineWidth = Math.round(this._opts.curEntity.value * this._opts.zoom / 100);
 				// clear
@@ -6450,7 +6452,7 @@ function(
 				this._drawLine(this._lineCanvasCtx, this._mouse.startX, this._mouse.startY, e.offsetX, e.offsetY, lineWidth);
 			}
 			// change of state
-			if (!wasPreview && this._mouse.wasPreview) {
+			if (!wasPreview && this._flags.wasPreview) {
 				this._lineCanvas.classList.add("is-dragged");
 			}
 		}
@@ -6465,18 +6467,18 @@ function(
 	 */
 	$anonymizer.prototype._mouseUpLine = function(e) {
 		var isPreview = null;
-		if (!this._mouse.wasMove) {
+		if (!this._flags.wasMove) {
 			isPreview = this._isPreview(e.offsetX, e.offsetY);
 		}
 		// only for left mouse click
-		if (!this._mouse.wasRightClick) {
+		if (!this._flags.wasRightClick) {
 			if (isPreview) {
 				// preview click - click coordinates on the canvas center
 				this._setPosition(isPreview.xRatio, isPreview.yRatio);
 				this._alignImgToCanvas();
 				this._redraw();
 			}
-			else if (this._mouse.wasLine) {
+			else if (this._flags.wasLine) {
 				// create a line
 				var zc = this._opts.zoom / 100;
 				var xc = Math.round(this._x * zc);
@@ -6512,7 +6514,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseUpDocument = function(e) {
-		this._mouse.wasLine = false;
+		this._flags.wasLine = false;
 		this._mouseUpLine(e);
 	};
 	/**

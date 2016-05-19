@@ -2,7 +2,7 @@
 
 ## 2.5.3 (18. 5. 2016)
 
-* move $common getCookies -> $cookies service
+* move $common getCookies -> $cookie service
 * move $common chainPromises -> $q
 * add $slider - selector for number within the range
 * add $anonymizer - canvas for image preview with posibility for add geometries
