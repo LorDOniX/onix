@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.5.4 (20. 5. 2016)
+
+* bugfixing - $anonymizer
+* $slider wheel support
+
 ## 2.5.3 (18. 5. 2016)
 
 * move $common getCookies -> $cookie service
