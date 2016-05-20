@@ -142,6 +142,9 @@ function(
 		// clear previous
 		el.innerHTML = "";
 
+		// add class
+		el.classList.add("preview-images");
+
 		var opts = {
 			maxSize: 0,
 			count: 0,

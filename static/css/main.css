@@ -40,3 +40,8 @@
 	position: relative;
 	background: #eee;
 }
+
+.upload-previews {
+	text-align: center;
+	padding: 10px;
+}

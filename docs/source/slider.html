@@ -68,13 +68,18 @@ function(
 			mouseDownCaret: this._mouseDownCaret.bind(this),
 			mouseMoveLineHolder: this._mouseMoveLineHolder.bind(this),
 			mouseUpDocument: this._mouseUpDocument.bind(this),
-			sendSignalInner: this._sendSignalInner.bind(this)
+			sendSignalInner: this._sendSignalInner.bind(this),
+			mouseWheel: this._mouseWheel.bind(this)
 		};
 
 		this._els.input.addEventListener(&quot;keyup&quot;, this._binds.keyUp);
 		this._els.tube.addEventListener(&quot;click&quot;, this._binds.click);
 		this._els.caret.addEventListener(&quot;mousedown&quot;, this._binds.mouseDownCaret);
 		this._els.lineHolder.addEventListener(&quot;mousemove&quot;, this._binds.mouseMoveLineHolder);
+		// firefox
+		this._els.lineHolder.addEventListener(&quot;DOMMouseScroll&quot;, this._binds.mouseWheel);
+		// others
+		this._els.lineHolder.addEventListener(&quot;mousewheel&quot;, this._binds.mouseWheel);
 		
 		// def. max value
 		this.setValue(this._opts.max);
@@ -300,6 +305,30 @@ function(
 		}
 		else {
 			this._sendSignalInner();
+		}
+	};
+
+<span id='$slider-method-_mouseWheel'>	/**
+</span>	 * Mouse wheel event.
+	 *
+	 * @param {Event} e Mouse event
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._mouseWheel = function(e) {
+		var delta = e.wheelDelta || -e.detail;
+		if (!delta) { return; }
+
+		e.stopPropagation();
+		e.preventDefault();
+
+		if (delta &gt; 0) {
+			this.setValue(this._value + 1);
+			this._sendSignal();
+		}
+		else {
+			this.setValue(this._value - 1);
+			this._sendSignal();
 		}
 	};
 

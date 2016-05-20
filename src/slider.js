@@ -51,13 +51,18 @@ function(
 			mouseDownCaret: this._mouseDownCaret.bind(this),
 			mouseMoveLineHolder: this._mouseMoveLineHolder.bind(this),
 			mouseUpDocument: this._mouseUpDocument.bind(this),
-			sendSignalInner: this._sendSignalInner.bind(this)
+			sendSignalInner: this._sendSignalInner.bind(this),
+			mouseWheel: this._mouseWheel.bind(this)
 		};
 
 		this._els.input.addEventListener("keyup", this._binds.keyUp);
 		this._els.tube.addEventListener("click", this._binds.click);
 		this._els.caret.addEventListener("mousedown", this._binds.mouseDownCaret);
 		this._els.lineHolder.addEventListener("mousemove", this._binds.mouseMoveLineHolder);
+		// firefox
+		this._els.lineHolder.addEventListener("DOMMouseScroll", this._binds.mouseWheel);
+		// others
+		this._els.lineHolder.addEventListener("mousewheel", this._binds.mouseWheel);
 		
 		// def. max value
 		this.setValue(this._opts.max);
@@ -283,6 +288,30 @@ function(
 		}
 		else {
 			this._sendSignalInner();
+		}
+	};
+
+	/**
+	 * Mouse wheel event.
+	 *
+	 * @param {Event} e Mouse event
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._mouseWheel = function(e) {
+		var delta = e.wheelDelta || -e.detail;
+		if (!delta) { return; }
+
+		e.stopPropagation();
+		e.preventDefault();
+
+		if (delta > 0) {
+			this.setValue(this._value + 1);
+			this._sendSignal();
+		}
+		else {
+			this.setValue(this._value - 1);
+			this._sendSignal();
 		}
 	};
 

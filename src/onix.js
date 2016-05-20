@@ -699,7 +699,7 @@ onix = (function() {
 	onix.info = function() {
 		console.log(
 			"OnixJS framework\n" +
-			"2.5.3/18. 5. 2016\n" +
+			"2.5.4/20. 5. 2016\n" +
 			"source: https://gitlab.com/LorDOniX/onix\n" +
 			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
 			"@license MIT\n" +

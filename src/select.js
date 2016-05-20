@@ -134,9 +134,9 @@ function(
 	$select.prototype._captionClick = function(e, scope) {
 		e.stopPropagation();
 
-		scope._binds.removeAllOpened();
-
 		var isOpen = scope._el.classList.contains(scope._CONST.OPEN_CLASS);
+
+		scope._binds.removeAllOpened();
 
 		if (isOpen) {
 			// outside click

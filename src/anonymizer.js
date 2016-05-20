@@ -2,10 +2,12 @@ onix.factory("$anonymizer", [
 	"$dom",
 	"$event",
 	"$loader",
+	"$q",
 function(
 	$dom,
 	$event,
-	$loader
+	$loader,
+	$q
 ) {
 	/**
 	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -18,7 +20,7 @@ function(
 	 * @param {Number} [optsArg.minZoom = 20] min zoom in [%]
 	 * @param {Number} [optsArg.maxZoom = 100] max zoom in [%]
 	 * @param {Number} [optsArg.zoomStep = 10] o kolik [%] How many [%] add/dec with zoom change
-	 * @param {Number} [optsArg.zoomMoveStep = 0] Under 100% multiplier for faster image movement
+	 * @param {Number} [optsArg.zoomMoveStep = 1] Under 100% multiplier for faster image movement
 	 * @param {Object} [optsArg.curEntity = $anonymizer.ENTITES.CIRCLE] Start entity from $anonymizer.ENTITES
 	 * @param {Number} [optsArg.showPreview = true] Show preview - image overview
 	 * @param {Number} [optsArg.previewLeft = 17] Preview location from left top corner, axe x [px]
@@ -49,7 +51,7 @@ function(
 			minZoom: 20,
 			maxZoom: 100,
 			zoomStep: 10,
-			zoomMoveStep: 0,
+			zoomMoveStep: 1,
 			curEntity: $anonymizer.ENTITES.CIRCLE,
 			showPreview: true,
 			previewLeft: 17,
@@ -62,17 +64,26 @@ function(
 			this._opts[key] = optsArg[key];
 		}
 
+		// canvas width & height
+		this._canWidth = this._opts.canWidth;
+		this._canHeight = this._opts.canHeight;
+
+		// zoom
+		this._zoom = this._opts.zoom;
+		// zoom step
+		this._zoomStep = this._opts.zoomStep;
+		// step for zoom move
+		this._zoomMoveStep = 0;
+
 		// act. image width
 		this._curWidth = 0;
 		// act. image height
 		this._curHeight = 0;
-		// step for zoom move
-		this._zoomMoveStep = 0;
 
 		// create main canvas
 		this._canvas = document.createElement("canvas");
-		this._canvas.width = this._opts.canWidth;
-		this._canvas.height = this._opts.canHeight;
+		this._canvas.width = this._canWidth;
+		this._canvas.height = this._canHeight;
 
 		// ctx of main canvas
 		this._ctx = this._canvas.getContext("2d");
@@ -171,7 +182,7 @@ function(
 		CIRCLE: {
 			min: 10,
 			value: 50,
-			max: 50,
+			max: 100,
 			id: "CIRCLE",
 			fillStyle: "rgba(0, 0, 255, 0.5)",
 			priority: 1
@@ -194,12 +205,12 @@ function(
 	 */
 	$anonymizer.prototype._redraw = function() {
 		// pictue
-		this._ctx.clearRect(0, 0, this._opts.canWidth, this._opts.canHeight);
+		this._ctx.clearRect(0, 0, this._canWidth, this._canHeight);
 		this._ctx.drawImage(this._img, this._x, this._y, this._img.width, this._img.height, 0, 0, this._curWidth, this._curHeight);
 
 		// entites
 		if (this._entites.length) {
-			var zc = this._opts.zoom / 100;
+			var zc = this._zoom / 100;
 			var xc = this._x * zc;
 			var yc = this._y * zc;
 
@@ -228,6 +239,17 @@ function(
 
 		// image preview
 		this._drawPreview();
+	};
+
+	/**
+	 * Draw white canvas.
+	 * 
+	 * @private
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype._setWhiteCanvas = function() {
+		this._ctx.clearRect(0, 0, this._canWidth, this._canHeight);
+		this._drawFillRect(this._ctx, 0, 0, this._canWidth, this._canHeight, "#fff");
 	};
 
 	/**
@@ -330,14 +352,14 @@ function(
 		this._ctx.drawImage(this._img, 0, 0, this._img.width, this._img.height, this._opts.previewLeft, this._opts.previewTop, this._opts.previewWidth, height);
 
 		// red border - current view
-		var zc = this._opts.zoom / 100;
+		var zc = this._zoom / 100;
 		var xc = this._x * zc;
 		var yc = this._y * zc;
 
 		var xRatio = xc / this._curWidth;
 		var yRatio = yc / this._curHeight;
-		var x2Ratio = (xc + this._opts.canWidth) / this._curWidth;
-		var y2Ratio = (yc + this._opts.canHeight) / this._curHeight;
+		var x2Ratio = (xc + this._canWidth) / this._curWidth;
+		var y2Ratio = (yc + this._canHeight) / this._curHeight;
 
 		// restrictions
 		xRatio = this._setRange(xRatio, 0, 1);
@@ -370,7 +392,7 @@ function(
 		this._drawFillRect(this._entityCanvasCtx, 0, 0, width, height, "#f9f9f9");
 
 		var curEnt = this._opts.curEntity;
-		var zc = this._opts.zoom / 100;
+		var zc = this._zoom / 100;
 
 		switch (curEnt.id) {
 			case $anonymizer.ENTITES.CIRCLE.id:
@@ -404,11 +426,11 @@ function(
 	 */
 	$anonymizer.prototype._getFromPoint = function(x, y) {
 		var fromPoint = {
-			x: x || Math.round(this._opts.canWidth / 2),
-			y: y || Math.round(this._opts.canHeight / 2)
+			x: x || Math.round(this._canWidth / 2),
+			y: y || Math.round(this._canHeight / 2)
 		};
 
-		var zc = this._opts.zoom / 100;
+		var zc = this._zoom / 100;
 		var x = Math.round(this._x * zc) + fromPoint.x;
 		var y = Math.round(this._y * zc) + fromPoint.y;
 
@@ -425,14 +447,14 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._postZoom = function() {
-		var zc = this._opts.zoom / 100;
+		var zc = this._zoom / 100;
 
 		this._curWidth = Math.round(this._img.width * zc);
 		this._curHeight = Math.round(this._img.height * zc);
 
-		if (this._opts.zoom < 100) {
+		if (this._zoom < 100) {
 			// function for zoom and mouse move
-			this._zoomMoveStep = Math.max(((100 - this._opts.zoom) / 10 * this._opts.zoomMoveStep) / 2, 1);
+			this._zoomMoveStep = Math.max(((100 - this._zoom) / 10 * this._opts.zoomMoveStep) / 2, 1);
 		}
 	};
 
@@ -479,13 +501,13 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._setPosition = function(xRatio, yRatio, x, y) {
-		x = x || this._opts.canWidth / 2;
-		y = y || this._opts.canHeight / 2;
+		x = x || this._canWidth / 2;
+		y = y || this._canHeight / 2;
 
 		xRatio = this._setRange(xRatio, 0, 1);
 		yRatio = this._setRange(yRatio, 0, 1);
 
-		var zc = this._opts.zoom / 100;
+		var zc = this._zoom / 100;
 		var xc = (this._curWidth * xRatio) - x;
 		var yc = (this._curHeight * yRatio) - y;
 
@@ -500,24 +522,24 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._alignImgToCanvas = function() {
-		var maxX = Math.max(this._curWidth - this._opts.canWidth, 0);
-		var currX = Math.round(this._x * this._opts.zoom / 100);
+		var maxX = Math.max(this._curWidth - this._canWidth, 0);
+		var currX = Math.round(this._x * this._zoom / 100);
 
 		if (this._x < 0) {
 			this._x = 0;
 		}
 		else if (currX > maxX) {
-			this._x = Math.round(maxX * 100 / this._opts.zoom);
+			this._x = Math.round(maxX * 100 / this._zoom);
 		}
 
-		var maxY = Math.max(this._curHeight - this._opts.canHeight, 0);
-		var currY = Math.round(this._y * this._opts.zoom / 100);
+		var maxY = Math.max(this._curHeight - this._canHeight, 0);
+		var currY = Math.round(this._y * this._zoom / 100);
 
 		if (this._y < 0) {
 			this._y = 0;
 		}
 		else if (currY > maxY) {
-			this._y = Math.round(maxY * 100 / this._opts.zoom);
+			this._y = Math.round(maxY * 100 / this._zoom);
 		}
 	};
 
@@ -567,10 +589,10 @@ function(
 		var fromPoint = this._getFromPoint(e.offsetX, e.offsetY);
 
 		if (delta > 0) {
-			this.zoomPlus(fromPoint);
+			this._setZoom(this._zoom + this._zoomStep, fromPoint);
 		}
 		else {
-			this.zoomMinus(fromPoint);
+			this._setZoom(this._zoom - this._zoomStep, fromPoint);
 		}
 	};
 
@@ -605,8 +627,8 @@ function(
 		else if (this._opts.curEntity == $anonymizer.ENTITES.LINE) {
 			// add canvas
 			var lineCanvas = document.createElement("canvas");
-			lineCanvas.width = this._opts.canWidth;
-			lineCanvas.height = this._opts.canHeight;
+			lineCanvas.width = this._canWidth;
+			lineCanvas.height = this._canHeight;
 			lineCanvas.classList.add("line-canvas");
 
 			this._flags.wasPreview = false;
@@ -718,7 +740,7 @@ function(
 
 		var left = this._opts.previewLeft;
 		var top = this._opts.previewTop;
-		var zc = this._opts.zoom / 100;
+		var zc = this._zoom / 100;
 
 		x = x || 0;
 		y = y || 0;
@@ -768,7 +790,7 @@ function(
 			}
 			else {
 				// add circle
-				var zc = this._opts.zoom / 100;
+				var zc = this._zoom / 100;
 				var x = Math.round(this._x * zc) + e.offsetX;
 				var y = Math.round(this._y * zc) + e.offsetY;
 
@@ -827,10 +849,10 @@ function(
 				this._flags.wasLine = true;
 
 				// line width
-				var lineWidth = Math.round(this._opts.curEntity.value * this._opts.zoom / 100);
+				var lineWidth = Math.round(this._opts.curEntity.value * this._zoom / 100);
 
 				// clear
-				this._lineCanvasCtx.clearRect(0, 0, this._opts.canWidth, this._opts.canHeight);
+				this._lineCanvasCtx.clearRect(0, 0, this._canWidth, this._canHeight);
 				// draw a line
 				this._drawLine(this._lineCanvasCtx, this._mouse.startX, this._mouse.startY, e.offsetX, e.offsetY, lineWidth);
 			}
@@ -867,7 +889,7 @@ function(
 			}
 			else if (this._flags.wasLine) {
 				// create a line
-				var zc = this._opts.zoom / 100;
+				var zc = this._zoom / 100;
 				var xc = Math.round(this._x * zc);
 				var yc = Math.round(this._y * zc);
 
@@ -915,78 +937,100 @@ function(
 	};
 
 	/**
-	 * Load and show image in canvas.
+	 * Set new value for zoom.
+	 * 
+	 * @param  {Number} value New value
+	 * @param  {Object} [fromPoint] Center of the screen or data from mouse wheel
+	 * @private
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype._setZoom = function(value, fromPoint) {
+		var oldZoom = this._zoom;
+		var newZoom = this._setRange(value, this._opts.minZoom, this._opts.maxZoom);
+
+		if (newZoom == oldZoom) return;
+
+		this._zoom = newZoom;
+		this.trigger("zoom", this._zoom);
+		this._postZoom();
+
+		fromPoint = fromPoint || this._getFromPoint();
+		
+		this._setPosition(fromPoint.xRatio, fromPoint.yRatio, fromPoint.x, fromPoint.y);
+		this._alignImgToCanvas();
+		this._drawEntityPreview();
+		this._redraw();
+	};
+
+	/**
+	 * Load and show image in canvas. Returns promise after load.
 	 * 
 	 * @param  {String} url Path to image
+	 * @return {$q} Promise
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.loadImage = function(url) {
+		var promise = $q.defer();
+
+		this._setWhiteCanvas();
+
 		this._spinner.classList.remove("hide");
 
 		var img = new Image();
-		img.onload = function() {
+
+		img.addEventListener("load", function() {
 			this._spinner.classList.add("hide");
 			this._img = img;
 			this._imgWidth = img.width;
 			this._imgHeight = img.height;
+			this._zoom = this._opts.zoom;
 
-			this.trigger("zoom", this._opts.zoom);
+			this.trigger("zoom", this._zoom);
 
 			this._postZoom();
 			this._setCenter();
 			this._alignImgToCanvas();
 			this._drawEntityPreview();
 			this._redraw();
-		}.bind(this);
+
+			promise.resolve();
+		}.bind(this));
+
+		img.addEventListener("error", function() {
+			promise.reject();
+		});
+
 		img.src = url || "";
+
+		return promise;
 	};
 
 	/**
 	 * Increase zoom by one step, fires signal "zoom".
 	 * 
-	 * @param  {Object} [fromPoint] Center of the screen or data from mouse wheel
 	 * @member $anonymizer
 	 */
-	$anonymizer.prototype.zoomPlus = function(fromPoint) {
-		fromPoint = fromPoint || this._getFromPoint();
-
-		this._opts.zoom += this._opts.zoomStep;
-
-		if (this._opts.zoom > this._opts.maxZoom) {
-			this._opts.zoom = this._opts.maxZoom;
-		}
-
-		this.trigger("zoom", this._opts.zoom);
-
-		this._postZoom();
-		this._setPosition(fromPoint.xRatio, fromPoint.yRatio, fromPoint.x, fromPoint.y);
-		this._alignImgToCanvas();
-		this._drawEntityPreview();
-		this._redraw();
+	$anonymizer.prototype.zoomPlus = function() {
+		this._setZoom(this._zoom + this._zoomStep);
 	};
 
 	/**
 	 * Decrease zoom by one step, fires signal "zoom".
 	 * 
-	 * @param  {Object} [fromPoint] Center of the screen or data from mouse wheel
 	 * @member $anonymizer
 	 */
-	$anonymizer.prototype.zoomMinus = function(fromPoint) {
-		fromPoint = fromPoint || this._getFromPoint();
+	$anonymizer.prototype.zoomMinus = function() {
+		this._setZoom(this._zoom - this._zoomStep);
+	};
 
-		this._opts.zoom -= this._opts.zoomStep;
-
-		if (this._opts.zoom < this._opts.minZoom) {
-			this._opts.zoom = this._opts.minZoom;
-		}
-
-		this.trigger("zoom", this._opts.zoom);
-
-		this._postZoom();
-		this._setPosition(fromPoint.xRatio, fromPoint.yRatio, fromPoint.x, fromPoint.y);
-		this._alignImgToCanvas();
-		this._drawEntityPreview();
-		this._redraw();
+	/**
+	 * Set new value for zoom.
+	 * 
+	 * @param  {Number} value New value
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype.setZoom = function(value) {
+		this._setZoom(value);
 	};
 
 	/**
@@ -1154,11 +1198,11 @@ function(
 		width = width || this._parent.offsetWidth;
 		height = height || this._parent.offsetHeight;
 
-		this._opts.canWidth = width;
-		this._opts.canHeight = height;
+		this._canWidth = width;
+		this._canHeight = height;
 
-		this._canvas.width = this._opts.canWidth;
-		this._canvas.height = this._opts.canHeight;
+		this._canvas.width = width;
+		this._canvas.height = height;
 
 		if (this._img) {
 			this._postZoom();
