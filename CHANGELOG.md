@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.5.5 (xx. x. 2016)
+
+* $common humanLength -> formatSize with TB, GB support
+* change directory hierarchy - test folder, remove static
+
 ## 2.5.4 (20. 5. 2016)
 
 * bugfixing - $anonymizer

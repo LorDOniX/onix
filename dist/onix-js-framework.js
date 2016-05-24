@@ -3474,22 +3474,21 @@ function(
 		}
 	};
 	/**
-	 * Size to KB/MB.
+	 * Format size in bytes.
 	 * 
 	 * @param  {Number} size
 	 * @return {String}
 	 * @member $common
 	 */
-	this.humanLength = function(size) {
-		size = size || 0;
-		var sizeKB = size / 1024;
-		var sizeMB = size / (1024 * 1024);
-		if (sizeKB < 1024) {
-			return sizeKB.toFixed(2) + " KB";
+	this.formatSize = function(size) {
+		if (typeof size !== "number") {
+			return "null";
 		}
-		else {
-			return sizeMB.toFixed(2) + " MB";
-		}
+		var lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1000)) : 0;
+		var sizes = ["", "K", "M", "G", "T"];
+		lv = Math.min(sizes.length, lv);
+		var value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
+		return value + " " + sizes[lv] + "B";
 	};
 }]);
 /**

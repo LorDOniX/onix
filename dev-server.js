@@ -4,7 +4,7 @@ var path = require('path');
 var app = express();
 var port = process.env.PORT || 8001;
 
-var MAIN_PATH = "static";
+var MAIN_PATH = "test";
 
 // paths
 app.use("/css", express.static(path.join(__dirname, MAIN_PATH + '/css')));

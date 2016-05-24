@@ -7,10 +7,12 @@ var fs = require("fs");
 var Less = require('less');
 var UglifyJS = require("uglify-js");
 
+// dont change watch paths order! - see watcher
 const _CONST = {
 	WATCH_PATHS: [
 		"src/",
-		"less/"
+		"less/",
+		"test/less/"
 	],
 	JS_MINIMAL_FILES: [
 		"src/polyfills.js",
@@ -57,7 +59,9 @@ const _CONST = {
 	HEADER_FILE: "HEADER",
 	HEADER_MINIMAL_FILE: "HEADER_MINIMAL",
 	LESS_FILE: "less/onix.less",
-	CSS_FILE: "dist/onix.css"
+	CSS_FILE: "dist/onix.css",
+	LESS_TEST_FILE: "test/less/main.less",
+	CSS_TEST_FILE: "test/css/main.css"
 };
 
 class Common {
@@ -361,15 +365,21 @@ class Bundler {
 			if (buffer.length == 1) {
 				let path = buffer[0];
 
+				console.log(path);
+
 				if (_CONST.JS_FILES.indexOf(path) != -1) {
 					Common.readFile(path).then((data) => {
 						this._filesCache[path] = data;
+
 						this._makeJS(_CONST.JS_FILES, _CONST.JS_OUTPUT);
-						this._makeJS(_CONST.JS_MINIMAL_FILES, _CONST.JS_MINIMAL_OUTPUT);
 					});
 				}
-				else {
-					// less
+				else if (path.indexOf(_CONST.WATCH_PATHS[2]) != -1) {
+					// less main
+					this._makeLess(_CONST.LESS_TEST_FILE, _CONST.CSS_TEST_FILE, false);
+				}
+				else if (path.indexOf(_CONST.WATCH_PATHS[1]) != -1) {
+					// less onix
 					this._makeLess(_CONST.LESS_FILE, _CONST.CSS_FILE, false);
 				}
 			}
@@ -507,6 +517,10 @@ class Bundler {
 			method: "_makeLess",
 			args: [c.LESS_FILE, c.CSS_FILE, false],
 			scope: this
+		}, {
+			method: "_makeLess",
+			args: [c.LESS_TEST_FILE, c.CSS_TEST_FILE, false],
+			scope: this
 		}]).then(() => {
 			Common.col("Dev is done");
 
@@ -533,6 +547,10 @@ class Bundler {
 		}, {
 			method: "_makeLess",
 			args: [c.LESS_FILE, c.CSS_FILE, true],
+			scope: this
+		}, {
+			method: "_makeLess",
+			args: [c.LESS_TEST_FILE, c.CSS_TEST_FILE, true],
 			scope: this
 		}, {
 			method: "_uglify",

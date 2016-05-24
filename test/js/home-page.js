@@ -189,7 +189,7 @@ function(
 				var promise = $q.defer();
 
 				setTimeout(function() {
-					promise.resolve("test promise 3 - " + $common.humanLength(123456789));
+					promise.resolve("test promise 3 - " + $common.formatSize(123456789));
 				}, 1000);
 
 				return promise; 
