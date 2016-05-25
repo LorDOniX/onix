@@ -1,4 +1,4 @@
-app.factory("HomeSnippet", [
+homeApp.factory("HomeSnippet", [
 	"Snippet",
 	"TestFromModule",
 function(

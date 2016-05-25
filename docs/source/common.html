@@ -285,25 +285,26 @@ function(
 		}
 	};
 
-<span id='$common-method-humanLength'>	/**
-</span>	 * Size to KB/MB.
+<span id='$common-method-formatSize'>	/**
+</span>	 * Format size in bytes.
 	 * 
 	 * @param  {Number} size
 	 * @return {String}
 	 * @member $common
 	 */
-	this.humanLength = function(size) {
-		size = size || 0;
-
-		var sizeKB = size / 1024;
-		var sizeMB = size / (1024 * 1024);
-
-		if (sizeKB &lt; 1024) {
-			return sizeKB.toFixed(2) + &quot; KB&quot;;
+	this.formatSize = function(size) {
+		if (typeof size !== &quot;number&quot;) {
+			return &quot;null&quot;;
 		}
-		else {
-			return sizeMB.toFixed(2) + &quot; MB&quot;;
-		}
+
+		var lv = size &gt; 0 ? Math.floor(Math.log(size) / Math.log(1000)) : 0;
+		var sizes = [&quot;&quot;, &quot;K&quot;, &quot;M&quot;, &quot;G&quot;, &quot;T&quot;];
+
+		lv = Math.min(sizes.length, lv);
+		
+		var value = lv &gt; 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
+
+		return value + &quot; &quot; + sizes[lv] + &quot;B&quot;;
 	};
 }]);
 </pre>

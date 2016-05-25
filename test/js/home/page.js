@@ -1,4 +1,4 @@
-app.factory("Page", [
+homeApp.factory("Page", [
 	"$dom",
 	"$template",
 	"$common",

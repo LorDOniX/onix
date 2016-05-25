@@ -1,4 +1,4 @@
-app.service("HomeResource", [
+homeApp.service("HomeResource", [
 	"$http",
 	"Config",
 function(

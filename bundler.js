@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 var fs = require("fs");
 var Less = require('less');
 var UglifyJS = require("uglify-js");
+var filesJson = require("./src/files");
 
 // dont change watch paths order! - see watcher
 const _CONST = {
@@ -14,54 +15,34 @@ const _CONST = {
 		"less/",
 		"test/less/"
 	],
-	JS_MINIMAL_FILES: [
-		"src/polyfills.js",
-		"src/onix.js",
-		"src/filter.js",
-		"src/q.js",
-		"src/common.js"
-	],
-	JS_FILES: [
-		"src/polyfills.js",
-		"src/exif.js",
-		"src/onix.js",
-		"src/local-storage.js",
-		"src/cookie.js",
-		"src/routeParams.js",
-		"src/math.js",
-		"src/date.js",
-		"src/filter.js",
-		"src/filters.js",
-		"src/q.js",
-		"src/promise.js",
-		"src/job.js",
-		"src/my-query.js",
-		"src/dom.js",
-		"src/location.js",
-		"src/common.js",
-		"src/notify.js",
-		"src/event.js",
-		"src/loader.js",
-		"src/http.js",
-		"src/i18n.js",
-		"src/template.js",
-		"src/route.js",
-		"src/select.js",
-		"src/image.js",
-		"src/preview-images.js",
-		"src/slider.js",
-		"src/anonymizer.js"
-	],
+	JS_ONIX: "onix.js",
+	JS_SRC_PATH: "src/",
 	JS_OUTPUT: "dist/onix-js-framework.js",
 	JS_MINIMAL_OUTPUT: "dist/onix-js-minimal-framework.js",
 	JS_OUTPUT_MIN: "dist/onix-js-framework.min.js",
 	JS_MINIMAL_OUTPUT_MIN: "dist/onix-js-minimal-framework.min.js",
 	HEADER_FILE: "HEADER",
-	HEADER_MINIMAL_FILE: "HEADER_MINIMAL",
 	LESS_FILE: "less/onix.less",
 	CSS_FILE: "dist/onix.css",
 	LESS_TEST_FILE: "test/less/main.less",
 	CSS_TEST_FILE: "test/css/main.css"
+};
+
+const _JS_MINIMAL_FILES = filesJson.minimal.map((item) => {
+	return _CONST.JS_SRC_PATH + item;
+});
+
+const _JS_FILES = filesJson.onix.map((item) => {
+	return _CONST.JS_SRC_PATH + item;
+});
+
+const _HEADER = {
+	VERSION: "2.5.5",
+	DATE: "25. 5. 2016",
+	VERSION_PH: "{VERSION}",
+	DATE_PH: "{DATE}",
+	MINIMAL_PH: "{MINIMAL}",
+	ONIX_JS_PH: '"{ONIX_INFO}"'
 };
 
 class Common {
@@ -342,11 +323,11 @@ class Bundler {
 	_loadFiles() {
 		return new Promise((resolve, reject) => {
 			let c = _CONST;
-			let allFiles = [c.HEADER_FILE, c.HEADER_MINIMAL_FILE].concat(c.JS_FILES);
+			let allFiles = [c.HEADER_FILE].concat(_JS_FILES);
 
 			Common.readFiles(allFiles).then((all) => {
 				all.forEach((file) => {
-					this._filesCache[file.path] = file.data;
+					this._filesCache[file.path] = this._getData(file.path, file.data);
 				});
 
 				resolve();
@@ -365,13 +346,12 @@ class Bundler {
 			if (buffer.length == 1) {
 				let path = buffer[0];
 
-				console.log(path);
-
-				if (_CONST.JS_FILES.indexOf(path) != -1) {
+				if (_JS_FILES.indexOf(path) != -1) {
 					Common.readFile(path).then((data) => {
-						this._filesCache[path] = data;
+						// todo update onix.js
+						this._filesCache[path] = this._getData(path, data);
 
-						this._makeJS(_CONST.JS_FILES, _CONST.JS_OUTPUT);
+						this._makeJS(_JS_FILES, _CONST.JS_OUTPUT);
 					});
 				}
 				else if (path.indexOf(_CONST.WATCH_PATHS[2]) != -1) {
@@ -384,6 +364,14 @@ class Bundler {
 				}
 			}
 		});
+	}
+
+	_getData(path, data) {
+		if (path.indexOf(_CONST.JS_ONIX) != -1) {
+			data = data.replace(_HEADER.ONIX_JS_PH, this._getHeader());
+		}
+		
+		return data;
 	}
 
 	/**
@@ -462,14 +450,14 @@ class Bundler {
 	
 	/**
 	 * @param  {String[]} inputFiles
-	 * @param  {String} headerFile
+	 * @param  {String} headerFileData
 	 * @param  {String} outputFile
 	 * @return {Promise}
 	 */
-	_uglify(inputFiles, headerFile, outputFile) {
+	_uglify(inputFiles, headerFileData, outputFile) {
 		return new Promise((resolve, reject) => {
 			let result = UglifyJS.minify(inputFiles);
-			let data = this._filesCache[headerFile] + result.code;
+			let data = headerFileData + result.code;
 
 			// write output
 			Common.writeFile(outputFile, data).then(() => {
@@ -483,13 +471,57 @@ class Bundler {
 	}
 
 	/**
+	 * Get header data
+	 * 
+	 * @param  {Boolean} addComment Add comment around header?
+	 * @param  {Boolean} addMinimal Add minimal header line? 
+	 * @return {String}
+	 */
+	_getHeader(addComment, addMinimal) {
+		let headerData = this._filesCache[_CONST.HEADER_FILE];
+		let output = [];
+		let joiner = addComment ? "\n" : "";
+
+		if (addComment) {
+			output.push("/**");
+		}
+		
+		let lines = headerData.split("\n");
+		let minPh = addMinimal ? " * minimal version: contains [" + filesJson.minimal.join(", ") + "]" : "";
+
+		lines.forEach((line, ind) => {
+			if (!line.trim().length) return;
+
+			// minimal version replace
+			if (line.match(new RegExp(_HEADER.MINIMAL_PH))) {
+				output.push(minPh);
+			}
+			else {
+				// replace version, date
+				line = line.replace(_HEADER.VERSION_PH, _HEADER.VERSION).replace(_HEADER.DATE_PH, _HEADER.DATE);
+
+				// add comment, update onix.js info() method; lines - 2 (eof, last)
+				output.push((addComment ? " * " : "'") + line + (addComment ? "" : "\\n'" + (ind < lines.length - 2 ? "+\n" : "")));
+			}
+		});
+
+		if (addComment) {
+			output.push(" */");
+			// for last \n
+			output.push("");
+		}
+
+		return output.join(joiner);
+	}
+
+	/**
 	 * Run documentation for JS duck
 	 * 
 	 * @return {Promise}
 	 */
 	_jsduck() {
 		return new Promise((resolve, reject) => {
-			exec("jsduck src/*.js --output docs --warnings=-nodoc,-dup_member,-link_ambiguous --external=XMLHttpRequest,$q", (error, stdout, stderr) => {
+			exec("jsduck src/core/*.js src/onix/*.js src/utils/*.js --output docs --warnings=-nodoc,-dup_member,-link_ambiguous --external=XMLHttpRequest,$q", (error, stdout, stderr) => {
 				if (stdout) {
 					console.log(stdout);
 					resolve();
@@ -507,11 +539,11 @@ class Bundler {
 
 		Common.chainPromises([{
 			method: "_makeJS",
-			args: [c.JS_FILES, c.JS_OUTPUT],
+			args: [_JS_FILES, c.JS_OUTPUT],
 			scope: this
 		}, {
 			method: "_makeJS",
-			args: [c.JS_MINIMAL_FILES, c.JS_MINIMAL_OUTPUT],
+			args: [_JS_MINIMAL_FILES, c.JS_MINIMAL_OUTPUT],
 			scope: this
 		}, {
 			method: "_makeLess",
@@ -538,11 +570,11 @@ class Bundler {
 
 		Common.chainPromises([{
 			method: "_makeJS",
-			args: [c.JS_FILES, c.JS_OUTPUT],
+			args: [_JS_FILES, c.JS_OUTPUT],
 			scope: this
 		}, {
 			method: "_makeJS",
-			args: [c.JS_MINIMAL_FILES, c.JS_MINIMAL_OUTPUT],
+			args: [_JS_MINIMAL_FILES, c.JS_MINIMAL_OUTPUT],
 			scope: this
 		}, {
 			method: "_makeLess",
@@ -554,11 +586,11 @@ class Bundler {
 			scope: this
 		}, {
 			method: "_uglify",
-			args: [[c.JS_OUTPUT], c.HEADER_FILE, c.JS_OUTPUT_MIN],
+			args: [[c.JS_OUTPUT], this._getHeader(true), c.JS_OUTPUT_MIN],
 			scope: this
 		}, {
 			method: "_uglify",
-			args: [[c.JS_MINIMAL_OUTPUT], c.HEADER_MINIMAL_FILE, c.JS_MINIMAL_OUTPUT_MIN],
+			args: [[c.JS_MINIMAL_OUTPUT], this._getHeader(true, true), c.JS_MINIMAL_OUTPUT_MIN],
 			scope: this
 		}, {
 			method: "_jsduck",

@@ -1548,14 +1548,12 @@ onix = (function() {
 	 * @member onix
 	 */
 	onix.info = function() {
-		console.log(
-			"OnixJS framework\n" +
-			"2.5.4/20. 5. 2016\n" +
-			"source: https://gitlab.com/LorDOniX/onix\n" +
-			"documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n" +
-			"@license MIT\n" +
-			"* - Free for use in both personal and commercial projects\n"
-		);
+		console.log('OnixJS framework\n'+
+'2.5.5/25. 5. 2016\n'+
+'source: https://gitlab.com/LorDOniX/onix\n'+
+'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
+'@license MIT\n'+
+'- Free for use in both personal and commercial projects\n');
 	};
 	onix.factory("$di", function() {
 		/**
@@ -1604,379 +1602,6 @@ onix = (function() {
 	return onix;
 })();
 /**
- * Cover class for localStorage.
- * 
- * @class $localStorage
- */
-onix.factory("$localStorage", function() {
-	// localStorage provider
-	var provider = ("localStorage" in window) ? localStorage : {
-		_data: {},
-		setItem: function(key, value) {
-			if (!key) return;
-			this._data[key] = value;
-		},
-		getItem: function(key) {
-			if (!key) return null;
-			return this._data[key];
-		},
-		removeItem: function(key) {
-			if (!key) return;
-			if (key in this._data) {
-				delete this._data[key];
-			}
-		}
-	};
-	return {
-		/**
-		 * Set value to localStorage.
-		 *
-		 * @param {String} key
-		 * @param {String} [value]
-		 * @member $localStorage
-		 */
-		set: function(key, value) {
-			provider.setItem(key, value);
-		},
-		/**
-		 * Get value from localStorage.
-		 *
-		 * @param {String} key
-		 * @return {String}
-		 * @member $localStorage
-		 */
-		get: function(key) {
-			return provider.getItem(key);
-		},
-		/**
-		 * Remove key from localStorage.
-		 *
-		 * @param {String} key
-		 * @return {Boolean}
-		 * @member $localStorage
-		 */
-		remove: function(key) {
-			provider.removeItem(key);
-		}
-	};
-});
-/**
- * Functionality over browser cookies.
- *
- * @class $cookie
- */
-onix.service("$cookie", function() {
-	/**
-	 * Get cookies by her name.
-	 *
-	 * @param  {String} name
-	 * @return {String}
-	 * @member $cookie
-	 * @private
-	 */
-	this.get = function(name) {
-		var cookieValue = null;
-		if (document.cookie && document.cookie != '') {
-			var cookies = document.cookie.split(';');
-			cookies.every(function(cookie) {
-				cookie = cookie.trim();
-				if (cookie.substring(0, name.length + 1) == (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					return false;
-				}
-				else return true;
-			});
-		}
-		return cookieValue;
-	};
-});
-/**
- * Data for controllers in the $route.
- * 
- * @class $routeParams
- */
-onix.factory("$routeParams", function() {
-	return {};
-});
-/**
- * Many useful alghoritms.
- * 
- * @class $math
- */
-onix.service("$math", function() {
-	/**
-	 * Math constants.
-	 *
-	 * @private
-	 * @type {Object}
-	 * @member $math
-	 */
-	this._CONST = {
-		ZOOM: 156543.034
-	};
-	/**
-	 * Is there two bounding box intersection?
-	 * 
-	 * @param  {Object} bbox1
-	 * @param  {Number} bbox1.x Left top coordinates - axe x
-	 * @param  {Number} bbox1.y Left top coordinates - axe y
-	 * @param  {Number} bbox1.width Width of the bbox
-	 * @param  {Number} bbox1.height Height of the bbox
-	 * @param  {Object} bbox2
-	 * @param  {Number} bbox2.x Left top coordinates - axe x
-	 * @param  {Number} bbox2.y Left top coordinates - axe y
-	 * @param  {Number} bbox2.width Width of the bbox
-	 * @param  {Number} bbox2.height Height of the bbox
-	 * @return {Boolean}
-	 * @member $math
-	 */
-	this.isBBoxIntersection = function(bbox1, bbox2) {
-		var ltx = Math.max(bbox1.x, bbox2.x);
-		var lty = Math.max(bbox1.y, bbox2.y);
-		var rbx = Math.min(bbox1.x + bbox1.width, bbox2.x + bbox2.width);
-		var rby = Math.min(bbox1.y + bbox1.height, bbox2.y + bbox2.height);
-		// width and height of intesection has to be higher than 0
-		var width = Math.abs(rbx - ltx);
-		var height = Math.abs(rby - lty);
-		if (ltx <= rbx && lty <= rby && width * height > 0) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	};
-	/**
-	 * Get BBox from points.
-	 * 
-	 * @param  {Object[]} points
-	 * @param  {Number} points.x Coordinate on axe x
-	 * @param  {Number} points.y Coordinate on axe y
-	 * @return {Object} Output bbox with x, y, width and height variables
-	 * @member $math
-	 */
-	this.getBBox = function(points) {
-		var minX = Infinity;
-		var minY = Infinity;
-		var maxX = -Infinity;
-		var maxY = -Infinity;
-		// for each point
-		for (var i = 0; i < points.length; i++) {
-			minX = Math.min(points[i].x, minX);
-			minY = Math.min(points[i].y, minY);
-			maxX = Math.max(points[i].x, maxX);
-			maxY = Math.max(points[i].y, maxY);
-		}
-		return {
-			x: minX,
-			y: minY,
-			width: Math.abs(maxX - minX),
-			height: Math.abs(maxY - minY)
-		};
-	};
-	/**
-	 * Determinant 2x2 count.
-	 * 
-	 * @param {Number} x1
-	 * @param {Number} x2
-	 * @param {Number} y1
-	 * @param {Number} y2
-	 * @returns {Number}
-	 * @member $math
-	 */
-	this.det2 = function(x1, x2, y1, y2) {
-		return (x1 * y2 - y1 * x2);
-	};
-	/**
-	 * Intersection of two lines.
-	 * 
-	 * @param  {Object} firstLine
-	 * @param  {Object} firstLine.x1 Line start axe x
-	 * @param  {Object} firstLine.y1 Line start axe y
-	 * @param  {Object} firstLine.x2 Line end axe x
-	 * @param  {Object} firstLine.y2 Line end axe y
-	 * @param  {Object} secondLine
-	 * @param  {Object} secondLine.x1 Line start axe x
-	 * @param  {Object} secondLine.y1 Line start axe y
-	 * @param  {Object} secondLine.x2 Line end axe x
-	 * @param  {Object} secondLine.y2 Line end axe y
-	 * @returns {Object} Intersection point x, y
-	 * @member $math
-	 */
-	this.linesIntersection = function(firstLine, secondLine) {
-		var TOLERANCE = 0.000001;
-		var a = this.det2(firstLine.x1 - firstLine.x2, firstLine.y1 - firstLine.y2, secondLine.x1 - secondLine.x2, secondLine.y1 - secondLine.y2);
-		if (Math.abs(a) < TOLERANCE) return null; // lines are parallel
-		var d1 = this.det2(firstLine.x1, firstLine.y1, firstLine.x2, firstLine.y2);
-		var d2 = this.det2(secondLine.x1, secondLine.y1, secondLine.x2, secondLine.y2);
-		var x = this.det2(d1, firstLine.x1 - firstLine.x2, d2, secondLine.x1 - secondLine.x2) / a;
-		var y = this.det2(d1, firstLine.y1 - firstLine.y2, d2, secondLine.y1 - secondLine.y2) / a;
-		if (x < Math.min(firstLine.x1, firstLine.x2) - TOLERANCE || x > Math.max(firstLine.x1, firstLine.x2) + TOLERANCE) return null
-		if (y < Math.min(firstLine.y1, firstLine.y2) - TOLERANCE || y > Math.max(firstLine.y1, firstLine.y2) + TOLERANCE) return null
-		if (x < Math.min(secondLine.x1, secondLine.x2) - TOLERANCE || x > Math.max(secondLine.x1, secondLine.x2) + TOLERANCE) return null
-		if (y < Math.min(secondLine.y1, secondLine.y2) - TOLERANCE || y > Math.max(secondLine.y1, secondLine.y2) + TOLERANCE) return null
-		return {
-			x: Math.round(x),
-			y: Math.round(y)
-		};
-	};
-	/**
-	 * Is there point and bounding box intersection?
-	 * 
-	 * @param  {Object} point
-	 * @param  {Number} point.x Point coordinates - axe x
-	 * @param  {Number} point.y Point coordinates - axe y
-	 * @param  {Object} bbox
-	 * @param  {Number} bbox.x Left top coordinates - axe x
-	 * @param  {Number} bbox.y Left top coordinates - axe y
-	 * @param  {Number} bbox.width Width of the bbox
-	 * @param  {Number} bbox.height Height of the bbox
-	 * @return {Boolean}
-	 * @member $math
-	 */
-	this.pointBBoxIntersection = function(point, bbox) {
-		return point.x >= bbox.x && point.x <= (bbox.x + bbox.width) && point.y >= bbox.y && point.y <= (bbox.y + bbox.height);
-	};
-	/**
-	 * Logarithm - base 2.
-	 * 
-	 * @param  {Number} val Input value
-	 * @return {Number}
-	 * @member $math
-	 */
-	this.log2 = function(val) {
-		return Math.log(val) / Math.log(2);
-	};
-	/**
-	 * Map zoom in mercator projection to distance in meters.
-	 * 
-	 * @param  {Number} zoom   Mercator zoom - 2..n
-	 * @param  {Number} horFOV Horizontal field of view
-	 * @param  {Number} height Screen height size
-	 * @return {Number} Distance in meters
-	 * @member $math
-	 */
-	this.zoomToDistance = function(zoom, horFOV, height) {
-		var resolution = this._CONST.ZOOM / Math.pow(2, zoom); // m/px
-		var halfHeight = height / 2;
-		var y = Math.floor(resolution * halfHeight);
-		// we need a half - its in degrees - thats why / 2 * / 180 for radians [rad]; vertical fov -> we need height
-		var alfa = horFOV / 360 * Math.PI;
-		return Math.floor(y / Math.tan(alfa));
-	};
-	/**
-	 * Reverse function for zoomToDistance - distance in meters to zoom in mercator projection.
-	 * 
-	 * @param  {Number} distance Distance in meters
-	 * @param  {Number} horFOV Horizontal field of view
-	 * @param  {Number} height Screen height size
-	 * @return {Number} Mercator zoom
-	 * @member $math
-	 */
-	this.distanceToZoom = function(distance, horFOV, height) {
-		var alfa = horFOV / 360 * Math.PI;
-		var y = Math.tan(alfa) * distance;
-		var mPPx = 2 * y / height; // distance / half of height; meters per pixel
-		return Math.floor(this.log2(this._CONST.ZOOM / mPPx));
-	};
-	/**
-	 * Move point coordinates by angle in degrees.
-	 * 
-	 * @param  {Object} point
-	 * @param  {Number} point.x Point coordinates - axe x
-	 * @param  {Number} point.y Point coordinates - axe y
-	 * @param  {Number} angle Angle in degrees CW
-	 * @member $math
-	 */
-	this.movePointByAngle = function(point, angle) {
-		var rad = (360 - angle) / 180 * Math.PI;
-		var x = point.x;
-		var y = point.y;
-		point.x = x * Math.cos(rad) - y * Math.sin(rad);
-		point.y = x * Math.sin(rad) + y * Math.cos(rad)
-	};
-	/**
-	 * Move point by vector, you can also rotate vector by angle in degrees.
-	 * 
-	 * @param  {Object} point
-	 * @param  {Number} point.x Point coordinates - axe x
-	 * @param  {Number} point.y Point coordinates - axe y
-	 * @param  {Object} vector
-	 * @param  {Number} vector.x Point coordinates - axe x
-	 * @param  {Number} vector.y Point coordinates - axe y
-	 * @param  {Number} [angle] Angle in degrees for vector rotation CW
-	 */
-	this.movePointByVector = function(point, vector, angle) {
-		// because overwrite reference object
-		var vectorSave = {
-			x: vector.x,
-			y: vector.y
-		};
-		this.movePointByAngle(vectorSave, angle || 0);
-		point.x += vectorSave.x;
-		point.y += vectorSave.y;
-	};
-});
-/**
- * Date operations.
- * 
- * @class $date
- */
-onix.service("$date", function() {
-	/**
-	 * Parse EN date to CS format.
-	 * year-month-day -> day. month. year
-	 * 2016-06-31 -> 31. 6. 2016
-	 * 
-	 * @param {String} enDate
-	 * @return {String}
-	 * @member $date
-	 */
-	this.dateENtoCS = function(enDate) {
-		enDate = enDate || "";
-		var parts = enDate.split("-");
-		if (parts.length == 3) {
-			// delete first 0
-			return [parts[2].replace(/^0/, ""), parts[1].replace(/^0/, ""), parts[0]].join(". ");
-		}
-		else return "";
-	};
-	/**
-	 * Parse CS date to EN format.
-	 * day. month. year -> year-month-day
-	 * 31. 6. 2016 -> 2016-06-31
-	 * 
-	 * @param {String} csDate
-	 * @return {String}
-	 * @member $date
-	 */
-	this.dateCStoEN = function(csDate) {
-		// day. month. year 31. 12. 2015
-		csDate = csDate || "";
-		var parts = csDate.split(".");
-		if (parts.length == 3) {
-			var year = parts[2].trim();
-			var month = parts[1].trim();
-			var date = parts[0].trim();
-			// add 0 from left
-			date = date.length == 1 ? "0" + date : date;
-			month = month.length == 1 ? "0" + month : month;
-			return [year, month, date].join("-");
-		}
-		else return "";
-	};
-	/**
-	 * Is string contains CS date format?
-	 * 
-	 * @param  {String} csDate
-	 * @return {Boolean}
-	 * @member $date
-	 */
-	this.isCSdate = function(csDate) {
-		csDate = csDate || "";
-		return !!(csDate.match(/([1-9]|[1-3][0-9])\.[ ]*([1-9]|1[0-2])\.[ ]*[1-9][0-9]{3}/));
-	};
-});
-/**
  * Filter process input data and output can be used in template or in the code.
  *
  * @class $filter
@@ -2011,1229 +1636,6 @@ function(
 		});
 	};
 }]);
-/**
- * Filter - lowercase functionality.
- *
- * @class $filterLowercase
- */
-onix.filter("lowercase", function() {
-	/**
-	 * Input is transformatted to lowercase.
-	 *
-	 * @method lowercase
-	 * @param  {String} input
-	 * @return {String|Object}
-	 * @member $filterLowercase
-	 */
-	return function(input) {
-		if (typeof input === "string") {
-			return input.toLowerCase();
-		}
-		else return input;
-	};
-});
-/**
- * Filter - uppercase functionality.
- *
- * @class $filterUppercase
- */
-onix.filter("uppercase", function() {
-	/**
-	 * Input is transformatted to uppercase.
-	 *
-	 * @method uppercase
-	 * @param  {String} input
-	 * @return {String|Object}
-	 * @member $filterUppercase
-	 */
-	return function(input) {
-		if (typeof input === "string") {
-			return input.toUpperCase();
-		}
-		else return input;
-	};
-});
-/**
- * Filter - json stringify functionality.
- *
- * @class $filterJson
- */
-onix.filter("json", function() {
-	/**
-	 * Input object is stringfied.
-	 *
-	 * @method json
-	 * @param {Object} obj Input object
-	 * @param {Number} [spacing] Number of spaces per indetation
-	 * @return {String}
-	 * @member $filterJson
-	 */
-	return function(obj, spacing) {
-		if (typeof obj === "object") {
-			var space = null;
-			if (spacing) {
-				spacing = parseInt(spacing, 10);
-				space = isNaN(spacing) ? null : spacing;
-			}
-			return JSON.stringify(obj, null, space);
-		}
-		else return obj;
-	};
-});
-onix.factory("$q", function() {
-	/**
-	 * Promise implementation which is similar to angular $q.
-	 * 
-	 * @class $q
-	 */
-	var $q = function() {
-		/**
-		 * Promise states.
-		 *
-		 * @member $q
-		 * @private
-		 */
-		this._STATES = {
-			IDLE: 0,
-			RESOLVED: 1,
-			REJECTED: 2
-		};
-		// current state
-		this._state = this._STATES.IDLE;
-		// all funcs
-		this._funcs = [];
-		// done data
-		this._finishData = null;
-	};
-	/**
-	 * Resolve all functions.
-	 *
-	 * @param  {Boolean} isError
-	 * @member $q
-	 * @private
-	 */
-	$q.prototype._resolveFuncs = function(isError) {
-		this._funcs.forEach(function(fnItem) {
-			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
-				(fnItem.fn)(this._finishData);
-			}
-		}, this);
-		// clear array
-		this._funcs.length = 0;
-		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
-	};
-	/**
-	 * Is promise already finished?
-	 *
-	 * @return {Boolean}
-	 * @member $q
-	 * @private
-	 */
-	$q.prototype._isAlreadyFinished = function() {
-		if (this._state != this._STATES.IDLE) {
-			this._resolveFuncs(this._state == this._STATES.REJECTED);
-		}
-	};
-	/**
-	 * Resolve promise using obj.
-	 *
-	 * @param  {Object} obj
-	 * @member $q
-	 */
-	$q.prototype.resolve = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(false);
-	};
-	/**
-	 * Reject promise using obj.
-	 *
-	 * @param  {Object} obj
-	 * @member $q
-	 */
-	$q.prototype.reject = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(true);
-	};
-	/**
-	 * After promise resolve/reject call then (okFn, errorFn).
-	 *
-	 * @chainable
-	 * @param {Function} [cbOk]
-	 * @param {Function} [cbError]
-	 * @member $q
-	 */
-	$q.prototype.then = function(cbOk, cbError) {
-		if (cbOk && typeof cbOk === "function") {
-			this._funcs.push({
-				fn: cbOk,
-				isError: false
-			});
-		}
-		if (cbError && typeof cbError === "function") {
-			this._funcs.push({
-				fn: cbError,
-				isError: true
-			});
-		}
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * After promise resolve call then cbOk.
-	 *
-	 * @chainable
-	 * @param  {Function} cbOk
-	 * @member $q
-	 */
-	$q.prototype.done = function(cbOk) {
-		this._funcs.push({
-			fn: cbOk,
-			isError: false
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * After promise reject call then cbError.
-	 *
-	 * @chainable
-	 * @param  {Function} cbError
-	 * @member $q
-	 */
-	$q.prototype.error = function(cbError) {
-		this._funcs.push({
-			fn: cbError,
-			isError: true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * Finally for promise.
-	 *
-	 * @method finally
-	 * @chainable
-	 * @param  {Function} cb
-	 * @member $q
-	 */
-	$q.prototype["finally"] = function(cb) {
-		this._funcs.push({
-			fn: cb,
-			"finally": true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	return {
-		/**
-		 * Inner method for chaining promises.
-		 * 
-		 * @param  {Object[]} opts
-		 * @param  {String|Function} opts.method Function or method name inside scope
-		 * @param  {Object} opts.scope Scope for method function
-		 * @param  {Array} opts.args Additional arguments for function
-		 * @param  {$q} promise Done promise $q
-		 * @param  {Array} outArray Array for output from all executed promises
-		 * @private
-		 * @member $q
-		 */
-		_chainPromisesInner: function(opts, promise, outArray) {
-			var firstItem = opts.shift();
-			if (firstItem) {
-				// string or function itself
-				var fn;
-				var error = false;
-				switch (typeof firstItem.method) {
-					case "string":
-						if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
-							error = true;
-						}
-						else {
-							fn = firstItem.scope[firstItem.method];
-							if (typeof fn !== "function") {
-								error = true;
-							}
-						}
-						break;
-					case "function":
-						fn = firstItem.method;
-						break;
-					default:
-						error = true;
-				}
-				if (!error) {
-					fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
-						outArray.push(data);
-						this._chainPromisesInner(opts, promise, outArray);
-					}.bind(this), function(err) {
-						outArray.push(err);
-						this._chainPromisesInner(opts, promise, outArray);
-					}.bind(this));
-				}
-				else {
-					promise.resolve(outArray);
-				}
-			}
-			else {
-				promise.resolve(outArray);
-			}
-		},
-		/**
-		 * Resolve all promises in the array.
-		 *
-		 * @param {$q[]} promises
-		 * @return {$q}
-		 * @member $q
-		 */
-		all: function(promises) {
-			var promise = new $q();
-			if (Array.isArray(promises)) {
-				var count = promises.length;
-				var test = function() {
-					count--;
-					if (count == 0) {
-						promise.resolve();
-					}
-				};
-				promises.forEach(function(item) {
-					item["finally"](test);
-				});
-			}
-			else {
-				promise.resolve();
-			}
-			return promise;
-		},
-		/**
-		 * Deferable object of the promise.
-		 *
-		 * @return {$q}
-		 * @member $q
-		 */
-		defer: function() {
-			return new $q();
-		},
-		/**
-		 * Is object promise?
-		 * 
-		 * @param  {Object}  obj Tested object
-		 * @return {Boolean}
-		 * @member $q
-		 */
-		isPromise: function(obj) {
-			return obj instanceof $q;
-		},
-		/**
-		 * Chaining multiple methods with promises, returns promise.
-		 * 
-		 * @param  {Object[]} opts
-		 * @param  {String|Function} opts.method Function or method name inside scope
-		 * @param  {Object} opts.scope Scope for method function
-		 * @param  {Array} opts.args Additional arguments for function
-		 * @return {$q}
-		 * @member $q
-		 */
-		chainPromises: function(opts) {
-			var promise = this.defer();
-			this._chainPromisesInner(opts, promise, []);
-			return promise;
-		}
-	};
-});
-onix.factory("$promise", function() {
-	/**
-	 * ES6 promise implementation.
-	 * 
-	 * @class $promise
-	 */
-	var $promise = function(cbFn) {
-		/**
-		 * Promise states.
-		 *
-		 * @member $promise
-		 * @private
-		 */
-		this._STATES = {
-			IDLE: 0,
-			RESOLVED: 1,
-			REJECTED: 2
-		};
-		// current state
-		this._state = this._STATES.IDLE;
-		// all funcs
-		this._funcs = [];
-		// done data
-		this._finishData = null;
-		// call promise cb function
-		if (cbFn && typeof cbFn === "function") {
-			cbFn.apply(cbFn, [
-				this._resolve.bind(this),
-				this._reject.bind(this)
-			]);
-		}
-	};
-	/**
-	 * Resolve promise using obj.
-	 *
-	 * @private
-	 * @param  {Object} obj
-	 * @member $promise
-	 */
-	$promise.prototype._resolve = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(false);
-	};
-	/**
-	 * Reject promise using obj.
-	 *
-	 * @private
-	 * @param  {Object} obj
-	 * @member $promise
-	 */
-	$promise.prototype._reject = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(true);
-	};
-	/**
-	 * Resolve all functions.
-	 *
-	 * @param  {Boolean} isError
-	 * @member $promise
-	 * @private
-	 */
-	$promise.prototype._resolveFuncs = function(isError) {
-		this._funcs.forEach(function(fnItem) {
-			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
-				(fnItem.fn)(this._finishData);
-			}
-		}, this);
-		// clear array
-		this._funcs.length = 0;
-		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
-	};
-	/**
-	 * Is promise already finished?
-	 *
-	 * @return {Boolean}
-	 * @member $promise
-	 * @private
-	 */
-	$promise.prototype._isAlreadyFinished = function() {
-		if (this._state != this._STATES.IDLE) {
-			this._resolveFuncs(this._state == this._STATES.REJECTED);
-		}
-	};
-	/**
-	 * After promise resolve/reject call then (okFn, errorFn).
-	 *
-	 * @chainable
-	 * @param {Function} [cbOk]
-	 * @param {Function} [cbError]
-	 * @member $promise
-	 */
-	$promise.prototype.then = function(cbOk, cbError) {
-		if (cbOk && typeof cbOk === "function") {
-			this._funcs.push({
-				fn: cbOk,
-				isError: false
-			});
-		}
-		if (cbError && typeof cbError === "function") {
-			this._funcs.push({
-				fn: cbError,
-				isError: true
-			});
-		}
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * After promise resolve call then cbOk.
-	 *
-	 * @chainable
-	 * @param  {Function} cbOk
-	 * @member $promise
-	 */
-	$promise.prototype.done = function(cbOk) {
-		this._funcs.push({
-			fn: cbOk,
-			isError: false
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * After promise reject call then cbError.
-	 *
-	 * @chainable
-	 * @param  {Function} cbError
-	 * @member $promise
-	 */
-	$promise.prototype.error = function(cbError) {
-		this._funcs.push({
-			fn: cbError,
-			isError: true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * Finally for promise.
-	 *
-	 * @method finally
-	 * @chainable
-	 * @param  {Function} cb
-	 * @member $promise
-	 */
-	$promise.prototype["finally"] = function(cb) {
-		this._funcs.push({
-			fn: cb,
-			"finally": true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	// static methods
-	/**
-	 * Resolve all promises in the array.
-	 *
-	 * @param {$promise[]} promises
-	 * @return {$promise}
-	 * @member $promise
-	 */
-	$promise.all = function(promises) {
-		return new $promise(function(resolve) {
-			if (Array.isArray(promises)) {
-				var count = promises.length;
-				var test = function() {
-					count--;
-					if (count == 0) {
-						resolve();
-					}
-				};
-				promises.forEach(function(item) {
-					item["finally"](test);
-				});
-			}
-			else {
-				resolve();
-			}
-		});
-	};
-	/**
-	 * Resolve promise with variable object.
-	 *
-	 * @param {Object} [obj] Resolved object
-	 * @return {$promise}
-	 * @member $promise
-	 */
-	$promise.resolve = function(obj) {
-		return new $promise(function(resolve) {
-			resolve(obj);
-		});
-	};
-	/**
-	 * Reject promise with variable object.
-	 *
-	 * @param {Object} [obj] Rejected object
-	 * @return {$promise}
-	 * @member $promise
-	 */
-	$promise.reject = function(obj) {
-		return new $promise(function(resolve, reject) {
-			reject(obj);
-		});
-	};
-	return $promise;
-});
-onix.factory("$job", [
-	"$q",
-function(
-	$q
-) {
-	/**
-	 * Factory for manage multiple tasks.
-	 * 
- 	 * @class $job
- 	 */
-	var $job = function() {
-		this._donePromise = $q.defer();
-		this._tasks = [];
-		this._taskDone = {
-			cb: null,
-			scope: null
-		};
-	};
-	/**
-	 * Add task to job. Every job task needs to call doneFn(), which is added to the last argument position.
-	 * 
-	 * @param {Function} task Job function
-	 * @param {Function|Object} [scope] Variable function scope
-	 * @param {Object} [args] Add params to the function
-	 * @member $job
-	 */
-	$job.prototype.add = function(task, scope, args) {
-		args = args || [];
-		if (!Array.isArray(args)) {
-			args = [args];
-		}
-		this._tasks.push({
-			task: task,
-			scope: scope,
-			args: args
-		});
-	};
-	/**
-	 * Start job.
-	 *
-	 * @member $job
-	 */
-	$job.prototype.start = function() {
-		if (!this._tasks.length) return;
-		// because of pop
-		this._tasks.reverse();
-		this._doJob();
-		return this._donePromise;
-	};
-	/**
-	 * Clear all job taks.
-	 *
-	 * @member $job
-	 */
-	$job.prototype.clear = function() {
-		this._tasks = [];
-	};
-	/**
-	 * Set progress function, which will be called after each task will be done.
-	 * 
-	 * @param {Function} cb
-	 * @param {Function|Object} [scope]
-	 * @member $job
-	 */
-	$job.prototype.setTaskDone = function(cb, scope) {
-		this._taskDone.cb = cb;
-		this._taskDone.scope = scope;
-	};
-	/**
-	 * Internal function for running job queue.
-	 *
-	 * @member $job
-	 */
-	$job.prototype._doJob = function() {
-		var rest = this._tasks.length;
-		if (rest == 0) {
-			this._donePromise.resolve();
-		}
-		else {
-			var job = this._tasks.pop();
-			var doneFn = function() {
-				if (this._taskDone.cb) {
-					var doneFnArgs = Array.prototype.slice.call(arguments, 0);
-					this._taskDone.cb.apply(this._taskDone.scope || this._taskDone.cb, doneFnArgs);
-				}
-				this._doJob();
-			}.bind(this);
-			job.task.apply(job.scope || job.task, job.args.concat(doneFn));
-		}
-	};
-	return {
-		/**
-		 * Factory for creating new job.
-		 *
-		 * @member $job
-		 */
-		create: function() {
-			return new $job();
-		},
-		/**
-		 * Run jobs array with count for how many functions will be processed simultinously.
-		 *
-		 * @param  {Object[]} jobsArray Array with jobs objects
-		 * @param  {Function} jobsArray.task Job function
-		 * @param  {Function} [jobsArray.scope] Variable function scope
-		 * @param  {Function} [jobsArray.args] Add params to the function
-		 * @param  {Number} count How many functions processed simultinously
-		 * @param  {Object} taskDoneObj Callback after one task have been done
-		 * @param  {Object} taskDoneObj.cb Function
-		 * @param  {Object} [taskDoneObj.scope] Function scope
-		 * @return {$q} Callback after all jobs are done
-		 * @member $job
-		 */
-		multipleJobs: function(jobsArray, count, taskDoneObj) {
-			var len = jobsArray.length;
-			var jobs = [];
-			for (var i = 0; i < len; i++) {
-				var jp = count > 0 ? i % count : i;
-				var jobItem = jobsArray[i];
-				if (!jobs[jp]) {
-					jobs[jp] = this.create();
-					if (taskDoneObj) {
-						jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
-					}
-				}
-				// add one job
-				jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
-			}
-			var jobPromises = [];
-			jobs.forEach(function(job) {
-				jobPromises.push(job.start());
-			});
-			return $q.all(jobPromises);
-		}
-	};
-}]);
-onix.factory("$myQuery", function() {
-	/**
-	 * DOM manipulation in the style of jquery.
-	 * 
-	 * @class $myQuery
-	 * @chainable
-	 * @param {String|HTMLElement|Array} value
-	 * @param {HTMLElement} [parent]
-	 * @member $myQuery
-	 */
-	var $myQuery = function(value, parent) {
-		this._els = [];
-		parent = parent || document;
-		if (typeof value === "string") {
-			if (parent instanceof $myQuery) {
-				parent = parent.getEl();
-			}
-			this._els = parent.querySelectorAll(value);
-		}
-		else if (Array.isArray(value)) {
-			this._els = value;
-		}
-		else {
-			this._els.push(value);
-		}
-		return this;
-	};
-	/**
-	 * Operation on elements.
-	 * 
-	 * @param  {Function} cb
-	 * @param  {Function} [scope]
-	 * @member $myQuery
-	 * @private
-	 */
-	$myQuery.prototype._operation = function(cb, scope) {
-		// NodeList -> Array
-		if (!Array.isArray(this._els)) {
-			this._els = Array.prototype.slice.call(this._els);
-		}
-		this._els.forEach(function(item, ind) {
-			cb.apply(scope || cb, [item, ind]);
-		});
-	};
-	/**
-	 * Set or get all - cover function.
-	 * 
-	 * @chainable
-	 * @param  {String} newValue
-	 * @param  {String} attr
-	 * @member $myQuery
-	 * @private
-	 */
-	$myQuery.prototype._setGetAll = function(newValue, attr) {
-		if (newValue) {
-			this._operation(function(item) {
-				item[attr] = newValue;
-			});
-			return this;
-		}
-		else {
-			var values = [];
-			this._operation(function(item) {
-				values.push(item[attr]);
-			});
-			if (!values.length) {
-				return null;
-			}
-			else if (values.length == 1) {
-				return values[0];
-			}
-			else {
-				return values;
-			}
-		}
-	};
-	/**
-	 * Get original element.
-	 *
-	 * @param  {Number} [ind]
-	 * @return {HTMLElement}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.getEl = function(ind) {
-		ind = ind || 0;
-		if (ind > this._els.length) {
-			return null;
-		}
-		else {
-			return this._els[ind];
-		}
-	};
-	/**
-	 * Get or set attribute.
-	 *
-	 * @chainable
-	 * @param  {String} name
-	 * @param  {String} [newValue]
-	 * @return {String|Array}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.attr = function(name, newValue) {
-		if (newValue) {
-			this._operation(function(item) {
-				item.setAttribute(name, newValue);
-			});
-			return this;
-		}
-		else {
-			var values = [];
-			this._operation(function(item) {
-				values.push(item.getAttribute(name));
-			});
-			if (!values.length) {
-				return null;
-			}
-			else if (values.length == 1) {
-				return values[0];
-			}
-			else {
-				return values;
-			}
-		}
-	};
-	/**
-	 * Get or set src.
-	 * 
-	 * @param  {String} [newValue]
-	 * @return {String}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.src = function(newValue) {
-		return this._setGetAll(newValue, "src");
-	};
-	/**
-	 * Hide element.
-	 * 
-	 * @chainable
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.hide = function() {
-		this._operation(function(item) {
-			item.style.display = "none";
-		});
-		return this;
-	};
-	/**
-	 * Show element.
-	 *
-	 * @chainable
-	 * @param  {String} [displayStyle]
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.show = function(displayStyle) {
-		this._operation(function(item) {
-			item.style.display = displayStyle || "";
-		});
-		return this;
-	};
-	/**
-	 * Get or set value.
-	 *
-	 * @chainable
-	 * @param  {String} [newValue]
-	 * @return {String}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.val = function(newValue) {
-		return this._setGetAll(newValue, "value");
-	};
-	/**
-	 * Get or set HTML.
-	 * 
-	 * @param  {String} [newValue]
-	 * @return {String}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.html = function(newValue) {
-		return this._setGetAll(newValue, "innerHTML");
-	};
-	/**
-	 * Append another element to this one.
-	 *
-	 * @chainable
-	 * @param  {HTMLElement} child
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.append = function(child) {
-		this._operation(function(item) {
-			item.appendChild(child);
-		});
-		return this;
-	};
-	/**
-	 * Add CSS class.
-	 *
-	 * @chainable
-	 * @param  {String} className
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.addClass = function(className) {
-		this._operation(function(item) {
-			item.classList.add(className);
-		});
-		return this;
-	};
-	/**
-	 * Remove CSS class.
-	 *
-	 * @chainable
-	 * @param  {String} className
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.removeClass = function(className) {
-		this._operation(function(item) {
-			item.classList.remove(className);
-		});
-		return this;
-	};
-	/**
-	 * Toggle CSS class.
-	 *
-	 * @chainable
-	 * @param  {String} className
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.toggleClass = function(className) {
-		this._operation(function(item) {
-			item.classList.toggle(className);
-		});
-		return this;
-	};
-	/**
-	 * Get width.
-	 * 
-	 * @return {Number}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.width = function() {
-		var width = 0;
-		this._operation(function(item) {
-			width += item.offsetWidth;
-		});
-		return width;
-	};
-	/**
-	 * Get height.
-	 * 
-	 * @return {Number}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.height = function() {
-		var height = 0;
-		this._operation(function(item) {
-			height += item.offsetHeight;
-		});
-		return height;
-	};
-	/**
-	 * Click event.
-	 *
-	 * @chainable
-	 * @param  {Function} cb
-	 * @param  {Function} [scope]
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.click = function(cb, scope) {
-		this._operation(function(item) {
-			item.addEventListener("click", function(event) {
-				cb.apply(scope || cb, [event, item]);
-			});
-		});
-		return this;
-	};
-	/**
-	 * Change event.
-	 *
-	 * @chainable
-	 * @param  {Function} cb
-	 * @param  {Function} [scope]
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.change = function(cb, scope) {
-		this._operation(function(item) {
-			item.addEventListener("change", function(event) {
-				cb.apply(scope || cb, [event, item]);
-			});
-		});
-		return this;
-	};
-	/**
-	 * Foreach.
-	 *
-	 * @chainable
-	 * @param  {Function} cb
-	 * @param  {Function} [scope]
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.forEach = function(cb, scope) {
-		this._operation(function(item, ind) {
-			cb.apply(scope || cb, [item, ind]);
-		});
-		return this;
-	};
-	/**
-	 * Remove element.
-	 *
-	 * @chainable
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.remove = function() {
-		this._operation(function(item) {
-			item.parentNode.removeChild(item);
-		});
-		return this;
-	};
-	/**
-	 * Prepend element.
-	 *
-	 * @chainable
-	 * @param  {HTMLElement} child
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.prepend = function(child) {
-		this._operation(function(item) {
-			item.parentNode.insertBefore(child, item);
-		});
-		return this;
-	};
-	/**
-	 * Empty element - clear all its children.
-	 * Much faster than innerHTML = "".
-	 * 
-	 * @chainable
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.empty = function() {
-		this._operation(function(item) {
-			while (item.firstChild) {
-				item.removeChild(item.firstChild);
-			}
-		});
-		return this;
-	};
-	/**
-	 * Get all elements length.
-	 * 
-	 * @return {Number}
-	 * @member $myQuery
-	 */
-	$myQuery.prototype.len = function() {
-		return this._els.length;
-	};
-	/**
-	 * Quick acces to myQuery and DOM manipulation.
-	 *
-	 * @param  {String|HTMLElement|Array} value
-	 * @param {HTMLElement} [parent]
-	 * @return {$myQuery}
-	 * @member onix
-	 * @property {Function}
-	 */
-	onix.element = function(value, parent) {
-		return new $myQuery(value, parent);
-	};
-	return {
-		 /**
-		 * Main cover function.
-		 * 
-		 * @param  {String|HTMLElement|Array} value
-		 * @param {HTMLElement} [parent]
-		 * @return {$myQuery}
-		 * @member $myQuery
-		 */
-		get: function(value, parent) {
-			return new $myQuery(value, parent);
-		}
-	};
-});
-/**
- * Run for cache $myQuery object.
- *
- * @private
- * @member onix
- */
-onix.run(["$myQuery", function() {
-}]);
-/**
- * Class for creating DOM elements and getting their references.
- * 
- * @class $dom
- */
-onix.service("$dom", function() {
-	/**
-	 * Create $dom from the configuration.
-	 *
-	 * @param  {Object} config
-	 * @param  {String} config.el Element name
-	 * @param  {Object} config.attrs Atributes
-	 * @param  {Array} config.child Child nodes
-	 * @param  {Array} config.events Bind events
-	 * @param  {String|Array} config.class Add CSS class/es
-	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
-	 * @return {Object}
-	 * @member $dom
-	 */
-	this.create = function(config, exported) {
-		var el = document.createElement(config.el);
-		Object.keys(config).forEach(function(key) {
-			switch (key) {
-				case "el":
-					break;
-				case "attrs":
-					Object.keys(config.attrs).forEach(function(attr) {
-						el.setAttribute(attr, config.attrs[attr]);
-					});
-					break;
-				case "events":
-					config.events.forEach(function(item) {
-						el.addEventListener(item.event, item.fn);
-					});
-					break;
-				case "child":
-					config.child.forEach(function(child) {
-						el.appendChild(this.create(child, exported));
-					}, this);
-					break;
-				case "_exported":
-					exported[config._exported] = el;
-					break;
-				case "class":
-					var value = config["class"];
-					if (typeof value === "string") {
-						el.classList.add(value);
-					}
-					else if (Array.isArray(value)) {
-						value.forEach(function(item) {
-							el.classList.add(item);
-						});
-					}
-					break;
-				default:
-					el[key] = config[key];
-			}
-		}, this);
-		return el;
-	};
-	/**
-	 * Get element from the document.
-	 *
-	 * @param  {String|Array} els Els = "" -> element; [x, y] -> { x: el, y: el }; [{sel: "div", name: "xyz"}] -> { "xyz": div el }
-	 * @param  {Object} [parent]
-	 * @return {Object}
-	 * @member $dom
-	 */
-	this.get = function(els, parent) {
-		var output;
-		parent = parent || document;
-		if (typeof els === "string" && els) {
-			output = parent.querySelector(els);
-		}
-		else if (Array.isArray(els)) {
-			output = {};
-			els.forEach(function(item) {
-				if (typeof item === "string") {
-					var name = item.replace(/^[.# ]+/g, "");
-					output[name] = parent.querySelector(item);
-				}
-				else {
-					var name = item.sel.replace(/^[.# ]+/g, "");
-					output[item.name || name] = parent.querySelector(item.sel);
-				}
-			});
-		}
-		return output;
-	};
-});
-/**
- * Support class for location operations.
- * 
- * @class $location
- */
-onix.service("$location", function() {
-	// ------------------------ public ----------------------------------------
-	/**
-	 * Page refresh.
-	 *
-	 * @member $location
-	 */
-	this.refresh = function() {
-		window.location.reload();
-	};
-	/**
-	 * Create a new search url.
-	 * 
-	 * @param  {Object} obj
-	 * @return {String}
-	 * @member $location
-	 */
-	this.createSearchURL = function(obj) {
-		var newURL = [];
-		if (obj) {
-			// write
-			var newURL = [];
-			Object.keys(obj).forEach(function(key) {
-				newURL.push(key + "=" + encodeURIComponent(obj[key]));
-			});
-		}
-		if (newURL.length) {
-			return "?" + newURL.join("&");
-		}
-		else return "";
-	};
-	/**
-	 * Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url.
-	 *
-	 * @param  {Object} [obj]
-	 * @return {Object}
-	 * @member $location
-	 */
-	this.search = function(obj) {
-		if (obj) {
-			// write
-			var newURL = this.createSearchURL(obj);
-			if (newURL) {
-				window.location.search = newURL;
-			}
-		}
-		else {
-			// read
-			var data = location.search;
-			var output = {};
-			if (data) {
-				data = data.replace("?", "");
-				data.split("&").forEach(function(item) {
-					var parts = item.split("=");
-					output[parts[0]] = decodeURIComponent(parts[1]);
-				});
-			}
-			return output;
-		}
-	};
-	/**
-	 * Get current location.
-	 *
-	 * @return {String}
-	 * @member $location
-	 */
-	this.get = function() {
-		return window.location.pathname;
-	};
-});
 /**
  * Commom functions used in whole application.
  *
@@ -3492,131 +1894,185 @@ function(
 	};
 }]);
 /**
- * $notify uses bootstrap alerts and provides additional functionality.
- * 
- * @class $notify
+ * Functionality over browser cookies.
+ *
+ * @class $cookie
  */
-onix.service("$notify", [
-	"$common",
-	"$q",
-function(
-	$common,
-	$q
-) {
+onix.service("$cookie", function() {
 	/**
-	 * Create notification object from the element.
-	 * 
-	 * @param {HTMLElement} el
-	 * @member $notify
-	 */
-	var $notify = function(el) {
-		this._el = el;
-		this._HIDE_TIMEOUT = 1500; // [ms]
-		this._options = {
-			"ok": "alert-success",
-			"error": "alert-danger",
-			"info": "alert-info",
-			"warn": "alert-warning"
-		};
-		return this;
-	};
-	/**
-	 * Set value to the notify element.
+	 * Get cookies by her name.
 	 *
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
+	 * @param  {String} name
+	 * @return {String}
+	 * @member $cookie
 	 * @private
 	 */
-	$notify.prototype._setValue = function(txt) {
-		if ($common.isElement(txt)) {
-			onix.element(this._el).empty().append(txt);
+	this.get = function(name) {
+		var cookieValue = null;
+		if (document.cookie && document.cookie != '') {
+			var cookies = document.cookie.split(';');
+			cookies.every(function(cookie) {
+				cookie = cookie.trim();
+				if (cookie.substring(0, name.length + 1) == (name + '=')) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					return false;
+				}
+				else return true;
+			});
 		}
-		else if (typeof txt === "string") {
-			this._el.innerHTML = txt;
+		return cookieValue;
+	};
+});
+/**
+ * Date operations.
+ * 
+ * @class $date
+ */
+onix.service("$date", function() {
+	/**
+	 * Parse EN date to CS format.
+	 * year-month-day -> day. month. year
+	 * 2016-06-31 -> 31. 6. 2016
+	 * 
+	 * @param {String} enDate
+	 * @return {String}
+	 * @member $date
+	 */
+	this.dateENtoCS = function(enDate) {
+		enDate = enDate || "";
+		var parts = enDate.split("-");
+		if (parts.length == 3) {
+			// delete first 0
+			return [parts[2].replace(/^0/, ""), parts[1].replace(/^0/, ""), parts[0]].join(". ");
 		}
+		else return "";
 	};
 	/**
-	 * Reset CSS classes.
-	 *
-	 * @member $notify
-	 */
-	$notify.prototype.reset = function() {
-		Object.keys(this._options).forEach(function(key) {
-			this._el.classList.remove(this._options[key]);
-		}.bind(this));
-		return this;
-	};
-	/**
-	 * Show OK state.
+	 * Parse CS date to EN format.
+	 * day. month. year -> year-month-day
+	 * 31. 6. 2016 -> 2016-06-31
 	 * 
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
+	 * @param {String} csDate
+	 * @return {String}
+	 * @member $date
 	 */
-	$notify.prototype.ok = function(txt) {
-		this._el.classList.add(this._options["ok"]);
-		this._setValue(txt);
-		return this;
+	this.dateCStoEN = function(csDate) {
+		// day. month. year 31. 12. 2015
+		csDate = csDate || "";
+		var parts = csDate.split(".");
+		if (parts.length == 3) {
+			var year = parts[2].trim();
+			var month = parts[1].trim();
+			var date = parts[0].trim();
+			// add 0 from left
+			date = date.length == 1 ? "0" + date : date;
+			month = month.length == 1 ? "0" + month : month;
+			return [year, month, date].join("-");
+		}
+		else return "";
 	};
 	/**
-	 * Show ERROR state.
+	 * Is string contains CS date format?
 	 * 
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
+	 * @param  {String} csDate
+	 * @return {Boolean}
+	 * @member $date
 	 */
-	$notify.prototype.error = function(txt) {
-		this._el.classList.add(this._options["error"]);
-		this._setValue(txt);
-		return this;
+	this.isCSdate = function(csDate) {
+		csDate = csDate || "";
+		return !!(csDate.match(/([1-9]|[1-3][0-9])\.[ ]*([1-9]|1[0-2])\.[ ]*[1-9][0-9]{3}/));
+	};
+});
+/**
+ * Class for creating DOM elements and getting their references.
+ * 
+ * @class $dom
+ */
+onix.service("$dom", function() {
+	/**
+	 * Create $dom from the configuration.
+	 *
+	 * @param  {Object} config
+	 * @param  {String} config.el Element name
+	 * @param  {Object} config.attrs Atributes
+	 * @param  {Array} config.child Child nodes
+	 * @param  {Array} config.events Bind events
+	 * @param  {String|Array} config.class Add CSS class/es
+	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
+	 * @return {Object}
+	 * @member $dom
+	 */
+	this.create = function(config, exported) {
+		var el = document.createElement(config.el);
+		Object.keys(config).forEach(function(key) {
+			switch (key) {
+				case "el":
+					break;
+				case "attrs":
+					Object.keys(config.attrs).forEach(function(attr) {
+						el.setAttribute(attr, config.attrs[attr]);
+					});
+					break;
+				case "events":
+					config.events.forEach(function(item) {
+						el.addEventListener(item.event, item.fn);
+					});
+					break;
+				case "child":
+					config.child.forEach(function(child) {
+						el.appendChild(this.create(child, exported));
+					}, this);
+					break;
+				case "_exported":
+					exported[config._exported] = el;
+					break;
+				case "class":
+					var value = config["class"];
+					if (typeof value === "string") {
+						el.classList.add(value);
+					}
+					else if (Array.isArray(value)) {
+						value.forEach(function(item) {
+							el.classList.add(item);
+						});
+					}
+					break;
+				default:
+					el[key] = config[key];
+			}
+		}, this);
+		return el;
 	};
 	/**
-	 * Show INFO state.
+	 * Get element from the document.
 	 *
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
+	 * @param  {String|Array} els Els = "" -> element; [x, y] -> { x: el, y: el }; [{sel: "div", name: "xyz"}] -> { "xyz": div el }
+	 * @param  {Object} [parent]
+	 * @return {Object}
+	 * @member $dom
 	 */
-	$notify.prototype.info = function(txt) {
-		this._el.classList.add(this._options["info"]);
-		this._setValue(txt);
-		return this;
+	this.get = function(els, parent) {
+		var output;
+		parent = parent || document;
+		if (typeof els === "string" && els) {
+			output = parent.querySelector(els);
+		}
+		else if (Array.isArray(els)) {
+			output = {};
+			els.forEach(function(item) {
+				if (typeof item === "string") {
+					var name = item.replace(/^[.# ]+/g, "");
+					output[name] = parent.querySelector(item);
+				}
+				else {
+					var name = item.sel.replace(/^[.# ]+/g, "");
+					output[item.name || name] = parent.querySelector(item.sel);
+				}
+			});
+		}
+		return output;
 	};
-	/**
-	 * Show WARNING state.
-	 *
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
-	 */
-	$notify.prototype.warn = function(txt) {
-		this._el.classList.add(this._options["warn"]);
-		this._setValue(txt);
-		return this;
-	};
-	/**
-	 * Hide alert after timeout and returns promise at the end of operation.
-	 * Default timeout is 1500 ms.
-	 *
-	 * @param {Number} [timeout] Hide timeout in [ms]
-	 * @return {$q}
-	 * @member $notify
-	 */
-	$notify.prototype.hide = function(timeout) {
-		var promise = $q.defer();
-		setTimeout(function() {
-			this.reset();
-			promise.resolve();
-		}.bind(this), timeout || this._HIDE_TIMEOUT);
-		return promise;
-	};
-	/**
-	 * Main public access to the notify obj.
-	 *
-	 * @param  {HTMLElement} el
-	 * @return {$notify}
-	 * @member $notify
-	 */
-	this.get = function(el) {
-		return new $notify(el);
-	};
-}]);
+});
 onix.factory("$event", [
 	"$common",
 function(
@@ -3739,90 +2195,74 @@ function(
 	};
 }]);
 /**
- * Progress loader in the application.
- * 
- * @class $loader
+ * Filter - lowercase functionality.
+ *
+ * @class $filterLowercase
  */
-onix.factory("$loader", [
-	"$dom",
-function(
-	$dom
-) {
-	var $loader = {
-		/**
-		 * Create loader.
-		 *
-		 * @private
-		 * @member $loader
-		 */
-		_create: function() {
-			this._el = $dom.create({
-				el: "div",
-				"class": "loader"
-			});
-			// insert into the body on first position
-			document.body.insertBefore(this._el, document.body.firstChild);
-		},
-		/**
-		 * Loader init.
-		 *
-		 * @private
-		 * @member $loader
-		 */
-		_init: function() {
-			this._create();
-		},
-		/**
-		 * Start loader.
-		 *
-		 * @member $loader
-		 */
-		start: function() {
-			this._el.classList.add("start");
-		},
-		/**
-		 * End loader.
-		 *
-		 * @member $loader
-		 */
-		end: function() {
-			this._el.classList.remove("start");
-			this._el.classList.add("end");
-			setTimeout(function() {
-				this._el.classList.remove("end");
-				this._el.classList.add("hide");
-				setTimeout(function() {
-					this._el.classList.remove("hide");
-				}.bind(this), 350);
-			}.bind(this), 150);
-		},
-		/**
-		 * Get spinner - DOM or object.
-		 *
-		 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
-		 * @return {HTMLElement|Object}
-		 * @member $loader
-		 */
-		getSpinner: function(getObject) {
-			var children = [];
-			for (var i = 1; i < 6; i++) {
-				children.push({
-					el: "div",
-					"class": "rect" + i
-				});
-			}
-			var domConf = {
-				el: "div",
-				"class": "spinner",
-				child: children
-			};
-			return (getObject ? domConf : $dom.create(domConf));
+onix.filter("lowercase", function() {
+	/**
+	 * Input is transformatted to lowercase.
+	 *
+	 * @method lowercase
+	 * @param  {String} input
+	 * @return {String|Object}
+	 * @member $filterLowercase
+	 */
+	return function(input) {
+		if (typeof input === "string") {
+			return input.toLowerCase();
 		}
+		else return input;
 	};
-	// loader init
-	$loader._init();
-	return $loader;
-}]);
+});
+/**
+ * Filter - uppercase functionality.
+ *
+ * @class $filterUppercase
+ */
+onix.filter("uppercase", function() {
+	/**
+	 * Input is transformatted to uppercase.
+	 *
+	 * @method uppercase
+	 * @param  {String} input
+	 * @return {String|Object}
+	 * @member $filterUppercase
+	 */
+	return function(input) {
+		if (typeof input === "string") {
+			return input.toUpperCase();
+		}
+		else return input;
+	};
+});
+/**
+ * Filter - json stringify functionality.
+ *
+ * @class $filterJson
+ */
+onix.filter("json", function() {
+	/**
+	 * Input object is stringfied.
+	 *
+	 * @method json
+	 * @param {Object} obj Input object
+	 * @param {Number} [spacing] Number of spaces per indetation
+	 * @return {String}
+	 * @member $filterJson
+	 */
+	return function(obj, spacing) {
+		if (typeof obj === "object") {
+			var space = null;
+			if (spacing) {
+				spacing = parseInt(spacing, 10);
+				space = isNaN(spacing) ? null : spacing;
+			}
+			return JSON.stringify(obj, null, space);
+		}
+		else return obj;
+	};
+});
 /**
  * XMLHttpRequest cover class.
  * 
@@ -4266,6 +2706,1806 @@ onix.provider("$i18n", function() {
 onix.config(["$i18nProvider", function($i18nProvider) {
 	$i18nProvider.postProcess();
 }]);
+/**
+ * Class for creating img previews from File[] variable.
+ * 
+ * @class $image
+ */
+onix.service("$image", [
+	"$q",
+function(
+	$q
+) {
+	/**
+	 * FileReader is available.
+	 *
+	 * @private
+	 * @member $image
+	 * @type {Boolean}
+	 */
+	this._hasFileReader = "FileReader" in window;
+	/**
+	 * Canvas is available.
+	 *
+	 * @private
+	 * @member $image
+	 * @type {Boolean}
+	 */
+	this._hasCanvas = !!document.createElement("canvas").getContext;
+	/**
+	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
+	 *
+	 * @param  {Object} file Input file
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {$q} Promise with output object
+	 * @member $image
+	 */
+	this.readFromFile = function(file, maxSize) {
+		var promise = $q.defer();
+		if (!this._hasFileReader) {
+			promise.reject();
+			return promise;
+		}
+		var reader = new FileReader();
+		var output = {
+			img: null,
+			exif: null,
+			canvas: null
+		};
+		reader.onload = function(e) {
+			var binaryData = reader.result;
+			var binaryDataArray = new Uint8Array(binaryData);
+			var exif = null;
+			// exif only for jpeg
+			if (file.type != "png") {
+				exif = this.getEXIF(binaryData);
+			}
+			var img = new Image();
+			img.onload = function() {
+				var imd = this.getImageDim(img, maxSize);
+				var canvas = this.getCanvas(img, {
+					width: imd.width,
+					height: imd.height,
+					orientation: exif ? exif.Orientation : 0,
+					scaled: imd.scale != 1
+				});
+				output.img = img;
+				output.exif = exif;
+				output.canvas = canvas;
+				promise.resolve(output);
+			}.bind(this);
+			img.src = this.fileToBase64(file.type, binaryDataArray);
+		}.bind(this);
+		reader.readAsArrayBuffer(file);
+		return promise;
+	};
+	/**
+	 * Counts image dimension; if maxSize is available, new dimension is calculated.
+	 *
+	 * @param  {Image} img
+	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
+	 * @return {Object}
+	 * @member $image
+	 */
+	this.getImageDim = function(img, maxSize) {
+		var maxSize = maxSize || 0;
+		var largeWidth = maxSize > 0 && img.width > maxSize;
+		var largeHeight = maxSize > 0 && img.height > maxSize;
+		var output = {
+			width: img.width,
+			height: img.height,
+			scale: 1
+		};
+		if (largeWidth || largeHeight) {
+			// resize picture
+			var imgWidth = img.width;
+			var imgHeight = img.height;
+			// portrait x landscape
+			if (img.width > img.height) {
+				// landscape
+				imgHeight = maxSize * imgHeight / imgWidth;
+				imgWidth = maxSize;
+			}
+			else {
+				// portrait
+				imgWidth = maxSize * imgWidth / imgHeight;
+				imgHeight = maxSize;
+			}
+			output.scale = img.width / imgWidth; // ratio between original x scaled image
+			output.width = imgWidth;
+			output.height = imgHeight;
+		}
+		return output;
+	};
+	/**
+	 * Get image canvas - read input img, create canvas with it.
+	 *
+	 * @param  {Image} img
+	 * @param  {Object} [optsArg] Variable options
+	 * @param  {Number} [optsArg.width] Output canvas width
+	 * @param  {Number} [optsArg.height] Output canvas height
+	 * @param  {Number} [optsArg.orientation] EXIF orientation
+	 * @param  {Boolean} [optsArg.scaled = false]
+	 * @return {Canvas}
+	 * @member $image
+	 */
+	this.getCanvas = function(img, optsArg) {
+		var opts = {
+			width: img.width || 0,
+			height: img.height || 0,
+			orientation: 0,
+			scaled: false
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+		if (!this._hasCanvas) return null;
+		var canvas = document.createElement("canvas");
+		var ctx = canvas.getContext("2d");
+		var draw = true;
+		canvas.width = opts.width;
+		canvas.height = opts.height;
+		// rotate
+		if (opts.orientation) {
+			switch (opts.orientation) {
+				case 2:
+					// horizontal flip
+					ctx.translate(opts.width, 0);
+					ctx.scale(-1, 1);
+					break;
+				case 3:
+					// 180° rotate left
+					ctx.translate(opts.width, opts.height);
+					ctx.rotate(Math.PI);
+					break;
+				case 4:
+					// vertical flip
+					ctx.translate(0, opts.height);
+					ctx.scale(1, -1);
+					break;
+				case 5:
+					// vertical flip + 90 rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.scale(1, -1);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+				case 6:
+					// 90° rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(0, -opts.height);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+				case 7:
+					// horizontal flip + 90 rotate right
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(0.5 * Math.PI);
+					ctx.translate(opts.width, -opts.height);
+					ctx.scale(-1, 1);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+					break;
+				case 8:
+					// 90° rotate left
+					canvas.width = opts.height;
+					canvas.height = opts.width;
+					ctx.rotate(-0.5 * Math.PI);
+					ctx.translate(-opts.width, 0);
+					if (opts.scaled) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						draw = false;
+					}
+			}
+		}
+		if (draw) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			if (opts.scaled) {
+				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+			}
+			else {
+				ctx.drawImage(img, 0, 0);
+			}
+		}
+		return canvas;
+	};
+	/**
+	 * Binary data to base64.
+	 *
+	 * @param  {String} fileType
+	 * @param  {Array} binaryData
+	 * @return {String}
+	 * @member $image
+	 */
+	this.fileToBase64 = function(fileType, binaryData) {
+		var length = binaryData.length;
+		var output = "";
+		for (var i = 0; i < length; i += 1) {
+			output += String.fromCharCode(binaryData[i]);
+		}
+		return 'data:' + fileType + ';base64,' + btoa(output);
+	};
+	/**
+	 * Is file a picture?
+	 *
+	 * @param  {File}  file
+	 * @return {Boolean}
+	 * @member $image
+	 */
+	this.isPicture = function(file) {
+		if (file) {
+			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
+		}
+		else return false;
+	};
+	/**
+	 * Get picture files from array of files.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Array}
+	 * @member $image
+	 */
+	this.getPictureFiles = function(files) {
+		var pictureFiles = [];
+		if (files && files.length) {
+			for (var i = 0; i < files.length; i++) {
+				var item = files[i];
+				if (this.isPicture(item)) {
+					pictureFiles.push(item);
+				}
+			}
+		}
+		return pictureFiles;
+	};
+	/**
+	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
+	 * 
+	 * @param  {Array} array of files
+	 * @return {Boolean}
+	 * @member $image
+	 */
+	this.getPicturesCount = function(files) {
+		return this.getPictureFiles(files).length;
+	};
+	/**
+	 * Get image EXIF information.
+	 * 
+	 * @param  {Binary[]} imgData Binary img data
+	 * @return {Object}
+	 * @member $image
+	 */
+	this.getEXIF = function(imgData) {
+		if ("EXIF" in window) {
+			return EXIF.readFromBinaryFile(imgData);
+		}
+		else {
+			return {};
+		}
+	};
+}]);
+onix.factory("$job", [
+	"$q",
+function(
+	$q
+) {
+	/**
+	 * Factory for manage multiple tasks.
+	 * 
+ 	 * @class $job
+ 	 */
+	var $job = function() {
+		this._donePromise = $q.defer();
+		this._tasks = [];
+		this._taskDone = {
+			cb: null,
+			scope: null
+		};
+	};
+	/**
+	 * Add task to job. Every job task needs to call doneFn(), which is added to the last argument position.
+	 * 
+	 * @param {Function} task Job function
+	 * @param {Function|Object} [scope] Variable function scope
+	 * @param {Object} [args] Add params to the function
+	 * @member $job
+	 */
+	$job.prototype.add = function(task, scope, args) {
+		args = args || [];
+		if (!Array.isArray(args)) {
+			args = [args];
+		}
+		this._tasks.push({
+			task: task,
+			scope: scope,
+			args: args
+		});
+	};
+	/**
+	 * Start job.
+	 *
+	 * @member $job
+	 */
+	$job.prototype.start = function() {
+		if (!this._tasks.length) return;
+		// because of pop
+		this._tasks.reverse();
+		this._doJob();
+		return this._donePromise;
+	};
+	/**
+	 * Clear all job taks.
+	 *
+	 * @member $job
+	 */
+	$job.prototype.clear = function() {
+		this._tasks = [];
+	};
+	/**
+	 * Set progress function, which will be called after each task will be done.
+	 * 
+	 * @param {Function} cb
+	 * @param {Function|Object} [scope]
+	 * @member $job
+	 */
+	$job.prototype.setTaskDone = function(cb, scope) {
+		this._taskDone.cb = cb;
+		this._taskDone.scope = scope;
+	};
+	/**
+	 * Internal function for running job queue.
+	 *
+	 * @member $job
+	 */
+	$job.prototype._doJob = function() {
+		var rest = this._tasks.length;
+		if (rest == 0) {
+			this._donePromise.resolve();
+		}
+		else {
+			var job = this._tasks.pop();
+			var doneFn = function() {
+				if (this._taskDone.cb) {
+					var doneFnArgs = Array.prototype.slice.call(arguments, 0);
+					this._taskDone.cb.apply(this._taskDone.scope || this._taskDone.cb, doneFnArgs);
+				}
+				this._doJob();
+			}.bind(this);
+			job.task.apply(job.scope || job.task, job.args.concat(doneFn));
+		}
+	};
+	return {
+		/**
+		 * Factory for creating new job.
+		 *
+		 * @member $job
+		 */
+		create: function() {
+			return new $job();
+		},
+		/**
+		 * Run jobs array with count for how many functions will be processed simultinously.
+		 *
+		 * @param  {Object[]} jobsArray Array with jobs objects
+		 * @param  {Function} jobsArray.task Job function
+		 * @param  {Function} [jobsArray.scope] Variable function scope
+		 * @param  {Function} [jobsArray.args] Add params to the function
+		 * @param  {Number} count How many functions processed simultinously
+		 * @param  {Object} taskDoneObj Callback after one task have been done
+		 * @param  {Object} taskDoneObj.cb Function
+		 * @param  {Object} [taskDoneObj.scope] Function scope
+		 * @return {$q} Callback after all jobs are done
+		 * @member $job
+		 */
+		multipleJobs: function(jobsArray, count, taskDoneObj) {
+			var len = jobsArray.length;
+			var jobs = [];
+			for (var i = 0; i < len; i++) {
+				var jp = count > 0 ? i % count : i;
+				var jobItem = jobsArray[i];
+				if (!jobs[jp]) {
+					jobs[jp] = this.create();
+					if (taskDoneObj) {
+						jobs[jp].setTaskDone(taskDoneObj.cb, taskDoneObj.scope);
+					}
+				}
+				// add one job
+				jobs[jp].add(jobItem.task, jobItem.scope, jobItem.args);
+			}
+			var jobPromises = [];
+			jobs.forEach(function(job) {
+				jobPromises.push(job.start());
+			});
+			return $q.all(jobPromises);
+		}
+	};
+}]);
+/**
+ * Cover class for localStorage.
+ * 
+ * @class $localStorage
+ */
+onix.factory("$localStorage", function() {
+	// localStorage provider
+	var provider = ("localStorage" in window) ? localStorage : {
+		_data: {},
+		setItem: function(key, value) {
+			if (!key) return;
+			this._data[key] = value;
+		},
+		getItem: function(key) {
+			if (!key) return null;
+			return this._data[key];
+		},
+		removeItem: function(key) {
+			if (!key) return;
+			if (key in this._data) {
+				delete this._data[key];
+			}
+		}
+	};
+	return {
+		/**
+		 * Set value to localStorage.
+		 *
+		 * @param {String} key
+		 * @param {String} [value]
+		 * @member $localStorage
+		 */
+		set: function(key, value) {
+			provider.setItem(key, value);
+		},
+		/**
+		 * Get value from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {String}
+		 * @member $localStorage
+		 */
+		get: function(key) {
+			return provider.getItem(key);
+		},
+		/**
+		 * Remove key from localStorage.
+		 *
+		 * @param {String} key
+		 * @return {Boolean}
+		 * @member $localStorage
+		 */
+		remove: function(key) {
+			provider.removeItem(key);
+		}
+	};
+});
+/**
+ * Support class for location operations.
+ * 
+ * @class $location
+ */
+onix.service("$location", function() {
+	// ------------------------ public ----------------------------------------
+	/**
+	 * Page refresh.
+	 *
+	 * @member $location
+	 */
+	this.refresh = function() {
+		window.location.reload();
+	};
+	/**
+	 * Create a new search url.
+	 * 
+	 * @param  {Object} obj
+	 * @return {String}
+	 * @member $location
+	 */
+	this.createSearchURL = function(obj) {
+		var newURL = [];
+		if (obj) {
+			// write
+			var newURL = [];
+			Object.keys(obj).forEach(function(key) {
+				newURL.push(key + "=" + encodeURIComponent(obj[key]));
+			});
+		}
+		if (newURL.length) {
+			return "?" + newURL.join("&");
+		}
+		else return "";
+	};
+	/**
+	 * Get or set new url search. obj -> set new url from obj; !obj -> create obj from search part of url.
+	 *
+	 * @param  {Object} [obj]
+	 * @return {Object}
+	 * @member $location
+	 */
+	this.search = function(obj) {
+		if (obj) {
+			// write
+			var newURL = this.createSearchURL(obj);
+			if (newURL) {
+				window.location.search = newURL;
+			}
+		}
+		else {
+			// read
+			var data = location.search;
+			var output = {};
+			if (data) {
+				data = data.replace("?", "");
+				data.split("&").forEach(function(item) {
+					var parts = item.split("=");
+					output[parts[0]] = decodeURIComponent(parts[1]);
+				});
+			}
+			return output;
+		}
+	};
+	/**
+	 * Get current location.
+	 *
+	 * @return {String}
+	 * @member $location
+	 */
+	this.get = function() {
+		return window.location.pathname;
+	};
+});
+/**
+ * Many useful alghoritms.
+ * 
+ * @class $math
+ */
+onix.service("$math", function() {
+	/**
+	 * Math constants.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @member $math
+	 */
+	this._CONST = {
+		ZOOM: 156543.034
+	};
+	/**
+	 * Is there two bounding box intersection?
+	 * 
+	 * @param  {Object} bbox1
+	 * @param  {Number} bbox1.x Left top coordinates - axe x
+	 * @param  {Number} bbox1.y Left top coordinates - axe y
+	 * @param  {Number} bbox1.width Width of the bbox
+	 * @param  {Number} bbox1.height Height of the bbox
+	 * @param  {Object} bbox2
+	 * @param  {Number} bbox2.x Left top coordinates - axe x
+	 * @param  {Number} bbox2.y Left top coordinates - axe y
+	 * @param  {Number} bbox2.width Width of the bbox
+	 * @param  {Number} bbox2.height Height of the bbox
+	 * @return {Boolean}
+	 * @member $math
+	 */
+	this.isBBoxIntersection = function(bbox1, bbox2) {
+		var ltx = Math.max(bbox1.x, bbox2.x);
+		var lty = Math.max(bbox1.y, bbox2.y);
+		var rbx = Math.min(bbox1.x + bbox1.width, bbox2.x + bbox2.width);
+		var rby = Math.min(bbox1.y + bbox1.height, bbox2.y + bbox2.height);
+		// width and height of intesection has to be higher than 0
+		var width = Math.abs(rbx - ltx);
+		var height = Math.abs(rby - lty);
+		if (ltx <= rbx && lty <= rby && width * height > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	};
+	/**
+	 * Get BBox from points.
+	 * 
+	 * @param  {Object[]} points
+	 * @param  {Number} points.x Coordinate on axe x
+	 * @param  {Number} points.y Coordinate on axe y
+	 * @return {Object} Output bbox with x, y, width and height variables
+	 * @member $math
+	 */
+	this.getBBox = function(points) {
+		var minX = Infinity;
+		var minY = Infinity;
+		var maxX = -Infinity;
+		var maxY = -Infinity;
+		// for each point
+		for (var i = 0; i < points.length; i++) {
+			minX = Math.min(points[i].x, minX);
+			minY = Math.min(points[i].y, minY);
+			maxX = Math.max(points[i].x, maxX);
+			maxY = Math.max(points[i].y, maxY);
+		}
+		return {
+			x: minX,
+			y: minY,
+			width: Math.abs(maxX - minX),
+			height: Math.abs(maxY - minY)
+		};
+	};
+	/**
+	 * Determinant 2x2 count.
+	 * 
+	 * @param {Number} x1
+	 * @param {Number} x2
+	 * @param {Number} y1
+	 * @param {Number} y2
+	 * @returns {Number}
+	 * @member $math
+	 */
+	this.det2 = function(x1, x2, y1, y2) {
+		return (x1 * y2 - y1 * x2);
+	};
+	/**
+	 * Intersection of two lines.
+	 * 
+	 * @param  {Object} firstLine
+	 * @param  {Object} firstLine.x1 Line start axe x
+	 * @param  {Object} firstLine.y1 Line start axe y
+	 * @param  {Object} firstLine.x2 Line end axe x
+	 * @param  {Object} firstLine.y2 Line end axe y
+	 * @param  {Object} secondLine
+	 * @param  {Object} secondLine.x1 Line start axe x
+	 * @param  {Object} secondLine.y1 Line start axe y
+	 * @param  {Object} secondLine.x2 Line end axe x
+	 * @param  {Object} secondLine.y2 Line end axe y
+	 * @returns {Object} Intersection point x, y
+	 * @member $math
+	 */
+	this.linesIntersection = function(firstLine, secondLine) {
+		var TOLERANCE = 0.000001;
+		var a = this.det2(firstLine.x1 - firstLine.x2, firstLine.y1 - firstLine.y2, secondLine.x1 - secondLine.x2, secondLine.y1 - secondLine.y2);
+		if (Math.abs(a) < TOLERANCE) return null; // lines are parallel
+		var d1 = this.det2(firstLine.x1, firstLine.y1, firstLine.x2, firstLine.y2);
+		var d2 = this.det2(secondLine.x1, secondLine.y1, secondLine.x2, secondLine.y2);
+		var x = this.det2(d1, firstLine.x1 - firstLine.x2, d2, secondLine.x1 - secondLine.x2) / a;
+		var y = this.det2(d1, firstLine.y1 - firstLine.y2, d2, secondLine.y1 - secondLine.y2) / a;
+		if (x < Math.min(firstLine.x1, firstLine.x2) - TOLERANCE || x > Math.max(firstLine.x1, firstLine.x2) + TOLERANCE) return null
+		if (y < Math.min(firstLine.y1, firstLine.y2) - TOLERANCE || y > Math.max(firstLine.y1, firstLine.y2) + TOLERANCE) return null
+		if (x < Math.min(secondLine.x1, secondLine.x2) - TOLERANCE || x > Math.max(secondLine.x1, secondLine.x2) + TOLERANCE) return null
+		if (y < Math.min(secondLine.y1, secondLine.y2) - TOLERANCE || y > Math.max(secondLine.y1, secondLine.y2) + TOLERANCE) return null
+		return {
+			x: Math.round(x),
+			y: Math.round(y)
+		};
+	};
+	/**
+	 * Is there point and bounding box intersection?
+	 * 
+	 * @param  {Object} point
+	 * @param  {Number} point.x Point coordinates - axe x
+	 * @param  {Number} point.y Point coordinates - axe y
+	 * @param  {Object} bbox
+	 * @param  {Number} bbox.x Left top coordinates - axe x
+	 * @param  {Number} bbox.y Left top coordinates - axe y
+	 * @param  {Number} bbox.width Width of the bbox
+	 * @param  {Number} bbox.height Height of the bbox
+	 * @return {Boolean}
+	 * @member $math
+	 */
+	this.pointBBoxIntersection = function(point, bbox) {
+		return point.x >= bbox.x && point.x <= (bbox.x + bbox.width) && point.y >= bbox.y && point.y <= (bbox.y + bbox.height);
+	};
+	/**
+	 * Logarithm - base 2.
+	 * 
+	 * @param  {Number} val Input value
+	 * @return {Number}
+	 * @member $math
+	 */
+	this.log2 = function(val) {
+		return Math.log(val) / Math.log(2);
+	};
+	/**
+	 * Map zoom in mercator projection to distance in meters.
+	 * 
+	 * @param  {Number} zoom   Mercator zoom - 2..n
+	 * @param  {Number} horFOV Horizontal field of view
+	 * @param  {Number} height Screen height size
+	 * @return {Number} Distance in meters
+	 * @member $math
+	 */
+	this.zoomToDistance = function(zoom, horFOV, height) {
+		var resolution = this._CONST.ZOOM / Math.pow(2, zoom); // m/px
+		var halfHeight = height / 2;
+		var y = Math.floor(resolution * halfHeight);
+		// we need a half - its in degrees - thats why / 2 * / 180 for radians [rad]; vertical fov -> we need height
+		var alfa = horFOV / 360 * Math.PI;
+		return Math.floor(y / Math.tan(alfa));
+	};
+	/**
+	 * Reverse function for zoomToDistance - distance in meters to zoom in mercator projection.
+	 * 
+	 * @param  {Number} distance Distance in meters
+	 * @param  {Number} horFOV Horizontal field of view
+	 * @param  {Number} height Screen height size
+	 * @return {Number} Mercator zoom
+	 * @member $math
+	 */
+	this.distanceToZoom = function(distance, horFOV, height) {
+		var alfa = horFOV / 360 * Math.PI;
+		var y = Math.tan(alfa) * distance;
+		var mPPx = 2 * y / height; // distance / half of height; meters per pixel
+		return Math.floor(this.log2(this._CONST.ZOOM / mPPx));
+	};
+	/**
+	 * Move point coordinates by angle in degrees.
+	 * 
+	 * @param  {Object} point
+	 * @param  {Number} point.x Point coordinates - axe x
+	 * @param  {Number} point.y Point coordinates - axe y
+	 * @param  {Number} angle Angle in degrees CW
+	 * @member $math
+	 */
+	this.movePointByAngle = function(point, angle) {
+		var rad = (360 - angle) / 180 * Math.PI;
+		var x = point.x;
+		var y = point.y;
+		point.x = x * Math.cos(rad) - y * Math.sin(rad);
+		point.y = x * Math.sin(rad) + y * Math.cos(rad)
+	};
+	/**
+	 * Move point by vector, you can also rotate vector by angle in degrees.
+	 * 
+	 * @param  {Object} point
+	 * @param  {Number} point.x Point coordinates - axe x
+	 * @param  {Number} point.y Point coordinates - axe y
+	 * @param  {Object} vector
+	 * @param  {Number} vector.x Point coordinates - axe x
+	 * @param  {Number} vector.y Point coordinates - axe y
+	 * @param  {Number} [angle] Angle in degrees for vector rotation CW
+	 */
+	this.movePointByVector = function(point, vector, angle) {
+		// because overwrite reference object
+		var vectorSave = {
+			x: vector.x,
+			y: vector.y
+		};
+		this.movePointByAngle(vectorSave, angle || 0);
+		point.x += vectorSave.x;
+		point.y += vectorSave.y;
+	};
+});
+onix.factory("$myQuery", function() {
+	/**
+	 * DOM manipulation in the style of jquery.
+	 * 
+	 * @class $myQuery
+	 * @chainable
+	 * @param {String|HTMLElement|Array} value
+	 * @param {HTMLElement} [parent]
+	 * @member $myQuery
+	 */
+	var $myQuery = function(value, parent) {
+		this._els = [];
+		parent = parent || document;
+		if (typeof value === "string") {
+			if (parent instanceof $myQuery) {
+				parent = parent.getEl();
+			}
+			this._els = parent.querySelectorAll(value);
+		}
+		else if (Array.isArray(value)) {
+			this._els = value;
+		}
+		else {
+			this._els.push(value);
+		}
+		return this;
+	};
+	/**
+	 * Operation on elements.
+	 * 
+	 * @param  {Function} cb
+	 * @param  {Function} [scope]
+	 * @member $myQuery
+	 * @private
+	 */
+	$myQuery.prototype._operation = function(cb, scope) {
+		// NodeList -> Array
+		if (!Array.isArray(this._els)) {
+			this._els = Array.prototype.slice.call(this._els);
+		}
+		this._els.forEach(function(item, ind) {
+			cb.apply(scope || cb, [item, ind]);
+		});
+	};
+	/**
+	 * Set or get all - cover function.
+	 * 
+	 * @chainable
+	 * @param  {String} newValue
+	 * @param  {String} attr
+	 * @member $myQuery
+	 * @private
+	 */
+	$myQuery.prototype._setGetAll = function(newValue, attr) {
+		if (newValue) {
+			this._operation(function(item) {
+				item[attr] = newValue;
+			});
+			return this;
+		}
+		else {
+			var values = [];
+			this._operation(function(item) {
+				values.push(item[attr]);
+			});
+			if (!values.length) {
+				return null;
+			}
+			else if (values.length == 1) {
+				return values[0];
+			}
+			else {
+				return values;
+			}
+		}
+	};
+	/**
+	 * Get original element.
+	 *
+	 * @param  {Number} [ind]
+	 * @return {HTMLElement}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.getEl = function(ind) {
+		ind = ind || 0;
+		if (ind > this._els.length) {
+			return null;
+		}
+		else {
+			return this._els[ind];
+		}
+	};
+	/**
+	 * Get or set attribute.
+	 *
+	 * @chainable
+	 * @param  {String} name
+	 * @param  {String} [newValue]
+	 * @return {String|Array}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.attr = function(name, newValue) {
+		if (newValue) {
+			this._operation(function(item) {
+				item.setAttribute(name, newValue);
+			});
+			return this;
+		}
+		else {
+			var values = [];
+			this._operation(function(item) {
+				values.push(item.getAttribute(name));
+			});
+			if (!values.length) {
+				return null;
+			}
+			else if (values.length == 1) {
+				return values[0];
+			}
+			else {
+				return values;
+			}
+		}
+	};
+	/**
+	 * Get or set src.
+	 * 
+	 * @param  {String} [newValue]
+	 * @return {String}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.src = function(newValue) {
+		return this._setGetAll(newValue, "src");
+	};
+	/**
+	 * Hide element.
+	 * 
+	 * @chainable
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.hide = function() {
+		this._operation(function(item) {
+			item.style.display = "none";
+		});
+		return this;
+	};
+	/**
+	 * Show element.
+	 *
+	 * @chainable
+	 * @param  {String} [displayStyle]
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.show = function(displayStyle) {
+		this._operation(function(item) {
+			item.style.display = displayStyle || "";
+		});
+		return this;
+	};
+	/**
+	 * Get or set value.
+	 *
+	 * @chainable
+	 * @param  {String} [newValue]
+	 * @return {String}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.val = function(newValue) {
+		return this._setGetAll(newValue, "value");
+	};
+	/**
+	 * Get or set HTML.
+	 * 
+	 * @param  {String} [newValue]
+	 * @return {String}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.html = function(newValue) {
+		return this._setGetAll(newValue, "innerHTML");
+	};
+	/**
+	 * Append another element to this one.
+	 *
+	 * @chainable
+	 * @param  {HTMLElement} child
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.append = function(child) {
+		this._operation(function(item) {
+			item.appendChild(child);
+		});
+		return this;
+	};
+	/**
+	 * Add CSS class.
+	 *
+	 * @chainable
+	 * @param  {String} className
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.addClass = function(className) {
+		this._operation(function(item) {
+			item.classList.add(className);
+		});
+		return this;
+	};
+	/**
+	 * Remove CSS class.
+	 *
+	 * @chainable
+	 * @param  {String} className
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.removeClass = function(className) {
+		this._operation(function(item) {
+			item.classList.remove(className);
+		});
+		return this;
+	};
+	/**
+	 * Toggle CSS class.
+	 *
+	 * @chainable
+	 * @param  {String} className
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.toggleClass = function(className) {
+		this._operation(function(item) {
+			item.classList.toggle(className);
+		});
+		return this;
+	};
+	/**
+	 * Get width.
+	 * 
+	 * @return {Number}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.width = function() {
+		var width = 0;
+		this._operation(function(item) {
+			width += item.offsetWidth;
+		});
+		return width;
+	};
+	/**
+	 * Get height.
+	 * 
+	 * @return {Number}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.height = function() {
+		var height = 0;
+		this._operation(function(item) {
+			height += item.offsetHeight;
+		});
+		return height;
+	};
+	/**
+	 * Click event.
+	 *
+	 * @chainable
+	 * @param  {Function} cb
+	 * @param  {Function} [scope]
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.click = function(cb, scope) {
+		this._operation(function(item) {
+			item.addEventListener("click", function(event) {
+				cb.apply(scope || cb, [event, item]);
+			});
+		});
+		return this;
+	};
+	/**
+	 * Change event.
+	 *
+	 * @chainable
+	 * @param  {Function} cb
+	 * @param  {Function} [scope]
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.change = function(cb, scope) {
+		this._operation(function(item) {
+			item.addEventListener("change", function(event) {
+				cb.apply(scope || cb, [event, item]);
+			});
+		});
+		return this;
+	};
+	/**
+	 * Foreach.
+	 *
+	 * @chainable
+	 * @param  {Function} cb
+	 * @param  {Function} [scope]
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.forEach = function(cb, scope) {
+		this._operation(function(item, ind) {
+			cb.apply(scope || cb, [item, ind]);
+		});
+		return this;
+	};
+	/**
+	 * Remove element.
+	 *
+	 * @chainable
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.remove = function() {
+		this._operation(function(item) {
+			item.parentNode.removeChild(item);
+		});
+		return this;
+	};
+	/**
+	 * Prepend element.
+	 *
+	 * @chainable
+	 * @param  {HTMLElement} child
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.prepend = function(child) {
+		this._operation(function(item) {
+			item.parentNode.insertBefore(child, item);
+		});
+		return this;
+	};
+	/**
+	 * Empty element - clear all its children.
+	 * Much faster than innerHTML = "".
+	 * 
+	 * @chainable
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.empty = function() {
+		this._operation(function(item) {
+			while (item.firstChild) {
+				item.removeChild(item.firstChild);
+			}
+		});
+		return this;
+	};
+	/**
+	 * Get all elements length.
+	 * 
+	 * @return {Number}
+	 * @member $myQuery
+	 */
+	$myQuery.prototype.len = function() {
+		return this._els.length;
+	};
+	/**
+	 * Quick acces to myQuery and DOM manipulation.
+	 *
+	 * @param  {String|HTMLElement|Array} value
+	 * @param {HTMLElement} [parent]
+	 * @return {$myQuery}
+	 * @member onix
+	 * @property {Function}
+	 */
+	onix.element = function(value, parent) {
+		return new $myQuery(value, parent);
+	};
+	return {
+		 /**
+		 * Main cover function.
+		 * 
+		 * @param  {String|HTMLElement|Array} value
+		 * @param {HTMLElement} [parent]
+		 * @return {$myQuery}
+		 * @member $myQuery
+		 */
+		get: function(value, parent) {
+			return new $myQuery(value, parent);
+		}
+	};
+});
+/**
+ * Run for cache $myQuery object.
+ *
+ * @private
+ * @member onix
+ */
+onix.run(["$myQuery", function() {
+}]);
+onix.factory("$promise", function() {
+	/**
+	 * ES6 promise implementation.
+	 * 
+	 * @class $promise
+	 */
+	var $promise = function(cbFn) {
+		/**
+		 * Promise states.
+		 *
+		 * @member $promise
+		 * @private
+		 */
+		this._STATES = {
+			IDLE: 0,
+			RESOLVED: 1,
+			REJECTED: 2
+		};
+		// current state
+		this._state = this._STATES.IDLE;
+		// all funcs
+		this._funcs = [];
+		// done data
+		this._finishData = null;
+		// call promise cb function
+		if (cbFn && typeof cbFn === "function") {
+			cbFn.apply(cbFn, [
+				this._resolve.bind(this),
+				this._reject.bind(this)
+			]);
+		}
+	};
+	/**
+	 * Resolve promise using obj.
+	 *
+	 * @private
+	 * @param  {Object} obj
+	 * @member $promise
+	 */
+	$promise.prototype._resolve = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(false);
+	};
+	/**
+	 * Reject promise using obj.
+	 *
+	 * @private
+	 * @param  {Object} obj
+	 * @member $promise
+	 */
+	$promise.prototype._reject = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(true);
+	};
+	/**
+	 * Resolve all functions.
+	 *
+	 * @param  {Boolean} isError
+	 * @member $promise
+	 * @private
+	 */
+	$promise.prototype._resolveFuncs = function(isError) {
+		this._funcs.forEach(function(fnItem) {
+			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
+				(fnItem.fn)(this._finishData);
+			}
+		}, this);
+		// clear array
+		this._funcs.length = 0;
+		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
+	};
+	/**
+	 * Is promise already finished?
+	 *
+	 * @return {Boolean}
+	 * @member $promise
+	 * @private
+	 */
+	$promise.prototype._isAlreadyFinished = function() {
+		if (this._state != this._STATES.IDLE) {
+			this._resolveFuncs(this._state == this._STATES.REJECTED);
+		}
+	};
+	/**
+	 * After promise resolve/reject call then (okFn, errorFn).
+	 *
+	 * @chainable
+	 * @param {Function} [cbOk]
+	 * @param {Function} [cbError]
+	 * @member $promise
+	 */
+	$promise.prototype.then = function(cbOk, cbError) {
+		if (cbOk && typeof cbOk === "function") {
+			this._funcs.push({
+				fn: cbOk,
+				isError: false
+			});
+		}
+		if (cbError && typeof cbError === "function") {
+			this._funcs.push({
+				fn: cbError,
+				isError: true
+			});
+		}
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * After promise resolve call then cbOk.
+	 *
+	 * @chainable
+	 * @param  {Function} cbOk
+	 * @member $promise
+	 */
+	$promise.prototype.done = function(cbOk) {
+		this._funcs.push({
+			fn: cbOk,
+			isError: false
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * After promise reject call then cbError.
+	 *
+	 * @chainable
+	 * @param  {Function} cbError
+	 * @member $promise
+	 */
+	$promise.prototype.error = function(cbError) {
+		this._funcs.push({
+			fn: cbError,
+			isError: true
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * Finally for promise.
+	 *
+	 * @method finally
+	 * @chainable
+	 * @param  {Function} cb
+	 * @member $promise
+	 */
+	$promise.prototype["finally"] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			"finally": true
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	// static methods
+	/**
+	 * Resolve all promises in the array.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.all = function(promises) {
+		return new $promise(function(resolve) {
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+					if (count == 0) {
+						resolve();
+					}
+				};
+				promises.forEach(function(item) {
+					item["finally"](test);
+				});
+			}
+			else {
+				resolve();
+			}
+		});
+	};
+	/**
+	 * Resolve promise with variable object.
+	 *
+	 * @param {Object} [obj] Resolved object
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.resolve = function(obj) {
+		return new $promise(function(resolve) {
+			resolve(obj);
+		});
+	};
+	/**
+	 * Reject promise with variable object.
+	 *
+	 * @param {Object} [obj] Rejected object
+	 * @return {$promise}
+	 * @member $promise
+	 */
+	$promise.reject = function(obj) {
+		return new $promise(function(resolve, reject) {
+			reject(obj);
+		});
+	};
+	return $promise;
+});
+onix.factory("$q", function() {
+	/**
+	 * Promise implementation which is similar to angular $q.
+	 * 
+	 * @class $q
+	 */
+	var $q = function() {
+		/**
+		 * Promise states.
+		 *
+		 * @member $q
+		 * @private
+		 */
+		this._STATES = {
+			IDLE: 0,
+			RESOLVED: 1,
+			REJECTED: 2
+		};
+		// current state
+		this._state = this._STATES.IDLE;
+		// all funcs
+		this._funcs = [];
+		// done data
+		this._finishData = null;
+	};
+	/**
+	 * Resolve all functions.
+	 *
+	 * @param  {Boolean} isError
+	 * @member $q
+	 * @private
+	 */
+	$q.prototype._resolveFuncs = function(isError) {
+		this._funcs.forEach(function(fnItem) {
+			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
+				(fnItem.fn)(this._finishData);
+			}
+		}, this);
+		// clear array
+		this._funcs.length = 0;
+		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
+	};
+	/**
+	 * Is promise already finished?
+	 *
+	 * @return {Boolean}
+	 * @member $q
+	 * @private
+	 */
+	$q.prototype._isAlreadyFinished = function() {
+		if (this._state != this._STATES.IDLE) {
+			this._resolveFuncs(this._state == this._STATES.REJECTED);
+		}
+	};
+	/**
+	 * Resolve promise using obj.
+	 *
+	 * @param  {Object} obj
+	 * @member $q
+	 */
+	$q.prototype.resolve = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(false);
+	};
+	/**
+	 * Reject promise using obj.
+	 *
+	 * @param  {Object} obj
+	 * @member $q
+	 */
+	$q.prototype.reject = function(obj) {
+		this._finishData = obj;
+		this._resolveFuncs(true);
+	};
+	/**
+	 * After promise resolve/reject call then (okFn, errorFn).
+	 *
+	 * @chainable
+	 * @param {Function} [cbOk]
+	 * @param {Function} [cbError]
+	 * @member $q
+	 */
+	$q.prototype.then = function(cbOk, cbError) {
+		if (cbOk && typeof cbOk === "function") {
+			this._funcs.push({
+				fn: cbOk,
+				isError: false
+			});
+		}
+		if (cbError && typeof cbError === "function") {
+			this._funcs.push({
+				fn: cbError,
+				isError: true
+			});
+		}
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * After promise resolve call then cbOk.
+	 *
+	 * @chainable
+	 * @param  {Function} cbOk
+	 * @member $q
+	 */
+	$q.prototype.done = function(cbOk) {
+		this._funcs.push({
+			fn: cbOk,
+			isError: false
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * After promise reject call then cbError.
+	 *
+	 * @chainable
+	 * @param  {Function} cbError
+	 * @member $q
+	 */
+	$q.prototype.error = function(cbError) {
+		this._funcs.push({
+			fn: cbError,
+			isError: true
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	/**
+	 * Finally for promise.
+	 *
+	 * @method finally
+	 * @chainable
+	 * @param  {Function} cb
+	 * @member $q
+	 */
+	$q.prototype["finally"] = function(cb) {
+		this._funcs.push({
+			fn: cb,
+			"finally": true
+		});
+		this._isAlreadyFinished();
+		return this;
+	};
+	return {
+		/**
+		 * Inner method for chaining promises.
+		 * 
+		 * @param  {Object[]} opts
+		 * @param  {String|Function} opts.method Function or method name inside scope
+		 * @param  {Object} opts.scope Scope for method function
+		 * @param  {Array} opts.args Additional arguments for function
+		 * @param  {$q} promise Done promise $q
+		 * @param  {Array} outArray Array for output from all executed promises
+		 * @private
+		 * @member $q
+		 */
+		_chainPromisesInner: function(opts, promise, outArray) {
+			var firstItem = opts.shift();
+			if (firstItem) {
+				// string or function itself
+				var fn;
+				var error = false;
+				switch (typeof firstItem.method) {
+					case "string":
+						if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
+							error = true;
+						}
+						else {
+							fn = firstItem.scope[firstItem.method];
+							if (typeof fn !== "function") {
+								error = true;
+							}
+						}
+						break;
+					case "function":
+						fn = firstItem.method;
+						break;
+					default:
+						error = true;
+				}
+				if (!error) {
+					fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
+						outArray.push(data);
+						this._chainPromisesInner(opts, promise, outArray);
+					}.bind(this), function(err) {
+						outArray.push(err);
+						this._chainPromisesInner(opts, promise, outArray);
+					}.bind(this));
+				}
+				else {
+					promise.resolve(outArray);
+				}
+			}
+			else {
+				promise.resolve(outArray);
+			}
+		},
+		/**
+		 * Resolve all promises in the array.
+		 *
+		 * @param {$q[]} promises
+		 * @return {$q}
+		 * @member $q
+		 */
+		all: function(promises) {
+			var promise = new $q();
+			if (Array.isArray(promises)) {
+				var count = promises.length;
+				var test = function() {
+					count--;
+					if (count == 0) {
+						promise.resolve();
+					}
+				};
+				promises.forEach(function(item) {
+					item["finally"](test);
+				});
+			}
+			else {
+				promise.resolve();
+			}
+			return promise;
+		},
+		/**
+		 * Deferable object of the promise.
+		 *
+		 * @return {$q}
+		 * @member $q
+		 */
+		defer: function() {
+			return new $q();
+		},
+		/**
+		 * Is object promise?
+		 * 
+		 * @param  {Object}  obj Tested object
+		 * @return {Boolean}
+		 * @member $q
+		 */
+		isPromise: function(obj) {
+			return obj instanceof $q;
+		},
+		/**
+		 * Chaining multiple methods with promises, returns promise.
+		 * 
+		 * @param  {Object[]} opts
+		 * @param  {String|Function} opts.method Function or method name inside scope
+		 * @param  {Object} opts.scope Scope for method function
+		 * @param  {Array} opts.args Additional arguments for function
+		 * @return {$q}
+		 * @member $q
+		 */
+		chainPromises: function(opts) {
+			var promise = this.defer();
+			this._chainPromisesInner(opts, promise, []);
+			return promise;
+		}
+	};
+});
+/**
+ * Simple router for the application.
+ * 
+ * @class $route
+ */
+onix.service("$route", [
+	"$location",
+	"$template",
+	"$di",
+	"$routeParams",
+function(
+	$location,
+	$template,
+	$di,
+	$routeParams
+) {
+	/**
+	 * All routes.
+	 *
+	 * @private
+	 * @type {Array}
+	 * @member $route
+	 */
+	this._routes = [];
+	/**
+	 * Otherwise route.
+	 *
+	 * @private
+	 * @type {Object}
+	 * @member $route
+	 */
+	this._otherwise = null;
+	/**
+	 * Set $routeParams object. First clear all old keys and add new ones, if the available.
+	 *
+	 * @private
+	 * @param {Object} [routeParams] Route params object
+	 * @type {Object}
+	 * @member $route
+	 */
+	this._setRouteParams = function(routeParams) {
+		Object.keys($routeParams).forEach(function(key) {
+			delete $routeParams[key];
+		});
+		routeParams = routeParams || {};
+		Object.keys(routeParams).forEach(function(key) {
+			$routeParams[key] = routeParams[key];
+		});
+	};
+	/**
+	 * Add route to the router.
+	 *
+	 * @chainable
+	 * @param  {String} url 
+	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
+	 * @member $route
+	 */
+	this.when = function(url, config) {
+		this._routes.push({
+			url: url,
+			config: config
+		});
+		return this;
+	};
+	/**
+	 * Otherwise.
+	 *
+	 * @chainable
+	 * @param  {String} page
+	 * @param  {Object} config
+	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
+	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
+	 * @param  {String} [config.controller] Run this function if the route is used
+	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
+	 * @member $route
+	 */
+	this.otherwise = function(config) {
+		this._otherwise = {
+			config: config
+		};
+		return this;
+	};
+	/**
+	 * Run controller from route path.
+	 *
+	 * @private
+	 * @param  {Array|Function} contr
+	 * @param  {Object} [routeParams] Additonal data
+	 * @member $route
+	 */
+	this._runController = function(contr, routeParams) {
+		var pp = $di.parseParam(contr);
+		this._setRouteParams(routeParams);
+		$di.run({
+			fn: pp.fn,
+			inject: pp.inject
+		});
+	};
+	/**
+	 * Route GO. Walk through all routes, if there is match, route controller will be called.
+	 *
+	 * @member $route
+	 */
+	this.go = function() {
+		var path = $location.get();
+		var find = false;
+		var config = null;
+		var data = {};
+		this._routes.every(function(item) {
+			if (path.match(new RegExp(item.url))) {
+				config = item.config;
+				find = true;
+				return false;
+			}
+			else {
+				return true;
+			}
+		});
+		if (!find && this._otherwise) {
+			config = this._otherwise.config;
+		}
+		if (config) {
+			var templateId = "";
+			var templateUrl = null;
+			var contr = null;
+			var routeParams = {};
+			Object.keys(config).forEach(function(key) {
+				var value = config[key];
+				switch (key) {
+					case "templateId":
+						templateId = value;
+						break;
+					case "templateUrl":
+						templateUrl = value;
+						break;
+					case "controller":
+						contr = value;
+						break;
+					default:
+						routeParams[key] = value;
+				}
+			});
+			if (templateUrl) {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
+					if (contr) {
+						this._runController(contr, routeParams);
+					}
+				}.bind(this));
+			}
+			else {
+				if (contr) {
+					this._runController(contr, routeParams);
+				}
+			}
+		}
+	};
+}]);
+/**
+ * Data for controllers in the $route.
+ * 
+ * @class $routeParams
+ */
+onix.factory("$routeParams", function() {
+	return {};
+});
 onix.provider("$template", function() {
 	/**
 	 * Configuration for template delimeters.
@@ -4573,1194 +4813,6 @@ onix.provider("$template", function() {
 		return $template;
 	}];
 });
-/**
- * Simple router for the application.
- * 
- * @class $route
- */
-onix.service("$route", [
-	"$location",
-	"$template",
-	"$di",
-	"$routeParams",
-function(
-	$location,
-	$template,
-	$di,
-	$routeParams
-) {
-	/**
-	 * All routes.
-	 *
-	 * @private
-	 * @type {Array}
-	 * @member $route
-	 */
-	this._routes = [];
-	/**
-	 * Otherwise route.
-	 *
-	 * @private
-	 * @type {Object}
-	 * @member $route
-	 */
-	this._otherwise = null;
-	/**
-	 * Set $routeParams object. First clear all old keys and add new ones, if the available.
-	 *
-	 * @private
-	 * @param {Object} [routeParams] Route params object
-	 * @type {Object}
-	 * @member $route
-	 */
-	this._setRouteParams = function(routeParams) {
-		Object.keys($routeParams).forEach(function(key) {
-			delete $routeParams[key];
-		});
-		routeParams = routeParams || {};
-		Object.keys(routeParams).forEach(function(key) {
-			$routeParams[key] = routeParams[key];
-		});
-	};
-	/**
-	 * Add route to the router.
-	 *
-	 * @chainable
-	 * @param  {String} url 
-	 * @param  {Object} config
-	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
-	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
-	 * @param  {String} [config.controller] Run this function if the route is used
-	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
-	 * @member $route
-	 */
-	this.when = function(url, config) {
-		this._routes.push({
-			url: url,
-			config: config
-		});
-		return this;
-	};
-	/**
-	 * Otherwise.
-	 *
-	 * @chainable
-	 * @param  {String} page
-	 * @param  {Object} config
-	 * @param  {String} [config.templateId] Template ID which will be used for templateUrl
-	 * @param  {String} [config.templateUrl] Template URL which will be loaded and cached in the $template
-	 * @param  {String} [config.controller] Run this function if the route is used
-	 * @param  {Object} [config.xyz] Rest parameters goes to the $routeParams
-	 * @member $route
-	 */
-	this.otherwise = function(config) {
-		this._otherwise = {
-			config: config
-		};
-		return this;
-	};
-	/**
-	 * Run controller from route path.
-	 *
-	 * @private
-	 * @param  {Array|Function} contr
-	 * @param  {Object} [routeParams] Additonal data
-	 * @member $route
-	 */
-	this._runController = function(contr, routeParams) {
-		var pp = $di.parseParam(contr);
-		this._setRouteParams(routeParams);
-		$di.run({
-			fn: pp.fn,
-			inject: pp.inject
-		});
-	};
-	/**
-	 * Route GO. Walk through all routes, if there is match, route controller will be called.
-	 *
-	 * @member $route
-	 */
-	this.go = function() {
-		var path = $location.get();
-		var find = false;
-		var config = null;
-		var data = {};
-		this._routes.every(function(item) {
-			if (path.match(new RegExp(item.url))) {
-				config = item.config;
-				find = true;
-				return false;
-			}
-			else {
-				return true;
-			}
-		});
-		if (!find && this._otherwise) {
-			config = this._otherwise.config;
-		}
-		if (config) {
-			var templateId = "";
-			var templateUrl = null;
-			var contr = null;
-			var routeParams = {};
-			Object.keys(config).forEach(function(key) {
-				var value = config[key];
-				switch (key) {
-					case "templateId":
-						templateId = value;
-						break;
-					case "templateUrl":
-						templateUrl = value;
-						break;
-					case "controller":
-						contr = value;
-						break;
-					default:
-						routeParams[key] = value;
-				}
-			});
-			if (templateUrl) {
-				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
-					if (contr) {
-						this._runController(contr, routeParams);
-					}
-				}.bind(this));
-			}
-			else {
-				if (contr) {
-					this._runController(contr, routeParams);
-				}
-			}
-		}
-	};
-}]);
-onix.factory("$select", [
-	"$common",
-	"$event",
-	"$dom",
-function(
-	$common,
-	$event,
-	$dom
-) {
-	/**
-	 * $select uses bootstrap dropdown and provides additional functionality.
-	 *
-	 * @class $select
-	 * @param {HTMLElement} el Where element has class "dropdown"
-	 * @param {Object} opts
-	 * @param {Boolean} opts.addCaption Add caption to select
-	 * @member $select
-	 */
-	var $select = function(el, opts) {
-		// extend our class
-		$event.bindEvents(this);
-		this._opts = {
-			addCaption: false
-		};
-		for (var key in opts) {
-			this._opts[key] = opts[key];
-		}
-		this._CONST = {
-			CAPTION_SEL: ".dropdown-toggle",
-			OPTIONS_SEL: ".dropdown-menu a",
-			CARET_SEL: ".caret",
-			OPEN_DROPDOWN_SEL: ".dropdown.open",
-			OPEN_CLASS: "open",
-			ACTIVE_CLASS: "active"
-		};
-		this._el = el;
-		this._optinsRef = [];
-		this._captionEl = null;
-		this.captionTextEl = null;
-		this._binds = {
-			captionClick: $common.bindWithoutScope(this._captionClick, this),
-			choiceClick: $common.bindWithoutScope(this._choiceClick, this),
-			removeAllOpened: this._removeAllOpened.bind(this),
-			click: this._click.bind(this)
-		};
-		this._bind();
-	};
-	/**
-	 * Bind clicks on the select.
-	 *
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._bind = function() {
-		this._bindCaption();
-		this._bindChoices();
-	};
-	/**
-	 * Bind caption el.
-	 * 
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._bindCaption = function() {
-		var captionEl = this._el.querySelector(this._CONST.CAPTION_SEL);
-		if (captionEl) {
-			// click on the caption
-			captionEl.addEventListener("click", this._binds.captionClick);
-			// insert span placeholder for caption
-			if (this._opts.addCaption) {
-				var caretEl = captionEl.querySelector(this._CONST.CARET_SEL);
-				if (caretEl) {
-					var captionTextEl = $dom.create({
-						el: "span",
-						"class": "add-caption"
-					});
-					captionEl.insertBefore(captionTextEl, caretEl);
-					this._captionTextEl = captionTextEl;
-				}
-			}
-		}
-		this._captionEl = captionEl;
-	};
-	/**
-	 * Remove all opened selectors -> close all.
-	 *
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._removeAllOpened = function() {
-		var con = this._CONST;
-		// remove all
-		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
-			item.classList.remove(con.OPEN_CLASS);
-		});
-	};
-	/**
-	 * Outside click.
-	 * 
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._click = function() {
-		this._removeAllOpened();
-		window.removeEventListener("click", this._binds.click);
-	};
-	/**
-	 * Event - click on caption.
-	 * 
-	 * @param  {Event} e 
-	 * @param  {Object} scope
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._captionClick = function(e, scope) {
-		e.stopPropagation();
-		var isOpen = scope._el.classList.contains(scope._CONST.OPEN_CLASS);
-		scope._binds.removeAllOpened();
-		if (isOpen) {
-			// outside click
-			window.removeEventListener("click", scope._binds.click);
-		}
-		else {
-			// outside click
-			window.addEventListener("click", scope._binds.click);
-			scope._el.classList.add(scope._CONST.OPEN_CLASS);
-		}
-	};
-	/**
-	 * Bind choices inside select.
-	 *
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._bindChoices = function() {
-		onix.element(this._CONST.OPTIONS_SEL, this._el).forEach(function(option) {
-			option.addEventListener("click", this._binds.choiceClick);
-			// event ref
-			this._optinsRef.push({
-				el: option,
-				event: "click",
-				fn: this._binds.choiceClick
-			});
-		}, this);
-	};
-	/**
-	 * Event - click on option.
-	 * 
-	 * @param  {Event} e 
-	 * @param  {Object} scope
-	 * @member $select
-	 * @private
-	 */
-	$select.prototype._choiceClick = function(e, scope) {
-		var con = scope._CONST;
-		e.stopPropagation();
-		if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
-			// remove previously selected
-			var active = this.parentNode.parentNode.querySelector("." + con.ACTIVE_CLASS);
-			if (active) {
-				active.classList.remove(con.ACTIVE_CLASS);
-			}
-			// add to the current
-			this.parentNode.classList.add(con.ACTIVE_CLASS);
-			scope._el.classList.remove(con.OPEN_CLASS);
-			if (scope._opts.addCaption && scope._captionTextEl) {
-				scope._captionTextEl.innerHTML = this.innerHTML;
-			}
-			// trigger click
-			var value = this.getAttribute("data-value") || "";
-			scope.trigger("change", value);
-		}
-	};
-	/**
-	 * Unbind choices.
-	 *
-	 * @member $select
-	 */
-	$select.prototype.unbindChoices = function() {
-		if (this._optinsRef.length) {
-			this._optinsRef.forEach(function(option) {
-				option.el.removeEventListener(option.event, option.fn);
-			});
-			this._optinsRef = [];
-		}
-	};
-	/**
-	 * Rebind choices.
-	 *
-	 * @member $select
-	 */
-	$select.prototype.rebindChoices = function() {
-		this.unbindChoices();
-		this._bindChoices();
-	};
-	/**
-	 * Select option from the select.
-	 * 
-	 * @param {Number} ind Position 0..n
-	 * @member $select
-	 */
-	$select.prototype.selectOption = function(ind) {
-		ind = ind || 0;
-		var optionsCount = this._optinsRef.length;
-		if (optionsCount > 0 && ind >= 0 && ind < optionsCount) {
-			var el = this._optinsRef[ind].el;
-			var parent = this._optinsRef[ind].el.parentNode;
-			if (!parent.classList.contains(this._CONST.ACTIVE_CLASS)) {
-				parent.classList.add(this._CONST.ACTIVE_CLASS);
-				if (this._opts.addCaption && this._captionTextEl) {
-					this._captionTextEl.innerHTML = el.innerHTML;
-				}
-				// trigger click
-				var value = el.getAttribute("data-value") || "";
-				this.trigger("change", value);
-			}
-		}
-	};
-	/**
-	 * Set add caption from the current value.
-	 *
-	 * @member $select
-	 */
-	$select.prototype.setAddCaption = function() {
-		if (!this._opts.addCaption) return;
-		this._optinsRef.every(function(item) {
-			var parent = item.el.parentNode;
-			if (parent.classList.contains(this._CONST.ACTIVE_CLASS)) {
-				this._captionTextEl.innerHTML = item.el.innerHTML;
-				return false;
-			}
-			else return true;
-		}, this);
-	};
-	return $select;
-}]);
-/**
- * Class for creating img previews from File[] variable.
- * 
- * @class $image
- */
-onix.service("$image", [
-	"$q",
-function(
-	$q
-) {
-	/**
-	 * FileReader is available.
-	 *
-	 * @private
-	 * @member $image
-	 * @type {Boolean}
-	 */
-	this._hasFileReader = "FileReader" in window;
-	/**
-	 * Canvas is available.
-	 *
-	 * @private
-	 * @member $image
-	 * @type {Boolean}
-	 */
-	this._hasCanvas = !!document.createElement("canvas").getContext;
-	/**
-	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
-	 *
-	 * @param  {Object} file Input file
-	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
-	 * @return {$q} Promise with output object
-	 * @member $image
-	 */
-	this.readFromFile = function(file, maxSize) {
-		var promise = $q.defer();
-		if (!this._hasFileReader) {
-			promise.reject();
-			return promise;
-		}
-		var reader = new FileReader();
-		var output = {
-			img: null,
-			exif: null,
-			canvas: null
-		};
-		reader.onload = function(e) {
-			var binaryData = reader.result;
-			var binaryDataArray = new Uint8Array(binaryData);
-			var exif = null;
-			// exif only for jpeg
-			if (file.type != "png") {
-				exif = this.getEXIF(binaryData);
-			}
-			var img = new Image();
-			img.onload = function() {
-				var imd = this.getImageDim(img, maxSize);
-				var canvas = this.getCanvas(img, {
-					width: imd.width,
-					height: imd.height,
-					orientation: exif ? exif.Orientation : 0,
-					scaled: imd.scale != 1
-				});
-				output.img = img;
-				output.exif = exif;
-				output.canvas = canvas;
-				promise.resolve(output);
-			}.bind(this);
-			img.src = this.fileToBase64(file.type, binaryDataArray);
-		}.bind(this);
-		reader.readAsArrayBuffer(file);
-		return promise;
-	};
-	/**
-	 * Counts image dimension; if maxSize is available, new dimension is calculated.
-	 *
-	 * @param  {Image} img
-	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
-	 * @return {Object}
-	 * @member $image
-	 */
-	this.getImageDim = function(img, maxSize) {
-		var maxSize = maxSize || 0;
-		var largeWidth = maxSize > 0 && img.width > maxSize;
-		var largeHeight = maxSize > 0 && img.height > maxSize;
-		var output = {
-			width: img.width,
-			height: img.height,
-			scale: 1
-		};
-		if (largeWidth || largeHeight) {
-			// resize picture
-			var imgWidth = img.width;
-			var imgHeight = img.height;
-			// portrait x landscape
-			if (img.width > img.height) {
-				// landscape
-				imgHeight = maxSize * imgHeight / imgWidth;
-				imgWidth = maxSize;
-			}
-			else {
-				// portrait
-				imgWidth = maxSize * imgWidth / imgHeight;
-				imgHeight = maxSize;
-			}
-			output.scale = img.width / imgWidth; // ratio between original x scaled image
-			output.width = imgWidth;
-			output.height = imgHeight;
-		}
-		return output;
-	};
-	/**
-	 * Get image canvas - read input img, create canvas with it.
-	 *
-	 * @param  {Image} img
-	 * @param  {Object} [optsArg] Variable options
-	 * @param  {Number} [optsArg.width] Output canvas width
-	 * @param  {Number} [optsArg.height] Output canvas height
-	 * @param  {Number} [optsArg.orientation] EXIF orientation
-	 * @param  {Boolean} [optsArg.scaled = false]
-	 * @return {Canvas}
-	 * @member $image
-	 */
-	this.getCanvas = function(img, optsArg) {
-		var opts = {
-			width: img.width || 0,
-			height: img.height || 0,
-			orientation: 0,
-			scaled: false
-		};
-		for (var key in optsArg) {
-			opts[key] = optsArg[key];
-		}
-		if (!this._hasCanvas) return null;
-		var canvas = document.createElement("canvas");
-		var ctx = canvas.getContext("2d");
-		var draw = true;
-		canvas.width = opts.width;
-		canvas.height = opts.height;
-		// rotate
-		if (opts.orientation) {
-			switch (opts.orientation) {
-				case 2:
-					// horizontal flip
-					ctx.translate(opts.width, 0);
-					ctx.scale(-1, 1);
-					break;
-				case 3:
-					// 180° rotate left
-					ctx.translate(opts.width, opts.height);
-					ctx.rotate(Math.PI);
-					break;
-				case 4:
-					// vertical flip
-					ctx.translate(0, opts.height);
-					ctx.scale(1, -1);
-					break;
-				case 5:
-					// vertical flip + 90 rotate right
-					canvas.width = opts.height;
-					canvas.height = opts.width;
-					ctx.rotate(0.5 * Math.PI);
-					ctx.scale(1, -1);
-					if (opts.scaled) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-					break;
-				case 6:
-					// 90° rotate right
-					canvas.width = opts.height;
-					canvas.height = opts.width;
-					ctx.rotate(0.5 * Math.PI);
-					ctx.translate(0, -opts.height);
-					if (opts.scaled) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-					break;
-				case 7:
-					// horizontal flip + 90 rotate right
-					canvas.width = opts.height;
-					canvas.height = opts.width;
-					ctx.rotate(0.5 * Math.PI);
-					ctx.translate(opts.width, -opts.height);
-					ctx.scale(-1, 1);
-					if (opts.scaled) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-					break;
-				case 8:
-					// 90° rotate left
-					canvas.width = opts.height;
-					canvas.height = opts.width;
-					ctx.rotate(-0.5 * Math.PI);
-					ctx.translate(-opts.width, 0);
-					if (opts.scaled) {
-						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
-						draw = false;
-					}
-			}
-		}
-		if (draw) {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			if (opts.scaled) {
-				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
-			}
-			else {
-				ctx.drawImage(img, 0, 0);
-			}
-		}
-		return canvas;
-	};
-	/**
-	 * Binary data to base64.
-	 *
-	 * @param  {String} fileType
-	 * @param  {Array} binaryData
-	 * @return {String}
-	 * @member $image
-	 */
-	this.fileToBase64 = function(fileType, binaryData) {
-		var length = binaryData.length;
-		var output = "";
-		for (var i = 0; i < length; i += 1) {
-			output += String.fromCharCode(binaryData[i]);
-		}
-		return 'data:' + fileType + ';base64,' + btoa(output);
-	};
-	/**
-	 * Is file a picture?
-	 *
-	 * @param  {File}  file
-	 * @return {Boolean}
-	 * @member $image
-	 */
-	this.isPicture = function(file) {
-		if (file) {
-			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
-		}
-		else return false;
-	};
-	/**
-	 * Get picture files from array of files.
-	 * 
-	 * @param  {Array} array of files
-	 * @return {Array}
-	 * @member $image
-	 */
-	this.getPictureFiles = function(files) {
-		var pictureFiles = [];
-		if (files && files.length) {
-			for (var i = 0; i < files.length; i++) {
-				var item = files[i];
-				if (this.isPicture(item)) {
-					pictureFiles.push(item);
-				}
-			}
-		}
-		return pictureFiles;
-	};
-	/**
-	 * Get picture files count from the array of Files. This function uses 'getPictureFiles'.
-	 * 
-	 * @param  {Array} array of files
-	 * @return {Boolean}
-	 * @member $image
-	 */
-	this.getPicturesCount = function(files) {
-		return this.getPictureFiles(files).length;
-	};
-	/**
-	 * Get image EXIF information.
-	 * 
-	 * @param  {Binary[]} imgData Binary img data
-	 * @return {Object}
-	 * @member $image
-	 */
-	this.getEXIF = function(imgData) {
-		if ("EXIF" in window) {
-			return EXIF.readFromBinaryFile(imgData);
-		}
-		else {
-			return {};
-		}
-	};
-}]);
-/**
- * Class for creating img previews from File[] variable.
- * 
- * @class $previewImages
- */
-onix.service("$previewImages", [
-	"$q",
-	"$image",
-	"$dom",
-	"$job",
-	"$loader",
-function(
-	$q,
-	$image,
-	$dom,
-	$job,
-	$loader
-) {
-	/**
-	 * Create one image preview.
-	 *
-	 * @private
-	 * @param  {File} file
-	 * @param  {Number} [maxSize] Max image size
-	 * @return {Object} dom references
-	 * @member $previewImages
-	 */
-	this._createPreview = function(file, maxSize) {
-		var exported = {};
-		var cont = $dom.create({
-			el: "span",
-			"class": ["preview-item", "preview-loading"],
-			child: [{
-				el: "span",
-				"class": "canvas-cover",
-				child: [$loader.getSpinner(true)],
-				style: "height: " + (maxSize || 100) + "px",
-				_exported: "canvasCover"
-			}, {
-				el: "span",
-				"class": "title",
-				innerHTML: file.name.replace(/\..*/g, "")
-			}]
-		}, exported);
-		return {
-			cont: cont,
-			canvasCover: exported.canvasCover
-		};
-	};
-	/**
-	 * Create preview holders. Only for images count 4 and 7.
-	 * Four images are in the one row, seven images has the last one above them.
-	 *
-	 * @private
-	 * @param {HTMLElement} el
-	 * @param {Number} count
-	 * @member $previewImages
-	 */
-	this._createPreviewHolders = function(el, count) {
-		if (!el || (count != 4 && count != 7)) return;
-		var exported = {};
-		// placeholder for 7 images
-		if (count == 7) {
-			// ceiling line
-			el.appendChild($dom.create({
-				el: "div",
-				child: [{
-					el: "span",
-					_exported: "img_06"
-				}]
-			}, exported));
-		}
-		var child = [];
-		var childCount = count == 7 ? 6 : 4;
-		for (var i = 0; i < childCount; i++) {
-			child.push({
-				el: "span",
-				_exported: "img_0" + i
-			});
-		}
-		// rest line
-		el.appendChild($dom.create({
-			el: "div",
-			child: child
-		}, exported));
-		for (var i = 0; i < count; i++) {
-			this._dom["img_0" + i] = exported["img_0" + i];
-		}
-	};
-	/**
-	 * One job task
-	 *
-	 * @private
-	 * @param  {Object} previewObj Object with file and preview ID
-	 * @param  {Number} maxSize Max image size in px
-	 * @param  {Function} jobDone Function which indicates that job is done
-	 */
-	this._jobTask = function(previewObj, maxSize, jobDone) {
-		var file = previewObj.file;
-		var previewID = previewObj.previewID;
-		var preview = this._createPreview(file, maxSize);
-		// append
-		if (previewID in this._dom) {
-			this._dom[previewID].appendChild(preview.cont);
-		}
-		else {
-			this._dom.previewItems.appendChild(preview.cont);
-		}
-		$image.readFromFile(file, maxSize).then(function(readFileObj) {
-			preview.cont.classList.remove("preview-loading");
-			preview.canvasCover.innerHTML = "";
-			preview.canvasCover.appendChild(readFileObj.canvas);
-			jobDone();
-		});
-	};
-	/**
-	 * Main function for showing img previews.
-	 * 
-	 * @param  {HTMLElement} el Placeholder element
-	 * @param  {File[]} files
-	 * @param  {Object} [opts] Configuration
-	 * @param  {Number} [opts.maxSize] Max image size in px; the size is used for image scale
-	 * @param  {Number} [opts.count] How many images are processed simultinously
-	 * @param  {Boolean} [opts.createHolder] Create placeholder, see _createPreviewHolders function
-	 * @member $previewImages
-	 */
-	this.show = function(el, files, optsArg) {
-		// clear previous
-		el.innerHTML = "";
-		// add class
-		el.classList.add("preview-images");
-		var opts = {
-			maxSize: 0,
-			count: 0,
-			createHolder: false
-		};
-		for (var key in optsArg) {
-			opts[key] = optsArg[key];
-		}
-		this._dom = {
-			previewItems: el
-		};
-		var pictureFiles = $image.getPictureFiles(files);
-		var count = pictureFiles.length;
-		if (count) {
-			// create placeholder?
-			if (opts.createHolder) {
-				this._createPreviewHolders(el, count);
-			}
-			var jobsArray = [];
-			// sort by name, make previewID - only for 7 pictures
-			pictureFiles = pictureFiles.sort(function(a, b) {
-				if (a.name < b.name)
-					return -1;
-				else if (a.name > b.name)
-					return 1;
-				else 
-					return 0;
-			}).forEach(function(pf, ind) {
-				jobsArray.push({
-					task: this._jobTask,
-					scope: this,
-					args: [{
-						file: pf,
-						previewID: "img_0" + ind
-					}, opts.maxSize]
-				});
-			}, this);
-			// run jobs array
-			$job.multipleJobs(jobsArray, opts.count);
-		}
-	};
-}]);
-onix.factory("$slider", [
-	"$dom",
-	"$event",
-function(
-	$dom,
-	$event
-) {
-	/**
-	 * Slider - slider with input for selecting numbers from the range.
-	 * 
-	 * @param {HTMLElement} parent Where is canvas appended
-	 * @param {Object} [optsArg] Configuration
-	 * @param {Number} [optsArg.min] Min value
-	 * @param {Number} [optsArg.max] Max value
-	 * @param {Number} [optsArg.timeout] Timeout for signal fire (keydown, move)
-	 * @class $slider
-	 */
-	var $slider = function(parent, optsArg) {
-		$event.bindEvents(this);
-		this._parent = parent;
-		this._root = this._create();
-		this._opts = {
-			min: 0,
-			max: 100,
-			timeout: 333
-		};
-		for (var key in optsArg) {
-			this._opts[key] = optsArg[key];
-		}
-		// selected value
-		this._value = null;
-		// signal change - helper
-		this._signalObj = {
-			id: null,
-			lastValue: null
-		};
-		// is key down?
-		this._isKeydown = false;
-		parent.appendChild(this._root);
-		this._binds = {
-			keyUp: this._keyUp.bind(this),
-			click: this._click.bind(this),
-			mouseDownCaret: this._mouseDownCaret.bind(this),
-			mouseMoveLineHolder: this._mouseMoveLineHolder.bind(this),
-			mouseUpDocument: this._mouseUpDocument.bind(this),
-			sendSignalInner: this._sendSignalInner.bind(this),
-			mouseWheel: this._mouseWheel.bind(this)
-		};
-		this._els.input.addEventListener("keyup", this._binds.keyUp);
-		this._els.tube.addEventListener("click", this._binds.click);
-		this._els.caret.addEventListener("mousedown", this._binds.mouseDownCaret);
-		this._els.lineHolder.addEventListener("mousemove", this._binds.mouseMoveLineHolder);
-		// firefox
-		this._els.lineHolder.addEventListener("DOMMouseScroll", this._binds.mouseWheel);
-		// others
-		this._els.lineHolder.addEventListener("mousewheel", this._binds.mouseWheel);
-		// def. max value
-		this.setValue(this._opts.max);
-	};
-	/**
-	 * Create slider and his children.
-	 *
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._create = function() {
-		this._els = {};
-		return $dom.create({
-			el: "div",
-			"class": "slider",
-			child: [{
-				el: "input",
-				type: "text",
-				value: "",
-				_exported: "input"
-			}, {
-				el: "span",
-				"class": "line-holder",
-				_exported: "lineHolder",
-				child: [{
-					el: "span",
-					"class": "lh-tube",
-					_exported: "tube"
-				}, {
-					el: "span",
-					"class": "lh-caret",
-					_exported: "caret"
-				}]
-			}]
-		}, this._els);
-	};
-	/**
-	 * Set caret position.
-	 * 
-	 * @param {Number} posX Value [px] caret offset accord to the start
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._setCaret = function(posX) {
-		var width = this._els.lineHolder.offsetWidth;
-		if (posX < 0) {
-			posX = 0;
-		}
-		else if (posX > width) {
-			posX = width;
-		}
-		this._els.caret.style.left = posX.toFixed(2) + "px";
-	};
-	/**
-	 * Key up event from the input.
-	 *
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._keyUp = function() {
-		var inputEl = this._els.input;
-		var value = parseFloat(inputEl.value);
-		var errors = 0;
-		if (isNaN(value)) {
-			errors++;
-		}
-		else if (!this.setValue(value)) {
-			errors++;
-		}
-		else {
-			this._sendSignal(true);
-		}
-		inputEl.classList[errors ? "add" : "remove"]("error");
-	};
-	/**
-	 * Click on tube event.
-	 *
-	 * @param {Event} e
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._click = function(e) {
-		e.stopPropagation();
-		e.preventDefault();
-		var width = this._els.lineHolder.offsetWidth;
-		var value = e.offsetX;
-		var ratio = value / width;
-		// increate click range
-		if (ratio <= 0.05) {
-			value = 0;
-		}
-		else if (ratio >= 0.95) {
-			value = width;
-		}
-		this._isKeydown = false;
-		this._setCaret(value);
-		this._setValue(value, true);
-	};
-	/**
-	 * Click on the caret event, binds mouse up over the document.
-	 *
-	 * @param {Event} e
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._mouseDownCaret = function(e) {
-		e.stopPropagation();
-		e.preventDefault();
-		this._isKeydown = true;
-		document.addEventListener("mouseup", this._binds.mouseUpDocument);
-	};
-	/**
-	 * Mouse up event over the document.
-	 * 
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._mouseUpDocument = function() {
-		this._isKeydown = false;
-		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
-	};
-	/**
-	 * Mouse move event over line holder - only if was clicked on the caret.
-	 *
-	 * @param {Event} e
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._mouseMoveLineHolder = function(e) {
-		if (!this._isKeydown) return;
-		var posX = e.offsetX;
-		var caretEl = this._els.caret;
-		if (e.target == caretEl) {
-			posX += parseFloat(caretEl.style.left) - caretEl.offsetWidth / 2;
-		}
-		this._setCaret(posX);
-		this._setValue(posX);
-	};
-	/**
-	 * Get value -> position convert.
-	 *
-	 * @param {Number} value Value in the range --> [px] position for the caret.
-	 * @return {Number}
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._getPosFromValue = function(value) {
-		value = value || this._value;
-		var width = this._els.lineHolder.offsetWidth;
-		var range = this._opts.max - this._opts.min;
-		var posX = (value - this._opts.min) / range * width;
-		return posX;
-	};
-	/**
-	 * Set value using caret position. Fires signal "change".
-	 *
-	 * @param {Number} posX Value on the axe x
-	 * @param {Boolean} [fromClick] It was called from click method?
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._setValue = function(posX, fromClick) {
-		posX = posX || 0;
-		var width = this._els.lineHolder.offsetWidth;
-		var range = this._opts.max - this._opts.min;
-		if (posX < 0) {
-			posX = 0;
-		}
-		else if (posX > width) {
-			posX = width;
-		}
-		var value = Math.round(posX / width * range + this._opts.min);
-		this._value = value;
-		this._els.input.value = value;
-		this._sendSignal(!fromClick);
-	};
-	/**
-	 * Delayed sending of signal.
-	 *
-	 * @param {Boolean} [withTimeout] Send with timeout?
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._sendSignal = function(withTimeout) {
-		if (this._signalObj.id) {
-			clearTimeout(this._signalObj.id);
-			this._signalObj.id = null;
-		}
-		if (withTimeout) {
-			this._signalObj.id = setTimeout(this._binds.sendSignalInner, this._opts.timeout);
-		}
-		else {
-			this._sendSignalInner();
-		}
-	};
-	/**
-	 * Mouse wheel event.
-	 *
-	 * @param {Event} e Mouse event
-	 * @private
-	 * @member $slider
-	 */
-	$slider.prototype._mouseWheel = function(e) {
-		var delta = e.wheelDelta || -e.detail;
-		if (!delta) { return; }
-		e.stopPropagation();
-		e.preventDefault();
-		if (delta > 0) {
-			this.setValue(this._value + 1);
-			this._sendSignal();
-		}
-		else {
-			this.setValue(this._value - 1);
-			this._sendSignal();
-		}
-	};
-	/**
-	 * Delayed sending of signal - inner method.
-	 *
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._sendSignalInner = function() {
-		if (this._value == this._signalObj.lastValue) return;
-		this._signalObj.lastValue = this._value;
-		this.trigger("change", this._value);
-	};
-	/**
-	 * Set slider value.
-	 * 
-	 * @param {Number} value New value
-	 * @return {Boolean} If there was error, it returns false
-	 * @member $slider
-	 */
-	$slider.prototype.setValue = function(value) {
-		if (typeof value === "number" && value >= this._opts.min && value <= this._opts.max) {
-			this._value = value;
-			this._els.input.value = value;
-			this._setCaret(this._getPosFromValue(value));
-			return true;
-		}
-		else {
-			return false;
-		}
-	};
-	/**
-	 * Get slider value.
-	 * 
-	 * @return {Number}
-	 * @member $slider
-	 */
-	$slider.prototype.getValue = function() {
-		return this._value;
-	};
-	/**
-	 * Overwrite configuration object.
-	 *
-	 * @param {Object} optsArg See constructor.
-	 * @member $slider
-	 */
-	$slider.prototype.rewriteOpts = function(optsArg) {
-		for (var key in optsArg) {
-			this._opts[key] = optsArg[key];
-		}
-		if (this._value < this._opts.min || this._value > this._opts.max) {
-			this._value = this._opts.max;
-		}
-		this.setValue(this._value);
-	};
-	return $slider;
-}]);
 onix.factory("$anonymizer", [
 	"$dom",
 	"$event",
@@ -6799,4 +5851,950 @@ function(
 		}
 	};
 	return $anonymizer;
+}]);
+/**
+ * Progress loader in the application.
+ * 
+ * @class $loader
+ */
+onix.factory("$loader", [
+	"$dom",
+function(
+	$dom
+) {
+	var $loader = {
+		/**
+		 * Create loader.
+		 *
+		 * @private
+		 * @member $loader
+		 */
+		_create: function() {
+			this._el = $dom.create({
+				el: "div",
+				"class": "loader"
+			});
+			// insert into the body on first position
+			document.body.insertBefore(this._el, document.body.firstChild);
+		},
+		/**
+		 * Loader init.
+		 *
+		 * @private
+		 * @member $loader
+		 */
+		_init: function() {
+			this._create();
+		},
+		/**
+		 * Start loader.
+		 *
+		 * @member $loader
+		 */
+		start: function() {
+			this._el.classList.add("start");
+		},
+		/**
+		 * End loader.
+		 *
+		 * @member $loader
+		 */
+		end: function() {
+			this._el.classList.remove("start");
+			this._el.classList.add("end");
+			setTimeout(function() {
+				this._el.classList.remove("end");
+				this._el.classList.add("hide");
+				setTimeout(function() {
+					this._el.classList.remove("hide");
+				}.bind(this), 350);
+			}.bind(this), 150);
+		},
+		/**
+		 * Get spinner - DOM or object.
+		 *
+		 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
+		 * @return {HTMLElement|Object}
+		 * @member $loader
+		 */
+		getSpinner: function(getObject) {
+			var children = [];
+			for (var i = 1; i < 6; i++) {
+				children.push({
+					el: "div",
+					"class": "rect" + i
+				});
+			}
+			var domConf = {
+				el: "div",
+				"class": "spinner",
+				child: children
+			};
+			return (getObject ? domConf : $dom.create(domConf));
+		}
+	};
+	// loader init
+	$loader._init();
+	return $loader;
+}]);
+/**
+ * $notify uses bootstrap alerts and provides additional functionality.
+ * 
+ * @class $notify
+ */
+onix.service("$notify", [
+	"$common",
+	"$q",
+function(
+	$common,
+	$q
+) {
+	/**
+	 * Create notification object from the element.
+	 * 
+	 * @param {HTMLElement} el
+	 * @member $notify
+	 */
+	var $notify = function(el) {
+		this._el = el;
+		this._HIDE_TIMEOUT = 1500; // [ms]
+		this._options = {
+			"ok": "alert-success",
+			"error": "alert-danger",
+			"info": "alert-info",
+			"warn": "alert-warning"
+		};
+		return this;
+	};
+	/**
+	 * Set value to the notify element.
+	 *
+	 * @param  {String|HTMLElement} txt
+	 * @member $notify
+	 * @private
+	 */
+	$notify.prototype._setValue = function(txt) {
+		if ($common.isElement(txt)) {
+			onix.element(this._el).empty().append(txt);
+		}
+		else if (typeof txt === "string") {
+			this._el.innerHTML = txt;
+		}
+	};
+	/**
+	 * Reset CSS classes.
+	 *
+	 * @member $notify
+	 */
+	$notify.prototype.reset = function() {
+		Object.keys(this._options).forEach(function(key) {
+			this._el.classList.remove(this._options[key]);
+		}.bind(this));
+		return this;
+	};
+	/**
+	 * Show OK state.
+	 * 
+	 * @param  {String|HTMLElement} txt
+	 * @member $notify
+	 */
+	$notify.prototype.ok = function(txt) {
+		this._el.classList.add(this._options["ok"]);
+		this._setValue(txt);
+		return this;
+	};
+	/**
+	 * Show ERROR state.
+	 * 
+	 * @param  {String|HTMLElement} txt
+	 * @member $notify
+	 */
+	$notify.prototype.error = function(txt) {
+		this._el.classList.add(this._options["error"]);
+		this._setValue(txt);
+		return this;
+	};
+	/**
+	 * Show INFO state.
+	 *
+	 * @param  {String|HTMLElement} txt
+	 * @member $notify
+	 */
+	$notify.prototype.info = function(txt) {
+		this._el.classList.add(this._options["info"]);
+		this._setValue(txt);
+		return this;
+	};
+	/**
+	 * Show WARNING state.
+	 *
+	 * @param  {String|HTMLElement} txt
+	 * @member $notify
+	 */
+	$notify.prototype.warn = function(txt) {
+		this._el.classList.add(this._options["warn"]);
+		this._setValue(txt);
+		return this;
+	};
+	/**
+	 * Hide alert after timeout and returns promise at the end of operation.
+	 * Default timeout is 1500 ms.
+	 *
+	 * @param {Number} [timeout] Hide timeout in [ms]
+	 * @return {$q}
+	 * @member $notify
+	 */
+	$notify.prototype.hide = function(timeout) {
+		var promise = $q.defer();
+		setTimeout(function() {
+			this.reset();
+			promise.resolve();
+		}.bind(this), timeout || this._HIDE_TIMEOUT);
+		return promise;
+	};
+	/**
+	 * Main public access to the notify obj.
+	 *
+	 * @param  {HTMLElement} el
+	 * @return {$notify}
+	 * @member $notify
+	 */
+	this.get = function(el) {
+		return new $notify(el);
+	};
+}]);
+/**
+ * Class for creating img previews from File[] variable.
+ * 
+ * @class $previewImages
+ */
+onix.service("$previewImages", [
+	"$q",
+	"$image",
+	"$dom",
+	"$job",
+	"$loader",
+function(
+	$q,
+	$image,
+	$dom,
+	$job,
+	$loader
+) {
+	/**
+	 * Create one image preview.
+	 *
+	 * @private
+	 * @param  {File} file
+	 * @param  {Number} [maxSize] Max image size
+	 * @return {Object} dom references
+	 * @member $previewImages
+	 */
+	this._createPreview = function(file, maxSize) {
+		var exported = {};
+		var cont = $dom.create({
+			el: "span",
+			"class": ["preview-item", "preview-loading"],
+			child: [{
+				el: "span",
+				"class": "canvas-cover",
+				child: [$loader.getSpinner(true)],
+				style: "height: " + (maxSize || 100) + "px",
+				_exported: "canvasCover"
+			}, {
+				el: "span",
+				"class": "title",
+				innerHTML: file.name.replace(/\..*/g, "")
+			}]
+		}, exported);
+		return {
+			cont: cont,
+			canvasCover: exported.canvasCover
+		};
+	};
+	/**
+	 * Create preview holders. Only for images count 4 and 7.
+	 * Four images are in the one row, seven images has the last one above them.
+	 *
+	 * @private
+	 * @param {HTMLElement} el
+	 * @param {Number} count
+	 * @member $previewImages
+	 */
+	this._createPreviewHolders = function(el, count) {
+		if (!el || (count != 4 && count != 7)) return;
+		var exported = {};
+		// placeholder for 7 images
+		if (count == 7) {
+			// ceiling line
+			el.appendChild($dom.create({
+				el: "div",
+				child: [{
+					el: "span",
+					_exported: "img_06"
+				}]
+			}, exported));
+		}
+		var child = [];
+		var childCount = count == 7 ? 6 : 4;
+		for (var i = 0; i < childCount; i++) {
+			child.push({
+				el: "span",
+				_exported: "img_0" + i
+			});
+		}
+		// rest line
+		el.appendChild($dom.create({
+			el: "div",
+			child: child
+		}, exported));
+		for (var i = 0; i < count; i++) {
+			this._dom["img_0" + i] = exported["img_0" + i];
+		}
+	};
+	/**
+	 * One job task
+	 *
+	 * @private
+	 * @param  {Object} previewObj Object with file and preview ID
+	 * @param  {Number} maxSize Max image size in px
+	 * @param  {Function} jobDone Function which indicates that job is done
+	 */
+	this._jobTask = function(previewObj, maxSize, jobDone) {
+		var file = previewObj.file;
+		var previewID = previewObj.previewID;
+		var preview = this._createPreview(file, maxSize);
+		// append
+		if (previewID in this._dom) {
+			this._dom[previewID].appendChild(preview.cont);
+		}
+		else {
+			this._dom.previewItems.appendChild(preview.cont);
+		}
+		$image.readFromFile(file, maxSize).then(function(readFileObj) {
+			preview.cont.classList.remove("preview-loading");
+			preview.canvasCover.innerHTML = "";
+			preview.canvasCover.appendChild(readFileObj.canvas);
+			jobDone();
+		});
+	};
+	/**
+	 * Main function for showing img previews.
+	 * 
+	 * @param  {HTMLElement} el Placeholder element
+	 * @param  {File[]} files
+	 * @param  {Object} [opts] Configuration
+	 * @param  {Number} [opts.maxSize] Max image size in px; the size is used for image scale
+	 * @param  {Number} [opts.count] How many images are processed simultinously
+	 * @param  {Boolean} [opts.createHolder] Create placeholder, see _createPreviewHolders function
+	 * @member $previewImages
+	 */
+	this.show = function(el, files, optsArg) {
+		// clear previous
+		el.innerHTML = "";
+		// add class
+		el.classList.add("preview-images");
+		var opts = {
+			maxSize: 0,
+			count: 0,
+			createHolder: false
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+		this._dom = {
+			previewItems: el
+		};
+		var pictureFiles = $image.getPictureFiles(files);
+		var count = pictureFiles.length;
+		if (count) {
+			// create placeholder?
+			if (opts.createHolder) {
+				this._createPreviewHolders(el, count);
+			}
+			var jobsArray = [];
+			// sort by name, make previewID - only for 7 pictures
+			pictureFiles = pictureFiles.sort(function(a, b) {
+				if (a.name < b.name)
+					return -1;
+				else if (a.name > b.name)
+					return 1;
+				else 
+					return 0;
+			}).forEach(function(pf, ind) {
+				jobsArray.push({
+					task: this._jobTask,
+					scope: this,
+					args: [{
+						file: pf,
+						previewID: "img_0" + ind
+					}, opts.maxSize]
+				});
+			}, this);
+			// run jobs array
+			$job.multipleJobs(jobsArray, opts.count);
+		}
+	};
+}]);
+onix.factory("$select", [
+	"$common",
+	"$event",
+	"$dom",
+function(
+	$common,
+	$event,
+	$dom
+) {
+	/**
+	 * $select uses bootstrap dropdown and provides additional functionality.
+	 *
+	 * @class $select
+	 * @param {HTMLElement} el Where element has class "dropdown"
+	 * @param {Object} opts
+	 * @param {Boolean} opts.addCaption Add caption to select
+	 * @member $select
+	 */
+	var $select = function(el, opts) {
+		// extend our class
+		$event.bindEvents(this);
+		this._opts = {
+			addCaption: false
+		};
+		for (var key in opts) {
+			this._opts[key] = opts[key];
+		}
+		this._CONST = {
+			CAPTION_SEL: ".dropdown-toggle",
+			OPTIONS_SEL: ".dropdown-menu a",
+			CARET_SEL: ".caret",
+			OPEN_DROPDOWN_SEL: ".dropdown.open",
+			OPEN_CLASS: "open",
+			ACTIVE_CLASS: "active"
+		};
+		this._el = el;
+		this._optinsRef = [];
+		this._captionEl = null;
+		this.captionTextEl = null;
+		this._binds = {
+			captionClick: $common.bindWithoutScope(this._captionClick, this),
+			choiceClick: $common.bindWithoutScope(this._choiceClick, this),
+			removeAllOpened: this._removeAllOpened.bind(this),
+			click: this._click.bind(this)
+		};
+		this._bind();
+	};
+	/**
+	 * Bind clicks on the select.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._bind = function() {
+		this._bindCaption();
+		this._bindChoices();
+	};
+	/**
+	 * Bind caption el.
+	 * 
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._bindCaption = function() {
+		var captionEl = this._el.querySelector(this._CONST.CAPTION_SEL);
+		if (captionEl) {
+			// click on the caption
+			captionEl.addEventListener("click", this._binds.captionClick);
+			// insert span placeholder for caption
+			if (this._opts.addCaption) {
+				var caretEl = captionEl.querySelector(this._CONST.CARET_SEL);
+				if (caretEl) {
+					var captionTextEl = $dom.create({
+						el: "span",
+						"class": "add-caption"
+					});
+					captionEl.insertBefore(captionTextEl, caretEl);
+					this._captionTextEl = captionTextEl;
+				}
+			}
+		}
+		this._captionEl = captionEl;
+	};
+	/**
+	 * Remove all opened selectors -> close all.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._removeAllOpened = function() {
+		var con = this._CONST;
+		// remove all
+		onix.element(con.OPEN_DROPDOWN_SEL).forEach(function(item) {
+			item.classList.remove(con.OPEN_CLASS);
+		});
+	};
+	/**
+	 * Outside click.
+	 * 
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._click = function() {
+		this._removeAllOpened();
+		window.removeEventListener("click", this._binds.click);
+	};
+	/**
+	 * Event - click on caption.
+	 * 
+	 * @param  {Event} e 
+	 * @param  {Object} scope
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._captionClick = function(e, scope) {
+		e.stopPropagation();
+		var isOpen = scope._el.classList.contains(scope._CONST.OPEN_CLASS);
+		scope._binds.removeAllOpened();
+		if (isOpen) {
+			// outside click
+			window.removeEventListener("click", scope._binds.click);
+		}
+		else {
+			// outside click
+			window.addEventListener("click", scope._binds.click);
+			scope._el.classList.add(scope._CONST.OPEN_CLASS);
+		}
+	};
+	/**
+	 * Bind choices inside select.
+	 *
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._bindChoices = function() {
+		onix.element(this._CONST.OPTIONS_SEL, this._el).forEach(function(option) {
+			option.addEventListener("click", this._binds.choiceClick);
+			// event ref
+			this._optinsRef.push({
+				el: option,
+				event: "click",
+				fn: this._binds.choiceClick
+			});
+		}, this);
+	};
+	/**
+	 * Event - click on option.
+	 * 
+	 * @param  {Event} e 
+	 * @param  {Object} scope
+	 * @member $select
+	 * @private
+	 */
+	$select.prototype._choiceClick = function(e, scope) {
+		var con = scope._CONST;
+		e.stopPropagation();
+		if (!this.parentNode.classList.contains(con.ACTIVE_CLASS)) {
+			// remove previously selected
+			var active = this.parentNode.parentNode.querySelector("." + con.ACTIVE_CLASS);
+			if (active) {
+				active.classList.remove(con.ACTIVE_CLASS);
+			}
+			// add to the current
+			this.parentNode.classList.add(con.ACTIVE_CLASS);
+			scope._el.classList.remove(con.OPEN_CLASS);
+			if (scope._opts.addCaption && scope._captionTextEl) {
+				scope._captionTextEl.innerHTML = this.innerHTML;
+			}
+			// trigger click
+			var value = this.getAttribute("data-value") || "";
+			scope.trigger("change", value);
+		}
+	};
+	/**
+	 * Unbind choices.
+	 *
+	 * @member $select
+	 */
+	$select.prototype.unbindChoices = function() {
+		if (this._optinsRef.length) {
+			this._optinsRef.forEach(function(option) {
+				option.el.removeEventListener(option.event, option.fn);
+			});
+			this._optinsRef = [];
+		}
+	};
+	/**
+	 * Rebind choices.
+	 *
+	 * @member $select
+	 */
+	$select.prototype.rebindChoices = function() {
+		this.unbindChoices();
+		this._bindChoices();
+	};
+	/**
+	 * Select option from the select.
+	 * 
+	 * @param {Number} ind Position 0..n
+	 * @member $select
+	 */
+	$select.prototype.selectOption = function(ind) {
+		ind = ind || 0;
+		var optionsCount = this._optinsRef.length;
+		if (optionsCount > 0 && ind >= 0 && ind < optionsCount) {
+			var el = this._optinsRef[ind].el;
+			var parent = this._optinsRef[ind].el.parentNode;
+			if (!parent.classList.contains(this._CONST.ACTIVE_CLASS)) {
+				parent.classList.add(this._CONST.ACTIVE_CLASS);
+				if (this._opts.addCaption && this._captionTextEl) {
+					this._captionTextEl.innerHTML = el.innerHTML;
+				}
+				// trigger click
+				var value = el.getAttribute("data-value") || "";
+				this.trigger("change", value);
+			}
+		}
+	};
+	/**
+	 * Set add caption from the current value.
+	 *
+	 * @member $select
+	 */
+	$select.prototype.setAddCaption = function() {
+		if (!this._opts.addCaption) return;
+		this._optinsRef.every(function(item) {
+			var parent = item.el.parentNode;
+			if (parent.classList.contains(this._CONST.ACTIVE_CLASS)) {
+				this._captionTextEl.innerHTML = item.el.innerHTML;
+				return false;
+			}
+			else return true;
+		}, this);
+	};
+	return $select;
+}]);
+onix.factory("$slider", [
+	"$dom",
+	"$event",
+function(
+	$dom,
+	$event
+) {
+	/**
+	 * Slider - slider with input for selecting numbers from the range.
+	 * 
+	 * @param {HTMLElement} parent Where is canvas appended
+	 * @param {Object} [optsArg] Configuration
+	 * @param {Number} [optsArg.min] Min value
+	 * @param {Number} [optsArg.max] Max value
+	 * @param {Number} [optsArg.timeout] Timeout for signal fire (keydown, move)
+	 * @class $slider
+	 */
+	var $slider = function(parent, optsArg) {
+		$event.bindEvents(this);
+		this._parent = parent;
+		this._root = this._create();
+		this._opts = {
+			min: 0,
+			max: 100,
+			timeout: 333
+		};
+		for (var key in optsArg) {
+			this._opts[key] = optsArg[key];
+		}
+		// selected value
+		this._value = null;
+		// signal change - helper
+		this._signalObj = {
+			id: null,
+			lastValue: null
+		};
+		// is key down?
+		this._isKeydown = false;
+		parent.appendChild(this._root);
+		this._binds = {
+			keyUp: this._keyUp.bind(this),
+			click: this._click.bind(this),
+			mouseDownCaret: this._mouseDownCaret.bind(this),
+			mouseMoveLineHolder: this._mouseMoveLineHolder.bind(this),
+			mouseUpDocument: this._mouseUpDocument.bind(this),
+			sendSignalInner: this._sendSignalInner.bind(this),
+			mouseWheel: this._mouseWheel.bind(this)
+		};
+		this._els.input.addEventListener("keyup", this._binds.keyUp);
+		this._els.tube.addEventListener("click", this._binds.click);
+		this._els.caret.addEventListener("mousedown", this._binds.mouseDownCaret);
+		this._els.lineHolder.addEventListener("mousemove", this._binds.mouseMoveLineHolder);
+		// firefox
+		this._els.lineHolder.addEventListener("DOMMouseScroll", this._binds.mouseWheel);
+		// others
+		this._els.lineHolder.addEventListener("mousewheel", this._binds.mouseWheel);
+		// def. max value
+		this.setValue(this._opts.max);
+	};
+	/**
+	 * Create slider and his children.
+	 *
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._create = function() {
+		this._els = {};
+		return $dom.create({
+			el: "div",
+			"class": "slider",
+			child: [{
+				el: "input",
+				type: "text",
+				value: "",
+				_exported: "input"
+			}, {
+				el: "span",
+				"class": "line-holder",
+				_exported: "lineHolder",
+				child: [{
+					el: "span",
+					"class": "lh-tube",
+					_exported: "tube"
+				}, {
+					el: "span",
+					"class": "lh-caret",
+					_exported: "caret"
+				}]
+			}]
+		}, this._els);
+	};
+	/**
+	 * Set caret position.
+	 * 
+	 * @param {Number} posX Value [px] caret offset accord to the start
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._setCaret = function(posX) {
+		var width = this._els.lineHolder.offsetWidth;
+		if (posX < 0) {
+			posX = 0;
+		}
+		else if (posX > width) {
+			posX = width;
+		}
+		this._els.caret.style.left = posX.toFixed(2) + "px";
+	};
+	/**
+	 * Key up event from the input.
+	 *
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._keyUp = function() {
+		var inputEl = this._els.input;
+		var value = parseFloat(inputEl.value);
+		var errors = 0;
+		if (isNaN(value)) {
+			errors++;
+		}
+		else if (!this.setValue(value)) {
+			errors++;
+		}
+		else {
+			this._sendSignal(true);
+		}
+		inputEl.classList[errors ? "add" : "remove"]("error");
+	};
+	/**
+	 * Click on tube event.
+	 *
+	 * @param {Event} e
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._click = function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		var width = this._els.lineHolder.offsetWidth;
+		var value = e.offsetX;
+		var ratio = value / width;
+		// increate click range
+		if (ratio <= 0.05) {
+			value = 0;
+		}
+		else if (ratio >= 0.95) {
+			value = width;
+		}
+		this._isKeydown = false;
+		this._setCaret(value);
+		this._setValue(value, true);
+	};
+	/**
+	 * Click on the caret event, binds mouse up over the document.
+	 *
+	 * @param {Event} e
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._mouseDownCaret = function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		this._isKeydown = true;
+		document.addEventListener("mouseup", this._binds.mouseUpDocument);
+	};
+	/**
+	 * Mouse up event over the document.
+	 * 
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._mouseUpDocument = function() {
+		this._isKeydown = false;
+		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
+	};
+	/**
+	 * Mouse move event over line holder - only if was clicked on the caret.
+	 *
+	 * @param {Event} e
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._mouseMoveLineHolder = function(e) {
+		if (!this._isKeydown) return;
+		var posX = e.offsetX;
+		var caretEl = this._els.caret;
+		if (e.target == caretEl) {
+			posX += parseFloat(caretEl.style.left) - caretEl.offsetWidth / 2;
+		}
+		this._setCaret(posX);
+		this._setValue(posX);
+	};
+	/**
+	 * Get value -> position convert.
+	 *
+	 * @param {Number} value Value in the range --> [px] position for the caret.
+	 * @return {Number}
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._getPosFromValue = function(value) {
+		value = value || this._value;
+		var width = this._els.lineHolder.offsetWidth;
+		var range = this._opts.max - this._opts.min;
+		var posX = (value - this._opts.min) / range * width;
+		return posX;
+	};
+	/**
+	 * Set value using caret position. Fires signal "change".
+	 *
+	 * @param {Number} posX Value on the axe x
+	 * @param {Boolean} [fromClick] It was called from click method?
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._setValue = function(posX, fromClick) {
+		posX = posX || 0;
+		var width = this._els.lineHolder.offsetWidth;
+		var range = this._opts.max - this._opts.min;
+		if (posX < 0) {
+			posX = 0;
+		}
+		else if (posX > width) {
+			posX = width;
+		}
+		var value = Math.round(posX / width * range + this._opts.min);
+		this._value = value;
+		this._els.input.value = value;
+		this._sendSignal(!fromClick);
+	};
+	/**
+	 * Delayed sending of signal.
+	 *
+	 * @param {Boolean} [withTimeout] Send with timeout?
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._sendSignal = function(withTimeout) {
+		if (this._signalObj.id) {
+			clearTimeout(this._signalObj.id);
+			this._signalObj.id = null;
+		}
+		if (withTimeout) {
+			this._signalObj.id = setTimeout(this._binds.sendSignalInner, this._opts.timeout);
+		}
+		else {
+			this._sendSignalInner();
+		}
+	};
+	/**
+	 * Mouse wheel event.
+	 *
+	 * @param {Event} e Mouse event
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._mouseWheel = function(e) {
+		var delta = e.wheelDelta || -e.detail;
+		if (!delta) { return; }
+		e.stopPropagation();
+		e.preventDefault();
+		if (delta > 0) {
+			this.setValue(this._value + 1);
+			this._sendSignal();
+		}
+		else {
+			this.setValue(this._value - 1);
+			this._sendSignal();
+		}
+	};
+	/**
+	 * Delayed sending of signal - inner method.
+	 *
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._sendSignalInner = function() {
+		if (this._value == this._signalObj.lastValue) return;
+		this._signalObj.lastValue = this._value;
+		this.trigger("change", this._value);
+	};
+	/**
+	 * Set slider value.
+	 * 
+	 * @param {Number} value New value
+	 * @return {Boolean} If there was error, it returns false
+	 * @member $slider
+	 */
+	$slider.prototype.setValue = function(value) {
+		if (typeof value === "number" && value >= this._opts.min && value <= this._opts.max) {
+			this._value = value;
+			this._els.input.value = value;
+			this._setCaret(this._getPosFromValue(value));
+			return true;
+		}
+		else {
+			return false;
+		}
+	};
+	/**
+	 * Get slider value.
+	 * 
+	 * @return {Number}
+	 * @member $slider
+	 */
+	$slider.prototype.getValue = function() {
+		return this._value;
+	};
+	/**
+	 * Overwrite configuration object.
+	 *
+	 * @param {Object} optsArg See constructor.
+	 * @member $slider
+	 */
+	$slider.prototype.rewriteOpts = function(optsArg) {
+		for (var key in optsArg) {
+			this._opts[key] = optsArg[key];
+		}
+		if (this._value < this._opts.min || this._value > this._opts.max) {
+			this._value = this._opts.max;
+		}
+		this.setValue(this._value);
+	};
+	return $slider;
 }]);

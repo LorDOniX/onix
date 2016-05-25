@@ -1,4 +1,4 @@
-app.factory("Snippet", [
+homeApp.factory("Snippet", [
 	"$template",
 	"$common",
 	"$event",

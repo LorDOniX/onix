@@ -1,19 +1,19 @@
-app = onix.module("app", ["myModule"]);
+homeApp = onix.module("homeApp", ["myModule", "menu"]);
 
-app.value("Config", {
-	// app localization
+homeApp.value("Config", {
+	// homeApp localization
 	LOCALIZATION: {
 		LANG: "en",
 		PATH: "/locale/en.json"
 	},
 
-	// app resource URLs
+	// homeApp resource URLs
 	URLS: {
 		HOME: "/api/home/"
 	}
 });
 
-app.config(["$i18nProvider", function($i18nProvider) {
+homeApp.config(["$i18nProvider", function($i18nProvider) {
 	// if you are using underscore -> uncomment line below
 	//$i18nProvider.disableGlobalTranslation();
 	
@@ -25,7 +25,7 @@ app.config(["$i18nProvider", function($i18nProvider) {
 	});
 }]);
 
-app.run([
+homeApp.run([
 	"$route",
 	"$template",
 	"Config",

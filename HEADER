@@ -1,8 +1,7 @@
-/**
- * OnixJS framework
- * 2.5.4/20. 5. 2016
- * source: https://gitlab.com/LorDOniX/onix
- * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
- * @license MIT
- * - Free for use in both personal and commercial projects
- */
+OnixJS framework
+{VERSION}/{DATE}
+source: https://gitlab.com/LorDOniX/onix
+documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
+{MINIMAL}
+@license MIT
+- Free for use in both personal and commercial projects

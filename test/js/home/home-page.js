@@ -1,4 +1,4 @@
-app.factory("HomePage", [
+homeApp.factory("HomePage", [
 	"Page",
 	"$common",
 	"$template",
@@ -16,6 +16,7 @@ app.factory("HomePage", [
 	"$previewImages",
 	"$math",
 	"$date",
+	"MainMenu",
 function(
 	Page,
 	$common,
@@ -33,7 +34,8 @@ function(
 	$image,
 	$previewImages,
 	$math,
-	$date
+	$date,
+	MainMenu
 ) {
 
 	var HomePage = Page.create();
@@ -44,6 +46,8 @@ function(
 		this._getEl("title").innerHTML = _("home_page.title");
 
 		this._loadTemplate();
+
+		MainMenu.create(MainMenu.PAGES.HOME);
 
 		// dropdowns
 		var dropdown = new $select(this._getEl("dropdown"));

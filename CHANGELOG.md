@@ -1,9 +1,11 @@
 # Change Log
 
-## 2.5.5 (xx. x. 2016)
+## 2.5.5 (25. 4. 2016)
 
 * $common humanLength -> formatSize with TB, GB support
 * change directory hierarchy - test folder, remove static
+* main.less compile for test website
+* only one place for header update
 
 ## 2.5.4 (20. 5. 2016)
 

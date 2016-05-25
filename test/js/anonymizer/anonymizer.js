@@ -1,11 +1,15 @@
-onix.run([
+anonymizerApp = onix.module("anonymizerApp", ["menu"]);
+
+anonymizerApp.run([
 	"$slider",
 	"$anonymizer",
 	"$template",
+	"MainMenu",
 function(
 	$slider,
 	$anonymizer,
-	$template
+	$template,
+	MainMenu
 ) {
 	var HP = function() {
 		this._els = null;
@@ -17,6 +21,8 @@ function(
 	};
 
 	HP.prototype.run = function() {
+		MainMenu.create(MainMenu.PAGES.ANONYMIZER);
+
 		this._slider = new $slider(this._els.sliderHolder, {
 			timeout: 0
 		});
