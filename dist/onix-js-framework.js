@@ -1549,7 +1549,7 @@ onix = (function() {
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.5/25. 5. 2016\n'+
+'2.5.6/30. 5. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2135,8 +2135,9 @@ function(
 		 */
 		off: function (name, fn) {
 			var events = this._getEvents(name);
-			$common.reverseForEach(events, function(item) {
-				if (!fn || fn && item.fn == fn) {
+			$common.reverseForEach(events, function(event) {
+				var item = event.item;
+				if (!fn || (fn && item.fn == fn)) {
 					this._allEvents.splice(item.pos, 1);
 				}
 			}, this);

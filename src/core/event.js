@@ -66,8 +66,10 @@ function(
 		off: function (name, fn) {
 			var events = this._getEvents(name);
 
-			$common.reverseForEach(events, function(item) {
-				if (!fn || fn && item.fn == fn) {
+			$common.reverseForEach(events, function(event) {
+				var item = event.item;
+
+				if (!fn || (fn && item.fn == fn)) {
 					this._allEvents.splice(item.pos, 1);
 				}
 			}, this);

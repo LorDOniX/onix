@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.6 (30. 4. 2016)
+
+* $event off bugfix
+
 ## 2.5.5 (25. 4. 2016)
 
 * $common humanLength -> formatSize with TB, GB support

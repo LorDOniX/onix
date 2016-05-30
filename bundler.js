@@ -37,8 +37,8 @@ const _JS_FILES = filesJson.onix.map((item) => {
 });
 
 const _HEADER = {
-	VERSION: "2.5.5",
-	DATE: "25. 5. 2016",
+	VERSION: "2.5.6",
+	DATE: "30. 5. 2016",
 	VERSION_PH: "{VERSION}",
 	DATE_PH: "{DATE}",
 	MINIMAL_PH: "{MINIMAL}",
