@@ -1,10 +1,16 @@
 # Change Log
 
-## 2.5.6 (30. 4. 2016)
+## 2.5.7 (2. 6. 2016)
+
+* $common inherit - new method for functions inheritance
+* $resize - new service which handles window resize event
+* $event off bugfix
+
+## 2.5.6 (30. 5. 2016)
 
 * $event off bugfix
 
-## 2.5.5 (25. 4. 2016)
+## 2.5.5 (25. 5. 2016)
 
 * $common humanLength -> formatSize with TB, GB support
 * change directory hierarchy - test folder, remove static

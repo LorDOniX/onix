@@ -1545,11 +1545,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
+	 * version: 2.5.7
+	 * date: 2. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.6/30. 5. 2016\n'+
+'2.5.7/2. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -1728,6 +1730,29 @@ function(
 		dest = dest || {};
 		source = source || {};
 		this._objCopy(dest, source);
+	};
+	/**
+	 * Inherit function with another function/s.
+	 * First argument is source function, others are for inheritance.
+	 * Last parameters have higher priority than the previous ones.
+	 *
+	 * @member $common
+	 */
+	this.inherit = function() {
+		// first is source, rest is inherit classess
+		var args = arguments;
+		if (args.length < 2) return;
+		var source = args[0].prototype;
+		var inherits = Array.prototype.slice.call(args, 1);
+		// all inherits items
+		inherits.forEach(function(inhItem) {
+			// iterate prototype items
+			for (var p in inhItem.prototype) {
+				source[p] = typeof inhItem.prototype[p] != "object"
+					? inhItem.prototype[p]
+					: JSON.parse(JSON.stringify(inhItem.prototype[p]));
+			}
+		}, this);
 	};
 	/**
 	 * Bind function arguments without scope.
@@ -2134,13 +2159,15 @@ function(
 		 * @member $event
 		 */
 		off: function (name, fn) {
-			var events = this._getEvents(name);
-			$common.reverseForEach(events, function(event) {
-				var item = event.item;
+			var len = this._allEvents.length;
+			len = len > 0 ? len - 1 : -1;
+			for (var i = len; i >= 0; i--) {
+				var item = this._allEvents[i];
+				if (item.name != name) continue;
 				if (!fn || (fn && item.fn == fn)) {
-					this._allEvents.splice(item.pos, 1);
+					this._allEvents.splice(i, 1);
 				}
-			}, this);
+			}
 		},
 		/**
 		 * Add one time event to the stack.
@@ -2193,6 +2220,90 @@ function(
 			if (!scope) return;
 			$common.extend(scope, $event);
 		}
+	};
+}]);
+/**
+ * Handle window resize event, triggers signal "resize".
+ *
+ * @class $resize
+ */
+onix.service("$resize", [
+	"$event",
+function(
+	$event
+) {
+	// ------------------------ private ----------------------------------------
+	/**
+	 * Is active?
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._active = false;
+	/**
+	 * Resize object.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._resizeObj = {
+		id: null,
+		timeout: 333
+	};
+	/**
+	 * Window resize event.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._resize = function() {
+		if (this._resizeObj.id) {
+			clearTimeout(this._resizeObj.id);
+			this._resizeObj.id = null;
+		}
+		this._resizeObj.id = setTimeout(this._binds.resizeInner, this._resizeObj.timeout);
+	};
+	/**
+	 * Window resize event - trigger signal "resize".
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._resizeInner = function() {
+		this.trigger("resize");
+	};
+	/**
+	 * Binds for functions.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._binds = {
+		resize: this._resize.bind(this),
+		resizeInner: this._resizeInner.bind(this)
+	};
+	// ------------------------ public ----------------------------------------
+	// add events
+	$event.bindEvents(this);
+	/**
+	 * Bind resize event to window object.
+	 *
+	 * @member $resize
+	 */
+	this.start = function() {
+		if (this._active) return;
+		window.addEventListener("resize", this._binds.resize);
+		this._active = true;
+	};
+	/**
+	 * Unbind resize event from window object.
+	 *
+	 * @member $resize
+	 */
+	this.end = function() {
+		if (!this._active) return;
+		window.removeEventListener("resize", this._binds.resize);
+		this._active = false;
 	};
 }]);
 /**

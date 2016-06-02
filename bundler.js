@@ -37,12 +37,12 @@ const _JS_FILES = filesJson.onix.map((item) => {
 });
 
 const _HEADER = {
-	VERSION: "2.5.6",
-	DATE: "30. 5. 2016",
 	VERSION_PH: "{VERSION}",
 	DATE_PH: "{DATE}",
 	MINIMAL_PH: "{MINIMAL}",
-	ONIX_JS_PH: '"{ONIX_INFO}"'
+	ONIX_JS_PH: '"{ONIX_INFO}"',
+	ONIX_JS_VERSION: "version: ",
+	ONIX_JS_DATE: "date: "
 };
 
 class Common {
@@ -327,7 +327,7 @@ class Bundler {
 
 			Common.readFiles(allFiles).then((all) => {
 				all.forEach((file) => {
-					this._filesCache[file.path] = this._getData(file.path, file.data);
+					this._filesCache[file.path] = file.data;
 				});
 
 				resolve();
@@ -349,7 +349,7 @@ class Bundler {
 				if (_JS_FILES.indexOf(path) != -1) {
 					Common.readFile(path).then((data) => {
 						// todo update onix.js
-						this._filesCache[path] = this._getData(path, data);
+						this._filesCache[path] = data;
 
 						this._makeJS(_JS_FILES, _CONST.JS_OUTPUT);
 					});
@@ -366,14 +366,6 @@ class Bundler {
 		});
 	}
 
-	_getData(path, data) {
-		if (path.indexOf(_CONST.JS_ONIX) != -1) {
-			data = data.replace(_HEADER.ONIX_JS_PH, this._getHeader());
-		}
-		
-		return data;
-	}
-
 	/**
 	 * Get argument from console/enviroment.
 	 * @return {String} one optinal parameter
@@ -387,12 +379,23 @@ class Bundler {
 		else return "";
 	}
 
+	_getJSfromCache(path) {
+		let data = this._filesCache[path] || "";
+		let onixPath = this._getOnixJSPath();
+
+		if (path == onixPath) {
+			data = data.replace(_HEADER.ONIX_JS_PH, this._getHeader());
+		}
+		
+		return data;
+	}
+
 	_makeJS(inputFiles, outputFile) {
 		return new Promise((resolve, reject) => {
 			let output = [];
 
 			inputFiles.forEach((file) => {
-				output.push(this._filesCache[file] || "");
+				output.push(this._getJSfromCache(file));
 			});
 
 			// clear blank lines
@@ -470,6 +473,46 @@ class Bundler {
 		});
 	}
 
+	_getOnixJSPath() {
+		let path = "";
+
+		_JS_FILES.every((filePath) => {
+			if (filePath.indexOf(_CONST.JS_ONIX) != -1) {
+				path = filePath;
+				return false;
+			}
+			else return true;
+		});
+
+		return path;
+	}
+
+	_parseOnixJSFile() {
+		let path = this._getOnixJSPath();
+		let data = this._filesCache[path] || "";
+		let lines = data.split("\n");
+		let output = {
+			version: "",
+			date: ""
+		};
+
+		lines.forEach((line) => {
+			line = line.trim();
+
+			let ind = line.indexOf(_HEADER.ONIX_JS_VERSION);
+			let ind2 = line.indexOf(_HEADER.ONIX_JS_DATE);
+
+			if (ind != -1) {
+				output.version = line.substr(ind + _HEADER.ONIX_JS_VERSION.length);
+			}
+			else if (ind2 != -1) {
+				output.date = line.substr(ind2 + _HEADER.ONIX_JS_DATE.length);
+			}
+		});
+
+		return output;
+	}
+
 	/**
 	 * Get header data
 	 * 
@@ -478,6 +521,7 @@ class Bundler {
 	 * @return {String}
 	 */
 	_getHeader(addComment, addMinimal) {
+		let parsedData = this._parseOnixJSFile();
 		let headerData = this._filesCache[_CONST.HEADER_FILE];
 		let output = [];
 		let joiner = addComment ? "\n" : "";
@@ -498,7 +542,7 @@ class Bundler {
 			}
 			else {
 				// replace version, date
-				line = line.replace(_HEADER.VERSION_PH, _HEADER.VERSION).replace(_HEADER.DATE_PH, _HEADER.DATE);
+				line = line.replace(_HEADER.VERSION_PH, parsedData.version).replace(_HEADER.DATE_PH, parsedData.date);
 
 				// add comment, update onix.js info() method; lines - 2 (eof, last)
 				output.push((addComment ? " * " : "'") + line + (addComment ? "" : "\\n'" + (ind < lines.length - 2 ? "+\n" : "")));
@@ -554,6 +598,9 @@ class Bundler {
 			args: [c.LESS_TEST_FILE, c.CSS_TEST_FILE, false],
 			scope: this
 		}]).then(() => {
+			let pd = this._parseOnixJSFile();
+
+			Common.col("Onix version {0} date {1}", pd.version, pd.date);
 			Common.col("Dev is done");
 
 			switch (runType) {

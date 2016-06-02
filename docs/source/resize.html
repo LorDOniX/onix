@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='$resize'>/**
+</span> * Handle window resize event, triggers signal &quot;resize&quot;.
+ *
+ * @class $resize
+ */
+onix.service(&quot;$resize&quot;, [
+	&quot;$event&quot;,
+function(
+	$event
+) {
+	// ------------------------ private ----------------------------------------
+	
+<span id='$resize-property-_active'>	/**
+</span>	 * Is active?
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._active = false;
+	
+<span id='$resize-property-_resizeObj'>	/**
+</span>	 * Resize object.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._resizeObj = {
+		id: null,
+		timeout: 333
+	};
+
+<span id='$resize-method-_resize'>	/**
+</span>	 * Window resize event.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._resize = function() {
+		if (this._resizeObj.id) {
+			clearTimeout(this._resizeObj.id);
+			this._resizeObj.id = null;
+		}
+
+		this._resizeObj.id = setTimeout(this._binds.resizeInner, this._resizeObj.timeout);
+	};
+
+<span id='$resize-method-_resizeInner'>	/**
+</span>	 * Window resize event - trigger signal &quot;resize&quot;.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._resizeInner = function() {
+		this.trigger(&quot;resize&quot;);
+	};
+
+<span id='$resize-property-_binds'>	/**
+</span>	 * Binds for functions.
+	 *
+	 * @member $resize
+	 * @private
+	 */
+	this._binds = {
+		resize: this._resize.bind(this),
+		resizeInner: this._resizeInner.bind(this)
+	};
+	
+	// ------------------------ public ----------------------------------------
+	
+	// add events
+	$event.bindEvents(this);
+
+<span id='$resize-method-start'>	/**
+</span>	 * Bind resize event to window object.
+	 *
+	 * @member $resize
+	 */
+	this.start = function() {
+		if (this._active) return;
+
+		window.addEventListener(&quot;resize&quot;, this._binds.resize);
+		this._active = true;
+	};
+
+<span id='$resize-method-end'>	/**
+</span>	 * Unbind resize event from window object.
+	 *
+	 * @member $resize
+	 */
+	this.end = function() {
+		if (!this._active) return;
+
+		window.removeEventListener(&quot;resize&quot;, this._binds.resize);
+		this._active = false;
+	};
+}]);
+</pre>
+</body>
+</html>

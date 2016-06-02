@@ -106,6 +106,34 @@ function(
 	};
 
 	/**
+	 * Inherit function with another function/s.
+	 * First argument is source function, others are for inheritance.
+	 * Last parameters have higher priority than the previous ones.
+	 *
+	 * @member $common
+	 */
+	this.inherit = function() {
+		// first is source, rest is inherit classess
+		var args = arguments;
+
+		if (args.length < 2) return;
+
+		var source = args[0].prototype;
+		var inherits = Array.prototype.slice.call(args, 1);
+
+		// all inherits items
+		inherits.forEach(function(inhItem) {
+			// iterate prototype items
+			for (var p in inhItem.prototype) {
+				source[p] = typeof inhItem.prototype[p] != "object"
+					? inhItem.prototype[p]
+					: JSON.parse(JSON.stringify(inhItem.prototype[p]));
+
+			}
+		}, this);
+	};
+
+	/**
 	 * Bind function arguments without scope.
 	 *
 	 * @param  {Function} cb

@@ -17,6 +17,7 @@
 		"core/date.js",
 		"core/dom.js",
 		"core/event.js",
+		"core/resize.js",
 		"core/filters.js",
 		"core/http.js",
 		"core/i18n.js",

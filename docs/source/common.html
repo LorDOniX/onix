@@ -122,6 +122,34 @@ function(
 		this._objCopy(dest, source);
 	};
 
+<span id='$common-method-inherit'>	/**
+</span>	 * Inherit function with another function/s.
+	 * First argument is source function, others are for inheritance.
+	 * Last parameters have higher priority than the previous ones.
+	 *
+	 * @member $common
+	 */
+	this.inherit = function() {
+		// first is source, rest is inherit classess
+		var args = arguments;
+
+		if (args.length &lt; 2) return;
+
+		var source = args[0].prototype;
+		var inherits = Array.prototype.slice.call(args, 1);
+
+		// all inherits items
+		inherits.forEach(function(inhItem) {
+			// iterate prototype items
+			for (var p in inhItem.prototype) {
+				source[p] = typeof inhItem.prototype[p] != &quot;object&quot;
+					? inhItem.prototype[p]
+					: JSON.parse(JSON.stringify(inhItem.prototype[p]));
+
+			}
+		}, this);
+	};
+
 <span id='$common-method-bindWithoutScope'>	/**
 </span>	 * Bind function arguments without scope.
 	 *

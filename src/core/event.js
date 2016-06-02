@@ -64,15 +64,18 @@ function(
 		 * @member $event
 		 */
 		off: function (name, fn) {
-			var events = this._getEvents(name);
+			var len = this._allEvents.length;
+			len = len > 0 ? len - 1 : -1;
 
-			$common.reverseForEach(events, function(event) {
-				var item = event.item;
+			for (var i = len; i >= 0; i--) {
+				var item = this._allEvents[i];
+
+				if (item.name != name) continue;
 
 				if (!fn || (fn && item.fn == fn)) {
-					this._allEvents.splice(item.pos, 1);
+					this._allEvents.splice(i, 1);
 				}
-			}, this);
+			}
 		},
 
 		/**
