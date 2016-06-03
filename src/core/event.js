@@ -1,140 +1,106 @@
-onix.factory("$event", [
-	"$common",
-function(
-	$common
-) {
+onix.factory("$event", function() {
 	/**
 	 * This class is used for extending existing objects and brings signal functionality.
 	 * 
  	 * @class $event
  	 */
-	var $event = {
-		/**
-		 * All events. { name: name, event: function, scope, [once] }
-		 * 
-		 * @type {Array}
-		 * @member $event
-		 * @private
-		 */
-		_allEvents: [],
+	var $event = function() {};
 
-		/**
-		 * Get all events by his name.
-		 * 
-		 * @param  {String} name 
-		 * @return {Array}
-		 * @member $event
-		 */
-		_getEvents: function (name) {
-			var events = [];
+	/**
+	 * All events. { name: name, event: function, scope, [once] }
+	 * 
+	 * @type {Array}
+	 * @member $event
+	 * @private
+	 */
+	$event.prototype._allEvents = [];
 
-			this._allEvents.forEach(function(item, ind) {
-				if (name == item.name) {
-					events.push({
-						item: item,
-						pos: ind
-					});
-				}
-			});
+	/**
+	 * Add new event to the stack.
+	 * 
+	 * @param  {String} name 
+	 * @param  {Function} fn
+	 * @param  {Object|Function} [scope]
+	 * @member $event
+	 */
+	$event.prototype.on = function (name, fn, scope) {
+		if (arguments.length < 2) return;
 
-			return events;
-		},
+		this._allEvents.push({ 
+			name: name,
+			fn: fn,
+			scope: scope
+		});
+	};
 
-		/**
-		 * Add new event to the stack.
-		 * 
-		 * @param  {String} name 
-		 * @param  {Function} fn
-		 * @param  {Object|Function} scope
-		 * @member $event
-		 */
-		on: function (name, fn, scope) {
-			this._allEvents.push({ 
-				name: name,
-				fn: fn,
-				scope: scope
-			});
-		},
+	/**
+	 * Remove event from the stack.
+	 * 
+	 * @param  {String} name 
+	 * @param  {Function} [fn]
+	 * @member $event
+	 */
+	$event.prototype.off = function (name, fn) {
+		if (!name) return;
 
-		/**
-		 * Remove event from the stack.
-		 * 
-		 * @param  {String} name 
-		 * @param  {Function} [fn]
-		 * @member $event
-		 */
-		off: function (name, fn) {
-			var len = this._allEvents.length;
-			len = len > 0 ? len - 1 : -1;
+		var len = this._allEvents.length - 1;
 
-			for (var i = len; i >= 0; i--) {
-				var item = this._allEvents[i];
+		for (var i = len; i >= 0; i--) {
+			var item = this._allEvents[i];
 
-				if (item.name != name) continue;
+			if (item.name != name) continue;
 
-				if (!fn || (fn && item.fn == fn)) {
-					this._allEvents.splice(i, 1);
-				}
+			if (!fn || (fn && item.fn == fn)) {
+				this._allEvents.splice(i, 1);
 			}
-		},
-
-		/**
-		 * Add one time event to the stack.
-		 * 
-		 * @param  {String} name
-		 * @param  {Function} [fn]
-		 * @param  {Object|Function} [scope]
-		 * @member $event
-		 */
-		once: function (name, fn, scope) {
-			this._allEvents.push({ 
-				name: name,
-				fn: fn,
-				scope: scope,
-				once: true
-			});
-		},
-
-		/**
-		 * Trigger event with arguments 0..n.
-		 * 
-		 * @param  {String} name
-		 * @member $event
-		 */
-		trigger: function (name) {
-			var events = this._getEvents(name);
-			var args = arguments;
-			var onceArray = [];
-
-			events.forEach(function(event) {
-				var newArgs = Array.prototype.slice.call(args, 0);
-				newArgs.shift();
-
-				var item = event.item;
-
-				item.fn.apply(item.scope || this, newArgs);
-				if (item.once) {
-					onceArray.push(event.pos);
-				}
-			}, this);
-
-			$common.reverseForEach(onceArray, function(pos) {
-				this._allEvents.splice(pos, 1);
-			}, this);
 		}
 	};
 
-	return {
-		/**
-		 * Bind event functionality to the scope.
-		 *
-		 * @param {Object} scope
-		 * @member $event
-		 */
-		bindEvents: function(scope) {
-			if (!scope) return;
+	/**
+	 * Add one time event to the stack.
+	 * 
+	 * @param  {String} name
+	 * @param  {Function} [fn]
+	 * @param  {Object|Function} [scope]
+	 * @member $event
+	 */
+	$event.prototype.once = function (name, fn, scope) {
+		if (arguments.length < 2) return;
 
-			$common.extend(scope, $event);
+		this._allEvents.push({ 
+			name: name,
+			fn: fn,
+			scope: scope,
+			once: true
+		});
+	};
+
+	/**
+	 * Trigger event with arguments 0..n.
+	 * 
+	 * @param  {String} name
+	 * @member $event
+	 */
+	$event.prototype.trigger = function (name) {
+		if (!name) return;
+		
+		var args = Array.prototype.slice.call(arguments, 1);
+		var len = this._allEvents.length - 1;
+
+		for (var i = len; i >= 0; i--) {
+			var item = this._allEvents[i];
+
+			if (item.name != name) continue;
+
+			// call fn
+			item.fn.apply(item.scope || this, args);
+
+			// once event
+			if (item.once) {
+				this._allEvents.splice(i, 1);
+			}
 		}
 	};
-}]);
+
+	return $event;
+});

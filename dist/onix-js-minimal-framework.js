@@ -829,13 +829,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.7
-	 * date: 2. 6. 2016
+	 * version: 2.5.8
+	 * date: 3. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.7/2. 6. 2016\n'+
+'2.5.8/3. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+

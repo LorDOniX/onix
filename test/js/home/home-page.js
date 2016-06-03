@@ -1,6 +1,7 @@
 homeApp.factory("HomePage", [
 	"Page",
 	"$common",
+	"$event",
 	"$template",
 	"$loader",
 	"$select",
@@ -20,6 +21,7 @@ homeApp.factory("HomePage", [
 function(
 	Page,
 	$common,
+	$event,
 	$template,
 	$loader,
 	$select,
@@ -38,10 +40,14 @@ function(
 	MainMenu
 ) {
 
-	var HomePage = Page.create();
+	var HomePage = function(config) {
+		this._constructor(config);
+	};
+
+	$common.inherit(HomePage, Page, $event);
 	
 	// ------------------------ private ---------------------------------------
-	HomePage._afterInit = function() {
+	HomePage.prototype._show = function() {
 		// set title - using i18n get text _ function
 		this._getEl("title").innerHTML = _("home_page.title");
 
@@ -73,7 +79,7 @@ function(
 		});
 	};
 
-	HomePage._testPromise1 = function(val) {
+	HomePage.prototype._testPromise1 = function(val) {
 		var promise = $q.defer();
 
 		setTimeout(function() {
@@ -83,7 +89,7 @@ function(
 		return promise;
 	};
 
-	HomePage._testPromise2 = function(val) {
+	HomePage.prototype._testPromise2 = function(val) {
 		var promise = $q.defer();
 
 		setTimeout(function() {
@@ -97,7 +103,7 @@ function(
 	 * Load template to main template in index.html
 	 * Compile against data object; bind to HomePage page
 	 */
-	HomePage._loadTemplate = function() {
+	HomePage.prototype._loadTemplate = function() {
 		var el = onix.element(".placeholder").html($template.compile("testTempl", {
 			name: "Name from HP",
 			testObj: {
@@ -137,7 +143,7 @@ function(
 	 * @param  {ButtonElement} el
 	 * @param  {MouseEvent} event
 	 */
-	HomePage.buttonClick = function(el, event) {
+	HomePage.prototype.buttonClick = function(el, event) {
 		console.log(el, event);
 
 		// loader
@@ -155,28 +161,29 @@ function(
 		}, 500);
 	};
 
-	HomePage.filterTest = function() {
+	HomePage.prototype.filterTest = function() {
 		console.log("Test of filter 'lowercase' : HI, HOW ARE YOU? -> " + $filter("lowercase")("HI, HOW ARE YOU?"));
 	};
 
-	HomePage.snippetTest = function() {
-		HomeSnippet.dirTest();
+	HomePage.prototype.snippetTest = function() {
+		var homeSnippet = new HomeSnippet();
+		homeSnippet.dirTest();
 	};
 
-	HomePage.moduleTest = function() {
+	HomePage.prototype.moduleTest = function() {
 		TestFromModule.test();
 	};
 
 	/**
 	 * Test request to API on express server.
 	 */
-	HomePage.apiTest = function() {
+	HomePage.prototype.apiTest = function() {
 		HomeResource.get().then(function(data) {
 			console.log(data);
 		});
 	};
 
-	HomePage.chp = function() {
+	HomePage.prototype.chp = function() {
 		// test for chaining promises
 		console.log("chainPromises start...");
 
@@ -204,12 +211,12 @@ function(
 		});
 	};
 
-	HomePage.routeParams = function() {
+	HomePage.prototype.routeParams = function() {
 		console.log("routeParams");
 		console.log($routeParams);
 	};
 
-	HomePage.promiseTest = function() {
+	HomePage.prototype.promiseTest = function() {
 		var promise1 = new $promise(function(resolve) {
 			setTimeout(function() {
 				resolve();
@@ -231,7 +238,7 @@ function(
 		});
 	};
 
-	HomePage.uploadChange = function() {
+	HomePage.prototype.uploadChange = function() {
 		var uploadPreview = this._getEl("uploadPreview");
 		var filesInput = this._getEl("uploadInput");
 
@@ -242,7 +249,7 @@ function(
 		});
 	};
 
-	HomePage.mathAndDate = function() {
+	HomePage.prototype.mathAndDate = function() {
 		$common.col("2016-06-31 to CS date = {0}", $date.dateENtoCS("2016-06-31"));
 		$common.col("2016-06-31 is CS date? {0}",  $date.isCSdate("2016-06-31") ? "yes" : "no");
 		$common.col("zoomToDistance = {0}", $math.zoomToDistance(15, 45, 1024));
@@ -291,9 +298,10 @@ function(
 		}
 	};
 
-	HomePage.allTests = function() {
+	HomePage.prototype.allTests = function() {
 		console.log("Running all tests...");
 
+		this.buttonClick();
 		this.filterTest();
 		this.snippetTest();
 		this.moduleTest();

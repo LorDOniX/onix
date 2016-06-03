@@ -20,11 +20,13 @@
 	&quot;$event&quot;,
 	&quot;$loader&quot;,
 	&quot;$q&quot;,
+	&quot;$common&quot;,
 function(
 	$dom,
 	$event,
 	$loader,
-	$q
+	$q,
+	$common
 ) {
 <span id='$anonymizer'>	/**
 </span>	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -47,8 +49,6 @@ function(
 	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
-		$event.bindEvents(this);
-
 		// is canvas available?
 		this._hasCanvas = !!document.createElement(&quot;canvas&quot;).getContext;
 
@@ -185,6 +185,11 @@ function(
 			this._opts.entityPreview.appendChild(this._entityCanvas);
 		}
 	};
+
+<span id='$anonymizer-property-'>	/**
+</span>	 * Extend $anonymizer with events functionality.
+	 */
+	$common.inherit($anonymizer, $event);
 
 <span id='$anonymizer-static-property-ENTITES'>	/**
 </span>	 * List of entites.

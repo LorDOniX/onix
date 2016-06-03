@@ -4,8 +4,10 @@
  * @class $resize
  */
 onix.service("$resize", [
+	"$common",
 	"$event",
 function(
+	$common,
 	$event
 ) {
 	// ------------------------ private ----------------------------------------
@@ -68,7 +70,7 @@ function(
 	// ------------------------ public ----------------------------------------
 	
 	// add events
-	$event.bindEvents(this);
+	$common.extend(this, new $event());
 
 	/**
 	 * Bind resize event to window object.

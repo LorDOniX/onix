@@ -1545,13 +1545,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.7
-	 * date: 2. 6. 2016
+	 * version: 2.5.8
+	 * date: 3. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.7/2. 6. 2016\n'+
+'2.5.8/3. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -1659,29 +1659,7 @@ function(
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
 			if (source.hasOwnProperty(prop)) {
-				var sourceVal = source[prop];
-				var sourceType = typeof sourceVal;
-				// array
-				if (Array.isArray(sourceVal)) {
-					// array - copy object to another array - keep referencings on array, objects
-					var newArray = [];
-					sourceVal.forEach(function(item) {
-						newArray.push(item);
-					});
-					dest[prop] = newArray;
-				}
-				// not null and object
-				else if (sourceVal && sourceType === "object") {
-					// recursive copy
-					if (!(prop in dest)) {
-						dest[prop] = {};
- 					}
-					this._objCopy(dest[prop], sourceVal);
-				}
-				else {
-					// string, numbers, functions
-					dest[prop] = sourceVal;
-				}
+				dest[prop] = this.cloneValue(source[prop]);
 			}
 		}.bind(this));
 	};
@@ -1730,6 +1708,57 @@ function(
 		dest = dest || {};
 		source = source || {};
 		this._objCopy(dest, source);
+	};
+	/**
+	 * Clone value without references.
+	 * 
+	 * @param  {Object} value Input value
+	 * @param  {Number} [lvl] Recursive threshold
+	 * @return {Object} cloned value
+	 * @member $common
+	 */
+	this.cloneValue = function(value, lvl) {
+		lvl = lvl || 1;
+		// recursive call threshold
+		if (lvl > 100) return null;
+		switch (typeof value) {
+			case "object":
+				if (Array.isArray(value)) {
+					// array
+					var newArray = [];
+					value.forEach(function(item) {
+						newArray.push(this.cloneValue(item, lvl + 1));
+					}, this);
+					return newArray;
+				}
+				else if (value instanceof Date) {
+					// date
+					return new Date(value.getTime());
+				}
+				else if (value instanceof Element) {
+					// element
+					return value;
+				}
+				else if (value) {
+					// object
+					var newObj = {};
+					Object.keys(value).forEach(function(prop) {
+						if (value.hasOwnProperty(prop)) {
+							newObj[prop] = this.cloneValue(value[prop], lvl + 1);
+						}
+					}.bind(this));
+					return newObj;
+				}
+				else {
+					// null
+					return null;
+				}
+			case "undefined":
+			case "function":
+			case "number":
+			case "string":
+				return value;
+		}
 	};
 	/**
 	 * Inherit function with another function/s.
@@ -2098,138 +2127,105 @@ onix.service("$dom", function() {
 		return output;
 	};
 });
-onix.factory("$event", [
-	"$common",
-function(
-	$common
-) {
+onix.factory("$event", function() {
 	/**
 	 * This class is used for extending existing objects and brings signal functionality.
 	 * 
  	 * @class $event
  	 */
-	var $event = {
-		/**
-		 * All events. { name: name, event: function, scope, [once] }
-		 * 
-		 * @type {Array}
-		 * @member $event
-		 * @private
-		 */
-		_allEvents: [],
-		/**
-		 * Get all events by his name.
-		 * 
-		 * @param  {String} name 
-		 * @return {Array}
-		 * @member $event
-		 */
-		_getEvents: function (name) {
-			var events = [];
-			this._allEvents.forEach(function(item, ind) {
-				if (name == item.name) {
-					events.push({
-						item: item,
-						pos: ind
-					});
-				}
-			});
-			return events;
-		},
-		/**
-		 * Add new event to the stack.
-		 * 
-		 * @param  {String} name 
-		 * @param  {Function} fn
-		 * @param  {Object|Function} scope
-		 * @member $event
-		 */
-		on: function (name, fn, scope) {
-			this._allEvents.push({ 
-				name: name,
-				fn: fn,
-				scope: scope
-			});
-		},
-		/**
-		 * Remove event from the stack.
-		 * 
-		 * @param  {String} name 
-		 * @param  {Function} [fn]
-		 * @member $event
-		 */
-		off: function (name, fn) {
-			var len = this._allEvents.length;
-			len = len > 0 ? len - 1 : -1;
-			for (var i = len; i >= 0; i--) {
-				var item = this._allEvents[i];
-				if (item.name != name) continue;
-				if (!fn || (fn && item.fn == fn)) {
-					this._allEvents.splice(i, 1);
-				}
+	var $event = function() {};
+	/**
+	 * All events. { name: name, event: function, scope, [once] }
+	 * 
+	 * @type {Array}
+	 * @member $event
+	 * @private
+	 */
+	$event.prototype._allEvents = [];
+	/**
+	 * Add new event to the stack.
+	 * 
+	 * @param  {String} name 
+	 * @param  {Function} fn
+	 * @param  {Object|Function} [scope]
+	 * @member $event
+	 */
+	$event.prototype.on = function (name, fn, scope) {
+		if (arguments.length < 2) return;
+		this._allEvents.push({ 
+			name: name,
+			fn: fn,
+			scope: scope
+		});
+	};
+	/**
+	 * Remove event from the stack.
+	 * 
+	 * @param  {String} name 
+	 * @param  {Function} [fn]
+	 * @member $event
+	 */
+	$event.prototype.off = function (name, fn) {
+		if (!name) return;
+		var len = this._allEvents.length - 1;
+		for (var i = len; i >= 0; i--) {
+			var item = this._allEvents[i];
+			if (item.name != name) continue;
+			if (!fn || (fn && item.fn == fn)) {
+				this._allEvents.splice(i, 1);
 			}
-		},
-		/**
-		 * Add one time event to the stack.
-		 * 
-		 * @param  {String} name
-		 * @param  {Function} [fn]
-		 * @param  {Object|Function} [scope]
-		 * @member $event
-		 */
-		once: function (name, fn, scope) {
-			this._allEvents.push({ 
-				name: name,
-				fn: fn,
-				scope: scope,
-				once: true
-			});
-		},
-		/**
-		 * Trigger event with arguments 0..n.
-		 * 
-		 * @param  {String} name
-		 * @member $event
-		 */
-		trigger: function (name) {
-			var events = this._getEvents(name);
-			var args = arguments;
-			var onceArray = [];
-			events.forEach(function(event) {
-				var newArgs = Array.prototype.slice.call(args, 0);
-				newArgs.shift();
-				var item = event.item;
-				item.fn.apply(item.scope || this, newArgs);
-				if (item.once) {
-					onceArray.push(event.pos);
-				}
-			}, this);
-			$common.reverseForEach(onceArray, function(pos) {
-				this._allEvents.splice(pos, 1);
-			}, this);
 		}
 	};
-	return {
-		/**
-		 * Bind event functionality to the scope.
-		 *
-		 * @param {Object} scope
-		 * @member $event
-		 */
-		bindEvents: function(scope) {
-			if (!scope) return;
-			$common.extend(scope, $event);
+	/**
+	 * Add one time event to the stack.
+	 * 
+	 * @param  {String} name
+	 * @param  {Function} [fn]
+	 * @param  {Object|Function} [scope]
+	 * @member $event
+	 */
+	$event.prototype.once = function (name, fn, scope) {
+		if (arguments.length < 2) return;
+		this._allEvents.push({ 
+			name: name,
+			fn: fn,
+			scope: scope,
+			once: true
+		});
+	};
+	/**
+	 * Trigger event with arguments 0..n.
+	 * 
+	 * @param  {String} name
+	 * @member $event
+	 */
+	$event.prototype.trigger = function (name) {
+		if (!name) return;
+		var args = Array.prototype.slice.call(arguments, 1);
+		var len = this._allEvents.length - 1;
+		for (var i = len; i >= 0; i--) {
+			var item = this._allEvents[i];
+			if (item.name != name) continue;
+			// call fn
+			item.fn.apply(item.scope || this, args);
+			// once event
+			if (item.once) {
+				this._allEvents.splice(i, 1);
+			}
 		}
 	};
-}]);
+	return $event;
+});
 /**
  * Handle window resize event, triggers signal "resize".
  *
  * @class $resize
  */
 onix.service("$resize", [
+	"$common",
 	"$event",
 function(
+	$common,
 	$event
 ) {
 	// ------------------------ private ----------------------------------------
@@ -2284,7 +2280,7 @@ function(
 	};
 	// ------------------------ public ----------------------------------------
 	// add events
-	$event.bindEvents(this);
+	$common.extend(this, new $event());
 	/**
 	 * Bind resize event to window object.
 	 *
@@ -4930,11 +4926,13 @@ onix.factory("$anonymizer", [
 	"$event",
 	"$loader",
 	"$q",
+	"$common",
 function(
 	$dom,
 	$event,
 	$loader,
-	$q
+	$q,
+	$common
 ) {
 	/**
 	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -4957,7 +4955,6 @@ function(
 	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
-		$event.bindEvents(this);
 		// is canvas available?
 		this._hasCanvas = !!document.createElement("canvas").getContext;
 		if (!this._hasCanvas) {
@@ -5071,6 +5068,10 @@ function(
 			this._opts.entityPreview.appendChild(this._entityCanvas);
 		}
 	};
+	/**
+	 * Extend $anonymizer with events functionality.
+	 */
+	$common.inherit($anonymizer, $event);
 	/**
 	 * List of entites.
 	 * 
@@ -6367,8 +6368,6 @@ function(
 	 * @member $select
 	 */
 	var $select = function(el, opts) {
-		// extend our class
-		$event.bindEvents(this);
 		this._opts = {
 			addCaption: false
 		};
@@ -6395,6 +6394,10 @@ function(
 		};
 		this._bind();
 	};
+	/**
+	 * Extend $select with events functionality.
+	 */
+	$common.inherit($select, $event);
 	/**
 	 * Bind clicks on the select.
 	 *
@@ -6587,9 +6590,11 @@ function(
 onix.factory("$slider", [
 	"$dom",
 	"$event",
+	"$common",
 function(
 	$dom,
-	$event
+	$event,
+	$common
 ) {
 	/**
 	 * Slider - slider with input for selecting numbers from the range.
@@ -6602,7 +6607,6 @@ function(
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
-		$event.bindEvents(this);
 		this._parent = parent;
 		this._root = this._create();
 		this._opts = {
@@ -6643,6 +6647,10 @@ function(
 		// def. max value
 		this.setValue(this._opts.max);
 	};
+	/**
+	 * Extend $slider with events functionality.
+	 */
+	$common.inherit($slider, $event);
 	/**
 	 * Create slider and his children.
 	 *

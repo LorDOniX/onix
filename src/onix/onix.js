@@ -694,8 +694,8 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.7
-	 * date: 2. 6. 2016
+	 * version: 2.5.8
+	 * date: 3. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {

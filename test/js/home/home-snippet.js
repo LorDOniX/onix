@@ -1,19 +1,23 @@
 homeApp.factory("HomeSnippet", [
+	"$common",
 	"Snippet",
 	"TestFromModule",
 function(
+	$common,
 	Snippet,
 	TestFromModule
 ) {
+	var HomeSnippet = function(config, parent) {
+		this._constructor(config, parent);
 
-	TestFromModule.test();
+		TestFromModule.test();
+	};
 
-	var HomeSnippet = Snippet.create();
+	$common.inherit(HomeSnippet, Snippet);
 
-	HomeSnippet.dirTest = function() {
+	HomeSnippet.prototype.dirTest = function() {
 		console.log("HomeDir dirTest function()");
 	};
 
 	return HomeSnippet;
-	
 }]);

@@ -17,9 +17,6 @@ function(
 	 * @member $select
 	 */
 	var $select = function(el, opts) {
-		// extend our class
-		$event.bindEvents(this);
-
 		this._opts = {
 			addCaption: false
 		};
@@ -52,6 +49,11 @@ function(
 
 		this._bind();
 	};
+
+	/**
+	 * Extend $select with events functionality.
+	 */
+	$common.inherit($select, $event);
 
 	/**
 	 * Bind clicks on the select.

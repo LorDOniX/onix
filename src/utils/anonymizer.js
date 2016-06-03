@@ -3,11 +3,13 @@ onix.factory("$anonymizer", [
 	"$event",
 	"$loader",
 	"$q",
+	"$common",
 function(
 	$dom,
 	$event,
 	$loader,
-	$q
+	$q,
+	$common
 ) {
 	/**
 	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -30,8 +32,6 @@ function(
 	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
-		$event.bindEvents(this);
-
 		// is canvas available?
 		this._hasCanvas = !!document.createElement("canvas").getContext;
 
@@ -168,6 +168,11 @@ function(
 			this._opts.entityPreview.appendChild(this._entityCanvas);
 		}
 	};
+
+	/**
+	 * Extend $anonymizer with events functionality.
+	 */
+	$common.inherit($anonymizer, $event);
 
 	/**
 	 * List of entites.

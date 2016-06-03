@@ -1,9 +1,11 @@
 onix.factory("$slider", [
 	"$dom",
 	"$event",
+	"$common",
 function(
 	$dom,
-	$event
+	$event,
+	$common
 ) {
 	/**
 	 * Slider - slider with input for selecting numbers from the range.
@@ -16,8 +18,6 @@ function(
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
-		$event.bindEvents(this);
-
 		this._parent = parent;
 		this._root = this._create();
 
@@ -67,6 +67,11 @@ function(
 		// def. max value
 		this.setValue(this._opts.max);
 	};
+
+	/**
+	 * Extend $slider with events functionality.
+	 */
+	$common.inherit($slider, $event);
 
 	/**
 	 * Create slider and his children.

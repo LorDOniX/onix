@@ -50,10 +50,9 @@ function(
 	// route for home page
 	var HomePage = {
 		controller: ["HomePage", function(HomePage) {
-			HomePage.setConfig({
+			new HomePage({
 				templ: "detail"
 			});
-			HomePage.init();
 		}],
 		templateId: "detail",
 		templateUrl: "/templ/detail.html",

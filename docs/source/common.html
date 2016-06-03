@@ -36,33 +36,7 @@ function(
 	this._objCopy = function(dest, source) {
 		Object.keys(source).forEach(function(prop) {
 			if (source.hasOwnProperty(prop)) {
-				var sourceVal = source[prop];
-				var sourceType = typeof sourceVal;
-
-				// array
-				if (Array.isArray(sourceVal)) {
-					// array - copy object to another array - keep referencings on array, objects
-					var newArray = [];
-
-					sourceVal.forEach(function(item) {
-						newArray.push(item);
-					});
-
-					dest[prop] = newArray;
-				}
-				// not null and object
-				else if (sourceVal &amp;&amp; sourceType === &quot;object&quot;) {
-					// recursive copy
-					if (!(prop in dest)) {
-						dest[prop] = {};
- 					}
-
-					this._objCopy(dest[prop], sourceVal);
-				}
-				else {
-					// string, numbers, functions
-					dest[prop] = sourceVal;
-				}
+				dest[prop] = this.cloneValue(source[prop]);
 			}
 		}.bind(this));
 	};
@@ -120,6 +94,65 @@ function(
 		source = source || {};
 
 		this._objCopy(dest, source);
+	};
+
+<span id='$common-method-cloneValue'>	/**
+</span>	 * Clone value without references.
+	 * 
+	 * @param  {Object} value Input value
+	 * @param  {Number} [lvl] Recursive threshold
+	 * @return {Object} cloned value
+	 * @member $common
+	 */
+	this.cloneValue = function(value, lvl) {
+		lvl = lvl || 1;
+
+		// recursive call threshold
+		if (lvl &gt; 100) return null;
+
+		switch (typeof value) {
+			case &quot;object&quot;:
+				if (Array.isArray(value)) {
+					// array
+					var newArray = [];
+
+					value.forEach(function(item) {
+						newArray.push(this.cloneValue(item, lvl + 1));
+					}, this);
+
+					return newArray;
+				}
+				else if (value instanceof Date) {
+					// date
+					return new Date(value.getTime());
+				}
+				else if (value instanceof Element) {
+					// element
+					return value;
+				}
+				else if (value) {
+					// object
+					var newObj = {};
+
+					Object.keys(value).forEach(function(prop) {
+						if (value.hasOwnProperty(prop)) {
+							newObj[prop] = this.cloneValue(value[prop], lvl + 1);
+						}
+					}.bind(this));
+
+					return newObj;
+				}
+				else {
+					// null
+					return null;
+				}
+
+			case &quot;undefined&quot;:
+			case &quot;function&quot;:
+			case &quot;number&quot;:
+			case &quot;string&quot;:
+				return value;
+		}
 	};
 
 <span id='$common-method-inherit'>	/**

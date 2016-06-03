@@ -18,9 +18,11 @@
   <pre class="prettyprint lang-js">onix.factory(&quot;$slider&quot;, [
 	&quot;$dom&quot;,
 	&quot;$event&quot;,
+	&quot;$common&quot;,
 function(
 	$dom,
-	$event
+	$event,
+	$common
 ) {
 <span id='$slider'>	/**
 </span>	 * Slider - slider with input for selecting numbers from the range.
@@ -33,8 +35,6 @@ function(
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
-		$event.bindEvents(this);
-
 		this._parent = parent;
 		this._root = this._create();
 
@@ -84,6 +84,11 @@ function(
 		// def. max value
 		this.setValue(this._opts.max);
 	};
+
+<span id='$slider-property-'>	/**
+</span>	 * Extend $slider with events functionality.
+	 */
+	$common.inherit($slider, $event);
 
 <span id='$slider-method-_create'>	/**
 </span>	 * Create slider and his children.

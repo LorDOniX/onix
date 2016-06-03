@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.5.8 (3. 6. 2016)
+
+* $common cloneValue
+* $event is now only function, remove bindEvents
+* update test
+
 ## 2.5.7 (2. 6. 2016)
 
 * $common inherit - new method for functions inheritance
