@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.10 (3. 6. 2016)
+
+* $anonymizer bugfix - no image
+
 ## 2.5.9 (3. 6. 2016)
 
 * $resize is factory

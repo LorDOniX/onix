@@ -1545,13 +1545,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.9
+	 * version: 2.5.10
 	 * date: 3. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.9/3. 6. 2016\n'+
+'2.5.10/3. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -5437,6 +5437,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseWheel = function(e) {
+		if (!this._imgWidth && !this._imgHeight) return;
 		var delta = e.wheelDelta || -e.detail;
 		if (!delta) { return; }
 		e.stopPropagation();
@@ -5457,6 +5458,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseDown = function(e) {
+		if (!this._imgWidth && !this._imgHeight) return;
 		e.stopPropagation();
 		e.preventDefault();
 		this._mouse.startXSave = e.offsetX;
@@ -5779,8 +5781,12 @@ function(
 			promise.resolve();
 		}.bind(this));
 		img.addEventListener("error", function() {
+			this._spinner.classList.add("hide");
+			this._img = null;
+			this._imgWidth = 0;
+			this._imgHeight = 0;
 			promise.reject();
-		});
+		}.bind(this));
 		img.src = url || "";
 		return promise;
 	};
@@ -5894,6 +5900,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.stepBack = function() {
+		if (!this._imgWidth && !this._imgHeight) return;
 		this._entites.pop();
 		this._redraw();
 	};
@@ -5903,6 +5910,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.removeAll = function() {
+		if (!this._imgWidth && !this._imgHeight) return;
 		this._entites = [];
 		this._redraw();
 	};
