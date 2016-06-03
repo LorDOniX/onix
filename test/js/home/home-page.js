@@ -1,43 +1,45 @@
 homeApp.factory("HomePage", [
-	"Page",
 	"$common",
+	"$date",
 	"$event",
-	"$template",
-	"$loader",
-	"$select",
-	"$q",
-	"$promise",
-	"HomeResource",
-	"HomeSnippet",
-	"myModule::TestFromModule",
 	"$filter",
 	"$i18n",
-	"$routeParams",
 	"$image",
-	"$previewImages",
+	"$loader",
 	"$math",
-	"$date",
+	"$previewImages",
+	"$promise",
+	"$q",
+	"$resize",
+	"$routeParams",
+	"$select",
+	"$template",
+	"HomeResource",
+	"HomeSnippet",
 	"MainMenu",
+	"Page",
+	"myModule::TestFromModule",
 function(
-	Page,
 	$common,
+	$date,
 	$event,
-	$template,
-	$loader,
-	$select,
-	$q,
-	$promise,
-	HomeResource,
-	HomeSnippet,
-	TestFromModule,
 	$filter,
 	$i18n,
-	$routeParams,
 	$image,
-	$previewImages,
+	$loader,
 	$math,
-	$date,
-	MainMenu
+	$previewImages,
+	$promise,
+	$q,
+	$resize,
+	$routeParams,
+	$select,
+	$template,
+	HomeResource,
+	HomeSnippet,
+	MainMenu,
+	Page,
+	TestFromModule
 ) {
 
 	var HomePage = function(config) {
@@ -50,6 +52,11 @@ function(
 	HomePage.prototype._show = function() {
 		// set title - using i18n get text _ function
 		this._getEl("title").innerHTML = _("home_page.title");
+
+		$resize.start();
+		$resize.on("resize", function() {
+			console.log("resize event");
+		});
 
 		this._loadTemplate();
 

@@ -1,9 +1,4 @@
-/**
- * Handle window resize event, triggers signal "resize".
- *
- * @class $resize
- */
-onix.service("$resize", [
+onix.factory("$resize", [
 	"$common",
 	"$event",
 function(
@@ -13,23 +8,44 @@ function(
 	// ------------------------ private ----------------------------------------
 	
 	/**
-	 * Is active?
+	 * Handle window resize event, triggers signal "resize".
 	 *
-	 * @member $resize
-	 * @private
+	 * @class $resize
 	 */
-	this._active = false;
-	
-	/**
-	 * Resize object.
-	 *
-	 * @member $resize
-	 * @private
-	 */
-	this._resizeObj = {
-		id: null,
-		timeout: 333
+	var $resize = function() {
+		/**
+		 * Is active?
+		 *
+		 * @member $resize
+		 * @private
+		 */
+		this._active = false;
+		
+		/**
+		 * Resize object.
+		 *
+		 * @member $resize
+		 * @private
+		 */
+		this._resizeObj = {
+			id: null,
+			timeout: 333
+		};
+
+		/**
+		 * Binds for functions.
+		 *
+		 * @member $resize
+		 * @private
+		 */
+		this._binds = {
+			resize: this._resize.bind(this),
+			resizeInner: this._resizeInner.bind(this)
+		};
 	};
+
+	// add events
+	$common.inherit($resize, $event);
 
 	/**
 	 * Window resize event.
@@ -37,7 +53,7 @@ function(
 	 * @member $resize
 	 * @private
 	 */
-	this._resize = function() {
+	$resize.prototype._resize = function() {
 		if (this._resizeObj.id) {
 			clearTimeout(this._resizeObj.id);
 			this._resizeObj.id = null;
@@ -52,32 +68,18 @@ function(
 	 * @member $resize
 	 * @private
 	 */
-	this._resizeInner = function() {
+	$resize.prototype._resizeInner = function() {
 		this.trigger("resize");
-	};
-
-	/**
-	 * Binds for functions.
-	 *
-	 * @member $resize
-	 * @private
-	 */
-	this._binds = {
-		resize: this._resize.bind(this),
-		resizeInner: this._resizeInner.bind(this)
 	};
 	
 	// ------------------------ public ----------------------------------------
-	
-	// add events
-	$common.extend(this, new $event());
 
 	/**
 	 * Bind resize event to window object.
 	 *
 	 * @member $resize
 	 */
-	this.start = function() {
+	$resize.prototype.start = function() {
 		if (this._active) return;
 
 		window.addEventListener("resize", this._binds.resize);
@@ -89,10 +91,12 @@ function(
 	 *
 	 * @member $resize
 	 */
-	this.end = function() {
+	$resize.prototype.end = function() {
 		if (!this._active) return;
 
 		window.removeEventListener("resize", this._binds.resize);
 		this._active = false;
 	};
+
+	return new $resize();
 }]);

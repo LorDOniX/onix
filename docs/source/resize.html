@@ -15,12 +15,7 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='$resize'>/**
-</span> * Handle window resize event, triggers signal &quot;resize&quot;.
- *
- * @class $resize
- */
-onix.service(&quot;$resize&quot;, [
+  <pre class="prettyprint lang-js">onix.factory(&quot;$resize&quot;, [
 	&quot;$common&quot;,
 	&quot;$event&quot;,
 function(
@@ -29,24 +24,45 @@ function(
 ) {
 	// ------------------------ private ----------------------------------------
 	
-<span id='$resize-property-_active'>	/**
-</span>	 * Is active?
+<span id='$resize'>	/**
+</span>	 * Handle window resize event, triggers signal &quot;resize&quot;.
 	 *
-	 * @member $resize
-	 * @private
+	 * @class $resize
 	 */
-	this._active = false;
-	
-<span id='$resize-property-_resizeObj'>	/**
-</span>	 * Resize object.
-	 *
-	 * @member $resize
-	 * @private
-	 */
-	this._resizeObj = {
-		id: null,
-		timeout: 333
+	var $resize = function() {
+<span id='$resize-property-_active'>		/**
+</span>		 * Is active?
+		 *
+		 * @member $resize
+		 * @private
+		 */
+		this._active = false;
+		
+<span id='$resize-property-_resizeObj'>		/**
+</span>		 * Resize object.
+		 *
+		 * @member $resize
+		 * @private
+		 */
+		this._resizeObj = {
+			id: null,
+			timeout: 333
+		};
+
+<span id='$resize-property-_binds'>		/**
+</span>		 * Binds for functions.
+		 *
+		 * @member $resize
+		 * @private
+		 */
+		this._binds = {
+			resize: this._resize.bind(this),
+			resizeInner: this._resizeInner.bind(this)
+		};
 	};
+
+	// add events
+	$common.inherit($resize, $event);
 
 <span id='$resize-method-_resize'>	/**
 </span>	 * Window resize event.
@@ -54,7 +70,7 @@ function(
 	 * @member $resize
 	 * @private
 	 */
-	this._resize = function() {
+	$resize.prototype._resize = function() {
 		if (this._resizeObj.id) {
 			clearTimeout(this._resizeObj.id);
 			this._resizeObj.id = null;
@@ -69,32 +85,18 @@ function(
 	 * @member $resize
 	 * @private
 	 */
-	this._resizeInner = function() {
+	$resize.prototype._resizeInner = function() {
 		this.trigger(&quot;resize&quot;);
-	};
-
-<span id='$resize-property-_binds'>	/**
-</span>	 * Binds for functions.
-	 *
-	 * @member $resize
-	 * @private
-	 */
-	this._binds = {
-		resize: this._resize.bind(this),
-		resizeInner: this._resizeInner.bind(this)
 	};
 	
 	// ------------------------ public ----------------------------------------
-	
-	// add events
-	$common.extend(this, new $event());
 
 <span id='$resize-method-start'>	/**
 </span>	 * Bind resize event to window object.
 	 *
 	 * @member $resize
 	 */
-	this.start = function() {
+	$resize.prototype.start = function() {
 		if (this._active) return;
 
 		window.addEventListener(&quot;resize&quot;, this._binds.resize);
@@ -106,12 +108,14 @@ function(
 	 *
 	 * @member $resize
 	 */
-	this.end = function() {
+	$resize.prototype.end = function() {
 		if (!this._active) return;
 
 		window.removeEventListener(&quot;resize&quot;, this._binds.resize);
 		this._active = false;
 	};
+
+	return new $resize();
 }]);
 </pre>
 </body>

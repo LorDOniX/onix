@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.9 (3. 6. 2016)
+
+* $resize is factory
+
 ## 2.5.8 (3. 6. 2016)
 
 * $common cloneValue
