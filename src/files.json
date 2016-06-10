@@ -38,6 +38,7 @@
 		"utils/notify.js",
 		"utils/preview-images.js",
 		"utils/select.js",
-		"utils/slider.js"
+		"utils/slider.js",
+		"utils/crop.js"
 	]
 }

@@ -23,6 +23,11 @@ app.get("/api/home/", function(req, res) {
 	});
 });
 
+// cropper
+app.get('/crop', function(req, res) {
+	res.sendfile(MAIN_PATH + '/crop.html');
+});
+
 // anonymizer
 app.get('/anonymizer', function(req, res) {
 	res.sendfile(MAIN_PATH + '/anonymizer.html');

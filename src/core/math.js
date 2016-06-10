@@ -226,6 +226,7 @@ onix.service("$math", function() {
 	 * @param  {Number} vector.x Point coordinates - axe x
 	 * @param  {Number} vector.y Point coordinates - axe y
 	 * @param  {Number} [angle] Angle in degrees for vector rotation CW
+	 * @member $math
 	 */
 	this.movePointByVector = function(point, vector, angle) {
 		// because overwrite reference object
@@ -238,5 +239,26 @@ onix.service("$math", function() {
 
 		point.x += vectorSave.x;
 		point.y += vectorSave.y;
+	};
+
+	/**
+	 * Set value in selected range.
+	 * 
+	 * @param {Number} value Input value
+	 * @param {Number} min Min value
+	 * @param {Number} max Max value
+	 * @return {Number}
+	 * @member $math
+	 */
+	this.setRange = function(value, min, max) {
+		if (value < min) {
+			return min;
+		}
+		else if (value > max) {
+			return max;
+		}
+		else {
+			return value;
+		}
 	};
 });

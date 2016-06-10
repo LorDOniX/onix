@@ -1,11 +1,11 @@
 onix.factory("$anonymizer", [
-	"$dom",
+	"$math",
 	"$event",
 	"$loader",
 	"$q",
 	"$common",
 function(
-	$dom,
+	$math,
 	$event,
 	$loader,
 	$q,
@@ -21,7 +21,7 @@ function(
 	 * @param {Number} [optsArg.zoom = 100] start zoom in [%]
 	 * @param {Number} [optsArg.minZoom = 20] min zoom in [%]
 	 * @param {Number} [optsArg.maxZoom = 100] max zoom in [%]
-	 * @param {Number} [optsArg.zoomStep = 10] o kolik [%] How many [%] add/dec with zoom change
+	 * @param {Number} [optsArg.zoomStep = 10] How many [%] add/dec with zoom change
 	 * @param {Number} [optsArg.zoomMoveStep = 1] Under 100% multiplier for faster image movement
 	 * @param {Object} [optsArg.curEntity = $anonymizer.ENTITES.CIRCLE] Start entity from $anonymizer.ENTITES
 	 * @param {Number} [optsArg.showPreview = true] Show preview - image overview
@@ -367,10 +367,10 @@ function(
 		var y2Ratio = (yc + this._canHeight) / this._curHeight;
 
 		// restrictions
-		xRatio = this._setRange(xRatio, 0, 1);
-		yRatio = this._setRange(yRatio, 0, 1);
-		x2Ratio = this._setRange(x2Ratio, 0, 1);
-		y2Ratio = this._setRange(y2Ratio, 0, 1);
+		xRatio = $math.setRange(xRatio, 0, 1);
+		yRatio = $math.setRange(yRatio, 0, 1);
+		x2Ratio = $math.setRange(x2Ratio, 0, 1);
+		y2Ratio = $math.setRange(y2Ratio, 0, 1);
 
 		var x1 = Math.round(this._opts.previewLeft + xRatio * this._opts.previewWidth);
 		var y1 = Math.round(this._opts.previewTop + yRatio * height);
@@ -464,28 +464,6 @@ function(
 	};
 
 	/**
-	 * Set value in selected range.
-	 * 
-	 * @param {Number} value Input value
-	 * @param {Number} min Min value
-	 * @param {Number} max Max value
-	 * @return {Number}
-	 * @private
-	 * @member $anonymizer
-	 */
-	$anonymizer.prototype._setRange = function(value, min, max) {
-		if (value < min) {
-			return min;
-		}
-		else if (value > max) {
-			return max;
-		}
-		else {
-			return value;
-		}
-	};
-
-	/**
 	 * Set image center on the canvas center.
 	 *
 	 * @private
@@ -509,8 +487,8 @@ function(
 		x = x || this._canWidth / 2;
 		y = y || this._canHeight / 2;
 
-		xRatio = this._setRange(xRatio, 0, 1);
-		yRatio = this._setRange(yRatio, 0, 1);
+		xRatio = $math.setRange(xRatio, 0, 1);
+		yRatio = $math.setRange(yRatio, 0, 1);
 
 		var zc = this._zoom / 100;
 		var xc = (this._curWidth * xRatio) - x;
@@ -955,7 +933,7 @@ function(
 	 */
 	$anonymizer.prototype._setZoom = function(value, fromPoint) {
 		var oldZoom = this._zoom;
-		var newZoom = this._setRange(value, this._opts.minZoom, this._opts.maxZoom);
+		var newZoom = $math.setRange(value, this._opts.minZoom, this._opts.maxZoom);
 
 		if (newZoom == oldZoom) return;
 

@@ -1,0 +1,119 @@
+.crop {
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	.crop-top {
+		position: absolute;
+		top: 0;
+		width: 100px;
+		height: 100px;
+		background: rgba(255, 255, 255, 0.5);
+
+		.point-nw {
+			position: absolute;
+			background: #29ac07;
+			left: -5px;
+			bottom: -5px;
+			width: 10px;
+			height: 10px;
+			z-index: 10;
+		}
+
+		.point-ne {
+			position: absolute;
+			background: #29ac07;
+			right: -5px;
+			bottom: -5px;
+			width: 10px;
+			height: 10px;
+			z-index: 10;
+		}
+	}
+
+	.crop-bottom {
+		position: absolute;
+		bottom: 0;
+		width: 100px;
+		height: 100px;
+		background: rgba(255, 255, 255, 0.5);
+
+		.point-sw {
+			position: absolute;
+			background: #29ac07;
+			left: -5px;
+			top: -5px;
+			width: 10px;
+			height: 10px;
+			z-index: 10;
+		}
+
+		.point-se {
+			position: absolute;
+			background: #29ac07;
+			right: -5px;
+			top: -5px;
+			width: 10px;
+			height: 10px;
+			z-index: 10;
+		}
+	}
+
+	.crop-left {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100px;
+		height: 100px;
+		background: rgba(255, 255, 255, 0.5);
+	}
+
+	.crop-right {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 100px;
+		height: 100px;
+		background: rgba(255, 255, 255, 0.5);
+	}
+
+	.crop-middle {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100px;
+		height: 100px;
+		/*background: rgba(255, 0, 0, 0.1);*/
+		cursor: move;
+	}
+
+	&.resizable {
+		.point-nw {
+			cursor: nw-resize;
+		}
+
+		.point-ne {
+			cursor: ne-resize;
+		}
+
+		.point-sw {
+			cursor: sw-resize;
+		}
+
+		.point-se {
+			cursor: se-resize;
+		}
+	}
+}
+
+body > .crop-cover {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	cursor: move;
+}

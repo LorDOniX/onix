@@ -17,6 +17,10 @@ function(
 		ANONYMIZER: {
 			name: "Anonymizer",
 			url: "/anonymizer"
+		},
+		CROPPER: {
+			name: "Crop",
+			url: "/crop"
 		}
 	};
 
@@ -24,7 +28,7 @@ function(
 		var pagesLi = [];
 
 		// pages order
-		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER].forEach(function(page, ind) {
+		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER].forEach(function(page, ind) {
 			var pageObj = {
 				el: "li",
 				child: [{

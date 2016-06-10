@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.5.11 (10. 6. 2016)
+
+* $crop - new util for cropping images for example; test example
+* $math.setRange new function ($anonymizer is using it)
+
 ## 2.5.10 (3. 6. 2016)
 
 * $anonymizer bugfix - no image
