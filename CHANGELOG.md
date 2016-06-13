@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.13 (13. 6. 2016)
+
+* $event allEvents fix
+
 ## 2.5.12 (10. 6. 2016)
 
 * angular controller/directive comptability - only used for module import, these functions do nothing

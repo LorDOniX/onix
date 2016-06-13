@@ -43,6 +43,9 @@ function(
 ) {
 
 	var HomePage = function(config) {
+		// event init
+		this._eventInit();
+		
 		this._constructor(config);
 	};
 

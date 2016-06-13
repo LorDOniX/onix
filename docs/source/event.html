@@ -23,14 +23,22 @@
  	 */
 	var $event = function() {};
 
-<span id='$event-property-_allEvents'>	/**
-</span>	 * All events. { name: name, event: function, scope, [once] }
+<span id='$event-method-_eventInit'>	/**
+</span>	 * Init event functionality.
 	 * 
-	 * @type {Array}
 	 * @member $event
 	 * @private
 	 */
-	$event.prototype._allEvents = [];
+	$event.prototype._eventInit = function() {
+<span id='$event-property-_allEvents'>		/**
+</span>		 * All events. { name: name, event: function, scope, [once] }
+		 * 
+		 * @type {Array}
+		 * @member $event
+		 * @private
+		 */
+		this._allEvents = [];
+	};
 
 <span id='$event-method-on'>	/**
 </span>	 * Add new event to the stack.

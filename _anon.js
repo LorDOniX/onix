@@ -1,35 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>The source code</title>
-  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
-  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
-  <style type="text/css">
-    .highlight { display: block; background-color: #ddd; }
-  </style>
-  <script type="text/javascript">
-    function highlight() {
-      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
-    }
-  </script>
-</head>
-<body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js">onix.factory(&quot;$anonymizer&quot;, [
-	&quot;$math&quot;,
-	&quot;$event&quot;,
-	&quot;$loader&quot;,
-	&quot;$q&quot;,
-	&quot;$common&quot;,
+onix.factory("$anonymizer", [
+	"$math",
+	"$event",
+	"$loader",
+	"$q",
+	"$common",
+	"$dom",
 function(
 	$math,
 	$event,
 	$loader,
 	$q,
-	$common
+	$common,
+	$dom
 ) {
-<span id='$anonymizer'>	/**
-</span>	 * Anonymizer - canvas for image preview with posibility for add geometries.
+	/**
+	 * Anonymizer - canvas for image preview with posibility for add geometries.
 	 *
 	 * @param {HTMLElement} parent Where is canvas appended
 	 * @param {Object} [optsArg] Configuration
@@ -50,19 +35,16 @@ function(
 	 */
 	var $anonymizer = function(parent, optsArg) {
 		// is canvas available?
-		this._hasCanvas = !!document.createElement(&quot;canvas&quot;).getContext;
+		this._hasCanvas = !!document.createElement("canvas").getContext;
 
 		if (!this._hasCanvas) {
-			console.error(&quot;Canvas is not available!&quot;);
+			console.error("Canvas is not available!");
 			return null;
 		}
-		
-		// event init
-		this._eventInit();
 
 		// parent reference
 		this._parent = parent;
-		this._parent.classList.add(&quot;anonymizer&quot;);
+		this._parent.classList.add("anonymizer");
 
 		this._opts = {
 			canWidth: parent.offsetWidth || 0,
@@ -84,7 +66,7 @@ function(
 			this._opts[key] = optsArg[key];
 		}
 
-		// canvas width &amp; height
+		// canvas width & height
 		this._canWidth = this._opts.canWidth;
 		this._canHeight = this._opts.canHeight;
 
@@ -101,12 +83,12 @@ function(
 		this._curHeight = 0;
 
 		// create main canvas
-		this._canvas = document.createElement(&quot;canvas&quot;);
+		this._canvas = document.createElement("canvas");
 		this._canvas.width = this._canWidth;
 		this._canvas.height = this._canHeight;
 
 		// ctx of main canvas
-		this._ctx = this._canvas.getContext(&quot;2d&quot;);
+		this._ctx = this._canvas.getContext("2d");
 		// loaded image
 		this._img = null;
 
@@ -115,11 +97,11 @@ function(
 		// original image height
 		this._imgHeight = 0;
 
-		// canvas &amp; ctx for create line
+		// canvas & ctx for create line
 		this._lineCanvas = null;
 		this._lineCanvasCtx = null;
 
-		// canvas &amp; ctx for preview of a entity
+		// canvas & ctx for preview of a entity
 		this._entityCanvas = null;
 		this._entityCanvasCtx = null;
 
@@ -143,7 +125,9 @@ function(
 			startXSave: 0,
 			startYSave: 0,
 			startX: 0,
-			startY: 0
+			startY: 0,
+			anchorX: 0,
+			anchorY: 0
 		};
 
 		this._flags = {
@@ -167,11 +151,11 @@ function(
 		};
 
 		// firefox
-		this._canvas.addEventListener(&quot;DOMMouseScroll&quot;, this._binds.mouseWheel);
+		this._canvas.addEventListener("DOMMouseScroll", this._binds.mouseWheel);
 		// others
-		this._canvas.addEventListener(&quot;mousewheel&quot;, this._binds.mouseWheel);
-		this._canvas.addEventListener(&quot;mousedown&quot;, this._binds.mouseDown);
-		this._canvas.addEventListener(&quot;contextmenu&quot;, this._binds.contextMenu);
+		this._canvas.addEventListener("mousewheel", this._binds.mouseWheel);
+		this._canvas.addEventListener("mousedown", this._binds.mouseDown);
+		this._canvas.addEventListener("contextmenu", this._binds.contextMenu);
 
 		// spinner - progress for image load
 		this._spinner = $loader.getSpinner();
@@ -180,22 +164,22 @@ function(
 
 		// preview canvas
 		if (this._opts.entityPreview) {
-			this._entityCanvas = document.createElement(&quot;canvas&quot;);
+			this._entityCanvas = document.createElement("canvas");
 			this._entityCanvas.width = 300;
 			this._entityCanvas.height = 150;
-			this._entityCanvasCtx = this._entityCanvas.getContext(&quot;2d&quot;);
+			this._entityCanvasCtx = this._entityCanvas.getContext("2d");
 
 			this._opts.entityPreview.appendChild(this._entityCanvas);
 		}
 	};
 
-<span id='$anonymizer-property-'>	/**
-</span>	 * Extend $anonymizer with events functionality.
+	/**
+	 * Extend $anonymizer with events functionality.
 	 */
 	$common.inherit($anonymizer, $event);
 
-<span id='$anonymizer-static-property-ENTITES'>	/**
-</span>	 * List of entites.
+	/**
+	 * List of entites.
 	 * 
 	 * @type {Object}
 	 * @param {Object} CIRCLE Circle entity
@@ -208,22 +192,22 @@ function(
 			min: 10,
 			value: 50,
 			max: 100,
-			id: &quot;CIRCLE&quot;,
-			fillStyle: &quot;rgba(0, 0, 255, 0.5)&quot;,
+			id: "CIRCLE",
+			fillStyle: "rgba(0, 0, 255, 0.5)",
 			priority: 1
 		},
 		LINE: {
 			min: 10,
 			value: 20,
 			max: 100,
-			id: &quot;LINE&quot;,
-			strokeStyle: &quot;rgba(0, 255, 0, 0.5)&quot;,
+			id: "LINE",
+			strokeStyle: "rgba(0, 255, 0, 0.5)",
 			priority: 2
 		}
 	};
 
-<span id='$anonymizer-method-_redraw'>	/**
-</span>	 * Scene redraw - clear, picture, entites.
+	/**
+	 * Scene redraw - clear, picture, entites.
 	 *
 	 * @private
 	 * @member $anonymizer
@@ -266,19 +250,19 @@ function(
 		this._drawPreview();
 	};
 
-<span id='$anonymizer-method-_setWhiteCanvas'>	/**
-</span>	 * Draw white canvas.
+	/**
+	 * Draw white canvas.
 	 * 
 	 * @private
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._setWhiteCanvas = function() {
 		this._ctx.clearRect(0, 0, this._canWidth, this._canHeight);
-		this._drawFillRect(this._ctx, 0, 0, this._canWidth, this._canHeight, &quot;#fff&quot;);
+		this._drawFillRect(this._ctx, 0, 0, this._canWidth, this._canHeight, "#fff");
 	};
 
-<span id='$anonymizer-method-_drawCircle'>	/**
-</span>	 * Draw a circle.
+	/**
+	 * Draw a circle.
 	 * 
 	 * @param  {Canvas} ctx Canvas context
 	 * @param  {Number} x Center coordinates axe x
@@ -295,8 +279,8 @@ function(
 		ctx.fill();
 	};
 
-<span id='$anonymizer-method-_drawLine'>	/**
-</span>	 * Draw a line.
+	/**
+	 * Draw a line.
 	 * 
 	 * @param  {Canvas} ctx Canvas context
 	 * @param  {Number} x Line start coordinates axe x
@@ -317,8 +301,8 @@ function(
 		ctx.stroke();
 	};
 
-<span id='$anonymizer-method-_drawFillRect'>	/**
-</span>	 * Draw a filled rectangle.
+	/**
+	 * Draw a filled rectangle.
 	 * 
 	 * @param  {Canvas} ctx Canvas context
 	 * @param  {Number} x Start coordinates axe x
@@ -331,13 +315,13 @@ function(
 	 */
 	$anonymizer.prototype._drawFillRect = function(ctx, x, y, width, height, fillStyle) {
 		ctx.beginPath();
-		ctx.fillStyle = fillStyle || &quot;&quot;;
+		ctx.fillStyle = fillStyle || "";
 		ctx.fillRect(x, y, width, height);
 		ctx.closePath();
 	};
 
-<span id='$anonymizer-method-_drawRect'>	/**
-</span>	 * Draw a rectangle, only border.
+	/**
+	 * Draw a rectangle, only border.
 	 * 
 	 * @param  {Canvas} ctx Canvas context
 	 * @param  {Number} x Start coordinates axe x
@@ -353,13 +337,13 @@ function(
 		ctx.beginPath();
 		ctx.rect(x, y, width, height);
 		ctx.lineWidth = lineWidth || 1;
-		ctx.strokeStyle = strokeStyle || &quot;&quot;;
+		ctx.strokeStyle = strokeStyle || "";
 		ctx.closePath();
 		ctx.stroke();
 	};
 
-<span id='$anonymizer-method-_drawPreview'>	/**
-</span>	 * Draw a image preview.
+	/**
+	 * Draw a image preview.
 	 *
 	 * @private
 	 * @member $anonymizer
@@ -371,7 +355,7 @@ function(
 		var height = Math.round(this._opts.previewWidth / ratio);
 
 		// background
-		this._drawFillRect(this._ctx, this._opts.previewLeft - 1, this._opts.previewTop - 1, this._opts.previewWidth + 2, height + 2, &quot;rgba(255, 255, 255, 0.5)&quot;);
+		this._drawFillRect(this._ctx, this._opts.previewLeft - 1, this._opts.previewTop - 1, this._opts.previewWidth + 2, height + 2, "rgba(255, 255, 255, 0.5)");
 
 		// picture
 		this._ctx.drawImage(this._img, 0, 0, this._img.width, this._img.height, this._opts.previewLeft, this._opts.previewTop, this._opts.previewWidth, height);
@@ -398,11 +382,11 @@ function(
 		var y2 = Math.round(this._opts.previewTop + y2Ratio * height);
 
 		// red border
-		this._drawRect(this._ctx, x1, y1, x2 - x1, y2 - y1, &quot;#C01&quot;, 1);
+		this._drawRect(this._ctx, x1, y1, x2 - x1, y2 - y1, "#C01", 1);
 	};
 
-<span id='$anonymizer-method-_drawEntityPreview'>	/**
-</span>	 * Draw a entity preview for circle/line.
+	/**
+	 * Draw a entity preview for circle/line.
 	 *
 	 * @private
 	 * @member $anonymizer
@@ -414,7 +398,7 @@ function(
 		var height = this._entityCanvas.height;
 
 		this._entityCanvasCtx.clearRect(0, 0, width, height);
-		this._drawFillRect(this._entityCanvasCtx, 0, 0, width, height, &quot;#f9f9f9&quot;);
+		this._drawFillRect(this._entityCanvasCtx, 0, 0, width, height, "#f9f9f9");
 
 		var curEnt = this._opts.curEntity;
 		var zc = this._zoom / 100;
@@ -440,8 +424,8 @@ function(
 		}
 	};
 
-<span id='$anonymizer-method-_getFromPoint'>	/**
-</span>	 * Get center point for zoom, otherwise is used point with mouse wheel and cursor position.
+	/**
+	 * Get center point for zoom, otherwise is used point with mouse wheel and cursor position.
 	 *
 	 * @param {Number} [x] Coordinates on canvas axe x, otherwise is used center point on axe x
 	 * @param {Number} [y] Coordinates on canvas axe y, otherwise is used center point on axe y
@@ -465,8 +449,8 @@ function(
 		return fromPoint;
 	};
 
-<span id='$anonymizer-method-_postZoom'>	/**
-</span>	 * Post zoom operation - new image dimenstions, new move zoom step.
+	/**
+	 * Post zoom operation - new image dimenstions, new move zoom step.
 	 * 
 	 * @private
 	 * @member $anonymizer
@@ -477,14 +461,14 @@ function(
 		this._curWidth = Math.round(this._img.width * zc);
 		this._curHeight = Math.round(this._img.height * zc);
 
-		if (this._zoom &lt; 100) {
+		if (this._zoom < 100) {
 			// function for zoom and mouse move
 			this._zoomMoveStep = Math.max(((100 - this._zoom) / 10 * this._opts.zoomMoveStep) / 2, 1);
 		}
 	};
 
-<span id='$anonymizer-method-_setCenter'>	/**
-</span>	 * Set image center on the canvas center.
+	/**
+	 * Set image center on the canvas center.
 	 *
 	 * @private
 	 * @member $anonymizer
@@ -493,11 +477,11 @@ function(
 		this._setPosition(0.5, 0.5);
 	};
 	
-<span id='$anonymizer-method-_setPosition'>	/**
-</span>	 * Set image offset position.
+	/**
+	 * Set image offset position.
 	 * 
-	 * @param {Number} xRatio &lt;0;1&gt; Point position on the image
-	 * @param {Number} yRatio &lt;0;1&gt; Point position on the image
+	 * @param {Number} xRatio <0;1> Point position on the image
+	 * @param {Number} yRatio <0;1> Point position on the image
 	 * @param {Number} [x] Screen offset, otherwise center [px], axe x
 	 * @param {Number} [y] Screen offset, otherwise center [px], axe y
 	 * @private
@@ -518,8 +502,8 @@ function(
 		this._y = Math.max(Math.round(yc / zc), 0);
 	};
 
-<span id='$anonymizer-method-_alignImgToCanvas'>	/**
-</span>	 * Align image to the canvas - left top corner and bottom right corner.
+	/**
+	 * Align image to the canvas - left top corner and bottom right corner.
 	 *
 	 * @private
 	 * @member $anonymizer
@@ -528,26 +512,26 @@ function(
 		var maxX = Math.max(this._curWidth - this._canWidth, 0);
 		var currX = Math.round(this._x * this._zoom / 100);
 
-		if (this._x &lt; 0) {
+		if (this._x < 0) {
 			this._x = 0;
 		}
-		else if (currX &gt; maxX) {
+		else if (currX > maxX) {
 			this._x = Math.round(maxX * 100 / this._zoom);
 		}
 
 		var maxY = Math.max(this._curHeight - this._canHeight, 0);
 		var currY = Math.round(this._y * this._zoom / 100);
 
-		if (this._y &lt; 0) {
+		if (this._y < 0) {
 			this._y = 0;
 		}
-		else if (currY &gt; maxY) {
+		else if (currY > maxY) {
 			this._y = Math.round(maxY * 100 / this._zoom);
 		}
 	};
 
-<span id='$anonymizer-method-_isRightClick'>	/**
-</span>	 * It event contains right mouse click?
+	/**
+	 * It event contains right mouse click?
 	 *
 	 * @param {Event} e Mouse event
 	 * @return {Boolean}
@@ -555,7 +539,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._isRightClick = function(e) {
-		if (e &amp;&amp; ((e.which &amp;&amp; e.which == 3) || (e.button &amp;&amp; e.button == 2))) {
+		if (e && ((e.which && e.which == 3) || (e.button && e.button == 2))) {
 			return true;
 		}
 		else {
@@ -563,8 +547,8 @@ function(
 		}
 	};
 
-<span id='$anonymizer-method-_contextmenu'>	/**
-</span>	 * Disable context menu for canvas during right mouse click.
+	/**
+	 * Disable context menu for canvas during right mouse click.
 	 * 
 	 * @param  {Event} e Mouse event
 	 * @private
@@ -575,15 +559,15 @@ function(
 		e.preventDefault();
 	};
 
-<span id='$anonymizer-method-_mouseWheel'>	/**
-</span>	 * Mouse wheel event.
+	/**
+	 * Mouse wheel event.
 	 *
 	 * @param {Event} e Mouse event
 	 * @private
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseWheel = function(e) {
-		if (!this._imgWidth &amp;&amp; !this._imgHeight) return;
+		if (!this._imgWidth && !this._imgHeight) return;
 
 		var delta = e.wheelDelta || -e.detail;
 		if (!delta) { return; }
@@ -593,7 +577,7 @@ function(
 
 		var fromPoint = this._getFromPoint(e.offsetX, e.offsetY);
 
-		if (delta &gt; 0) {
+		if (delta > 0) {
 			this._setZoom(this._zoom + this._zoomStep, fromPoint);
 		}
 		else {
@@ -601,23 +585,29 @@ function(
 		}
 	};
 
-<span id='$anonymizer-method-_mouseDown'>	/**
-</span>	 * Mouse down - create a circle, start of the line, start of move.
+	/**
+	 * Mouse down - create a circle, start of the line, start of move.
 	 *
 	 * @param {Event} e Mouse event
 	 * @private
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseDown = function(e) {
-		if (!this._imgWidth &amp;&amp; !this._imgHeight) return;
+		if (!this._imgWidth && !this._imgHeight) return;
 
 		e.stopPropagation();
 		e.preventDefault();
 
-		this._mouse.startXSave = e.offsetX;
-		this._mouse.startYSave = e.offsetY;
-		this._mouse.startX = e.offsetX;
-		this._mouse.startY = e.offsetY;
+		this._mouse.startXSave = e.clientX;
+		this._mouse.startYSave = e.clientY;
+		this._mouse.startX = e.clientX;
+		this._mouse.startY = e.clientY;
+		
+		var bcr = this._canvas.getBoundingClientRect();
+
+		this._mouse.anchorX = bcr.left;
+		this._mouse.anchorY = bcr.top;
+
 		this._flags.wasMove = false;
 		this._flags.wasRightClick = this._isRightClick(e);
 
@@ -626,40 +616,49 @@ function(
 			this._flags.wasImgMove = false;
 			this._flags.wasPreview = false;
 
-			this._canvas.addEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
-			this._canvas.addEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
-			this._canvas.addEventListener(&quot;mouseleave&quot;, this._binds.mouseUp);
+			this._cover = $dom.createCover();
+
+			document.body.appendChild(this._cover);
+
+			this._cover.addEventListener("mousemove", this._binds.mouseMove);
+			this._cover.addEventListener("mouseup", this._binds.mouseUp);
+			this._cover.addEventListener("contextmenu", this._binds.contextMenu);
 		}
 		// line
 		else if (this._opts.curEntity == $anonymizer.ENTITES.LINE) {
 			// add canvas
-			var lineCanvas = document.createElement(&quot;canvas&quot;);
+			var lineCanvas = document.createElement("canvas");
 			lineCanvas.width = this._canWidth;
 			lineCanvas.height = this._canHeight;
-			lineCanvas.classList.add(&quot;line-canvas&quot;);
+			lineCanvas.classList.add("line-canvas");
 
 			this._flags.wasPreview = false;
 			this._flags.wasLine = false;
 
 			this._lineCanvas = lineCanvas;
-			this._lineCanvas.addEventListener(&quot;mousemove&quot;, this._binds.mouseMoveLine);
-			this._lineCanvas.addEventListener(&quot;mouseup&quot;, this._binds.mouseUpLine);
-			this._lineCanvas.addEventListener(&quot;contextmenu&quot;, this._binds.contextMenu);
+
+			this._cover = $dom.createCover();
+
+			document.body.appendChild(this._cover);
+
+			this._cover.addEventListener("mousemove", this._binds.mouseMoveLine);
+			this._cover.addEventListener("mouseup", this._binds.mouseUpLine);
+			this._cover.addEventListener("contextmenu", this._binds.contextMenu);
 
 			if (this._flags.wasRightClick) {
-				this._lineCanvas.classList.add(&quot;is-dragged&quot;);
+				this._lineCanvas.classList.add("is-dragged");
 			}
 
-			document.addEventListener(&quot;mouseup&quot;, this._binds.mouseUpDocument);
+			document.addEventListener("mouseup", this._binds.mouseUpDocument);
 
-			this._lineCanvasCtx = this._lineCanvas.getContext(&quot;2d&quot;);
+			this._lineCanvasCtx = this._lineCanvas.getContext("2d");
 
 			this._parent.appendChild(lineCanvas);
 		}
 	};
 
-<span id='$anonymizer-method-_imgMove'>	/**
-</span>	 * Image move - according to the coordinates of the mouse.
+	/**
+	 * Image move - according to the coordinates of the mouse.
 	 * 
 	 * @param  {Number} newX New value on the axe x
 	 * @param  {Number} newY New value on the axe y
@@ -670,12 +669,12 @@ function(
 		var diffX = this._mouse.startX - newX;
 		var diffY = this._mouse.startY - newY;
 
-		if (diffX == 0 &amp;&amp; diffY == 0) {
+		if (diffX == 0 && diffY == 0) {
 			return;
 		}
 
 		// image movement constant
-		var zms = this._zoomMoveStep &gt; 0 ? this._zoomMoveStep : 1;
+		var zms = this._zoomMoveStep > 0 ? this._zoomMoveStep : 1;
 
 		// move image to the new coordinates
 		this._x = diffX * zms + this._x;
@@ -685,8 +684,8 @@ function(
 		this._redraw();
 	};
 
-<span id='$anonymizer-method-_mouseMove'>	/**
-</span>	 * Mouse move over the canvas.
+	/**
+	 * Mouse move over the canvas.
 	 *
 	 * @param {Event} e Mouse event
 	 * @private
@@ -695,16 +694,16 @@ function(
 	$anonymizer.prototype._mouseMove = function(e) {
 		// mouse cursor
 		if (!this._flags.wasMove) {
-			this._canvas.classList.add(&quot;is-dragged&quot;);
+			this._canvas.classList.add("is-dragged");
 		}
 
 		// mouse move flag
 		this._flags.wasMove = true;
 
 		// mouse move over the preview?
-		var isPreview = this._isPreview(e.offsetX, e.offsetY);
+		var isPreview = this._isPreview(e.clientX, e.clientY);
 
-		if (!this._flags.wasRightClick &amp;&amp; !this._flags.wasImgMove &amp;&amp; isPreview) {
+		if (!this._flags.wasRightClick && !this._flags.wasImgMove && isPreview) {
 			// set preview flag
 			this._flags.wasPreview = true;
 
@@ -719,16 +718,16 @@ function(
 			this._flags.wasImgMove = true;
 
 			// image move
-			this._imgMove(e.offsetX, e.offsetY);
+			this._imgMove(e.clientX, e.clientY);
 		}
 
 		// save
-		this._mouse.startX = e.offsetX;
-		this._mouse.startY = e.offsetY;
+		this._mouse.startX = e.clientX;
+		this._mouse.startY = e.clientY;
 	};
 
-<span id='$anonymizer-method-_isPreview'>	/**
-</span>	 * Is there a preview on coordinates x, y?
+	/**
+	 * Is there a preview on coordinates x, y?
 	 * 
 	 * @param  {Number} x Click position on canvas, axe x
 	 * @param  {Number} y Click position on canvas, axe y
@@ -752,7 +751,7 @@ function(
 		x = x || 0;
 		y = y || 0;
 
-		if (x &gt;= left &amp;&amp; x &lt;= left + width &amp;&amp; y &gt;= top &amp;&amp; y &lt;= top + height) {
+		if (x >= left && x <= left + width && y >= top && y <= top + height) {
 			return {
 				xRatio: (x - left) / width,
 				yRatio: (y - top) / height
@@ -763,8 +762,8 @@ function(
 		}
 	};
 
-<span id='$anonymizer-method-_mouseUp'>	/**
-</span>	 * Mouse up - draw a circle, end of move, preview click.
+	/**
+	 * Mouse up - draw a circle, end of move, preview click.
 	 *
 	 * @param {Event} e Mouse event
 	 * @private
@@ -776,18 +775,21 @@ function(
 		// only it was move
 		if (this._flags.wasMove) {
 			// difference towards start click
-			var diffX = this._mouse.startXSave - e.offsetX;
-			var diffY = this._mouse.startYSave - e.offsetY;
+			var diffX = this._mouse.startXSave - e.clientX;
+			var diffY = this._mouse.startYSave - e.clientY;
 
-			if (diffX &gt;= this._THRESHOLD.MIN &amp;&amp; diffX &lt;= this._THRESHOLD.MAX &amp;&amp; diffY &gt;= this._THRESHOLD.MIN &amp;&amp; diffY &lt;= this._THRESHOLD.MAX) {
+			if (diffX >= this._THRESHOLD.MIN && diffX <= this._THRESHOLD.MAX && diffY >= this._THRESHOLD.MIN && diffY <= this._THRESHOLD.MAX) {
 				// we are in the range
 				thresholdTest = true;
 			}
 		}
 
 		// click - there was no move, threshold test, it is disabled for right mouse click
-		if (!this._flags.wasRightClick &amp;&amp; (!this._flags.wasMove || thresholdTest)) {
-			var isPreview = this._isPreview(e.offsetX, e.offsetY);
+		if (!this._flags.wasRightClick && (!this._flags.wasMove || thresholdTest)) {
+			var clickX = e.clientX - this._mouse.anchorX;
+			var clickY = e.clientY - this._mouse.anchorY;
+
+			var isPreview = this._isPreview(clickX, clickY);
 
 			if (isPreview) {
 				// preview click - click coordinates on the canvas center
@@ -798,8 +800,8 @@ function(
 			else {
 				// add circle
 				var zc = this._zoom / 100;
-				var x = Math.round(this._x * zc) + e.offsetX;
-				var y = Math.round(this._y * zc) + e.offsetY;
+				var x = Math.round(this._x * zc) + clickX;
+				var y = Math.round(this._y * zc) + clickY;
 
 				this._entites.push({
 					id: this._opts.curEntity.id,
@@ -812,15 +814,19 @@ function(
 			}
 		}
 
-		this._canvas.classList.remove(&quot;is-dragged&quot;);
+		this._canvas.classList.remove("is-dragged");
 
-		this._canvas.removeEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
-		this._canvas.removeEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
-		this._canvas.removeEventListener(&quot;mouseleave&quot;, this._binds.mouseUp);
+		this._cover.removeEventListener("mousemove", this._binds.mouseMove);
+		this._cover.removeEventListener("mouseup", this._binds.mouseUp);
+		this._cover.removeEventListener("contextmenu", this._binds.contextMenu);
+
+		document.body.removeChild(this._cover);
+
+		this._cover = null;
 	};
 
-<span id='$anonymizer-method-_mouseMoveLine'>	/**
-</span>	 * Mouse move over canvas - line draw.
+	/**
+	 * Mouse move over canvas - line draw.
 	 *
 	 * @param {Event} e Mouse event
 	 * @private
@@ -844,7 +850,7 @@ function(
 			var isPreview = this._isPreview(e.offsetX, e.offsetY);
 			var wasPreview = this._flags.wasPreview;
 
-			if (!this._flags.wasLine &amp;&amp; isPreview) {
+			if (!this._flags.wasLine && isPreview) {
 				this._flags.wasPreview = true;
 
 				// move over preview
@@ -865,14 +871,14 @@ function(
 			}
 
 			// change of state
-			if (!wasPreview &amp;&amp; this._flags.wasPreview) {
-				this._lineCanvas.classList.add(&quot;is-dragged&quot;);
+			if (!wasPreview && this._flags.wasPreview) {
+				this._lineCanvas.classList.add("is-dragged");
 			}
 		}
 	};
 
-<span id='$anonymizer-method-_mouseUpLine'>	/**
-</span>	 * End of move over canvas - create line, image move.
+	/**
+	 * End of move over canvas - create line, image move.
 	 * Draw a line in main canvas.
 	 *
 	 * @param {Event} e Mouse event
@@ -918,21 +924,22 @@ function(
 			}
 		}
 
-		this._lineCanvas.classList.remove(&quot;is-dragged&quot;);
+		this._lineCanvas.classList.remove("is-dragged");
 
-		this._lineCanvas.removeEventListener(&quot;mousemove&quot;, this._binds.mouseMoveLine);
-		this._lineCanvas.removeEventListener(&quot;mouseup&quot;, this._binds.mouseUpLine);
-		this._lineCanvas.removeEventListener(&quot;contextmenu&quot;, this._binds.contextMenu);
+		this._cover.removeEventListener("mousemove", this._binds.mouseMoveLine);
+		this._cover.removeEventListener("mouseup", this._binds.mouseUpLine);
+		this._cover.removeEventListener("contextmenu", this._binds.contextMenu);
 
-		document.removeEventListener(&quot;mouseup&quot;, this._binds.mouseUpDocument);
-
+		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
+		document.body.removeChild(this._cover);
+		
 		this._parent.removeChild(this._lineCanvas);
 
 		this._lineCanvas = null;
 	};
 
-<span id='$anonymizer-method-_mouseUpDocument'>	/**
-</span>	 * Mouse up over the document - drawing a line outside a canvas and mouse up -&gt; line is canceled.
+	/**
+	 * Mouse up over the document - drawing a line outside a canvas and mouse up -> line is canceled.
 	 *
 	 * @param {Event} e Mouse event
 	 * @private
@@ -943,8 +950,8 @@ function(
 		this._mouseUpLine(e);
 	};
 
-<span id='$anonymizer-method-_setZoom'>	/**
-</span>	 * Set new value for zoom.
+	/**
+	 * Set new value for zoom.
 	 * 
 	 * @param  {Number} value New value
 	 * @param  {Object} [fromPoint] Center of the screen or data from mouse wheel
@@ -958,7 +965,7 @@ function(
 		if (newZoom == oldZoom) return;
 
 		this._zoom = newZoom;
-		this.trigger(&quot;zoom&quot;, this._zoom);
+		this.trigger("zoom", this._zoom);
 		this._postZoom();
 
 		fromPoint = fromPoint || this._getFromPoint();
@@ -969,8 +976,8 @@ function(
 		this._redraw();
 	};
 
-<span id='$anonymizer-method-loadImage'>	/**
-</span>	 * Load and show image in canvas. Returns promise after load.
+	/**
+	 * Load and show image in canvas. Returns promise after load.
 	 * 
 	 * @param  {String} url Path to image
 	 * @return {$q} Promise
@@ -981,18 +988,18 @@ function(
 
 		this._setWhiteCanvas();
 
-		this._spinner.classList.remove(&quot;hide&quot;);
+		this._spinner.classList.remove("hide");
 
 		var img = new Image();
 
-		img.addEventListener(&quot;load&quot;, function() {
-			this._spinner.classList.add(&quot;hide&quot;);
+		img.addEventListener("load", function() {
+			this._spinner.classList.add("hide");
 			this._img = img;
 			this._imgWidth = img.width;
 			this._imgHeight = img.height;
 			this._zoom = this._opts.zoom;
 
-			this.trigger(&quot;zoom&quot;, this._zoom);
+			this.trigger("zoom", this._zoom);
 
 			this._postZoom();
 			this._setCenter();
@@ -1003,8 +1010,8 @@ function(
 			promise.resolve();
 		}.bind(this));
 
-		img.addEventListener(&quot;error&quot;, function() {
-			this._spinner.classList.add(&quot;hide&quot;);
+		img.addEventListener("error", function() {
+			this._spinner.classList.add("hide");
 
 			this._img = null;
 			this._imgWidth = 0;
@@ -1013,13 +1020,13 @@ function(
 			promise.reject();
 		}.bind(this));
 
-		img.src = url || &quot;&quot;;
+		img.src = url || "";
 
 		return promise;
 	};
 
-<span id='$anonymizer-method-zoomPlus'>	/**
-</span>	 * Increase zoom by one step, fires signal &quot;zoom&quot;.
+	/**
+	 * Increase zoom by one step, fires signal "zoom".
 	 * 
 	 * @member $anonymizer
 	 */
@@ -1027,8 +1034,8 @@ function(
 		this._setZoom(this._zoom + this._zoomStep);
 	};
 
-<span id='$anonymizer-method-zoomMinus'>	/**
-</span>	 * Decrease zoom by one step, fires signal &quot;zoom&quot;.
+	/**
+	 * Decrease zoom by one step, fires signal "zoom".
 	 * 
 	 * @member $anonymizer
 	 */
@@ -1036,8 +1043,8 @@ function(
 		this._setZoom(this._zoom - this._zoomStep);
 	};
 
-<span id='$anonymizer-method-setZoom'>	/**
-</span>	 * Set new value for zoom.
+	/**
+	 * Set new value for zoom.
 	 * 
 	 * @param  {Number} value New value
 	 * @member $anonymizer
@@ -1046,8 +1053,8 @@ function(
 		this._setZoom(value);
 	};
 
-<span id='$anonymizer-method-getEntityId'>	/**
-</span>	 * Get current draw entity ID.
+	/**
+	 * Get current draw entity ID.
 	 * 
 	 * @return {String}
 	 * @member $anonymizer
@@ -1056,8 +1063,8 @@ function(
 		return this._opts.curEntity.id;
 	};
 
-<span id='$anonymizer-method-switchEntity'>	/**
-</span>	 * Switch to other entity, uses priority.
+	/**
+	 * Switch to other entity, uses priority.
 	 *
 	 * @member $anonymizer
 	 */
@@ -1070,11 +1077,11 @@ function(
 		variants.forEach(function(variant) {
 			var varObj = $anonymizer.ENTITES[variant];
 
-			if (!selVariant &amp;&amp; varObj.priority &gt; this._opts.curEntity.priority) {
+			if (!selVariant && varObj.priority > this._opts.curEntity.priority) {
 				selVariant = varObj;
 			}
 
-			if (!lowestVariant || varObj.priority &lt; lowestVariant.priority) {
+			if (!lowestVariant || varObj.priority < lowestVariant.priority) {
 				lowestVariant = varObj;
 			}
 		}, this);
@@ -1088,8 +1095,8 @@ function(
 		this._drawEntityPreview();
 	};
 
-<span id='$anonymizer-method-getEntity'>	/**
-</span>	 * Get current entity object.
+	/**
+	 * Get current entity object.
 	 * 
 	 * @return {Object}
 	 * @member $anonymizer
@@ -1098,17 +1105,17 @@ function(
 		return this._opts.curEntity;
 	};
 
-<span id='$anonymizer-method-setEntityValue'>	/**
-</span>	 * Set value for current entity.
+	/**
+	 * Set value for current entity.
 	 * 
 	 * @param {Number} val New value
-	 * @return {Boolean} If there was an error -&gt; it returns false
+	 * @return {Boolean} If there was an error -> it returns false
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.setEntityValue = function(val) {
 		val = val || 0;
 
-		if (val &gt;= this._opts.curEntity.min &amp;&amp; val &lt;= this._opts.curEntity.max) {
+		if (val >= this._opts.curEntity.min && val <= this._opts.curEntity.max) {
 			this._opts.curEntity.value = val;
 			this._drawEntityPreview();
 			return true;
@@ -1118,8 +1125,8 @@ function(
 		}
 	};
 
-<span id='$anonymizer-method-setCircleEntity'>	/**
-</span>	 * Set circle as a selected entity.
+	/**
+	 * Set circle as a selected entity.
 	 *
 	 * @member $anonymizer
 	 */
@@ -1128,8 +1135,8 @@ function(
 		this._drawEntityPreview();
 	};
 
-<span id='$anonymizer-method-setLineEntity'>	/**
-</span>	 * Set line as a selected entity.
+	/**
+	 * Set line as a selected entity.
 	 *
 	 * @member $anonymizer
 	 */
@@ -1138,32 +1145,32 @@ function(
 		this._drawEntityPreview();
 	};
 
-<span id='$anonymizer-method-stepBack'>	/**
-</span>	 * Take last entity and redraw a scene.
+	/**
+	 * Take last entity and redraw a scene.
 	 * 
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.stepBack = function() {
-		if (!this._imgWidth &amp;&amp; !this._imgHeight) return;
+		if (!this._imgWidth && !this._imgHeight) return;
 		
 		this._entites.pop();
 		this._redraw();
 	};
 
-<span id='$anonymizer-method-removeAll'>	/**
-</span>	 * Remove all entites and redraw a scene.
+	/**
+	 * Remove all entites and redraw a scene.
 	 * 
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.removeAll = function() {
-		if (!this._imgWidth &amp;&amp; !this._imgHeight) return;
+		if (!this._imgWidth && !this._imgHeight) return;
 
 		this._entites = [];
 		this._redraw();
 	};
 
-<span id='$anonymizer-method-exportEntites'>	/**
-</span>	 * Export all entites on the screen and count them towards original image size.
+	/**
+	 * Export all entites on the screen and count them towards original image size.
 	 * 
 	 * @return {Object}
 	 * @member $anonymizer
@@ -1204,8 +1211,8 @@ function(
 		return output;
 	};
 
-<span id='$anonymizer-method-syncPort'>	/**
-</span>	 * Resize canvas with new width and height.
+	/**
+	 * Resize canvas with new width and height.
 	 * 
 	 * @param  {Number} [width] New width in [px]
 	 * @param  {Number} [height] New height in [px]
@@ -1232,6 +1239,3 @@ function(
 
 	return $anonymizer;
 }]);
-</pre>
-</body>
-</html>

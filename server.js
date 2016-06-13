@@ -23,6 +23,11 @@ app.get("/api/home/", function(req, res) {
 	});
 });
 
+// test
+app.get('/test', function(req, res) {
+	res.sendfile(MAIN_PATH + '/test.html');
+});
+
 // cropper
 app.get('/crop', function(req, res) {
 	res.sendfile(MAIN_PATH + '/crop.html');

@@ -39,6 +39,9 @@ function(
 			console.error("Canvas is not available!");
 			return null;
 		}
+		
+		// event init
+		this._eventInit();
 
 		// parent reference
 		this._parent = parent;

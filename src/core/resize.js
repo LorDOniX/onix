@@ -13,6 +13,9 @@ function(
 	 * @class $resize
 	 */
 	var $resize = function() {
+		// event init
+		this._eventInit();
+
 		/**
 		 * Is active?
 		 *

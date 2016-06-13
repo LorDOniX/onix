@@ -35,6 +35,9 @@ function(
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
+		// event init
+		this._eventInit();
+		
 		this._parent = parent;
 		this._root = this._create();
 

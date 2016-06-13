@@ -17,6 +17,9 @@ function(
 	 * @member $select
 	 */
 	var $select = function(el, opts) {
+		// event init
+		this._eventInit();
+		
 		this._opts = {
 			addCaption: false
 		};

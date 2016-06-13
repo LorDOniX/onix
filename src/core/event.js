@@ -7,13 +7,21 @@ onix.factory("$event", function() {
 	var $event = function() {};
 
 	/**
-	 * All events. { name: name, event: function, scope, [once] }
+	 * Init event functionality.
 	 * 
-	 * @type {Array}
 	 * @member $event
 	 * @private
 	 */
-	$event.prototype._allEvents = [];
+	$event.prototype._eventInit = function() {
+		/**
+		 * All events. { name: name, event: function, scope, [once] }
+		 * 
+		 * @type {Array}
+		 * @member $event
+		 * @private
+		 */
+		this._allEvents = [];
+	};
 
 	/**
 	 * Add new event to the stack.

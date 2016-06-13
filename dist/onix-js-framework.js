@@ -1566,13 +1566,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.12
-	 * date: 10. 6. 2016
+	 * version: 2.5.13
+	 * date: 13. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.12/10. 6. 2016\n'+
+'2.5.13/13. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2156,13 +2156,21 @@ onix.factory("$event", function() {
  	 */
 	var $event = function() {};
 	/**
-	 * All events. { name: name, event: function, scope, [once] }
+	 * Init event functionality.
 	 * 
-	 * @type {Array}
 	 * @member $event
 	 * @private
 	 */
-	$event.prototype._allEvents = [];
+	$event.prototype._eventInit = function() {
+		/**
+		 * All events. { name: name, event: function, scope, [once] }
+		 * 
+		 * @type {Array}
+		 * @member $event
+		 * @private
+		 */
+		this._allEvents = [];
+	};
 	/**
 	 * Add new event to the stack.
 	 * 
@@ -2251,6 +2259,8 @@ function(
 	 * @class $resize
 	 */
 	var $resize = function() {
+		// event init
+		this._eventInit();
 		/**
 		 * Is active?
 		 *
@@ -5006,6 +5016,8 @@ function(
 			console.error("Canvas is not available!");
 			return null;
 		}
+		// event init
+		this._eventInit();
 		// parent reference
 		this._parent = parent;
 		this._parent.classList.add("anonymizer");
@@ -6400,6 +6412,8 @@ function(
 	 * @member $select
 	 */
 	var $select = function(el, opts) {
+		// event init
+		this._eventInit();
 		this._opts = {
 			addCaption: false
 		};
@@ -6639,6 +6653,8 @@ function(
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
+		// event init
+		this._eventInit();
 		this._parent = parent;
 		this._root = this._create();
 		this._opts = {
