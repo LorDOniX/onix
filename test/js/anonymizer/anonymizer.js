@@ -24,7 +24,8 @@ function(
 		MainMenu.create(MainMenu.PAGES.ANONYMIZER);
 
 		this._slider = new $slider(this._els.sliderHolder, {
-			timeout: 0
+			timeout: 0,
+			wheelStep: 3
 		});
 
 		this._slider.on("change", function(value) {

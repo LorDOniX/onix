@@ -28,7 +28,6 @@
 		"core/math.js",
 		"core/my-query.js",
 		"core/promise.js",
-		"core/q.js",
 		"core/route.js",
 		"core/routeParams.js",
 		"core/template.js",

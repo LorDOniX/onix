@@ -67,4 +67,20 @@ onix.service("$date", function() {
 
 		return !!(csDate.match(/([1-9]|[1-3][0-9])\.[ ]*([1-9]|1[0-2])\.[ ]*[1-9][0-9]{3}/));
 	};
+
+	/**
+	 * Add days to date.
+	 * 
+	 * @param  {Date} date
+	 * @param  {Number} days
+	 * @return {Date}
+	 * @member $date
+	 */
+	this.addDays = function(date, days) {
+		days = days || 0;
+
+		var addTime = 1000 * 60 * 60 * 24 * days;
+
+		return new Date(date.getTime() + addTime);
+	};
 });

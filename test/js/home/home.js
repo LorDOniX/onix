@@ -29,7 +29,7 @@ homeApp.run([
 	"$route",
 	"$template",
 	"Config",
-	"$q",
+	"$promise",
 	"$i18n",
 	"$i18nProvider",
 	"$filterUppercase",
@@ -37,7 +37,7 @@ function(
 	$route,
 	$template,
 	Config,
-	$q,
+	$promise,
 	$i18n,
 	$i18nProvider,
 	$filterUppercase
@@ -65,7 +65,7 @@ function(
 		.otherwise(HomePage);
 
 	// all dependencies before start
-	$q.all([
+	$promise.all([
 		$template.load("testTempl", "/templ/test-templ.html"),
 		$i18n.loadLanguage(Config.LOCALIZATION.LANG, Config.LOCALIZATION.PATH)
 	]).then(function() {

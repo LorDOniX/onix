@@ -20,7 +20,71 @@
  *
  * @class $cookie
  */
-onix.service(&quot;$cookie&quot;, function() {
+onix.service(&quot;$cookie&quot;, [
+	&quot;$date&quot;,
+function(
+	$date
+) {
+<span id='$cookie-property-_CONST'>	/**
+</span>	 * $cookie constants.
+	 * 
+	 * @member $cookie
+	 * @private
+	 */
+	this._CONST = {
+		EXPIRES: {
+			MAX: &quot;Fri, 31 Dec 9999 23:59:59 GMT&quot;,
+			MIN: &quot;Thu, 01 Jan 1970 00:00:00 GMT&quot;
+		}
+	};
+
+<span id='$cookie-method-set'>	/**
+</span>	 * Set cookie. Default expiration is 30 days from creation.
+	 *
+	 * @param  {String} name
+	 * @param  {String} value
+	 * @param  {Object} [optsArg]
+	 * @param  {Number|String|Date} [optsArg.expiration=null] Cookie expiration
+	 * @param  {String} [optsArg.path=&quot;&quot;] Cookie path
+	 * @param  {String} [optsArg.domain=&quot;&quot;] Cookie domain
+	 * @param  {String} [optsArg.secure=&quot;&quot;] Cookie secure
+	 * @return {Boolean}
+	 * @member $cookie
+	 * @private
+	 */
+	this.set = function(name, value, optsArg) {
+		if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
+
+		var opts = {
+			expiration: $date.addDays(new Date(), 30),
+			path: &quot;&quot;,
+			domain: &quot;&quot;,
+			secure: &quot;&quot;
+		};
+
+		var expires = &quot;&quot;;
+		
+		if (opts.expiration) {
+			switch (opts.expiration.constructor) {
+				case Number:
+					expires = opts.expiration === Infinity ? &quot;; expires=&quot; + this._CONST.EXPIRES.MAX : &quot;; max-age=&quot; + opts.expiration;
+					break;
+
+				case String:
+					expires = &quot;; expires=&quot; + opts.expiration;
+					break;
+
+				case Date:
+					expires = &quot;; expires=&quot; + opts.expiration.toUTCString();
+					break;
+			}
+		}
+
+		document.cookie = encodeURIComponent(name) + &quot;=&quot; + encodeURIComponent(value) + expires + (opts.domain ? &quot;; domain=&quot; + opts.domain : &quot;&quot;) 
+						+ (opts.path ? &quot;; path=&quot; + opts.path : &quot;&quot;) + (opts.secure ? &quot;; secure&quot; : &quot;&quot;);
+		return true;
+	};
+
 <span id='$cookie-method-get'>	/**
 </span>	 * Get cookies by her name.
 	 *
@@ -30,6 +94,8 @@ onix.service(&quot;$cookie&quot;, function() {
 	 * @private
 	 */
 	this.get = function(name) {
+		name = name || &quot;&quot;;
+
 		var cookieValue = null;
 
 		if (document.cookie &amp;&amp; document.cookie != &#39;&#39;) {
@@ -48,7 +114,40 @@ onix.service(&quot;$cookie&quot;, function() {
 
 		return cookieValue;
 	};
-});
+
+<span id='$cookie-method-remove'>	/**
+</span>	 * Remove cookie.
+	 *
+	 * @param  {String} name Cookie name
+	 * @param  {String} [domain] Cookie domain
+	 * @param  {String} [path] Cookie path
+	 * @return {Boolean}
+	 * @member $cookie
+	 * @private
+	 */
+	this.remove = function(name, domain, path) {
+		if (!this.contains(name)) {
+			return false;
+		}
+
+		document.cookie = encodeURIComponent(name) + &quot;=; expires=&quot; + this._CONST.EXPIRES.MIN + (domain ? &quot;; domain=&quot; + domain : &quot;&quot;) + (path ? &quot;; path=&quot; + path : &quot;&quot;);
+		return true;
+	};
+
+<span id='$cookie-method-contains'>	/**
+</span>	 * Document contains cookie?
+	 *
+	 * @param  {String} name Cookie name
+	 * @return {Boolean}
+	 * @member $cookie
+	 * @private
+	 */
+	this.contains = function(name) {
+		if (!name) return false;
+
+		return (new RegExp(&quot;(?:^|;\\s*)&quot; + encodeURIComponent(name).replace(/[\-\.\+\*]/g, &quot;\\$&amp;&quot;) + &quot;\\s*\\=&quot;)).test(document.cookie);
+	};
+}]);
 </pre>
 </body>
 </html>

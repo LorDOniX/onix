@@ -4,13 +4,11 @@
  * @class $previewImages
  */
 onix.service("$previewImages", [
-	"$q",
 	"$image",
 	"$dom",
 	"$job",
 	"$loader",
 function(
-	$q,
 	$image,
 	$dom,
 	$job,

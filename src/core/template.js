@@ -29,8 +29,8 @@ onix.provider("$template", function() {
 	 *
 	 * @class $template
 	 */
-	this.$get = ["$common", "$q", "$http", "$filter", function(
-				$common, $q, $http, $filter) {
+	this.$get = ["$common", "$promise", "$http", "$filter", function(
+				$common, $promise, $http, $filter) {
 
 		var $template = {
 			/**
@@ -67,6 +67,8 @@ onix.provider("$template", function() {
 			_CONST: {
 				FILTER_DELIMETER: "|",
 				FILTER_PARAM_DELIMETER: ":",
+				EL_PREFIX: "data-",
+				DATA_BIND: "data-bind",
 				TEMPLATE_SCRIPT_SELECTOR: "script[type='text/template']"
 			},
 
@@ -153,18 +155,20 @@ onix.provider("$template", function() {
 			 * Bind one single event to the element.
 			 * 
 			 * @param  {HTMLElement} el
-			 * @param  {String} eventName click, keydown...
-			 * @param  {String} data data-x value
+			 * @param  {Object} attr { name, value }
 			 * @param  {Function} scope
 			 * @member $template
 			 * @private
 			 */
-			_bindEvent: function(el, eventName, data, scope) {
-				if (data && this._parseFnName(data) in scope) {
+			_bindEvent: function(el, attr, scope) {
+				if (!el || !attr || !scope) return;
+
+				var eventName = attr.name.replace(this._CONST.EL_PREFIX, "");
+				var fnName = this._parseFnName(attr.value);
+
+				if (eventName && fnName in scope) {
 					el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-" + eventName);
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
+						var args = templScope._parseArgs(attr.value, {
 							el: this,
 							event: event
 						});
@@ -172,6 +176,33 @@ onix.provider("$template", function() {
 						scope[fnName].apply(scope, args);
 					}, this));
 				}
+			},
+
+			/**
+			 * Get element prefixed attributes.
+			 * 
+			 * @param  {HTMLElement} el
+			 * @return {Array}
+			 * @member $template
+			 * @private
+			 */
+			_getAttributes: function(el) {
+				var output = [];
+
+				if (el && "attributes" in el) {
+					Object.keys(el.attributes).forEach(function(attr) {
+						var item = el.attributes[attr];
+
+						if (item.name.indexOf(this._CONST.EL_PREFIX) != -1) {
+							output.push({
+								name: item.name,
+								value: item.value
+							});
+						}
+					}, this);
+				}
+
+				return output;
 			},
 
 			/**
@@ -289,7 +320,7 @@ onix.provider("$template", function() {
 			},
 
 			/**
-			 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+			 * Bind all elements in the root element. Selectors all data-* and functions are binds against scope object.
 			 * For data-bind, scope has to have "addEls" function.
 			 * Supports: click, change, keydown, bind.
 			 *
@@ -299,21 +330,22 @@ onix.provider("$template", function() {
 			 * @member $template
 			 */
 			bindTemplate: function(root, scope, addElsCb) {
-				var allElements = onix.element("*[data-click], *[data-change], *[data-bind], *[data-keydown]", root);
+				var allElements = onix.element("*", root);
 
 				if (allElements.len()) {
 					var newEls = {};
 
 					allElements.forEach(function(item) {
-						this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
-						this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
-						this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
+						var attrs = this._getAttributes(item);
 
-						var dataBind = item.getAttribute("data-bind");
-
-						if (dataBind) {
-							newEls[dataBind] = item;
-						}
+						attrs.forEach(function(attr) {
+							if (attr.name == this._CONST.DATA_BIND) {
+								newEls[attr.value] = item;
+							}
+							else {
+								this._bindEvent(item, attr, scope);
+							}
+						}, this);
 					}, this);
 
 					if (addElsCb && typeof addElsCb === "function") {
@@ -327,23 +359,21 @@ onix.provider("$template", function() {
 			 *
 			 * @param  {String} key
 			 * @param  {String} path
-			 * @return {$q}
+			 * @return {$promise}
 			 * @member $template
 			 */
 			load: function(key, path) {
-				var promise = $q.defer();
+				return new $promise(function(resolve, reject) {
+					$http.createRequest({
+						url: path
+					}).then(function(data) {
+						this.add(key, data.data);
 
-				$http.createRequest({
-					url: path
-				}).then(function(data) {
-					this.add(key, data.data);
-
-					promise.resolve();
-				}.bind(this), function(data) {
-					promise.reject();
-				});
-
-				return promise;
+						resolve();
+					}.bind(this), function(data) {
+						reject(data);
+					});
+				}.bind(this));
 			}
 		};
 

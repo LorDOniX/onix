@@ -229,6 +229,12 @@ if (!("classList" in document.documentElement) && window.Element) {
 		});
 	})();
 }
+if (!Date.now) {
+	/**
+	 * aktuální timestamp dle ES5 - http://dailyjs.com/2010/01/07/ecmascript5-date/
+	 */
+	Date.now = function() { return +(new Date); }
+}
 (function() {
 	var debug = false;
 	var root = this;
@@ -1566,13 +1572,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.13
+	 * version: 2.6.0
 	 * date: 13. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.13/13. 6. 2016\n'+
+'2.6.0/13. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -1665,9 +1671,9 @@ function(
  * @class $common
  */
 onix.service("$common", [
-	"$q",
+	"$promise",
 function(
-	$q
+	$promise
 ) {
 	/**
 	 * Object copy, from source to dest.
@@ -1685,21 +1691,74 @@ function(
 		}.bind(this));
 	};
 	/**
+	 * Inner method for chaining promises.
+	 * 
+	 * @param  {Object[]} opts
+	 * @param  {String|Function} opts.method Function or method name inside scope
+	 * @param  {Object} opts.scope Scope for method function
+	 * @param  {Array} opts.args Additional arguments for function
+	 * @param  {Function} resolve Resolve callback for $promise
+	 * @param  {Array} outArray Array for output from all executed promises
+	 * @private
+	 * @member $common
+	 */
+	this._chainPromisesInner = function(opts, resolve, outArray) {
+		var firstItem = opts.shift();
+		if (firstItem) {
+			// string or function itself
+			var fn;
+			var error = false;
+			switch (typeof firstItem.method) {
+				case "string":
+					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
+						error = true;
+					}
+					else {
+						fn = firstItem.scope[firstItem.method];
+						if (typeof fn !== "function") {
+							error = true;
+						}
+					}
+					break;
+				case "function":
+					fn = firstItem.method;
+					break;
+				default:
+					error = true;
+			}
+			if (!error) {
+				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
+					outArray.push(data);
+					this._chainPromisesInner(opts, resolve, outArray);
+				}.bind(this), function(err) {
+					outArray.push(err);
+					this._chainPromisesInner(opts, resolve, outArray);
+				}.bind(this));
+			}
+			else {
+				resolve(outArray);
+			}
+		}
+		else {
+			resolve(outArray);
+		}
+	};
+	/**
 	 * Confirm window, returns promise.
 	 *
 	 * @param  {String} txt
-	 * @return {$q}
+	 * @return {$promise}
 	 * @member $common
 	 */
 	this.confirm = function(txt) {
-		var promise = $q.defer();
-		if (confirm(txt)) {
-			promise.resolve();
-		}
-		else {
-			promise.reject();
-		}
-		return promise;
+		return new $promise(function(resolve, reject) {
+			if (confirm(txt)) {
+				resolve();
+			}
+			else {
+				reject();
+			}
+		});
 	};
 	/**
 	 * Merge multiple objects into the single one.
@@ -1967,13 +2026,84 @@ function(
 		var value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
 		return value + " " + sizes[lv] + "B";
 	};
+	/**
+	 * Chaining multiple methods with promises, returns promise.
+	 * 
+	 * @param  {Object[]} opts
+	 * @param  {String|Function} opts.method Function or method name inside scope
+	 * @param  {Object} opts.scope Scope for method function
+	 * @param  {Array} opts.args Additional arguments for function
+	 * @return {$promise}
+	 * @member $common
+	 */
+	this.chainPromises = function(opts) {
+		return new $promise(function(resolve) {
+			this._chainPromisesInner(opts, resolve, []);
+		}.bind(this));
+	};
 }]);
 /**
  * Functionality over browser cookies.
  *
  * @class $cookie
  */
-onix.service("$cookie", function() {
+onix.service("$cookie", [
+	"$date",
+function(
+	$date
+) {
+	/**
+	 * $cookie constants.
+	 * 
+	 * @member $cookie
+	 * @private
+	 */
+	this._CONST = {
+		EXPIRES: {
+			MAX: "Fri, 31 Dec 9999 23:59:59 GMT",
+			MIN: "Thu, 01 Jan 1970 00:00:00 GMT"
+		}
+	};
+	/**
+	 * Set cookie. Default expiration is 30 days from creation.
+	 *
+	 * @param  {String} name
+	 * @param  {String} value
+	 * @param  {Object} [optsArg]
+	 * @param  {Number|String|Date} [optsArg.expiration=null] Cookie expiration
+	 * @param  {String} [optsArg.path=""] Cookie path
+	 * @param  {String} [optsArg.domain=""] Cookie domain
+	 * @param  {String} [optsArg.secure=""] Cookie secure
+	 * @return {Boolean}
+	 * @member $cookie
+	 * @private
+	 */
+	this.set = function(name, value, optsArg) {
+		if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
+		var opts = {
+			expiration: $date.addDays(new Date(), 30),
+			path: "",
+			domain: "",
+			secure: ""
+		};
+		var expires = "";
+		if (opts.expiration) {
+			switch (opts.expiration.constructor) {
+				case Number:
+					expires = opts.expiration === Infinity ? "; expires=" + this._CONST.EXPIRES.MAX : "; max-age=" + opts.expiration;
+					break;
+				case String:
+					expires = "; expires=" + opts.expiration;
+					break;
+				case Date:
+					expires = "; expires=" + opts.expiration.toUTCString();
+					break;
+			}
+		}
+		document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (opts.domain ? "; domain=" + opts.domain : "") 
+						+ (opts.path ? "; path=" + opts.path : "") + (opts.secure ? "; secure" : "");
+		return true;
+	};
 	/**
 	 * Get cookies by her name.
 	 *
@@ -1983,6 +2113,7 @@ onix.service("$cookie", function() {
 	 * @private
 	 */
 	this.get = function(name) {
+		name = name || "";
 		var cookieValue = null;
 		if (document.cookie && document.cookie != '') {
 			var cookies = document.cookie.split(';');
@@ -1997,7 +2128,36 @@ onix.service("$cookie", function() {
 		}
 		return cookieValue;
 	};
-});
+	/**
+	 * Remove cookie.
+	 *
+	 * @param  {String} name Cookie name
+	 * @param  {String} [domain] Cookie domain
+	 * @param  {String} [path] Cookie path
+	 * @return {Boolean}
+	 * @member $cookie
+	 * @private
+	 */
+	this.remove = function(name, domain, path) {
+		if (!this.contains(name)) {
+			return false;
+		}
+		document.cookie = encodeURIComponent(name) + "=; expires=" + this._CONST.EXPIRES.MIN + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+		return true;
+	};
+	/**
+	 * Document contains cookie?
+	 *
+	 * @param  {String} name Cookie name
+	 * @return {Boolean}
+	 * @member $cookie
+	 * @private
+	 */
+	this.contains = function(name) {
+		if (!name) return false;
+		return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+	};
+}]);
 /**
  * Date operations.
  * 
@@ -2056,6 +2216,19 @@ onix.service("$date", function() {
 	this.isCSdate = function(csDate) {
 		csDate = csDate || "";
 		return !!(csDate.match(/([1-9]|[1-3][0-9])\.[ ]*([1-9]|1[0-2])\.[ ]*[1-9][0-9]{3}/));
+	};
+	/**
+	 * Add days to date.
+	 * 
+	 * @param  {Date} date
+	 * @param  {Number} days
+	 * @return {Date}
+	 * @member $date
+	 */
+	this.addDays = function(date, days) {
+		days = days || 0;
+		var addTime = 1000 * 60 * 60 * 24 * days;
+		return new Date(date.getTime() + addTime);
 	};
 });
 /**
@@ -2154,7 +2327,8 @@ onix.factory("$event", function() {
 	 * 
  	 * @class $event
  	 */
-	var $event = function() {};
+	var $event = function() {
+	};
 	/**
 	 * Init event functionality.
 	 * 
@@ -2411,10 +2585,10 @@ onix.filter("json", function() {
  * @class $http
  */
 onix.service("$http", [
-	"$q",
+	"$promise",
 	"$common",
 function(
-	$q,
+	$promise,
 	$common
 ) {
 	/**
@@ -2501,72 +2675,78 @@ function(
 	 * @param  {Array} [config.getData] Data, which will be send in the url (GET)
 	 * @param  {Object|FormData} [config.postData] Post data
 	 * @param  {Object} [config.headers] Additional headers
-	 * @return {$q}
+	 * @return {$promise}
 	 * @member $http
 	 */
 	this.createRequest = function(config) {
-		var promise = $q.defer();
-		var request = new XMLHttpRequest();
-		config = config || {};
-		var method = config.method || this.METHOD.GET;
-		var url = config.url || "";
-		if (!url) {
-			promise.reject();
-			return promise;
-		}
-		url = this._updateURL(url, config.getData);
-		request.onerror = function () { promise.reject(); };
-		request.open(method, url, true);
-		request.onreadystatechange = function() {
-			if (request.readyState == 4) {
-				var responseData = request.responseText || "";
-				var responseType = request.getResponseHeader("Content-Type");
-				var promiseData = null;
-				if (responseType == "application/json") {
-					promiseData = responseData.length ? JSON.parse(responseData) : {};
+		return new $promise(function(resolve, reject) {
+			var request = new XMLHttpRequest();
+			config = config || {};
+			var method = config.method || this.METHOD.GET;
+			var url = config.url || "";
+			if (!url) {
+				reject();
+				return;
+			}
+			url = this._updateURL(url, config.getData);
+			request.onerror = function () { reject(); };
+			request.open(method, url, true);
+			request.onreadystatechange = function() {
+				if (request.readyState == 4) {
+					var responseData = request.responseText || "";
+					var responseType = request.getResponseHeader("Content-Type");
+					var promiseData = null;
+					if (responseType == "application/json") {
+						promiseData = responseData.length ? JSON.parse(responseData) : {};
+					}
+					else {
+						promiseData = responseData;
+					}
+					var promiseObj = {
+						status: request.status,
+						data: promiseData,
+						url: url,
+						method: method
+					};
+					// 200 ok
+					// 201 created
+					// 204 succesfully deleted
+					// 403 unautorized
+					if (request.status >= 200 && request.status < 300) {
+						resolve(promiseObj);
+					}
+					else {
+						reject(promiseObj);
+					}
+				}
+			};
+			try {
+				// add headers
+				var headers = config.headers;
+				if ($common.isObject(headers)) {
+					Object.keys(headers).forEach(function(headerName) {
+						request.setRequestHeader(headerName, headers[headerName]);
+					});
+				}
+				if (method == this.METHOD.GET) {
+					request.setRequestHeader('Accept', 'application/json');
+				}
+				var type = config.postType || this.POST_TYPES.JSON;
+				if (config.postData && type == this.POST_TYPES.JSON) {
+					request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+					request.send(JSON.stringify(config.postData));
+				}
+				else if (config.postData && type == this.POST_TYPES.FORM_DATA) {
+					request.send(this._preparePostData(config.postData));
 				}
 				else {
-					promiseData = responseData;
+					request.send();
 				}
-				// 200 ok
-				// 201 created
-				// 204 succesfully deleted
-				// 403 unautorized
-				promise[request.status >= 200 && request.status < 300 ? "resolve" : "reject"]({
-					status: request.status,
-					data: promiseData,
-					url: url,
-					method: method
-				});
 			}
-		};
-		try {
-			// add headers
-			var headers = config.headers;
-			if ($common.isObject(headers)) {
-				Object.keys(headers).forEach(function(headerName) {
-					request.setRequestHeader(headerName, headers[headerName]);
-				});
+			catch (err) {
+				reject();
 			}
-			if (method == this.METHOD.GET) {
-				request.setRequestHeader('Accept', 'application/json');
-			}
-			var type = config.postType || this.POST_TYPES.JSON;
-			if (config.postData && type == this.POST_TYPES.JSON) {
-				request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-				request.send(JSON.stringify(config.postData));
-			}
-			else if (config.postData && type == this.POST_TYPES.FORM_DATA) {
-				request.send(this._preparePostData(config.postData));
-			}
-			else {
-				request.send();
-			}
-		}
-		catch (err) {
-			promise.reject();
-		}
-		return promise;
+		}.bind(this));
 	};
 }]);
 onix.provider("$i18n", function() {
@@ -2764,8 +2944,8 @@ onix.provider("$i18n", function() {
 	 * 
 	 * @class $i18n
 	 */
-	this.$get = ["$http", "$q", function(
-				$http, $q) {
+	this.$get = ["$http", "$promise", function(
+				$http, $promise) {
 		var $i18n = {
 			/**
 			 * Get text function. Translate for the current language and the key.
@@ -2820,20 +3000,20 @@ onix.provider("$i18n", function() {
 			 *
 			 * @param  {String} lang Language key
 			 * @param  {String} url  Path to the file
-			 * @return {$q}
+			 * @return {$promise}
 			 * @member $i18n
 			 */
 			loadLanguage: function(lang, url) {
-				var promise = $q.defer();
-				$http.createRequest({
-					url: url
-				}).then(function(data) {
-					_addLanguage(lang, data.data);
-					promise.resolve();
-				}, function(data) {
-					promise.resolve();
+				return new $promise(function(resolve, reject) {
+					$http.createRequest({
+						url: url
+					}).then(function(data) {
+						_addLanguage(lang, data.data);
+						resolve();
+					}, function(data) {
+						reject(data);
+					});
 				});
-				return promise;
 			}
 		};
 		return $i18n;
@@ -2854,9 +3034,9 @@ onix.config(["$i18nProvider", function($i18nProvider) {
  * @class $image
  */
 onix.service("$image", [
-	"$q",
+	"$promise",
 function(
-	$q
+	$promise
 ) {
 	/**
 	 * FileReader is available.
@@ -2879,47 +3059,47 @@ function(
 	 *
 	 * @param  {Object} file Input file
 	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
-	 * @return {$q} Promise with output object
+	 * @return {$promise} Promise with output object
 	 * @member $image
 	 */
 	this.readFromFile = function(file, maxSize) {
-		var promise = $q.defer();
-		if (!this._hasFileReader) {
-			promise.reject();
-			return promise;
-		}
-		var reader = new FileReader();
-		var output = {
-			img: null,
-			exif: null,
-			canvas: null
-		};
-		reader.onload = function(e) {
-			var binaryData = reader.result;
-			var binaryDataArray = new Uint8Array(binaryData);
-			var exif = null;
-			// exif only for jpeg
-			if (file.type != "png") {
-				exif = this.getEXIF(binaryData);
+		return new $promise(function(resolve, reject) {
+			if (!this._hasFileReader) {
+				reject();
+				return;
 			}
-			var img = new Image();
-			img.onload = function() {
-				var imd = this.getImageDim(img, maxSize);
-				var canvas = this.getCanvas(img, {
-					width: imd.width,
-					height: imd.height,
-					orientation: exif ? exif.Orientation : 0,
-					scaled: imd.scale != 1
-				});
-				output.img = img;
-				output.exif = exif;
-				output.canvas = canvas;
-				promise.resolve(output);
+			var reader = new FileReader();
+			var output = {
+				img: null,
+				exif: null,
+				canvas: null
+			};
+			reader.onload = function(e) {
+				var binaryData = reader.result;
+				var binaryDataArray = new Uint8Array(binaryData);
+				var exif = null;
+				// exif only for jpeg
+				if (file.type != "png") {
+					exif = this.getEXIF(binaryData);
+				}
+				var img = new Image();
+				img.onload = function() {
+					var imd = this.getImageDim(img, maxSize);
+					var canvas = this.getCanvas(img, {
+						width: imd.width,
+						height: imd.height,
+						orientation: exif ? exif.Orientation : 0,
+						scaled: imd.scale != 1
+					});
+					output.img = img;
+					output.exif = exif;
+					output.canvas = canvas;
+					resolve(output);
+				}.bind(this);
+				img.src = this.fileToBase64(file.type, binaryDataArray);
 			}.bind(this);
-			img.src = this.fileToBase64(file.type, binaryDataArray);
-		}.bind(this);
-		reader.readAsArrayBuffer(file);
-		return promise;
+			reader.readAsArrayBuffer(file);
+		}.bind(this));
 	};
 	/**
 	 * Counts image dimension; if maxSize is available, new dimension is calculated.
@@ -3141,9 +3321,9 @@ function(
 	};
 }]);
 onix.factory("$job", [
-	"$q",
+	"$promise",
 function(
-	$q
+	$promise
 ) {
 	/**
 	 * Factory for manage multiple tasks.
@@ -3151,7 +3331,7 @@ function(
  	 * @class $job
  	 */
 	var $job = function() {
-		this._donePromise = $q.defer();
+		this._isRunning = false;
 		this._tasks = [];
 		this._taskDone = {
 			cb: null,
@@ -3180,14 +3360,21 @@ function(
 	/**
 	 * Start job.
 	 *
+	 * @return {$promise} Returns promise for whole job
 	 * @member $job
 	 */
 	$job.prototype.start = function() {
-		if (!this._tasks.length) return;
-		// because of pop
-		this._tasks.reverse();
-		this._doJob();
-		return this._donePromise;
+		return new $promise(function(resolve, reject) {
+			if (this._isRunning || !this._tasks.length) {
+				reject();
+				return;
+			}
+			// job is running
+			this._isRunning = true;
+			// because of pop
+			this._tasks.reverse();
+			this._doJob(resolve);
+		}.bind(this));
 	};
 	/**
 	 * Clear all job taks.
@@ -3211,12 +3398,14 @@ function(
 	/**
 	 * Internal function for running job queue.
 	 *
+	 * @param {Function} resolve Promise object
 	 * @member $job
 	 */
-	$job.prototype._doJob = function() {
+	$job.prototype._doJob = function(resolve) {
 		var rest = this._tasks.length;
 		if (rest == 0) {
-			this._donePromise.resolve();
+			this._isRunning = false;
+			resolve();
 		}
 		else {
 			var job = this._tasks.pop();
@@ -3225,7 +3414,7 @@ function(
 					var doneFnArgs = Array.prototype.slice.call(arguments, 0);
 					this._taskDone.cb.apply(this._taskDone.scope || this._taskDone.cb, doneFnArgs);
 				}
-				this._doJob();
+				this._doJob(resolve);
 			}.bind(this);
 			job.task.apply(job.scope || job.task, job.args.concat(doneFn));
 		}
@@ -3250,7 +3439,7 @@ function(
 		 * @param  {Object} taskDoneObj Callback after one task have been done
 		 * @param  {Object} taskDoneObj.cb Function
 		 * @param  {Object} [taskDoneObj.scope] Function scope
-		 * @return {$q} Callback after all jobs are done
+		 * @return {$promise} Callback after all jobs are done
 		 * @member $job
 		 */
 		multipleJobs: function(jobsArray, count, taskDoneObj) {
@@ -3272,7 +3461,7 @@ function(
 			jobs.forEach(function(job) {
 				jobPromises.push(job.start());
 			});
-			return $q.all(jobPromises);
+			return $promise.all(jobPromises);
 		}
 	};
 }]);
@@ -4056,14 +4245,19 @@ onix.factory("$promise", function() {
 		this._state = this._STATES.IDLE;
 		// all funcs
 		this._funcs = [];
-		// done data
-		this._finishData = null;
+		// fulfill data
+		this._fulfillData = null;
 		// call promise cb function
 		if (cbFn && typeof cbFn === "function") {
-			cbFn.apply(cbFn, [
-				this._resolve.bind(this),
-				this._reject.bind(this)
-			]);
+			try {
+				cbFn.apply(cbFn, [
+					this._resolve.bind(this),
+					this._reject.bind(this)
+				]);
+			}
+			catch (err) {
+				console.error("$promise exception " + err);
+			}
 		}
 	};
 	/**
@@ -4074,7 +4268,7 @@ onix.factory("$promise", function() {
 	 * @member $promise
 	 */
 	$promise.prototype._resolve = function(obj) {
-		this._finishData = obj;
+		this._fulfillData = obj;
 		this._resolveFuncs(false);
 	};
 	/**
@@ -4085,25 +4279,25 @@ onix.factory("$promise", function() {
 	 * @member $promise
 	 */
 	$promise.prototype._reject = function(obj) {
-		this._finishData = obj;
+		this._fulfillData = obj;
 		this._resolveFuncs(true);
 	};
 	/**
 	 * Resolve all functions.
 	 *
-	 * @param  {Boolean} isError
+	 * @param  {Boolean} isCatch
 	 * @member $promise
 	 * @private
 	 */
-	$promise.prototype._resolveFuncs = function(isError) {
+	$promise.prototype._resolveFuncs = function(isCatch) {
 		this._funcs.forEach(function(fnItem) {
-			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
-				(fnItem.fn)(this._finishData);
+			if ((fnItem.isCatch && isCatch) || (!fnItem.isCatch && !isCatch)) {
+				(fnItem.fn)(this._fulfillData);
 			}
 		}, this);
 		// clear array
 		this._funcs.length = 0;
-		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
+		this._state = isCatch ? this._STATES.REJECTED : this._STATES.RESOLVED;
 	};
 	/**
 	 * Is promise already finished?
@@ -4121,92 +4315,67 @@ onix.factory("$promise", function() {
 	 * After promise resolve/reject call then (okFn, errorFn).
 	 *
 	 * @chainable
-	 * @param {Function} [cbOk]
-	 * @param {Function} [cbError]
+	 * @param {Function} [resolveCb] Resolve function
+	 * @param {Function} [rejectCb] Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.then = function(cbOk, cbError) {
-		if (cbOk && typeof cbOk === "function") {
+	$promise.prototype.then = function(resolveCb, rejectCb) {
+		if (resolveCb && typeof resolveCb === "function") {
 			this._funcs.push({
-				fn: cbOk,
-				isError: false
+				fn: resolveCb,
+				isCatch: false
 			});
 		}
-		if (cbError && typeof cbError === "function") {
+		if (rejectCb && typeof rejectCb === "function") {
 			this._funcs.push({
-				fn: cbError,
-				isError: true
+				fn: rejectCb,
+				isCatch: true
 			});
 		}
 		this._isAlreadyFinished();
 		return this;
 	};
 	/**
-	 * After promise resolve call then cbOk.
+	 * After promise reject call then rejectCb.
 	 *
 	 * @chainable
-	 * @param  {Function} cbOk
+	 * @param  {Function} rejectCb Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.done = function(cbOk) {
+	$promise.prototype.catch = function(rejectCb) {
 		this._funcs.push({
-			fn: cbOk,
-			isError: false
+			fn: rejectCb,
+			isCatch: true
 		});
 		this._isAlreadyFinished();
 		return this;
 	};
 	/**
-	 * After promise reject call then cbError.
-	 *
-	 * @chainable
-	 * @param  {Function} cbError
-	 * @member $promise
-	 */
-	$promise.prototype.error = function(cbError) {
-		this._funcs.push({
-			fn: cbError,
-			isError: true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * Finally for promise.
-	 *
-	 * @method finally
-	 * @chainable
-	 * @param  {Function} cb
-	 * @member $promise
-	 */
-	$promise.prototype["finally"] = function(cb) {
-		this._funcs.push({
-			fn: cb,
-			"finally": true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	// static methods
-	/**
-	 * Resolve all promises in the array.
-	 *
+	 * Resolve multiple promises.
+	 * 
 	 * @param {$promise[]} promises
-	 * @return {$promise}
+	 * @param  {Boolean} isRace Is race?
+	 * @return {Boolean}
 	 * @member $promise
+	 * @private
+	 * @static
 	 */
-	$promise.all = function(promises) {
+	$promise._multiplePromises = function(promises, isRace) {
 		return new $promise(function(resolve) {
-			if (Array.isArray(promises)) {
-				var count = promises.length;
-				var test = function() {
+			if (Array.isArray(promises) && promises.length) {
+				var count = isRace ? 1 : promises.length;
+				var test = function(data) {
 					count--;
 					if (count == 0) {
-						resolve();
+						resolve(isRace ? data : null);
 					}
 				};
 				promises.forEach(function(item) {
-					item["finally"](test);
+					item.then(function(data) {
+						test(data);
+					}, function(data) {
+						test(data);
+					});
 				});
 			}
 			else {
@@ -4215,11 +4384,34 @@ onix.factory("$promise", function() {
 		});
 	};
 	/**
+	 * Resolve all promises in the array.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise}
+	 * @member $promise
+	 * @static
+	 */
+	$promise.all = function(promises) {
+		return $promise._multiplePromises(promises);
+	};
+	/**
+	 * Race all promises in the array - first one resolves promise.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise} With the value from the first resolved promise.
+	 * @member $promise
+	 * @static
+	 */
+	$promise.race = function(promises) {
+		return $promise._multiplePromises(promises, true);
+	};
+	/**
 	 * Resolve promise with variable object.
 	 *
 	 * @param {Object} [obj] Resolved object
 	 * @return {$promise}
 	 * @member $promise
+	 * @static
 	 */
 	$promise.resolve = function(obj) {
 		return new $promise(function(resolve) {
@@ -4232,6 +4424,7 @@ onix.factory("$promise", function() {
 	 * @param {Object} [obj] Rejected object
 	 * @return {$promise}
 	 * @member $promise
+	 * @static
 	 */
 	$promise.reject = function(obj) {
 		return new $promise(function(resolve, reject) {
@@ -4239,266 +4432,6 @@ onix.factory("$promise", function() {
 		});
 	};
 	return $promise;
-});
-onix.factory("$q", function() {
-	/**
-	 * Promise implementation which is similar to angular $q.
-	 * 
-	 * @class $q
-	 */
-	var $q = function() {
-		/**
-		 * Promise states.
-		 *
-		 * @member $q
-		 * @private
-		 */
-		this._STATES = {
-			IDLE: 0,
-			RESOLVED: 1,
-			REJECTED: 2
-		};
-		// current state
-		this._state = this._STATES.IDLE;
-		// all funcs
-		this._funcs = [];
-		// done data
-		this._finishData = null;
-	};
-	/**
-	 * Resolve all functions.
-	 *
-	 * @param  {Boolean} isError
-	 * @member $q
-	 * @private
-	 */
-	$q.prototype._resolveFuncs = function(isError) {
-		this._funcs.forEach(function(fnItem) {
-			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
-				(fnItem.fn)(this._finishData);
-			}
-		}, this);
-		// clear array
-		this._funcs.length = 0;
-		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
-	};
-	/**
-	 * Is promise already finished?
-	 *
-	 * @return {Boolean}
-	 * @member $q
-	 * @private
-	 */
-	$q.prototype._isAlreadyFinished = function() {
-		if (this._state != this._STATES.IDLE) {
-			this._resolveFuncs(this._state == this._STATES.REJECTED);
-		}
-	};
-	/**
-	 * Resolve promise using obj.
-	 *
-	 * @param  {Object} obj
-	 * @member $q
-	 */
-	$q.prototype.resolve = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(false);
-	};
-	/**
-	 * Reject promise using obj.
-	 *
-	 * @param  {Object} obj
-	 * @member $q
-	 */
-	$q.prototype.reject = function(obj) {
-		this._finishData = obj;
-		this._resolveFuncs(true);
-	};
-	/**
-	 * After promise resolve/reject call then (okFn, errorFn).
-	 *
-	 * @chainable
-	 * @param {Function} [cbOk]
-	 * @param {Function} [cbError]
-	 * @member $q
-	 */
-	$q.prototype.then = function(cbOk, cbError) {
-		if (cbOk && typeof cbOk === "function") {
-			this._funcs.push({
-				fn: cbOk,
-				isError: false
-			});
-		}
-		if (cbError && typeof cbError === "function") {
-			this._funcs.push({
-				fn: cbError,
-				isError: true
-			});
-		}
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * After promise resolve call then cbOk.
-	 *
-	 * @chainable
-	 * @param  {Function} cbOk
-	 * @member $q
-	 */
-	$q.prototype.done = function(cbOk) {
-		this._funcs.push({
-			fn: cbOk,
-			isError: false
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * After promise reject call then cbError.
-	 *
-	 * @chainable
-	 * @param  {Function} cbError
-	 * @member $q
-	 */
-	$q.prototype.error = function(cbError) {
-		this._funcs.push({
-			fn: cbError,
-			isError: true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	/**
-	 * Finally for promise.
-	 *
-	 * @method finally
-	 * @chainable
-	 * @param  {Function} cb
-	 * @member $q
-	 */
-	$q.prototype["finally"] = function(cb) {
-		this._funcs.push({
-			fn: cb,
-			"finally": true
-		});
-		this._isAlreadyFinished();
-		return this;
-	};
-	return {
-		/**
-		 * Inner method for chaining promises.
-		 * 
-		 * @param  {Object[]} opts
-		 * @param  {String|Function} opts.method Function or method name inside scope
-		 * @param  {Object} opts.scope Scope for method function
-		 * @param  {Array} opts.args Additional arguments for function
-		 * @param  {$q} promise Done promise $q
-		 * @param  {Array} outArray Array for output from all executed promises
-		 * @private
-		 * @member $q
-		 */
-		_chainPromisesInner: function(opts, promise, outArray) {
-			var firstItem = opts.shift();
-			if (firstItem) {
-				// string or function itself
-				var fn;
-				var error = false;
-				switch (typeof firstItem.method) {
-					case "string":
-						if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
-							error = true;
-						}
-						else {
-							fn = firstItem.scope[firstItem.method];
-							if (typeof fn !== "function") {
-								error = true;
-							}
-						}
-						break;
-					case "function":
-						fn = firstItem.method;
-						break;
-					default:
-						error = true;
-				}
-				if (!error) {
-					fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
-						outArray.push(data);
-						this._chainPromisesInner(opts, promise, outArray);
-					}.bind(this), function(err) {
-						outArray.push(err);
-						this._chainPromisesInner(opts, promise, outArray);
-					}.bind(this));
-				}
-				else {
-					promise.resolve(outArray);
-				}
-			}
-			else {
-				promise.resolve(outArray);
-			}
-		},
-		/**
-		 * Resolve all promises in the array.
-		 *
-		 * @param {$q[]} promises
-		 * @return {$q}
-		 * @member $q
-		 */
-		all: function(promises) {
-			var promise = new $q();
-			if (Array.isArray(promises)) {
-				var count = promises.length;
-				var test = function() {
-					count--;
-					if (count == 0) {
-						promise.resolve();
-					}
-				};
-				promises.forEach(function(item) {
-					item["finally"](test);
-				});
-			}
-			else {
-				promise.resolve();
-			}
-			return promise;
-		},
-		/**
-		 * Deferable object of the promise.
-		 *
-		 * @return {$q}
-		 * @member $q
-		 */
-		defer: function() {
-			return new $q();
-		},
-		/**
-		 * Is object promise?
-		 * 
-		 * @param  {Object}  obj Tested object
-		 * @return {Boolean}
-		 * @member $q
-		 */
-		isPromise: function(obj) {
-			return obj instanceof $q;
-		},
-		/**
-		 * Chaining multiple methods with promises, returns promise.
-		 * 
-		 * @param  {Object[]} opts
-		 * @param  {String|Function} opts.method Function or method name inside scope
-		 * @param  {Object} opts.scope Scope for method function
-		 * @param  {Array} opts.args Additional arguments for function
-		 * @return {$q}
-		 * @member $q
-		 */
-		chainPromises: function(opts) {
-			var promise = this.defer();
-			this._chainPromisesInner(opts, promise, []);
-			return promise;
-		}
-	};
 });
 /**
  * Simple router for the application.
@@ -4647,7 +4580,7 @@ function(
 				}
 			});
 			if (templateUrl) {
-				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).then(function() {
 					if (contr) {
 						this._runController(contr, routeParams);
 					}
@@ -4698,8 +4631,8 @@ onix.provider("$template", function() {
 	 *
 	 * @class $template
 	 */
-	this.$get = ["$common", "$q", "$http", "$filter", function(
-				$common, $q, $http, $filter) {
+	this.$get = ["$common", "$promise", "$http", "$filter", function(
+				$common, $promise, $http, $filter) {
 		var $template = {
 			/**
 			 * Template cache.
@@ -4733,6 +4666,8 @@ onix.provider("$template", function() {
 			_CONST: {
 				FILTER_DELIMETER: "|",
 				FILTER_PARAM_DELIMETER: ":",
+				EL_PREFIX: "data-",
+				DATA_BIND: "data-bind",
 				TEMPLATE_SCRIPT_SELECTOR: "script[type='text/template']"
 			},
 			/**
@@ -4807,24 +4742,47 @@ onix.provider("$template", function() {
 			 * Bind one single event to the element.
 			 * 
 			 * @param  {HTMLElement} el
-			 * @param  {String} eventName click, keydown...
-			 * @param  {String} data data-x value
+			 * @param  {Object} attr { name, value }
 			 * @param  {Function} scope
 			 * @member $template
 			 * @private
 			 */
-			_bindEvent: function(el, eventName, data, scope) {
-				if (data && this._parseFnName(data) in scope) {
+			_bindEvent: function(el, attr, scope) {
+				if (!el || !attr || !scope) return;
+				var eventName = attr.name.replace(this._CONST.EL_PREFIX, "");
+				var fnName = this._parseFnName(attr.value);
+				if (eventName && fnName in scope) {
 					el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute("data-" + eventName);
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
+						var args = templScope._parseArgs(attr.value, {
 							el: this,
 							event: event
 						});
 						scope[fnName].apply(scope, args);
 					}, this));
 				}
+			},
+			/**
+			 * Get element prefixed attributes.
+			 * 
+			 * @param  {HTMLElement} el
+			 * @return {Array}
+			 * @member $template
+			 * @private
+			 */
+			_getAttributes: function(el) {
+				var output = [];
+				if (el && "attributes" in el) {
+					Object.keys(el.attributes).forEach(function(attr) {
+						var item = el.attributes[attr];
+						if (item.name.indexOf(this._CONST.EL_PREFIX) != -1) {
+							output.push({
+								name: item.name,
+								value: item.value
+							});
+						}
+					}, this);
+				}
+				return output;
 			},
 			/**
 			 * Init - get all templates from the page. Uses 'text/template' script with template data.
@@ -4923,7 +4881,7 @@ onix.provider("$template", function() {
 				return this._cache[key] || "";
 			},
 			/**
-			 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+			 * Bind all elements in the root element. Selectors all data-* and functions are binds against scope object.
 			 * For data-bind, scope has to have "addEls" function.
 			 * Supports: click, change, keydown, bind.
 			 *
@@ -4933,17 +4891,19 @@ onix.provider("$template", function() {
 			 * @member $template
 			 */
 			bindTemplate: function(root, scope, addElsCb) {
-				var allElements = onix.element("*[data-click], *[data-change], *[data-bind], *[data-keydown]", root);
+				var allElements = onix.element("*", root);
 				if (allElements.len()) {
 					var newEls = {};
 					allElements.forEach(function(item) {
-						this._bindEvent(item, "click", item.getAttribute("data-click"), scope);
-						this._bindEvent(item, "change", item.getAttribute("data-change"), scope);
-						this._bindEvent(item, "keydown", item.getAttribute("data-keydown"), scope);
-						var dataBind = item.getAttribute("data-bind");
-						if (dataBind) {
-							newEls[dataBind] = item;
-						}
+						var attrs = this._getAttributes(item);
+						attrs.forEach(function(attr) {
+							if (attr.name == this._CONST.DATA_BIND) {
+								newEls[attr.value] = item;
+							}
+							else {
+								this._bindEvent(item, attr, scope);
+							}
+						}, this);
 					}, this);
 					if (addElsCb && typeof addElsCb === "function") {
 						addElsCb(newEls);
@@ -4955,20 +4915,20 @@ onix.provider("$template", function() {
 			 *
 			 * @param  {String} key
 			 * @param  {String} path
-			 * @return {$q}
+			 * @return {$promise}
 			 * @member $template
 			 */
 			load: function(key, path) {
-				var promise = $q.defer();
-				$http.createRequest({
-					url: path
-				}).then(function(data) {
-					this.add(key, data.data);
-					promise.resolve();
-				}.bind(this), function(data) {
-					promise.reject();
-				});
-				return promise;
+				return new $promise(function(resolve, reject) {
+					$http.createRequest({
+						url: path
+					}).then(function(data) {
+						this.add(key, data.data);
+						resolve();
+					}.bind(this), function(data) {
+						reject(data);
+					});
+				}.bind(this));
 			}
 		};
 		// template init
@@ -4980,13 +4940,13 @@ onix.factory("$anonymizer", [
 	"$math",
 	"$event",
 	"$loader",
-	"$q",
+	"$promise",
 	"$common",
 function(
 	$math,
 	$event,
 	$loader,
-	$q,
+	$promise,
 	$common
 ) {
 	/**
@@ -5086,7 +5046,8 @@ function(
 			startXSave: 0,
 			startYSave: 0,
 			startX: 0,
-			startY: 0
+			startY: 0,
+			bcr: null
 		};
 		this._flags = {
 			wasRightClick: false,
@@ -5103,7 +5064,6 @@ function(
 			mouseUp: this._mouseUp.bind(this),
 			mouseMoveLine: this._mouseMoveLine.bind(this),
 			mouseUpLine: this._mouseUpLine.bind(this),
-			mouseUpDocument: this._mouseUpDocument.bind(this),
 			contextMenu: this._contextmenu.bind(this)
 		};
 		// firefox
@@ -5360,10 +5320,10 @@ function(
 			y: y || Math.round(this._canHeight / 2)
 		};
 		var zc = this._zoom / 100;
-		var x = Math.round(this._x * zc) + fromPoint.x;
-		var y = Math.round(this._y * zc) + fromPoint.y;
-		fromPoint.xRatio = x / this._curWidth;
-		fromPoint.yRatio = y / this._curHeight;
+		var newX = Math.round(this._x * zc) + fromPoint.x;
+		var newY = Math.round(this._y * zc) + fromPoint.y;
+		fromPoint.xRatio = newX / this._curWidth;
+		fromPoint.yRatio = newY / this._curHeight;
 		return fromPoint;
 	};
 	/**
@@ -5475,13 +5435,38 @@ function(
 		if (!delta) { return; }
 		e.stopPropagation();
 		e.preventDefault();
-		var fromPoint = this._getFromPoint(e.offsetX, e.offsetY);
+		this._setBCR();
+		var data = this._getMouseXY(e);
+		var fromPoint = this._getFromPoint(data.x, data.y);
 		if (delta > 0) {
 			this._setZoom(this._zoom + this._zoomStep, fromPoint);
 		}
 		else {
 			this._setZoom(this._zoom - this._zoomStep, fromPoint);
 		}
+	};
+	/**
+	 * Get mouse coordinates.
+	 * 
+	 * @param  {Event} e
+	 * @return {Object}
+	 * @private
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype._getMouseXY = function(e) {
+		return {
+			x: e.clientX - this._mouse.bcr.left,
+			y: e.clientY - this._mouse.bcr.top
+		}
+	};
+	/**
+	 * Set mouse bounding client rect from canvas el.
+	 * 
+	 * @private
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype._setBCR = function() {
+		this._mouse.bcr = this._canvas.getBoundingClientRect();
 	};
 	/**
 	 * Mouse down - create a circle, start of the line, start of move.
@@ -5494,19 +5479,20 @@ function(
 		if (!this._imgWidth && !this._imgHeight) return;
 		e.stopPropagation();
 		e.preventDefault();
-		this._mouse.startXSave = e.offsetX;
-		this._mouse.startYSave = e.offsetY;
-		this._mouse.startX = e.offsetX;
-		this._mouse.startY = e.offsetY;
+		this._setBCR();
+		var data = this._getMouseXY(e);
+		this._mouse.startXSave = data.x;
+		this._mouse.startYSave = data.y;
+		this._mouse.startX = this._mouse.startXSave;
+		this._mouse.startY = this._mouse.startYSave;
 		this._flags.wasMove = false;
 		this._flags.wasRightClick = this._isRightClick(e);
 		// circle
 		if (this._opts.curEntity == $anonymizer.ENTITES.CIRCLE) {
 			this._flags.wasImgMove = false;
 			this._flags.wasPreview = false;
-			this._canvas.addEventListener("mousemove", this._binds.mouseMove);
-			this._canvas.addEventListener("mouseup", this._binds.mouseUp);
-			this._canvas.addEventListener("mouseleave", this._binds.mouseUp);
+			document.addEventListener("mousemove", this._binds.mouseMove);
+			document.addEventListener("mouseup", this._binds.mouseUp);
 		}
 		// line
 		else if (this._opts.curEntity == $anonymizer.ENTITES.LINE) {
@@ -5518,13 +5504,12 @@ function(
 			this._flags.wasPreview = false;
 			this._flags.wasLine = false;
 			this._lineCanvas = lineCanvas;
-			this._lineCanvas.addEventListener("mousemove", this._binds.mouseMoveLine);
-			this._lineCanvas.addEventListener("mouseup", this._binds.mouseUpLine);
 			this._lineCanvas.addEventListener("contextmenu", this._binds.contextMenu);
+			document.addEventListener("mousemove", this._binds.mouseMoveLine);
+			document.addEventListener("mouseup", this._binds.mouseUpLine);
 			if (this._flags.wasRightClick) {
 				this._lineCanvas.classList.add("is-dragged");
 			}
-			document.addEventListener("mouseup", this._binds.mouseUpDocument);
 			this._lineCanvasCtx = this._lineCanvas.getContext("2d");
 			this._parent.appendChild(lineCanvas);
 		}
@@ -5559,6 +5544,7 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseMove = function(e) {
+		var data = this._getMouseXY(e);
 		// mouse cursor
 		if (!this._flags.wasMove) {
 			this._canvas.classList.add("is-dragged");
@@ -5566,7 +5552,7 @@ function(
 		// mouse move flag
 		this._flags.wasMove = true;
 		// mouse move over the preview?
-		var isPreview = this._isPreview(e.offsetX, e.offsetY);
+		var isPreview = this._isPreview(data.x, data.y);
 		if (!this._flags.wasRightClick && !this._flags.wasImgMove && isPreview) {
 			// set preview flag
 			this._flags.wasPreview = true;
@@ -5579,11 +5565,11 @@ function(
 			// image move - flag
 			this._flags.wasImgMove = true;
 			// image move
-			this._imgMove(e.offsetX, e.offsetY);
+			this._imgMove(data.x, data.y);
 		}
 		// save
-		this._mouse.startX = e.offsetX;
-		this._mouse.startY = e.offsetY;
+		this._mouse.startX = data.x;
+		this._mouse.startY = data.y;
 	};
 	/**
 	 * Is there a preview on coordinates x, y?
@@ -5623,12 +5609,13 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseUp = function(e) {
+		var data = this._getMouseXY(e);
 		var thresholdTest = false;
 		// only it was move
 		if (this._flags.wasMove) {
 			// difference towards start click
-			var diffX = this._mouse.startXSave - e.offsetX;
-			var diffY = this._mouse.startYSave - e.offsetY;
+			var diffX = this._mouse.startXSave - data.x;
+			var diffY = this._mouse.startYSave - data.y;
 			if (diffX >= this._THRESHOLD.MIN && diffX <= this._THRESHOLD.MAX && diffY >= this._THRESHOLD.MIN && diffY <= this._THRESHOLD.MAX) {
 				// we are in the range
 				thresholdTest = true;
@@ -5636,7 +5623,7 @@ function(
 		}
 		// click - there was no move, threshold test, it is disabled for right mouse click
 		if (!this._flags.wasRightClick && (!this._flags.wasMove || thresholdTest)) {
-			var isPreview = this._isPreview(e.offsetX, e.offsetY);
+			var isPreview = this._isPreview(data.x, data.y);
 			if (isPreview) {
 				// preview click - click coordinates on the canvas center
 				this._setPosition(isPreview.xRatio, isPreview.yRatio);
@@ -5646,8 +5633,8 @@ function(
 			else {
 				// add circle
 				var zc = this._zoom / 100;
-				var x = Math.round(this._x * zc) + e.offsetX;
-				var y = Math.round(this._y * zc) + e.offsetY;
+				var x = Math.round(this._x * zc) + data.x;
+				var y = Math.round(this._y * zc) + data.y;
 				this._entites.push({
 					id: this._opts.curEntity.id,
 					value: this._opts.curEntity.value,
@@ -5658,9 +5645,8 @@ function(
 			}
 		}
 		this._canvas.classList.remove("is-dragged");
-		this._canvas.removeEventListener("mousemove", this._binds.mouseMove);
-		this._canvas.removeEventListener("mouseup", this._binds.mouseUp);
-		this._canvas.removeEventListener("mouseleave", this._binds.mouseUp);
+		document.removeEventListener("mousemove", this._binds.mouseMove);
+		document.removeEventListener("mouseup", this._binds.mouseUp);
 	};
 	/**
 	 * Mouse move over canvas - line draw.
@@ -5670,19 +5656,20 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseMoveLine = function(e) {
+		var data = this._getMouseXY(e);
 		// mouse move
 		this._flags.wasMove = true;
 		// right mouse click
 		if (this._flags.wasRightClick) {
 			// image move
-			this._imgMove(e.offsetX, e.offsetY);
+			this._imgMove(data.x, data.y);
 			// save
-			this._mouse.startX = e.offsetX;
-			this._mouse.startY = e.offsetY;
+			this._mouse.startX = data.x;
+			this._mouse.startY = data.y;
 		}
 		// left mouse click
 		else {
-			var isPreview = this._isPreview(e.offsetX, e.offsetY);
+			var isPreview = this._isPreview(data.x, data.y);
 			var wasPreview = this._flags.wasPreview;
 			if (!this._flags.wasLine && isPreview) {
 				this._flags.wasPreview = true;
@@ -5698,7 +5685,7 @@ function(
 				// clear
 				this._lineCanvasCtx.clearRect(0, 0, this._canWidth, this._canHeight);
 				// draw a line
-				this._drawLine(this._lineCanvasCtx, this._mouse.startX, this._mouse.startY, e.offsetX, e.offsetY, lineWidth);
+				this._drawLine(this._lineCanvasCtx, this._mouse.startX, this._mouse.startY, data.x, data.y, lineWidth);
 			}
 			// change of state
 			if (!wasPreview && this._flags.wasPreview) {
@@ -5715,9 +5702,10 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseUpLine = function(e) {
+		var data = this._getMouseXY(e);
 		var isPreview = null;
 		if (!this._flags.wasMove) {
-			isPreview = this._isPreview(e.offsetX, e.offsetY);
+			isPreview = this._isPreview(data.x, data.y);
 		}
 		// only for left mouse click
 		if (!this._flags.wasRightClick) {
@@ -5734,8 +5722,8 @@ function(
 				var yc = Math.round(this._y * zc);
 				var x = xc + this._mouse.startX;
 				var y = yc + this._mouse.startY;
-				var x2 = xc + e.offsetX;
-				var y2 = yc + e.offsetY;
+				var x2 = xc + data.x;
+				var y2 = yc + data.y;
 				this._entites.push({
 					id: this._opts.curEntity.id,
 					value: this._opts.curEntity.value,
@@ -5748,23 +5736,11 @@ function(
 			}
 		}
 		this._lineCanvas.classList.remove("is-dragged");
-		this._lineCanvas.removeEventListener("mousemove", this._binds.mouseMoveLine);
-		this._lineCanvas.removeEventListener("mouseup", this._binds.mouseUpLine);
 		this._lineCanvas.removeEventListener("contextmenu", this._binds.contextMenu);
-		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
+		document.removeEventListener("mousemove", this._binds.mouseMoveLine);
+		document.removeEventListener("mouseup", this._binds.mouseUpLine);
 		this._parent.removeChild(this._lineCanvas);
 		this._lineCanvas = null;
-	};
-	/**
-	 * Mouse up over the document - drawing a line outside a canvas and mouse up -> line is canceled.
-	 *
-	 * @param {Event} e Mouse event
-	 * @private
-	 * @member $anonymizer
-	 */
-	$anonymizer.prototype._mouseUpDocument = function(e) {
-		this._flags.wasLine = false;
-		this._mouseUpLine(e);
 	};
 	/**
 	 * Set new value for zoom.
@@ -5775,13 +5751,13 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._setZoom = function(value, fromPoint) {
+		fromPoint = fromPoint || this._getFromPoint();
 		var oldZoom = this._zoom;
 		var newZoom = $math.setRange(value, this._opts.minZoom, this._opts.maxZoom);
 		if (newZoom == oldZoom) return;
 		this._zoom = newZoom;
 		this.trigger("zoom", this._zoom);
 		this._postZoom();
-		fromPoint = fromPoint || this._getFromPoint();
 		this._setPosition(fromPoint.xRatio, fromPoint.yRatio, fromPoint.x, fromPoint.y);
 		this._alignImgToCanvas();
 		this._drawEntityPreview();
@@ -5791,37 +5767,37 @@ function(
 	 * Load and show image in canvas. Returns promise after load.
 	 * 
 	 * @param  {String} url Path to image
-	 * @return {$q} Promise
+	 * @return {$promise} Promise
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.loadImage = function(url) {
-		var promise = $q.defer();
-		this._setWhiteCanvas();
-		this._spinner.classList.remove("hide");
-		var img = new Image();
-		img.addEventListener("load", function() {
-			this._spinner.classList.add("hide");
-			this._img = img;
-			this._imgWidth = img.width;
-			this._imgHeight = img.height;
-			this._zoom = this._opts.zoom;
-			this.trigger("zoom", this._zoom);
-			this._postZoom();
-			this._setCenter();
-			this._alignImgToCanvas();
-			this._drawEntityPreview();
-			this._redraw();
-			promise.resolve();
+		return new $promise(function(resolve, reject) {
+			this._setWhiteCanvas();
+			this._spinner.classList.remove("hide");
+			var img = new Image();
+			img.addEventListener("load", function() {
+				this._spinner.classList.add("hide");
+				this._img = img;
+				this._imgWidth = img.width;
+				this._imgHeight = img.height;
+				this._zoom = this._opts.zoom;
+				this.trigger("zoom", this._zoom);
+				this._postZoom();
+				this._setCenter();
+				this._alignImgToCanvas();
+				this._drawEntityPreview();
+				this._redraw();
+				resolve();
+			}.bind(this));
+			img.addEventListener("error", function() {
+				this._spinner.classList.add("hide");
+				this._img = null;
+				this._imgWidth = 0;
+				this._imgHeight = 0;
+				reject();
+			}.bind(this));
+			img.src = url || "";
 		}.bind(this));
-		img.addEventListener("error", function() {
-			this._spinner.classList.add("hide");
-			this._img = null;
-			this._imgWidth = 0;
-			this._imgHeight = 0;
-			promise.reject();
-		}.bind(this));
-		img.src = url || "";
-		return promise;
 	};
 	/**
 	 * Increase zoom by one step, fires signal "zoom".
@@ -5966,18 +5942,18 @@ function(
 				case $anonymizer.ENTITES.CIRCLE.id:
 					output.actions.push({
 						type: entity.id.toLowerCase(),
-						x: Math.round(this._imgWidth * entity.xRatio),
-						y: Math.round(this._imgHeight * entity.yRatio),
+						x: $math.setRange(Math.round(this._imgWidth * entity.xRatio), 0, this._imgWidth),
+						y: $math.setRange(Math.round(this._imgHeight * entity.yRatio), 0, this._imgHeight),
 						r: entity.value
 					});
 					break;
 				case $anonymizer.ENTITES.LINE.id:
 					output.actions.push({
 						type: entity.id.toLowerCase(),
-						x1: Math.round(this._imgWidth * entity.xRatio),
-						y1: Math.round(this._imgHeight * entity.yRatio),
-						x2: Math.round(this._imgWidth * entity.x2Ratio),
-						y2: Math.round(this._imgHeight * entity.y2Ratio),
+						x1: $math.setRange(Math.round(this._imgWidth * entity.xRatio), 0, this._imgWidth),
+						y1: $math.setRange(Math.round(this._imgHeight * entity.yRatio), 0, this._imgHeight),
+						x2: $math.setRange(Math.round(this._imgWidth * entity.x2Ratio), 0, this._imgWidth),
+						y2: $math.setRange(Math.round(this._imgHeight * entity.y2Ratio), 0, this._imgHeight),
 						width: entity.value
 					});
 					break;
@@ -6101,10 +6077,10 @@ function(
  */
 onix.service("$notify", [
 	"$common",
-	"$q",
+	"$promise",
 function(
 	$common,
-	$q
+	$promise
 ) {
 	/**
 	 * Create notification object from the element.
@@ -6198,16 +6174,16 @@ function(
 	 * Default timeout is 1500 ms.
 	 *
 	 * @param {Number} [timeout] Hide timeout in [ms]
-	 * @return {$q}
+	 * @return {$promise}
 	 * @member $notify
 	 */
 	$notify.prototype.hide = function(timeout) {
-		var promise = $q.defer();
-		setTimeout(function() {
-			this.reset();
-			promise.resolve();
-		}.bind(this), timeout || this._HIDE_TIMEOUT);
-		return promise;
+		return new $promise(function(resolve) {
+			setTimeout(function() {
+				this.reset();
+				resolve();
+			}.bind(this), timeout || this._HIDE_TIMEOUT);
+		}.bind(this));
 	};
 	/**
 	 * Main public access to the notify obj.
@@ -6226,13 +6202,11 @@ function(
  * @class $previewImages
  */
 onix.service("$previewImages", [
-	"$q",
 	"$image",
 	"$dom",
 	"$job",
 	"$loader",
 function(
-	$q,
 	$image,
 	$dom,
 	$job,
@@ -6637,19 +6611,22 @@ onix.factory("$slider", [
 	"$dom",
 	"$event",
 	"$common",
+	"$math",
 function(
 	$dom,
 	$event,
-	$common
+	$common,
+	$math
 ) {
 	/**
 	 * Slider - slider with input for selecting numbers from the range.
 	 * 
 	 * @param {HTMLElement} parent Where is canvas appended
 	 * @param {Object} [optsArg] Configuration
-	 * @param {Number} [optsArg.min] Min value
-	 * @param {Number} [optsArg.max] Max value
-	 * @param {Number} [optsArg.timeout] Timeout for signal fire (keydown, move)
+	 * @param {Number} [optsArg.min=0] Min value
+	 * @param {Number} [optsArg.max=100] Max value
+	 * @param {Number} [optsArg.wheelStep=1] Mouse wheel step value
+	 * @param {Number} [optsArg.timeout=333] Timeout for signal fire (keydown, move)
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
@@ -6660,6 +6637,7 @@ function(
 		this._opts = {
 			min: 0,
 			max: 100,
+			wheelStep: 1,
 			timeout: 333
 		};
 		for (var key in optsArg) {
@@ -6672,22 +6650,22 @@ function(
 			id: null,
 			lastValue: null
 		};
-		// is key down?
-		this._isKeydown = false;
 		parent.appendChild(this._root);
 		this._binds = {
 			keyUp: this._keyUp.bind(this),
 			click: this._click.bind(this),
 			mouseDownCaret: this._mouseDownCaret.bind(this),
-			mouseMoveLineHolder: this._mouseMoveLineHolder.bind(this),
-			mouseUpDocument: this._mouseUpDocument.bind(this),
-			sendSignalInner: this._sendSignalInner.bind(this),
-			mouseWheel: this._mouseWheel.bind(this)
+			mouseMove: this._mouseMove.bind(this),
+			mouseWheel: this._mouseWheel.bind(this),
+			mouseUp: this._mouseUp.bind(this),
+			sendSignalInner: this._sendSignalInner.bind(this)
+		};
+		this._mouse = {
+			bcr: null
 		};
 		this._els.input.addEventListener("keyup", this._binds.keyUp);
 		this._els.tube.addEventListener("click", this._binds.click);
 		this._els.caret.addEventListener("mousedown", this._binds.mouseDownCaret);
-		this._els.lineHolder.addEventListener("mousemove", this._binds.mouseMoveLineHolder);
 		// firefox
 		this._els.lineHolder.addEventListener("DOMMouseScroll", this._binds.mouseWheel);
 		// others
@@ -6749,6 +6727,29 @@ function(
 		this._els.caret.style.left = posX.toFixed(2) + "px";
 	};
 	/**
+	 * Get mouse coordinates.
+	 * 
+	 * @param  {Event} e
+	 * @return {Object}
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._getMouseXY = function(e) {
+		return {
+			x: e.clientX - this._mouse.bcr.left,
+			y: e.clientY - this._mouse.bcr.top
+		}
+	};
+	/**
+	 * Set mouse bounding client rect from canvas el.
+	 * 
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._setBCR = function() {
+		this._mouse.bcr = this._els.lineHolder.getBoundingClientRect();
+	};
+	/**
 	 * Key up event from the input.
 	 *
 	 * @member $slider
@@ -6779,8 +6780,9 @@ function(
 	$slider.prototype._click = function(e) {
 		e.stopPropagation();
 		e.preventDefault();
+		this._setBCR();
 		var width = this._els.lineHolder.offsetWidth;
-		var value = e.offsetX;
+		var value = this._getMouseXY(e).x;
 		var ratio = value / width;
 		// increate click range
 		if (ratio <= 0.05) {
@@ -6789,7 +6791,6 @@ function(
 		else if (ratio >= 0.95) {
 			value = width;
 		}
-		this._isKeydown = false;
 		this._setCaret(value);
 		this._setValue(value, true);
 	};
@@ -6803,18 +6804,9 @@ function(
 	$slider.prototype._mouseDownCaret = function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		this._isKeydown = true;
-		document.addEventListener("mouseup", this._binds.mouseUpDocument);
-	};
-	/**
-	 * Mouse up event over the document.
-	 * 
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._mouseUpDocument = function() {
-		this._isKeydown = false;
-		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
+		this._setBCR();
+		document.addEventListener("mousemove", this._binds.mouseMove);
+		document.addEventListener("mouseup", this._binds.mouseUp);
 	};
 	/**
 	 * Mouse move event over line holder - only if was clicked on the caret.
@@ -6823,15 +6815,42 @@ function(
 	 * @member $slider
 	 * @private
 	 */
-	$slider.prototype._mouseMoveLineHolder = function(e) {
-		if (!this._isKeydown) return;
-		var posX = e.offsetX;
+	$slider.prototype._mouseMove = function(e) {
 		var caretEl = this._els.caret;
-		if (e.target == caretEl) {
-			posX += parseFloat(caretEl.style.left) - caretEl.offsetWidth / 2;
-		}
+		var posX = this._getMouseXY(e).x;
 		this._setCaret(posX);
 		this._setValue(posX);
+	};
+	/**
+	 * Mouse up event over the document.
+	 * 
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._mouseUp = function() {
+		document.removeEventListener("mousemove", this._binds.mouseMove);
+		document.removeEventListener("mouseup", this._binds.mouseUp);
+	};
+	/**
+	 * Mouse wheel event.
+	 *
+	 * @param {Event} e Mouse event
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._mouseWheel = function(e) {
+		var delta = e.wheelDelta || -e.detail;
+		if (!delta) { return; }
+		e.stopPropagation();
+		e.preventDefault();
+		if (delta > 0) {
+			this.setValue(this._value + this._opts.wheelStep);
+			this._sendSignal();
+		}
+		else {
+			this.setValue(this._value - this._opts.wheelStep);
+			this._sendSignal();
+		}
 	};
 	/**
 	 * Get value -> position convert.
@@ -6891,27 +6910,6 @@ function(
 		}
 	};
 	/**
-	 * Mouse wheel event.
-	 *
-	 * @param {Event} e Mouse event
-	 * @private
-	 * @member $slider
-	 */
-	$slider.prototype._mouseWheel = function(e) {
-		var delta = e.wheelDelta || -e.detail;
-		if (!delta) { return; }
-		e.stopPropagation();
-		e.preventDefault();
-		if (delta > 0) {
-			this.setValue(this._value + 1);
-			this._sendSignal();
-		}
-		else {
-			this.setValue(this._value - 1);
-			this._sendSignal();
-		}
-	};
-	/**
 	 * Delayed sending of signal - inner method.
 	 *
 	 * @member $slider
@@ -6930,7 +6928,8 @@ function(
 	 * @member $slider
 	 */
 	$slider.prototype.setValue = function(value) {
-		if (typeof value === "number" && value >= this._opts.min && value <= this._opts.max) {
+		if (typeof value === "number") {
+			value = $math.setRange(value, this._opts.min, this._opts.max);
 			this._value = value;
 			this._els.input.value = value;
 			this._setCaret(this._getPosFromValue(value));

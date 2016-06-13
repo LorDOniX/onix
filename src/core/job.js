@@ -1,7 +1,7 @@
 onix.factory("$job", [
-	"$q",
+	"$promise",
 function(
-	$q
+	$promise
 ) {
 	/**
 	 * Factory for manage multiple tasks.
@@ -9,7 +9,7 @@ function(
  	 * @class $job
  	 */
 	var $job = function() {
-		this._donePromise = $q.defer();
+		this._isRunning = false;
 		this._tasks = [];
 		this._taskDone = {
 			cb: null,
@@ -42,17 +42,24 @@ function(
 	/**
 	 * Start job.
 	 *
+	 * @return {$promise} Returns promise for whole job
 	 * @member $job
 	 */
 	$job.prototype.start = function() {
-		if (!this._tasks.length) return;
+		return new $promise(function(resolve, reject) {
+			if (this._isRunning || !this._tasks.length) {
+				reject();
+				return;
+			}
 
-		// because of pop
-		this._tasks.reverse();
+			// job is running
+			this._isRunning = true;
 
-		this._doJob();
+			// because of pop
+			this._tasks.reverse();
 
-		return this._donePromise;
+			this._doJob(resolve);
+		}.bind(this));
 	};
 
 	/**
@@ -79,13 +86,16 @@ function(
 	/**
 	 * Internal function for running job queue.
 	 *
+	 * @param {Function} resolve Promise object
 	 * @member $job
 	 */
-	$job.prototype._doJob = function() {
+	$job.prototype._doJob = function(resolve) {
 		var rest = this._tasks.length;
 
 		if (rest == 0) {
-			this._donePromise.resolve();
+			this._isRunning = false;
+			
+			resolve();
 		}
 		else {
 			var job = this._tasks.pop();
@@ -97,7 +107,7 @@ function(
 					this._taskDone.cb.apply(this._taskDone.scope || this._taskDone.cb, doneFnArgs);
 				}
 
-				this._doJob();
+				this._doJob(resolve);
 			}.bind(this);
 
 			job.task.apply(job.scope || job.task, job.args.concat(doneFn));
@@ -125,7 +135,7 @@ function(
 		 * @param  {Object} taskDoneObj Callback after one task have been done
 		 * @param  {Object} taskDoneObj.cb Function
 		 * @param  {Object} [taskDoneObj.scope] Function scope
-		 * @return {$q} Callback after all jobs are done
+		 * @return {$promise} Callback after all jobs are done
 		 * @member $job
 		 */
 		multipleJobs: function(jobsArray, count, taskDoneObj) {
@@ -154,7 +164,7 @@ function(
 				jobPromises.push(job.start());
 			});
 
-			return $q.all(jobPromises);
+			return $promise.all(jobPromises);
 		}
 	};
 }]);

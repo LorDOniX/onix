@@ -21,9 +21,9 @@
  * @class $image
  */
 onix.service(&quot;$image&quot;, [
-	&quot;$q&quot;,
+	&quot;$promise&quot;,
 function(
-	$q
+	$promise
 ) {
 <span id='$image-property-_hasFileReader'>	/**
 </span>	 * FileReader is available.
@@ -48,58 +48,56 @@ function(
 	 *
 	 * @param  {Object} file Input file
 	 * @param  {Number} [maxSize] If image width/height is higher than this value, image will be scaled to this dimension
-	 * @return {$q} Promise with output object
+	 * @return {$promise} Promise with output object
 	 * @member $image
 	 */
 	this.readFromFile = function(file, maxSize) {
-		var promise = $q.defer();
-
-		if (!this._hasFileReader) {
-			promise.reject();
-			return promise;
-		}
-
-		var reader = new FileReader();
-		var output = {
-			img: null,
-			exif: null,
-			canvas: null
-		};
-
-		reader.onload = function(e) {
-			var binaryData = reader.result;
-			var binaryDataArray = new Uint8Array(binaryData);
-			var exif = null;
-
-			// exif only for jpeg
-			if (file.type != &quot;png&quot;) {
-				exif = this.getEXIF(binaryData);
+		return new $promise(function(resolve, reject) {
+			if (!this._hasFileReader) {
+				reject();
+				return;
 			}
 
-			var img = new Image();
+			var reader = new FileReader();
+			var output = {
+				img: null,
+				exif: null,
+				canvas: null
+			};
 
-			img.onload = function() {
-				var imd = this.getImageDim(img, maxSize);
-				var canvas = this.getCanvas(img, {
-					width: imd.width,
-					height: imd.height,
-					orientation: exif ? exif.Orientation : 0,
-					scaled: imd.scale != 1
-				});
+			reader.onload = function(e) {
+				var binaryData = reader.result;
+				var binaryDataArray = new Uint8Array(binaryData);
+				var exif = null;
 
-				output.img = img;
-				output.exif = exif;
-				output.canvas = canvas;
+				// exif only for jpeg
+				if (file.type != &quot;png&quot;) {
+					exif = this.getEXIF(binaryData);
+				}
 
-				promise.resolve(output);
+				var img = new Image();
+
+				img.onload = function() {
+					var imd = this.getImageDim(img, maxSize);
+					var canvas = this.getCanvas(img, {
+						width: imd.width,
+						height: imd.height,
+						orientation: exif ? exif.Orientation : 0,
+						scaled: imd.scale != 1
+					});
+
+					output.img = img;
+					output.exif = exif;
+					output.canvas = canvas;
+
+					resolve(output);
+				}.bind(this);
+
+				img.src = this.fileToBase64(file.type, binaryDataArray);
 			}.bind(this);
 
-			img.src = this.fileToBase64(file.type, binaryDataArray);
-		}.bind(this);
-
-		reader.readAsArrayBuffer(file);
-
-		return promise;
+			reader.readAsArrayBuffer(file);
+		}.bind(this));
 	};
 
 <span id='$image-method-getImageDim'>	/**

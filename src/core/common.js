@@ -4,9 +4,9 @@
  * @class $common
  */
 onix.service("$common", [
-	"$q",
+	"$promise",
 function(
-	$q
+	$promise
 ) {
 	/**
 	 * Object copy, from source to dest.
@@ -25,23 +25,81 @@ function(
 	};
 
 	/**
+	 * Inner method for chaining promises.
+	 * 
+	 * @param  {Object[]} opts
+	 * @param  {String|Function} opts.method Function or method name inside scope
+	 * @param  {Object} opts.scope Scope for method function
+	 * @param  {Array} opts.args Additional arguments for function
+	 * @param  {Function} resolve Resolve callback for $promise
+	 * @param  {Array} outArray Array for output from all executed promises
+	 * @private
+	 * @member $common
+	 */
+	this._chainPromisesInner = function(opts, resolve, outArray) {
+		var firstItem = opts.shift();
+
+		if (firstItem) {
+			// string or function itself
+			var fn;
+			var error = false;
+
+			switch (typeof firstItem.method) {
+				case "string":
+					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
+						error = true;
+					}
+					else {
+						fn = firstItem.scope[firstItem.method];
+
+						if (typeof fn !== "function") {
+							error = true;
+						}
+					}
+					break;
+				case "function":
+					fn = firstItem.method;
+					break;
+				default:
+					error = true;
+			}
+
+			if (!error) {
+				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
+					outArray.push(data);
+
+					this._chainPromisesInner(opts, resolve, outArray);
+				}.bind(this), function(err) {
+					outArray.push(err);
+
+					this._chainPromisesInner(opts, resolve, outArray);
+				}.bind(this));
+			}
+			else {
+				resolve(outArray);
+			}
+		}
+		else {
+			resolve(outArray);
+		}
+	};
+
+	/**
 	 * Confirm window, returns promise.
 	 *
 	 * @param  {String} txt
-	 * @return {$q}
+	 * @return {$promise}
 	 * @member $common
 	 */
 	this.confirm = function(txt) {
-		var promise = $q.defer();
-
-		if (confirm(txt)) {
-			promise.resolve();
-		}
-		else {
-			promise.reject();
-		}
-
-		return promise;
+		return new $promise(function(resolve, reject) {
+			if (confirm(txt)) {
+				resolve();
+			}
+			else {
+				reject();
+			}
+		});
 	};
 
 	/**
@@ -349,5 +407,21 @@ function(
 		var value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
 
 		return value + " " + sizes[lv] + "B";
+	};
+
+	/**
+	 * Chaining multiple methods with promises, returns promise.
+	 * 
+	 * @param  {Object[]} opts
+	 * @param  {String|Function} opts.method Function or method name inside scope
+	 * @param  {Object} opts.scope Scope for method function
+	 * @param  {Array} opts.args Additional arguments for function
+	 * @return {$promise}
+	 * @member $common
+	 */
+	this.chainPromises = function(opts) {
+		return new $promise(function(resolve) {
+			this._chainPromisesInner(opts, resolve, []);
+		}.bind(this));
 	};
 }]);

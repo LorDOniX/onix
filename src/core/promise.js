@@ -23,15 +23,20 @@ onix.factory("$promise", function() {
 		// all funcs
 		this._funcs = [];
 
-		// done data
-		this._finishData = null;
+		// fulfill data
+		this._fulfillData = null;
 
 		// call promise cb function
 		if (cbFn && typeof cbFn === "function") {
-			cbFn.apply(cbFn, [
-				this._resolve.bind(this),
-				this._reject.bind(this)
-			]);
+			try {
+				cbFn.apply(cbFn, [
+					this._resolve.bind(this),
+					this._reject.bind(this)
+				]);
+			}
+			catch (err) {
+				console.error("$promise exception " + err);
+			}
 		}
 	};
 
@@ -43,7 +48,8 @@ onix.factory("$promise", function() {
 	 * @member $promise
 	 */
 	$promise.prototype._resolve = function(obj) {
-		this._finishData = obj;
+		this._fulfillData = obj;
+
 		this._resolveFuncs(false);
 	};
 
@@ -55,27 +61,29 @@ onix.factory("$promise", function() {
 	 * @member $promise
 	 */
 	$promise.prototype._reject = function(obj) {
-		this._finishData = obj;
+		this._fulfillData = obj;
+
 		this._resolveFuncs(true);
 	};
 
 	/**
 	 * Resolve all functions.
 	 *
-	 * @param  {Boolean} isError
+	 * @param  {Boolean} isCatch
 	 * @member $promise
 	 * @private
 	 */
-	$promise.prototype._resolveFuncs = function(isError) {
+	$promise.prototype._resolveFuncs = function(isCatch) {
 		this._funcs.forEach(function(fnItem) {
-			if (fnItem["finally"] || (fnItem.isError && isError) || (!fnItem.isError && !isError)) {
-				(fnItem.fn)(this._finishData);
+			if ((fnItem.isCatch && isCatch) || (!fnItem.isCatch && !isCatch)) {
+				(fnItem.fn)(this._fulfillData);
 			}
 		}, this);
 		
 		// clear array
 		this._funcs.length = 0;
-		this._state = isError ? this._STATES.REJECTED : this._STATES.RESOLVED;
+
+		this._state = isCatch ? this._STATES.REJECTED : this._STATES.RESOLVED;
 	};
 
 	/**
@@ -95,22 +103,22 @@ onix.factory("$promise", function() {
 	 * After promise resolve/reject call then (okFn, errorFn).
 	 *
 	 * @chainable
-	 * @param {Function} [cbOk]
-	 * @param {Function} [cbError]
+	 * @param {Function} [resolveCb] Resolve function
+	 * @param {Function} [rejectCb] Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.then = function(cbOk, cbError) {
-		if (cbOk && typeof cbOk === "function") {
+	$promise.prototype.then = function(resolveCb, rejectCb) {
+		if (resolveCb && typeof resolveCb === "function") {
 			this._funcs.push({
-				fn: cbOk,
-				isError: false
+				fn: resolveCb,
+				isCatch: false
 			});
 		}
 
-		if (cbError && typeof cbError === "function") {
+		if (rejectCb && typeof rejectCb === "function") {
 			this._funcs.push({
-				fn: cbError,
-				isError: true
+				fn: rejectCb,
+				isCatch: true
 			});
 		}
 
@@ -120,16 +128,16 @@ onix.factory("$promise", function() {
 	};
 
 	/**
-	 * After promise resolve call then cbOk.
+	 * After promise reject call then rejectCb.
 	 *
 	 * @chainable
-	 * @param  {Function} cbOk
+	 * @param  {Function} rejectCb Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.done = function(cbOk) {
+	$promise.prototype.catch = function(rejectCb) {
 		this._funcs.push({
-			fn: cbOk,
-			isError: false
+			fn: rejectCb,
+			isCatch: true
 		});
 
 		this._isAlreadyFinished();
@@ -138,65 +146,34 @@ onix.factory("$promise", function() {
 	};
 
 	/**
-	 * After promise reject call then cbError.
-	 *
-	 * @chainable
-	 * @param  {Function} cbError
-	 * @member $promise
-	 */
-	$promise.prototype.error = function(cbError) {
-		this._funcs.push({
-			fn: cbError,
-			isError: true
-		});
-
-		this._isAlreadyFinished();
-
-		return this;
-	};
-
-	/**
-	 * Finally for promise.
-	 *
-	 * @method finally
-	 * @chainable
-	 * @param  {Function} cb
-	 * @member $promise
-	 */
-	$promise.prototype["finally"] = function(cb) {
-		this._funcs.push({
-			fn: cb,
-			"finally": true
-		});
-
-		this._isAlreadyFinished();
-
-		return this;
-	};
-
-	// static methods
-
-	/**
-	 * Resolve all promises in the array.
-	 *
+	 * Resolve multiple promises.
+	 * 
 	 * @param {$promise[]} promises
-	 * @return {$promise}
+	 * @param  {Boolean} isRace Is race?
+	 * @return {Boolean}
 	 * @member $promise
+	 * @private
+	 * @static
 	 */
-	$promise.all = function(promises) {
+	$promise._multiplePromises = function(promises, isRace) {
 		return new $promise(function(resolve) {
-			if (Array.isArray(promises)) {
-				var count = promises.length;
-				var test = function() {
+			if (Array.isArray(promises) && promises.length) {
+				var count = isRace ? 1 : promises.length;
+
+				var test = function(data) {
 					count--;
 
 					if (count == 0) {
-						resolve();
+						resolve(isRace ? data : null);
 					}
 				};
 
 				promises.forEach(function(item) {
-					item["finally"](test);
+					item.then(function(data) {
+						test(data);
+					}, function(data) {
+						test(data);
+					});
 				});
 			}
 			else {
@@ -206,11 +183,36 @@ onix.factory("$promise", function() {
 	};
 
 	/**
+	 * Resolve all promises in the array.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise}
+	 * @member $promise
+	 * @static
+	 */
+	$promise.all = function(promises) {
+		return $promise._multiplePromises(promises);
+	};
+
+	/**
+	 * Race all promises in the array - first one resolves promise.
+	 *
+	 * @param {$promise[]} promises
+	 * @return {$promise} With the value from the first resolved promise.
+	 * @member $promise
+	 * @static
+	 */
+	$promise.race = function(promises) {
+		return $promise._multiplePromises(promises, true);
+	};
+
+	/**
 	 * Resolve promise with variable object.
 	 *
 	 * @param {Object} [obj] Resolved object
 	 * @return {$promise}
 	 * @member $promise
+	 * @static
 	 */
 	$promise.resolve = function(obj) {
 		return new $promise(function(resolve) {
@@ -224,6 +226,7 @@ onix.factory("$promise", function() {
 	 * @param {Object} [obj] Rejected object
 	 * @return {$promise}
 	 * @member $promise
+	 * @static
 	 */
 	$promise.reject = function(obj) {
 		return new $promise(function(resolve, reject) {

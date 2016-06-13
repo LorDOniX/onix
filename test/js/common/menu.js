@@ -21,6 +21,10 @@ function(
 		CROPPER: {
 			name: "Crop",
 			url: "/crop"
+		},
+		TEST: {
+			name: "Test",
+			url: "/test"
 		}
 	};
 
@@ -28,7 +32,14 @@ function(
 		var pagesLi = [];
 
 		// pages order
-		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER].forEach(function(page, ind) {
+		[
+			this.PAGES.HOME,
+			this.PAGES.MINIMAL,
+			this.PAGES.ANONYMIZER,
+			this.PAGES.CROPPER,
+			this.PAGES.TEST
+		]
+		.forEach(function(page, ind) {
 			var pageObj = {
 				el: "li",
 				child: [{

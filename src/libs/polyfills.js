@@ -259,3 +259,10 @@ if (!("classList" in document.documentElement) && window.Element) {
 		});
 	})();
 }
+
+if (!Date.now) {
+	/**
+	 * aktuální timestamp dle ES5 - http://dailyjs.com/2010/01/07/ecmascript5-date/
+	 */
+	Date.now = function() { return +(new Date); }
+}

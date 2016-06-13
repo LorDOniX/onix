@@ -4,10 +4,10 @@
  * @class $http
  */
 onix.service("$http", [
-	"$q",
+	"$promise",
 	"$common",
 function(
-	$q,
+	$promise,
 	$common
 ) {
 	/**
@@ -103,84 +103,90 @@ function(
 	 * @param  {Array} [config.getData] Data, which will be send in the url (GET)
 	 * @param  {Object|FormData} [config.postData] Post data
 	 * @param  {Object} [config.headers] Additional headers
-	 * @return {$q}
+	 * @return {$promise}
 	 * @member $http
 	 */
 	this.createRequest = function(config) {
-		var promise = $q.defer();
-		var request = new XMLHttpRequest();
+		return new $promise(function(resolve, reject) {
+			var request = new XMLHttpRequest();
 
-		config = config || {};
+			config = config || {};
 
-		var method = config.method || this.METHOD.GET;
-		var url = config.url || "";
+			var method = config.method || this.METHOD.GET;
+			var url = config.url || "";
 
-		if (!url) {
-			promise.reject();
-			return promise;
-		}
+			if (!url) {
+				reject();
+				return;
+			}
 
-		url = this._updateURL(url, config.getData);
+			url = this._updateURL(url, config.getData);
 
-		request.onerror = function () { promise.reject(); };
-		request.open(method, url, true);
-		request.onreadystatechange = function() {
-			if (request.readyState == 4) {
-				var responseData = request.responseText || "";
-				var responseType = request.getResponseHeader("Content-Type");
-				var promiseData = null;
+			request.onerror = function () { reject(); };
+			request.open(method, url, true);
+			request.onreadystatechange = function() {
+				if (request.readyState == 4) {
+					var responseData = request.responseText || "";
+					var responseType = request.getResponseHeader("Content-Type");
+					var promiseData = null;
 
-				if (responseType == "application/json") {
-					promiseData = responseData.length ? JSON.parse(responseData) : {};
+					if (responseType == "application/json") {
+						promiseData = responseData.length ? JSON.parse(responseData) : {};
+					}
+					else {
+						promiseData = responseData;
+					}
+					
+					var promiseObj = {
+						status: request.status,
+						data: promiseData,
+						url: url,
+						method: method
+					};
+
+					// 200 ok
+					// 201 created
+					// 204 succesfully deleted
+					// 403 unautorized
+					if (request.status >= 200 && request.status < 300) {
+						resolve(promiseObj);
+					}
+					else {
+						reject(promiseObj);
+					}
+				}
+			};
+
+			try {
+				// add headers
+				var headers = config.headers;
+				
+				if ($common.isObject(headers)) {
+					Object.keys(headers).forEach(function(headerName) {
+						request.setRequestHeader(headerName, headers[headerName]);
+					});
+				}
+
+				if (method == this.METHOD.GET) {
+					request.setRequestHeader('Accept', 'application/json');
+				}
+
+				var type = config.postType || this.POST_TYPES.JSON;
+
+				if (config.postData && type == this.POST_TYPES.JSON) {
+					request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+					request.send(JSON.stringify(config.postData));
+				}
+				else if (config.postData && type == this.POST_TYPES.FORM_DATA) {
+					request.send(this._preparePostData(config.postData));
 				}
 				else {
-					promiseData = responseData;
+					request.send();
 				}
-
-				// 200 ok
-				// 201 created
-				// 204 succesfully deleted
-				// 403 unautorized
-				promise[request.status >= 200 && request.status < 300 ? "resolve" : "reject"]({
-					status: request.status,
-					data: promiseData,
-					url: url,
-					method: method
-				});
 			}
-		};
-
-		try {
-			// add headers
-			var headers = config.headers;
-			
-			if ($common.isObject(headers)) {
-				Object.keys(headers).forEach(function(headerName) {
-					request.setRequestHeader(headerName, headers[headerName]);
-				});
+			catch (err) {
+				reject();
 			}
-
-			if (method == this.METHOD.GET) {
-				request.setRequestHeader('Accept', 'application/json');
-			}
-
-			var type = config.postType || this.POST_TYPES.JSON;
-
-			if (config.postData && type == this.POST_TYPES.JSON) {
-				request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-				request.send(JSON.stringify(config.postData));
-			}
-			else if (config.postData && type == this.POST_TYPES.FORM_DATA) {
-				request.send(this._preparePostData(config.postData));
-			}
-			else {
-				request.send();
-			}
-		}
-		catch (err) {
-			promise.reject();
-		}
-
-		return promise;
+		}.bind(this));
 	};
 }]);

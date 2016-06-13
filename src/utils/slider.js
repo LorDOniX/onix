@@ -2,19 +2,22 @@ onix.factory("$slider", [
 	"$dom",
 	"$event",
 	"$common",
+	"$math",
 function(
 	$dom,
 	$event,
-	$common
+	$common,
+	$math
 ) {
 	/**
 	 * Slider - slider with input for selecting numbers from the range.
 	 * 
 	 * @param {HTMLElement} parent Where is canvas appended
 	 * @param {Object} [optsArg] Configuration
-	 * @param {Number} [optsArg.min] Min value
-	 * @param {Number} [optsArg.max] Max value
-	 * @param {Number} [optsArg.timeout] Timeout for signal fire (keydown, move)
+	 * @param {Number} [optsArg.min=0] Min value
+	 * @param {Number} [optsArg.max=100] Max value
+	 * @param {Number} [optsArg.wheelStep=1] Mouse wheel step value
+	 * @param {Number} [optsArg.timeout=333] Timeout for signal fire (keydown, move)
 	 * @class $slider
 	 */
 	var $slider = function(parent, optsArg) {
@@ -27,6 +30,7 @@ function(
 		this._opts = {
 			min: 0,
 			max: 100,
+			wheelStep: 1,
 			timeout: 333
 		};
 
@@ -43,25 +47,25 @@ function(
 			lastValue: null
 		};
 
-		// is key down?
-		this._isKeydown = false;
-
 		parent.appendChild(this._root);
 
 		this._binds = {
 			keyUp: this._keyUp.bind(this),
 			click: this._click.bind(this),
 			mouseDownCaret: this._mouseDownCaret.bind(this),
-			mouseMoveLineHolder: this._mouseMoveLineHolder.bind(this),
-			mouseUpDocument: this._mouseUpDocument.bind(this),
-			sendSignalInner: this._sendSignalInner.bind(this),
-			mouseWheel: this._mouseWheel.bind(this)
+			mouseMove: this._mouseMove.bind(this),
+			mouseWheel: this._mouseWheel.bind(this),
+			mouseUp: this._mouseUp.bind(this),
+			sendSignalInner: this._sendSignalInner.bind(this)
+		};
+
+		this._mouse = {
+			bcr: null
 		};
 
 		this._els.input.addEventListener("keyup", this._binds.keyUp);
 		this._els.tube.addEventListener("click", this._binds.click);
 		this._els.caret.addEventListener("mousedown", this._binds.mouseDownCaret);
-		this._els.lineHolder.addEventListener("mousemove", this._binds.mouseMoveLineHolder);
 		// firefox
 		this._els.lineHolder.addEventListener("DOMMouseScroll", this._binds.mouseWheel);
 		// others
@@ -131,6 +135,31 @@ function(
 	};
 
 	/**
+	 * Get mouse coordinates.
+	 * 
+	 * @param  {Event} e
+	 * @return {Object}
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._getMouseXY = function(e) {
+		return {
+			x: e.clientX - this._mouse.bcr.left,
+			y: e.clientY - this._mouse.bcr.top
+		}
+	};
+
+	/**
+	 * Set mouse bounding client rect from canvas el.
+	 * 
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._setBCR = function() {
+		this._mouse.bcr = this._els.lineHolder.getBoundingClientRect();
+	};
+
+	/**
 	 * Key up event from the input.
 	 *
 	 * @member $slider
@@ -165,8 +194,10 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
+		this._setBCR();
+
 		var width = this._els.lineHolder.offsetWidth;
-		var value = e.offsetX;
+		var value = this._getMouseXY(e).x;
 		var ratio = value / width;
 
 		// increate click range
@@ -177,7 +208,6 @@ function(
 			value = width;
 		}
 
-		this._isKeydown = false;
 		this._setCaret(value);
 		this._setValue(value, true);
 	};
@@ -193,21 +223,10 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
-		this._isKeydown = true;
+		this._setBCR();
 
-		document.addEventListener("mouseup", this._binds.mouseUpDocument);
-	};
-
-	/**
-	 * Mouse up event over the document.
-	 * 
-	 * @member $slider
-	 * @private
-	 */
-	$slider.prototype._mouseUpDocument = function() {
-		this._isKeydown = false;
-
-		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
+		document.addEventListener("mousemove", this._binds.mouseMove);
+		document.addEventListener("mouseup", this._binds.mouseUp);
 	};
 
 	/**
@@ -217,18 +236,47 @@ function(
 	 * @member $slider
 	 * @private
 	 */
-	$slider.prototype._mouseMoveLineHolder = function(e) {
-		if (!this._isKeydown) return;
-
-		var posX = e.offsetX;
+	$slider.prototype._mouseMove = function(e) {
 		var caretEl = this._els.caret;
-
-		if (e.target == caretEl) {
-			posX += parseFloat(caretEl.style.left) - caretEl.offsetWidth / 2;
-		}
+		var posX = this._getMouseXY(e).x;
 
 		this._setCaret(posX);
 		this._setValue(posX);
+	};
+
+	/**
+	 * Mouse up event over the document.
+	 * 
+	 * @member $slider
+	 * @private
+	 */
+	$slider.prototype._mouseUp = function() {
+		document.removeEventListener("mousemove", this._binds.mouseMove);
+		document.removeEventListener("mouseup", this._binds.mouseUp);
+	};
+
+	/**
+	 * Mouse wheel event.
+	 *
+	 * @param {Event} e Mouse event
+	 * @private
+	 * @member $slider
+	 */
+	$slider.prototype._mouseWheel = function(e) {
+		var delta = e.wheelDelta || -e.detail;
+		if (!delta) { return; }
+
+		e.stopPropagation();
+		e.preventDefault();
+
+		if (delta > 0) {
+			this.setValue(this._value + this._opts.wheelStep);
+			this._sendSignal();
+		}
+		else {
+			this.setValue(this._value - this._opts.wheelStep);
+			this._sendSignal();
+		}
 	};
 
 	/**
@@ -300,30 +348,6 @@ function(
 	};
 
 	/**
-	 * Mouse wheel event.
-	 *
-	 * @param {Event} e Mouse event
-	 * @private
-	 * @member $slider
-	 */
-	$slider.prototype._mouseWheel = function(e) {
-		var delta = e.wheelDelta || -e.detail;
-		if (!delta) { return; }
-
-		e.stopPropagation();
-		e.preventDefault();
-
-		if (delta > 0) {
-			this.setValue(this._value + 1);
-			this._sendSignal();
-		}
-		else {
-			this.setValue(this._value - 1);
-			this._sendSignal();
-		}
-	};
-
-	/**
 	 * Delayed sending of signal - inner method.
 	 *
 	 * @member $slider
@@ -344,7 +368,8 @@ function(
 	 * @member $slider
 	 */
 	$slider.prototype.setValue = function(value) {
-		if (typeof value === "number" && value >= this._opts.min && value <= this._opts.max) {
+		if (typeof value === "number") {
+			value = $math.setRange(value, this._opts.min, this._opts.max);
 			this._value = value;
 			this._els.input.value = value;
 			this._setCaret(this._getPosFromValue(value));

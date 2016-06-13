@@ -5,10 +5,10 @@
  */
 onix.service("$notify", [
 	"$common",
-	"$q",
+	"$promise",
 function(
 	$common,
-	$q
+	$promise
 ) {
 	/**
 	 * Create notification object from the element.
@@ -121,19 +121,17 @@ function(
 	 * Default timeout is 1500 ms.
 	 *
 	 * @param {Number} [timeout] Hide timeout in [ms]
-	 * @return {$q}
+	 * @return {$promise}
 	 * @member $notify
 	 */
 	$notify.prototype.hide = function(timeout) {
-		var promise = $q.defer();
-
-		setTimeout(function() {
-			this.reset();
-			
-			promise.resolve();
-		}.bind(this), timeout || this._HIDE_TIMEOUT);
-
-		return promise;
+		return new $promise(function(resolve) {
+			setTimeout(function() {
+				this.reset();
+				
+				resolve();
+			}.bind(this), timeout || this._HIDE_TIMEOUT);
+		}.bind(this));
 	};
 
 	/**

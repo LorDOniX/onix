@@ -46,8 +46,8 @@
 	 *
 	 * @class $template
 	 */
-	this.$get = [&quot;$common&quot;, &quot;$q&quot;, &quot;$http&quot;, &quot;$filter&quot;, function(
-				$common, $q, $http, $filter) {
+	this.$get = [&quot;$common&quot;, &quot;$promise&quot;, &quot;$http&quot;, &quot;$filter&quot;, function(
+				$common, $promise, $http, $filter) {
 
 		var $template = {
 <span id='$template-property-_cache'>			/**
@@ -84,6 +84,8 @@
 			_CONST: {
 				FILTER_DELIMETER: &quot;|&quot;,
 				FILTER_PARAM_DELIMETER: &quot;:&quot;,
+				EL_PREFIX: &quot;data-&quot;,
+				DATA_BIND: &quot;data-bind&quot;,
 				TEMPLATE_SCRIPT_SELECTOR: &quot;script[type=&#39;text/template&#39;]&quot;
 			},
 
@@ -170,18 +172,20 @@
 </span>			 * Bind one single event to the element.
 			 * 
 			 * @param  {HTMLElement} el
-			 * @param  {String} eventName click, keydown...
-			 * @param  {String} data data-x value
+			 * @param  {Object} attr { name, value }
 			 * @param  {Function} scope
 			 * @member $template
 			 * @private
 			 */
-			_bindEvent: function(el, eventName, data, scope) {
-				if (data &amp;&amp; this._parseFnName(data) in scope) {
+			_bindEvent: function(el, attr, scope) {
+				if (!el || !attr || !scope) return;
+
+				var eventName = attr.name.replace(this._CONST.EL_PREFIX, &quot;&quot;);
+				var fnName = this._parseFnName(attr.value);
+
+				if (eventName &amp;&amp; fnName in scope) {
 					el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
-						var value = this.getAttribute(&quot;data-&quot; + eventName);
-						var fnName = templScope._parseFnName(value);
-						var args = templScope._parseArgs(value, {
+						var args = templScope._parseArgs(attr.value, {
 							el: this,
 							event: event
 						});
@@ -189,6 +193,33 @@
 						scope[fnName].apply(scope, args);
 					}, this));
 				}
+			},
+
+<span id='$template-method-_getAttributes'>			/**
+</span>			 * Get element prefixed attributes.
+			 * 
+			 * @param  {HTMLElement} el
+			 * @return {Array}
+			 * @member $template
+			 * @private
+			 */
+			_getAttributes: function(el) {
+				var output = [];
+
+				if (el &amp;&amp; &quot;attributes&quot; in el) {
+					Object.keys(el.attributes).forEach(function(attr) {
+						var item = el.attributes[attr];
+
+						if (item.name.indexOf(this._CONST.EL_PREFIX) != -1) {
+							output.push({
+								name: item.name,
+								value: item.value
+							});
+						}
+					}, this);
+				}
+
+				return output;
 			},
 
 <span id='$template-method-_init'>			/**
@@ -306,7 +337,7 @@
 			},
 
 <span id='$template-method-bindTemplate'>			/**
-</span>			 * Bind all elements in the root element. Selectors all data-[click|change|bind|keydown] and functions are binds against scope object.
+</span>			 * Bind all elements in the root element. Selectors all data-* and functions are binds against scope object.
 			 * For data-bind, scope has to have &quot;addEls&quot; function.
 			 * Supports: click, change, keydown, bind.
 			 *
@@ -316,21 +347,22 @@
 			 * @member $template
 			 */
 			bindTemplate: function(root, scope, addElsCb) {
-				var allElements = onix.element(&quot;*[data-click], *[data-change], *[data-bind], *[data-keydown]&quot;, root);
+				var allElements = onix.element(&quot;*&quot;, root);
 
 				if (allElements.len()) {
 					var newEls = {};
 
 					allElements.forEach(function(item) {
-						this._bindEvent(item, &quot;click&quot;, item.getAttribute(&quot;data-click&quot;), scope);
-						this._bindEvent(item, &quot;change&quot;, item.getAttribute(&quot;data-change&quot;), scope);
-						this._bindEvent(item, &quot;keydown&quot;, item.getAttribute(&quot;data-keydown&quot;), scope);
+						var attrs = this._getAttributes(item);
 
-						var dataBind = item.getAttribute(&quot;data-bind&quot;);
-
-						if (dataBind) {
-							newEls[dataBind] = item;
-						}
+						attrs.forEach(function(attr) {
+							if (attr.name == this._CONST.DATA_BIND) {
+								newEls[attr.value] = item;
+							}
+							else {
+								this._bindEvent(item, attr, scope);
+							}
+						}, this);
 					}, this);
 
 					if (addElsCb &amp;&amp; typeof addElsCb === &quot;function&quot;) {
@@ -344,23 +376,21 @@
 			 *
 			 * @param  {String} key
 			 * @param  {String} path
-			 * @return {$q}
+			 * @return {$promise}
 			 * @member $template
 			 */
 			load: function(key, path) {
-				var promise = $q.defer();
+				return new $promise(function(resolve, reject) {
+					$http.createRequest({
+						url: path
+					}).then(function(data) {
+						this.add(key, data.data);
 
-				$http.createRequest({
-					url: path
-				}).then(function(data) {
-					this.add(key, data.data);
-
-					promise.resolve();
-				}.bind(this), function(data) {
-					promise.reject();
-				});
-
-				return promise;
+						resolve();
+					}.bind(this), function(data) {
+						reject(data);
+					});
+				}.bind(this));
 			}
 		};
 

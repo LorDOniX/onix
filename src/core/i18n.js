@@ -228,8 +228,8 @@ onix.provider("$i18n", function() {
 	 * 
 	 * @class $i18n
 	 */
-	this.$get = ["$http", "$q", function(
-				$http, $q) {
+	this.$get = ["$http", "$promise", function(
+				$http, $promise) {
 		
 		var $i18n = {
 			/**
@@ -290,22 +290,20 @@ onix.provider("$i18n", function() {
 			 *
 			 * @param  {String} lang Language key
 			 * @param  {String} url  Path to the file
-			 * @return {$q}
+			 * @return {$promise}
 			 * @member $i18n
 			 */
 			loadLanguage: function(lang, url) {
-				var promise = $q.defer();
-
-				$http.createRequest({
-					url: url
-				}).then(function(data) {
-					_addLanguage(lang, data.data);
-					promise.resolve();
-				}, function(data) {
-					promise.resolve();
+				return new $promise(function(resolve, reject) {
+					$http.createRequest({
+						url: url
+					}).then(function(data) {
+						_addLanguage(lang, data.data);
+						resolve();
+					}, function(data) {
+						reject(data);
+					});
 				});
-
-				return promise;
 			}
 		};
 

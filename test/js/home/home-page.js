@@ -9,7 +9,6 @@ homeApp.factory("HomePage", [
 	"$math",
 	"$previewImages",
 	"$promise",
-	"$q",
 	"$resize",
 	"$routeParams",
 	"$select",
@@ -30,7 +29,6 @@ function(
 	$math,
 	$previewImages,
 	$promise,
-	$q,
 	$resize,
 	$routeParams,
 	$select,
@@ -90,23 +88,19 @@ function(
 	};
 
 	HomePage.prototype._testPromise1 = function(val) {
-		var promise = $q.defer();
-
-		setTimeout(function() {
-			promise.resolve("test promise 1 - " + val);
-		}, 1000);
-
-		return promise;
+		return new $promise(function(resolve) {
+			setTimeout(function() {
+				resolve("test promise 1 - " + val);
+			}, 1000);
+		});
 	};
 
 	HomePage.prototype._testPromise2 = function(val) {
-		var promise = $q.defer();
-
-		setTimeout(function() {
-			promise.resolve("test promise 2 - " + val);
-		}, 800);
-
-		return promise;
+		return new $promise(function(resolve) {
+			setTimeout(function() {
+				resolve("test promise 2 - " + val);
+			}, 800);
+		});
 	};
 
 	/**
@@ -197,7 +191,7 @@ function(
 		// test for chaining promises
 		console.log("chainPromises start...");
 
-		$q.chainPromises([{
+		$common.chainPromises([{
 			method: "_testPromise1",
 			scope: this,
 			args: [5]
@@ -207,15 +201,13 @@ function(
 			args: [10]
 		}, {
 			method: function() {
-				var promise = $q.defer();
-
-				setTimeout(function() {
-					promise.resolve("test promise 3 - " + $common.formatSize(123456789));
-				}, 1000);
-
-				return promise; 
+				return new $promise(function(resolve) {
+					setTimeout(function() {
+						resolve("test promise 3 - " + $common.formatSize(123456789));
+					}, 1000);
+				});
 			}
-		}]).done(function(output) {
+		}]).then(function(output) {
 			console.log("All done");
 			console.log(output);
 		});
@@ -241,6 +233,23 @@ function(
 
 		$promise.all([promise1, promise2]).then(function() {
 			console.log("$promise all done");
+		});
+
+		var race1 = new $promise(function(resolve) {
+			setTimeout(function() {
+				resolve({ a: 10 });
+			}, 500);
+		});
+
+		var race2 = new $promise(function(resolve) {
+			setTimeout(function() {
+				resolve({ a: 25 });
+			}, 300);
+		});
+
+		$promise.race([race1, race2]).then(function(data) {
+			console.log("$race is done");
+			console.log(data);
 		});
 
 		$promise.reject().then(function() {}, function() {

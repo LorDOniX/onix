@@ -168,7 +168,7 @@ function(
 			});
 
 			if (templateUrl) {
-				$template.load(config.templateId || config.templateUrl, config.templateUrl).done(function() {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).then(function() {
 					if (contr) {
 						this._runController(contr, routeParams);
 					}

@@ -4,7 +4,8 @@ onix.factory("$event", function() {
 	 * 
  	 * @class $event
  	 */
-	var $event = function() {};
+	var $event = function() {
+	};
 
 	/**
 	 * Init event functionality.

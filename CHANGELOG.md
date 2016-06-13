@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.6.0 (13. 6. 2016)
+
+* $template - all events bind
+* $anonymizer - bugfix, document mouse implementation
+* $slider - document mouse implementation, mouse wheel constant
+* $cookie - set, remove methods
+* $date - addDays method
+* $q - deleted
+* $common - chainPromises is moved from $q
+* framework uses $promise instead of $q
+* polyfills Date.now
+* test page
+
 ## 2.5.13 (13. 6. 2016)
 
 * $event allEvents fix

@@ -2,13 +2,13 @@ onix.factory("$anonymizer", [
 	"$math",
 	"$event",
 	"$loader",
-	"$q",
+	"$promise",
 	"$common",
 function(
 	$math,
 	$event,
 	$loader,
-	$q,
+	$promise,
 	$common
 ) {
 	/**
@@ -126,7 +126,8 @@ function(
 			startXSave: 0,
 			startYSave: 0,
 			startX: 0,
-			startY: 0
+			startY: 0,
+			bcr: null
 		};
 
 		this._flags = {
@@ -145,7 +146,6 @@ function(
 			mouseUp: this._mouseUp.bind(this),
 			mouseMoveLine: this._mouseMoveLine.bind(this),
 			mouseUpLine: this._mouseUpLine.bind(this),
-			mouseUpDocument: this._mouseUpDocument.bind(this),
 			contextMenu: this._contextmenu.bind(this)
 		};
 
@@ -439,11 +439,11 @@ function(
 		};
 
 		var zc = this._zoom / 100;
-		var x = Math.round(this._x * zc) + fromPoint.x;
-		var y = Math.round(this._y * zc) + fromPoint.y;
+		var newX = Math.round(this._x * zc) + fromPoint.x;
+		var newY = Math.round(this._y * zc) + fromPoint.y;
 
-		fromPoint.xRatio = x / this._curWidth;
-		fromPoint.yRatio = y / this._curHeight;
+		fromPoint.xRatio = newX / this._curWidth;
+		fromPoint.yRatio = newY / this._curHeight;
 
 		return fromPoint;
 	};
@@ -574,7 +574,10 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
-		var fromPoint = this._getFromPoint(e.offsetX, e.offsetY);
+		this._setBCR();
+
+		var data = this._getMouseXY(e);
+		var fromPoint = this._getFromPoint(data.x, data.y);
 
 		if (delta > 0) {
 			this._setZoom(this._zoom + this._zoomStep, fromPoint);
@@ -582,6 +585,31 @@ function(
 		else {
 			this._setZoom(this._zoom - this._zoomStep, fromPoint);
 		}
+	};
+
+	/**
+	 * Get mouse coordinates.
+	 * 
+	 * @param  {Event} e
+	 * @return {Object}
+	 * @private
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype._getMouseXY = function(e) {
+		return {
+			x: e.clientX - this._mouse.bcr.left,
+			y: e.clientY - this._mouse.bcr.top
+		}
+	};
+
+	/**
+	 * Set mouse bounding client rect from canvas el.
+	 * 
+	 * @private
+	 * @member $anonymizer
+	 */
+	$anonymizer.prototype._setBCR = function() {
+		this._mouse.bcr = this._canvas.getBoundingClientRect();
 	};
 
 	/**
@@ -597,10 +625,15 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
-		this._mouse.startXSave = e.offsetX;
-		this._mouse.startYSave = e.offsetY;
-		this._mouse.startX = e.offsetX;
-		this._mouse.startY = e.offsetY;
+		this._setBCR();
+
+		var data = this._getMouseXY(e);
+
+		this._mouse.startXSave = data.x;
+		this._mouse.startYSave = data.y;
+		this._mouse.startX = this._mouse.startXSave;
+		this._mouse.startY = this._mouse.startYSave;
+
 		this._flags.wasMove = false;
 		this._flags.wasRightClick = this._isRightClick(e);
 
@@ -609,9 +642,8 @@ function(
 			this._flags.wasImgMove = false;
 			this._flags.wasPreview = false;
 
-			this._canvas.addEventListener("mousemove", this._binds.mouseMove);
-			this._canvas.addEventListener("mouseup", this._binds.mouseUp);
-			this._canvas.addEventListener("mouseleave", this._binds.mouseUp);
+			document.addEventListener("mousemove", this._binds.mouseMove);
+			document.addEventListener("mouseup", this._binds.mouseUp);
 		}
 		// line
 		else if (this._opts.curEntity == $anonymizer.ENTITES.LINE) {
@@ -625,15 +657,14 @@ function(
 			this._flags.wasLine = false;
 
 			this._lineCanvas = lineCanvas;
-			this._lineCanvas.addEventListener("mousemove", this._binds.mouseMoveLine);
-			this._lineCanvas.addEventListener("mouseup", this._binds.mouseUpLine);
 			this._lineCanvas.addEventListener("contextmenu", this._binds.contextMenu);
+
+			document.addEventListener("mousemove", this._binds.mouseMoveLine);
+			document.addEventListener("mouseup", this._binds.mouseUpLine);
 
 			if (this._flags.wasRightClick) {
 				this._lineCanvas.classList.add("is-dragged");
 			}
-
-			document.addEventListener("mouseup", this._binds.mouseUpDocument);
 
 			this._lineCanvasCtx = this._lineCanvas.getContext("2d");
 
@@ -676,6 +707,8 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseMove = function(e) {
+		var data = this._getMouseXY(e);
+
 		// mouse cursor
 		if (!this._flags.wasMove) {
 			this._canvas.classList.add("is-dragged");
@@ -685,7 +718,7 @@ function(
 		this._flags.wasMove = true;
 
 		// mouse move over the preview?
-		var isPreview = this._isPreview(e.offsetX, e.offsetY);
+		var isPreview = this._isPreview(data.x, data.y);
 
 		if (!this._flags.wasRightClick && !this._flags.wasImgMove && isPreview) {
 			// set preview flag
@@ -702,12 +735,12 @@ function(
 			this._flags.wasImgMove = true;
 
 			// image move
-			this._imgMove(e.offsetX, e.offsetY);
+			this._imgMove(data.x, data.y);
 		}
 
 		// save
-		this._mouse.startX = e.offsetX;
-		this._mouse.startY = e.offsetY;
+		this._mouse.startX = data.x;
+		this._mouse.startY = data.y;
 	};
 
 	/**
@@ -754,13 +787,14 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseUp = function(e) {
+		var data = this._getMouseXY(e);
 		var thresholdTest = false;
 
 		// only it was move
 		if (this._flags.wasMove) {
 			// difference towards start click
-			var diffX = this._mouse.startXSave - e.offsetX;
-			var diffY = this._mouse.startYSave - e.offsetY;
+			var diffX = this._mouse.startXSave - data.x;
+			var diffY = this._mouse.startYSave - data.y;
 
 			if (diffX >= this._THRESHOLD.MIN && diffX <= this._THRESHOLD.MAX && diffY >= this._THRESHOLD.MIN && diffY <= this._THRESHOLD.MAX) {
 				// we are in the range
@@ -770,7 +804,7 @@ function(
 
 		// click - there was no move, threshold test, it is disabled for right mouse click
 		if (!this._flags.wasRightClick && (!this._flags.wasMove || thresholdTest)) {
-			var isPreview = this._isPreview(e.offsetX, e.offsetY);
+			var isPreview = this._isPreview(data.x, data.y);
 
 			if (isPreview) {
 				// preview click - click coordinates on the canvas center
@@ -781,8 +815,8 @@ function(
 			else {
 				// add circle
 				var zc = this._zoom / 100;
-				var x = Math.round(this._x * zc) + e.offsetX;
-				var y = Math.round(this._y * zc) + e.offsetY;
+				var x = Math.round(this._x * zc) + data.x;
+				var y = Math.round(this._y * zc) + data.y;
 
 				this._entites.push({
 					id: this._opts.curEntity.id,
@@ -797,9 +831,8 @@ function(
 
 		this._canvas.classList.remove("is-dragged");
 
-		this._canvas.removeEventListener("mousemove", this._binds.mouseMove);
-		this._canvas.removeEventListener("mouseup", this._binds.mouseUp);
-		this._canvas.removeEventListener("mouseleave", this._binds.mouseUp);
+		document.removeEventListener("mousemove", this._binds.mouseMove);
+		document.removeEventListener("mouseup", this._binds.mouseUp);
 	};
 
 	/**
@@ -810,21 +843,23 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseMoveLine = function(e) {
+		var data = this._getMouseXY(e);
+
 		// mouse move
 		this._flags.wasMove = true;
 
 		// right mouse click
 		if (this._flags.wasRightClick) {
 			// image move
-			this._imgMove(e.offsetX, e.offsetY);
+			this._imgMove(data.x, data.y);
 
 			// save
-			this._mouse.startX = e.offsetX;
-			this._mouse.startY = e.offsetY;
+			this._mouse.startX = data.x;
+			this._mouse.startY = data.y;
 		}
 		// left mouse click
 		else {
-			var isPreview = this._isPreview(e.offsetX, e.offsetY);
+			var isPreview = this._isPreview(data.x, data.y);
 			var wasPreview = this._flags.wasPreview;
 
 			if (!this._flags.wasLine && isPreview) {
@@ -844,7 +879,7 @@ function(
 				// clear
 				this._lineCanvasCtx.clearRect(0, 0, this._canWidth, this._canHeight);
 				// draw a line
-				this._drawLine(this._lineCanvasCtx, this._mouse.startX, this._mouse.startY, e.offsetX, e.offsetY, lineWidth);
+				this._drawLine(this._lineCanvasCtx, this._mouse.startX, this._mouse.startY, data.x, data.y, lineWidth);
 			}
 
 			// change of state
@@ -863,10 +898,11 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._mouseUpLine = function(e) {
+		var data = this._getMouseXY(e);
 		var isPreview = null;
 
 		if (!this._flags.wasMove) {
-			isPreview = this._isPreview(e.offsetX, e.offsetY);
+			isPreview = this._isPreview(data.x, data.y);
 		}
 
 		// only for left mouse click
@@ -885,8 +921,8 @@ function(
 
 				var x = xc + this._mouse.startX;
 				var y = yc + this._mouse.startY;
-				var x2 = xc + e.offsetX;
-				var y2 = yc + e.offsetY;
+				var x2 = xc + data.x;
+				var y2 = yc + data.y;
 
 				this._entites.push({
 					id: this._opts.curEntity.id,
@@ -902,28 +938,14 @@ function(
 		}
 
 		this._lineCanvas.classList.remove("is-dragged");
-
-		this._lineCanvas.removeEventListener("mousemove", this._binds.mouseMoveLine);
-		this._lineCanvas.removeEventListener("mouseup", this._binds.mouseUpLine);
 		this._lineCanvas.removeEventListener("contextmenu", this._binds.contextMenu);
 
-		document.removeEventListener("mouseup", this._binds.mouseUpDocument);
+		document.removeEventListener("mousemove", this._binds.mouseMoveLine);
+		document.removeEventListener("mouseup", this._binds.mouseUpLine);
 
 		this._parent.removeChild(this._lineCanvas);
 
 		this._lineCanvas = null;
-	};
-
-	/**
-	 * Mouse up over the document - drawing a line outside a canvas and mouse up -> line is canceled.
-	 *
-	 * @param {Event} e Mouse event
-	 * @private
-	 * @member $anonymizer
-	 */
-	$anonymizer.prototype._mouseUpDocument = function(e) {
-		this._flags.wasLine = false;
-		this._mouseUpLine(e);
 	};
 
 	/**
@@ -935,6 +957,8 @@ function(
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype._setZoom = function(value, fromPoint) {
+		fromPoint = fromPoint || this._getFromPoint();
+
 		var oldZoom = this._zoom;
 		var newZoom = $math.setRange(value, this._opts.minZoom, this._opts.maxZoom);
 
@@ -944,8 +968,6 @@ function(
 		this.trigger("zoom", this._zoom);
 		this._postZoom();
 
-		fromPoint = fromPoint || this._getFromPoint();
-		
 		this._setPosition(fromPoint.xRatio, fromPoint.yRatio, fromPoint.x, fromPoint.y);
 		this._alignImgToCanvas();
 		this._drawEntityPreview();
@@ -956,49 +978,47 @@ function(
 	 * Load and show image in canvas. Returns promise after load.
 	 * 
 	 * @param  {String} url Path to image
-	 * @return {$q} Promise
+	 * @return {$promise} Promise
 	 * @member $anonymizer
 	 */
 	$anonymizer.prototype.loadImage = function(url) {
-		var promise = $q.defer();
+		return new $promise(function(resolve, reject) {
+			this._setWhiteCanvas();
 
-		this._setWhiteCanvas();
+			this._spinner.classList.remove("hide");
 
-		this._spinner.classList.remove("hide");
+			var img = new Image();
 
-		var img = new Image();
+			img.addEventListener("load", function() {
+				this._spinner.classList.add("hide");
+				this._img = img;
+				this._imgWidth = img.width;
+				this._imgHeight = img.height;
+				this._zoom = this._opts.zoom;
 
-		img.addEventListener("load", function() {
-			this._spinner.classList.add("hide");
-			this._img = img;
-			this._imgWidth = img.width;
-			this._imgHeight = img.height;
-			this._zoom = this._opts.zoom;
+				this.trigger("zoom", this._zoom);
 
-			this.trigger("zoom", this._zoom);
+				this._postZoom();
+				this._setCenter();
+				this._alignImgToCanvas();
+				this._drawEntityPreview();
+				this._redraw();
 
-			this._postZoom();
-			this._setCenter();
-			this._alignImgToCanvas();
-			this._drawEntityPreview();
-			this._redraw();
+				resolve();
+			}.bind(this));
 
-			promise.resolve();
+			img.addEventListener("error", function() {
+				this._spinner.classList.add("hide");
+
+				this._img = null;
+				this._imgWidth = 0;
+				this._imgHeight = 0;
+
+				reject();
+			}.bind(this));
+
+			img.src = url || "";
 		}.bind(this));
-
-		img.addEventListener("error", function() {
-			this._spinner.classList.add("hide");
-
-			this._img = null;
-			this._imgWidth = 0;
-			this._imgHeight = 0;
-
-			promise.reject();
-		}.bind(this));
-
-		img.src = url || "";
-
-		return promise;
 	};
 
 	/**
@@ -1165,8 +1185,8 @@ function(
 				case $anonymizer.ENTITES.CIRCLE.id:
 					output.actions.push({
 						type: entity.id.toLowerCase(),
-						x: Math.round(this._imgWidth * entity.xRatio),
-						y: Math.round(this._imgHeight * entity.yRatio),
+						x: $math.setRange(Math.round(this._imgWidth * entity.xRatio), 0, this._imgWidth),
+						y: $math.setRange(Math.round(this._imgHeight * entity.yRatio), 0, this._imgHeight),
 						r: entity.value
 					});
 					break;
@@ -1174,10 +1194,10 @@ function(
 				case $anonymizer.ENTITES.LINE.id:
 					output.actions.push({
 						type: entity.id.toLowerCase(),
-						x1: Math.round(this._imgWidth * entity.xRatio),
-						y1: Math.round(this._imgHeight * entity.yRatio),
-						x2: Math.round(this._imgWidth * entity.x2Ratio),
-						y2: Math.round(this._imgHeight * entity.y2Ratio),
+						x1: $math.setRange(Math.round(this._imgWidth * entity.xRatio), 0, this._imgWidth),
+						y1: $math.setRange(Math.round(this._imgHeight * entity.yRatio), 0, this._imgHeight),
+						x2: $math.setRange(Math.round(this._imgWidth * entity.x2Ratio), 0, this._imgWidth),
+						y2: $math.setRange(Math.round(this._imgHeight * entity.y2Ratio), 0, this._imgHeight),
 						width: entity.value
 					});
 					break;

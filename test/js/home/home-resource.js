@@ -17,7 +17,7 @@ function(
 
 	/**
 	 * Get test data.
-	 * @return {$q}
+	 * @return {$promise}
 	 */
 	this.get = function() {
 		return $http.createRequest({
