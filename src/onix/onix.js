@@ -355,7 +355,8 @@ onix = (function() {
 
 	/**
 	 * Add a new run.
-	 * 
+	 *
+	 * @chainable
 	 * @param  {Array|Function} param With DI
 	 * @member $module
 	 */
@@ -372,6 +373,28 @@ onix = (function() {
 			type: $module.CONST.TYPE.RUN
 		});
 
+		return this;
+	};
+
+	/**
+	 * Add a new controller - only for back comptability with angular modules.
+	 * This feature is not implemented!
+	 *
+	 * @chainable
+	 * @member $module
+	 */
+	$module.prototype.controller = function() {
+		return this;
+	};
+
+	/**
+	 * Add a new directive - only for back comptability with angular modules.
+	 * This feature is not implemented!
+	 *
+	 * @chainable
+	 * @member $module
+	 */
+	$module.prototype.directive = function() {
 		return this;
 	};
 
@@ -694,7 +717,7 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.11
+	 * version: 2.5.12
 	 * date: 10. 6. 2016
 	 * @member onix
 	 */

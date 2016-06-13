@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.5.12 (10. 6. 2016)
+
+* angular controller/directive comptability - only used for module import, these functions do nothing
+* crop area fix
+
 ## 2.5.11 (10. 6. 2016)
 
 * $crop - new util for cropping images for example; test example

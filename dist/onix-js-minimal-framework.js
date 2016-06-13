@@ -542,7 +542,8 @@ onix = (function() {
 	};
 	/**
 	 * Add a new run.
-	 * 
+	 *
+	 * @chainable
 	 * @param  {Array|Function} param With DI
 	 * @member $module
 	 */
@@ -556,6 +557,26 @@ onix = (function() {
 			inject: pp.inject,
 			type: $module.CONST.TYPE.RUN
 		});
+		return this;
+	};
+	/**
+	 * Add a new controller - only for back comptability with angular modules.
+	 * This feature is not implemented!
+	 *
+	 * @chainable
+	 * @member $module
+	 */
+	$module.prototype.controller = function() {
+		return this;
+	};
+	/**
+	 * Add a new directive - only for back comptability with angular modules.
+	 * This feature is not implemented!
+	 *
+	 * @chainable
+	 * @member $module
+	 */
+	$module.prototype.directive = function() {
 		return this;
 	};
 	/**
@@ -829,13 +850,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.5.11
+	 * version: 2.5.12
 	 * date: 10. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.5.11/10. 6. 2016\n'+
+'2.5.12/10. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+

@@ -147,20 +147,6 @@ function(
 
 		this._dom.container.addEventListener("mousedown", this._binds.mouseDown);
 	};
-	
-	/**
-	 * Create crop cover element - during mouse down & move.
-	 * 
-	 * @return {Element}
-	 * @member $crop
-	 * @private
-	 */
-	$crop.prototype._createCover = function() {
-		return $dom.create({
-			el: "div",
-			"class": "crop-cover"
-		});
-	};
 
 	/**
 	 * Set crop center above his area.
@@ -258,18 +244,22 @@ function(
 
 		this._type = target.getAttribute("class");
 
+		switch (this._type) {
+			case "crop-top":
+			case "crop-bottom":
+			case "crop-left":
+			case "crop-right":
+				return;
+		}
+
 		// save values during click
 		this._mouse.startX = e.clientX;
 		this._mouse.startY = e.clientY;
 		this._mouse.startXSave = e.clientX;
 		this._mouse.startYSave = e.clientY;
 
-		this._dom.cover = this._createCover();
-
-		document.body.appendChild(this._dom.cover);
-
-		this._dom.cover.addEventListener("mousemove", this._binds.mouseMove);
-		this._dom.cover.addEventListener("mouseup", this._binds.mouseUp);
+		document.addEventListener("mousemove", this._binds.mouseMove);
+		document.addEventListener("mouseup", this._binds.mouseUp);
 	};
 
 	/**
@@ -339,12 +329,8 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
-		this._dom.cover.removeEventListener("mousemove", this._binds.mouseMove);
-		this._dom.cover.removeEventListener("mouseup", this._binds.mouseUp);
-
-		document.body.removeChild(this._dom.cover);
-
-		this._dom.cover = null;
+		document.removeEventListener("mousemove", this._binds.mouseMove);
+		document.removeEventListener("mouseup", this._binds.mouseUp);
 
 		if (this._mouse.startXSave != e.clientX || this._mouse.startYSave != e.clientY) {
 			// crop was changed

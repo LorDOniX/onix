@@ -372,7 +372,8 @@
 
 <span id='$module-method-run'>	/**
 </span>	 * Add a new run.
-	 * 
+	 *
+	 * @chainable
 	 * @param  {Array|Function} param With DI
 	 * @member $module
 	 */
@@ -389,6 +390,28 @@
 			type: $module.CONST.TYPE.RUN
 		});
 
+		return this;
+	};
+
+<span id='$module-method-controller'>	/**
+</span>	 * Add a new controller - only for back comptability with angular modules.
+	 * This feature is not implemented!
+	 *
+	 * @chainable
+	 * @member $module
+	 */
+	$module.prototype.controller = function() {
+		return this;
+	};
+
+<span id='$module-method-directive'>	/**
+</span>	 * Add a new directive - only for back comptability with angular modules.
+	 * This feature is not implemented!
+	 *
+	 * @chainable
+	 * @member $module
+	 */
+	$module.prototype.directive = function() {
 		return this;
 	};
 
@@ -711,7 +734,7 @@
 <span id='onix-method-info'>	/**
 </span>	 * Framework info.
 	 *
-	 * version: 2.5.11
+	 * version: 2.5.12
 	 * date: 10. 6. 2016
 	 * @member onix
 	 */

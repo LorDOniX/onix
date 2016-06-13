@@ -164,20 +164,6 @@ function(
 
 		this._dom.container.addEventListener(&quot;mousedown&quot;, this._binds.mouseDown);
 	};
-	
-<span id='$crop-method-_createCover'>	/**
-</span>	 * Create crop cover element - during mouse down &amp; move.
-	 * 
-	 * @return {Element}
-	 * @member $crop
-	 * @private
-	 */
-	$crop.prototype._createCover = function() {
-		return $dom.create({
-			el: &quot;div&quot;,
-			&quot;class&quot;: &quot;crop-cover&quot;
-		});
-	};
 
 <span id='$crop-method-_setCenter'>	/**
 </span>	 * Set crop center above his area.
@@ -275,18 +261,22 @@ function(
 
 		this._type = target.getAttribute(&quot;class&quot;);
 
+		switch (this._type) {
+			case &quot;crop-top&quot;:
+			case &quot;crop-bottom&quot;:
+			case &quot;crop-left&quot;:
+			case &quot;crop-right&quot;:
+				return;
+		}
+
 		// save values during click
 		this._mouse.startX = e.clientX;
 		this._mouse.startY = e.clientY;
 		this._mouse.startXSave = e.clientX;
 		this._mouse.startYSave = e.clientY;
 
-		this._dom.cover = this._createCover();
-
-		document.body.appendChild(this._dom.cover);
-
-		this._dom.cover.addEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
-		this._dom.cover.addEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
+		document.addEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
+		document.addEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
 	};
 
 <span id='$crop-method-_mouseMove'>	/**
@@ -356,12 +346,8 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
-		this._dom.cover.removeEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
-		this._dom.cover.removeEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
-
-		document.body.removeChild(this._dom.cover);
-
-		this._dom.cover = null;
+		document.removeEventListener(&quot;mousemove&quot;, this._binds.mouseMove);
+		document.removeEventListener(&quot;mouseup&quot;, this._binds.mouseUp);
 
 		if (this._mouse.startXSave != e.clientX || this._mouse.startYSave != e.clientY) {
 			// crop was changed

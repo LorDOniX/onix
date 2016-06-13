@@ -1,13 +1,6 @@
 TODO:
 - cookies set
 
-NICE TO HAVE:
-- controller
-	- data-controller="xyz"
-	- bind using DI
-	- handle controller can have multiple controllers
-- directive
-
 JSDUCK:
 - https://github.com/senchalabs/jsduck/wiki
 
