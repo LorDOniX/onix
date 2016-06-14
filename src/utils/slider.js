@@ -168,15 +168,14 @@ function(
 	$slider.prototype._keyUp = function() {
 		var inputEl = this._els.input;
 		var value = parseFloat(inputEl.value);
-		var errors = 0;
+		var errors = false;
 
-		if (isNaN(value)) {
-			errors++;
-		}
-		else if (!this.setValue(value)) {
-			errors++;
+		if (isNaN(value) || value < this._opts.min || value > this._opts.max) {
+			errors = true;
 		}
 		else {
+			// set new value
+			this.setValue(value);
 			this._sendSignal(true);
 		}
 
@@ -322,6 +321,7 @@ function(
 
 		this._value = value;
 		this._els.input.value = value;
+		this._els.input.classList.remove("error");
 
 		this._sendSignal(!fromClick);
 	};
@@ -370,9 +370,12 @@ function(
 	$slider.prototype.setValue = function(value) {
 		if (typeof value === "number") {
 			value = $math.setRange(value, this._opts.min, this._opts.max);
+
 			this._value = value;
 			this._els.input.value = value;
+			this._els.input.classList.remove("error");
 			this._setCaret(this._getPosFromValue(value));
+
 			return true;
 		}
 		else {
@@ -401,9 +404,7 @@ function(
 			this._opts[key] = optsArg[key];
 		}
 
-		if (this._value < this._opts.min || this._value > this._opts.max) {
-			this._value = this._opts.max;
-		}
+		this._value = $math.setRange(this._value, this._opts.min, this._opts.max);
 
 		this.setValue(this._value);
 	};

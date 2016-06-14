@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.6.2 (14. 6. 2016)
+
+* $slider - input keyup bugfix
+
 ## 2.6.1 (14. 6. 2016)
 
 * $dom - create: child does not have to be an array

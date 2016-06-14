@@ -1579,13 +1579,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.6.1
+	 * version: 2.6.2
 	 * date: 14. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.6.1/14. 6. 2016\n'+
+'2.6.2/14. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -6762,14 +6762,13 @@ function(
 	$slider.prototype._keyUp = function() {
 		var inputEl = this._els.input;
 		var value = parseFloat(inputEl.value);
-		var errors = 0;
-		if (isNaN(value)) {
-			errors++;
-		}
-		else if (!this.setValue(value)) {
-			errors++;
+		var errors = false;
+		if (isNaN(value) || value < this._opts.min || value > this._opts.max) {
+			errors = true;
 		}
 		else {
+			// set new value
+			this.setValue(value);
 			this._sendSignal(true);
 		}
 		inputEl.classList[errors ? "add" : "remove"]("error");
@@ -6892,6 +6891,7 @@ function(
 		var value = Math.round(posX / width * range + this._opts.min);
 		this._value = value;
 		this._els.input.value = value;
+		this._els.input.classList.remove("error");
 		this._sendSignal(!fromClick);
 	};
 	/**
@@ -6936,6 +6936,7 @@ function(
 			value = $math.setRange(value, this._opts.min, this._opts.max);
 			this._value = value;
 			this._els.input.value = value;
+			this._els.input.classList.remove("error");
 			this._setCaret(this._getPosFromValue(value));
 			return true;
 		}
@@ -6962,9 +6963,7 @@ function(
 		for (var key in optsArg) {
 			this._opts[key] = optsArg[key];
 		}
-		if (this._value < this._opts.min || this._value > this._opts.max) {
-			this._value = this._opts.max;
-		}
+		this._value = $math.setRange(this._value, this._opts.min, this._opts.max);
 		this.setValue(this._value);
 	};
 	return $slider;
