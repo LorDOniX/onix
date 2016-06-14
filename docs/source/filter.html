@@ -25,10 +25,6 @@ onix.factory(&quot;$filter&quot;, [
 function(
 	$di
 ) {
-	var emptyFilter = function(value) {
-		return value || &quot;&quot;;
-	};
-
 <span id='$filter-method-filter'>	/**
 </span>	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
 	 *
@@ -38,6 +34,10 @@ function(
 	 * @member $filter
 	 */
 	return function(filterName) {
+		var emptyFilter = function(value) {
+			return value || &quot;&quot;;
+		};
+		
 		if (!filterName) {
 			return emptyFilter;
 		}

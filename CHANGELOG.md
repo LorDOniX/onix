@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.6.1 (14. 6. 2016)
+
+* $dom - create: child does not have to be an array
+* $template - el prefix and data bind can be changed in config phase; object -> function
+* onix - $modules object -> function
+* $loader - object -> function
+
 ## 2.6.0 (13. 6. 2016)
 
 * $template - all events bind

@@ -952,6 +952,7 @@ if (!Date.now) {
 	}
 }.call(this));
 onix = (function() {
+	/* ************************************* $module **************************** */
 	/**
 	 * Module object - handles one module object with services, factories etc.
 	 * This object cannot be used in dependency injection!
@@ -1007,6 +1008,7 @@ onix = (function() {
 	 * @type {Object}
 	 * @member $module
 	 * @private
+	 * @static
 	 */
 	$module.CONST = {
 		PROVIDER_NAME: "Provider",
@@ -1029,6 +1031,7 @@ onix = (function() {
 	 * @param  {Array|Function} param 
 	 * @return {Object} Parse object
 	 * @member $module
+	 * @static
 	 */
 	$module.parseParam = function(param) {
 		var fn;
@@ -1059,6 +1062,7 @@ onix = (function() {
 	 * @param  {String} name
 	 * @return {String}
 	 * @member $module
+	 * @static
 	 */
 	$module.getFilterName = function(name) {
 		name = name || "";
@@ -1301,13 +1305,14 @@ onix = (function() {
 	$module.prototype.directive = function() {
 		return this;
 	};
+	/* ************************************* $modules **************************** */
 	/**
 	 * Modules object - handles all modules in the application; runs object.
 	 * This object cannot be used in dependency injection!
 	 *
 	 * @class $modules
 	 */
-	var $modules = {
+	var $modules = function() {
 		/**
 		 * All modules array.
 		 *
@@ -1315,7 +1320,7 @@ onix = (function() {
 		 * @member $modules
 		 * @type {Array}
 		 */
-		_modules: [],
+		this._modules = [];
 		/**
 		 * All modules object - quick access.
 		 *
@@ -1323,7 +1328,7 @@ onix = (function() {
 		 * @member $modules
 		 * @type {Object}
 		 */
-		_modulesObj: {},
+		this._modulesObj = {};
 		/**
 		 * Modules constants.
 		 *
@@ -1331,226 +1336,229 @@ onix = (function() {
 		 * @member $modules
 		 * @type {Object}
 		 */
-		_CONST: {
+		this._CONST = {
 			MODULE_SEPARATOR: "::",
-		},
-		/**
-		 * Function which does nothing.
-		 *
-		 * @private
-		 * @member $modules
-		 */
-		_noop: function() {
-		},
-		/**
-		 * Event - Dom LOAD.
-		 *
-		 * @member $modules
-		 */
-		domLoad: function() {
-			var configs = [];
-			var runs = [];
-			this._modules.forEach(function(module) {
-				var error = false;
-				var dependencies = module.getDependencies();
-				dependencies.every(function(dep) {
-					if (!(dep in this._modulesObj)) {
-						console.error("Module '" + this._name + "' dependency '" + dep + "' not found!");
-						error = true;
-						return false;
-					}
-					else {
-						return true;
-					}
-				}, this);
-				if (!error) {
-					configs = configs.concat(module.getConfigs());
-					runs = runs.concat(module.getRuns());
-				}
-			}, this);
-			// run all configs
-			configs.forEach(function(config) {
-				this.run(config, true);
-			}, this);
-			// run all runs
-			runs.forEach(function(run) {
-				this.run(run);
-			}, this);
-		},
-		/**
-		 * Get object by his name.
-		 *
-		 * @param {String} name Object name
-		 * @return {Object} Object data
-		 * @member $modules
-		 * @private
-		 */
-		_getObject: function(name) {
-			var output = null;
-			var searchModuleName = "";
-			var searchObjectName = "";
-			if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
-				var parts = name.split(this._CONST.MODULE_SEPARATOR);
-				if (parts.length == 2) {
-					searchModuleName = parts[0];
-					searchObjectName = parts[1];
+		};
+		// bind DOM ready
+		document.addEventListener("DOMContentLoaded", this._domLoad.bind(this));
+	};
+	/**
+	 * Event - Dom LOAD.
+	 *
+	 * @member $modules
+	 * @private
+	 */
+	$modules.prototype._domLoad = function() {
+		var configs = [];
+		var runs = [];
+		this._modules.forEach(function(module) {
+			var error = false;
+			var dependencies = module.getDependencies();
+			dependencies.every(function(dep) {
+				if (!(dep in this._modulesObj)) {
+					console.error("Module '" + this._name + "' dependency '" + dep + "' not found!");
+					error = true;
+					return false;
 				}
 				else {
-					console.error("Get object " + name + " error! Wrong module separator use.");
-					return null;
+					return true;
 				}
+			}, this);
+			if (!error) {
+				configs = configs.concat(module.getConfigs());
+				runs = runs.concat(module.getRuns());
+			}
+		}, this);
+		// run all configs
+		configs.forEach(function(config) {
+			this.run(config, true);
+		}, this);
+		// run all runs
+		runs.forEach(function(run) {
+			this.run(run);
+		}, this);
+	};
+	/**
+	 * Get object by his name.
+	 *
+	 * @param {String} name Object name
+	 * @return {Object} Object data
+	 * @member $modules
+	 * @private
+	 */
+	$modules.prototype._getObject = function(name) {
+		var output = null;
+		var searchModuleName = "";
+		var searchObjectName = "";
+		if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
+			var parts = name.split(this._CONST.MODULE_SEPARATOR);
+			if (parts.length == 2) {
+				searchModuleName = parts[0];
+				searchObjectName = parts[1];
 			}
 			else {
-				searchObjectName = name;
-			}
-			this._modules.every(function(module) {
-				var moduleObjects = module.getObjects();
-				if (searchModuleName) {
-					if (module.getName() != searchModuleName) return true;
-					if (searchObjectName in moduleObjects) {
-						output = moduleObjects[searchObjectName];
-						return false;
-					}
-					else {
-						console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
-						return false;
-					}
-				}
-				else {
-					if (searchObjectName in moduleObjects) {
-						output = moduleObjects[searchObjectName];
-						return false;
-					}
-					else return true;
-				}
-			});
-			return output;
-		},
-		/**
-		 * Run object configuration; returns his cache (data).
-		 *
-		 * @param  {Object}  obj Object configuration
-		 * @param  {Boolean} [isConfig] Is config phase?
-		 * @param  {Array} [parent] Parent objects
-		 * @return {Object}
-		 * @member $modules
-		 */
-		run: function(obj, isConfig, parent) {
-			parent = parent || [];
-			if (parent.indexOf(obj.name) != -1) {
-				console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
+				console.error("Get object " + name + " error! Wrong module separator use.");
 				return null;
 			}
-			var inject = [];
-			if (obj.provider) {
-				var providerObj = this._getObject(obj.provider);
-				if (!providerObj.cache) {
-					var providerFn = providerObj.fn || this._noop;
-					providerObj.cache = new providerFn();
+		}
+		else {
+			searchObjectName = name;
+		}
+		this._modules.every(function(module) {
+			var moduleObjects = module.getObjects();
+			if (searchModuleName) {
+				if (module.getName() != searchModuleName) return true;
+				if (searchObjectName in moduleObjects) {
+					output = moduleObjects[searchObjectName];
+					return false;
 				}
-				var getFn = providerObj.cache["$get"] || this._noop;
-				var pp = $module.parseParam(getFn);
-				obj.fn = pp.fn;
-				obj.inject = pp.inject;
-				delete obj.provider;
-			}
-			if (obj.inject && obj.inject.length) {
-				obj.inject.forEach(function(objName) {
-					if (typeof objName === "string") {
-						var injObj = this._getObject(objName);
-						if (!injObj) {
-							console.error("Object name: " + objName + " not found!");
-							inject.push(null);
-						}
-						else {
-							inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
-						}
-					}
-					else if (typeof objName === "object") {
-						inject.push(objName);
-					}
-				}, this);
-			}
-			// config phase
-			if (isConfig) {
-				switch (obj.type) {
-					case $module.CONST.TYPE.PROVIDER:
-						if (!obj.cache) {
-							var fn = obj.fn || this._noop;
-							obj.cache = new fn();
-						}
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.CONSTANT:
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.CONFIG:
-						var fn = obj.fn || this._noop;
-						return fn.apply(fn, inject);
-						break;
-					default:
-						return null;
+				else {
+					console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
+					return false;
 				}
 			}
-			// run phase
 			else {
-				switch (obj.type) {
-					case $module.CONST.TYPE.FACTORY:
-					case $module.CONST.TYPE.FILTER:
-						if (!obj.cache) {
-							var fn = obj.fn || this._noop;
-							obj.cache = fn.apply(fn, inject);
-						}
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.SERVICE:
-						if (!obj.cache) {
-							var fn = obj.fn || this._noop;
-							var serviceObj = Object.create(fn.prototype);
-							fn.apply(serviceObj, inject);
-							obj.cache = serviceObj;
-						}
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.VALUE:
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.CONSTANT:
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.RUN:
-						var fn = obj.fn || this._noop;
-						return fn.apply(fn, inject);
-						break;
-					default:
-						return null;
+				if (searchObjectName in moduleObjects) {
+					output = moduleObjects[searchObjectName];
+					return false;
 				}
+				else return true;
 			}
-		},
-		/**
-		 * Add a new module to the application.
-		 * 
-		 * @param {String} name Module name
-		 * @param {Array} [dependencies] Module dependencies
-		 * @return {Object} Created module
-		 * @member $modules
-		 */
-		addModule: function(name, dependencies) {
-			var module = new $module(name, dependencies);
-			this._modulesObj[name] = module
-			this._modules.push(module);
-			return module;
+		});
+		return output;
+	};
+	/**
+	 * Function which does nothing.
+	 *
+	 * @member $modules
+	 */
+	$modules.prototype.noop = function() {
+	};
+	/**
+	 * Run object configuration; returns his cache (data).
+	 *
+	 * @param  {Object}  obj Object configuration
+	 * @param  {Boolean} [isConfig] Is config phase?
+	 * @param  {Array} [parent] Parent objects
+	 * @return {Object}
+	 * @member $modules
+	 */
+	$modules.prototype.run = function(obj, isConfig, parent) {
+		parent = parent || [];
+		if (parent.indexOf(obj.name) != -1) {
+			console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
+			return null;
+		}
+		var inject = [];
+		if (obj.provider) {
+			var providerObj = this._getObject(obj.provider);
+			if (!providerObj.cache) {
+				var providerFn = providerObj.fn || this.noop;
+				providerObj.cache = new providerFn();
+			}
+			var getFn = providerObj.cache["$get"] || this.noop;
+			var pp = $module.parseParam(getFn);
+			obj.fn = pp.fn;
+			obj.inject = pp.inject;
+			delete obj.provider;
+		}
+		if (obj.inject && obj.inject.length) {
+			obj.inject.forEach(function(objName) {
+				if (typeof objName === "string") {
+					var injObj = this._getObject(objName);
+					if (!injObj) {
+						console.error("Object name: " + objName + " not found!");
+						inject.push(null);
+					}
+					else {
+						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+					}
+				}
+				else if (typeof objName === "object") {
+					inject.push(objName);
+				}
+			}, this);
+		}
+		// config phase
+		if (isConfig) {
+			switch (obj.type) {
+				case $module.CONST.TYPE.PROVIDER:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = new fn();
+					}
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.CONFIG:
+					var fn = obj.fn || this.noop;
+					return fn.apply(fn, inject);
+					break;
+				default:
+					return null;
+			}
+		}
+		// run phase
+		else {
+			switch (obj.type) {
+				case $module.CONST.TYPE.FACTORY:
+				case $module.CONST.TYPE.FILTER:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = fn.apply(fn, inject);
+					}
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.SERVICE:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						var serviceObj = Object.create(fn.prototype);
+						fn.apply(serviceObj, inject);
+						obj.cache = serviceObj;
+					}
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.VALUE:
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.RUN:
+					var fn = obj.fn || this.noop;
+					return fn.apply(fn, inject);
+					break;
+				default:
+					return null;
+			}
 		}
 	};
-	// bind DOM ready
-	document.addEventListener("DOMContentLoaded", $modules.domLoad.bind($modules));
+	/**
+	 * Add a new module to the application.
+	 * 
+	 * @param {String} name Module name
+	 * @param {Array} [dependencies] Module dependencies
+	 * @return {Object} Created module
+	 * @member $modules
+	 */
+	$modules.prototype.addModule = function(name, dependencies) {
+		var module = new $module(name, dependencies);
+		this._modulesObj[name] = module
+		this._modules.push(module);
+		return module;
+	};
+	// new instance from $modules class
+	var $modulesInst = new $modules();
+	/* ************************************* onix **************************** */
 	/**
 	 * Main framework object, which is created like new module with name 'onix'.
 	 * Module has addtional functions.
 	 * 
 	 * @class onix
 	 */
-	var onix = $modules.addModule("onix");
+	var onix = $modulesInst.addModule("onix");
 	/**
 	 * Add a new module to the application.
 	 * 
@@ -1560,30 +1568,30 @@ onix = (function() {
 	 * @member onix
 	 */
 	onix.module = function(name, dependencies) {
-		return $modules.addModule(name, dependencies);
+		return $modulesInst.addModule(name, dependencies);
 	};
 	/**
 	 * Empty function.
 	 *
 	 * @member onix
 	 */
-	onix.noop = function() {
-	};
+	onix.noop = $modulesInst.noop;
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.6.0
-	 * date: 13. 6. 2016
+	 * version: 2.6.1
+	 * date: 14. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.6.0/13. 6. 2016\n'+
+'2.6.1/14. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
 '- Free for use in both personal and commercial projects\n');
 	};
+	/* ************************************* $di **************************** */
 	onix.factory("$di", function() {
 		/**
 		 * Helper factory for dependency injection and parsing function parameters.
@@ -1624,7 +1632,7 @@ onix = (function() {
 				}
 				// def. type
 				runObj.type = $module.CONST.TYPE.RUN;
-				return $modules.run(runObj);
+				return $modulesInst.run(runObj);
 			}
 		}
 	});
@@ -1640,9 +1648,6 @@ onix.factory("$filter", [
 function(
 	$di
 ) {
-	var emptyFilter = function(value) {
-		return value || "";
-	};
 	/**
 	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
 	 *
@@ -1652,6 +1657,9 @@ function(
 	 * @member $filter
 	 */
 	return function(filterName) {
+		var emptyFilter = function(value) {
+			return value || "";
+		};
 		if (!filterName) {
 			return emptyFilter;
 		}
@@ -2243,7 +2251,7 @@ onix.service("$dom", function() {
 	 * @param  {Object} config
 	 * @param  {String} config.el Element name
 	 * @param  {Object} config.attrs Atributes
-	 * @param  {Array} config.child Child nodes
+	 * @param  {Array|Object} config.child Child nodes
 	 * @param  {Array} config.events Bind events
 	 * @param  {String|Array} config.class Add CSS class/es
 	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
@@ -2267,7 +2275,11 @@ onix.service("$dom", function() {
 					});
 					break;
 				case "child":
-					config.child.forEach(function(child) {
+					var value = config.child;
+					if (!Array.isArray(value)) {
+						value = [value];
+					}
+					value.forEach(function(child) {
 						el.appendChild(this.create(child, exported));
 					}, this);
 					break;
@@ -2689,7 +2701,7 @@ function(
 				return;
 			}
 			url = this._updateURL(url, config.getData);
-			request.onerror = function () { reject(); };
+			request.onerror = function (err) { reject(err); };
 			request.open(method, url, true);
 			request.onreadystatechange = function() {
 				if (request.readyState == 4) {
@@ -2744,7 +2756,7 @@ function(
 				}
 			}
 			catch (err) {
-				reject();
+				reject(err);
 			}
 		}.bind(this));
 	};
@@ -3550,7 +3562,7 @@ onix.service("$location", function() {
 			// write
 			var newURL = [];
 			Object.keys(obj).forEach(function(key) {
-				newURL.push(key + "=" + encodeURIComponent(obj[key]));
+				newURL.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
 			});
 		}
 		if (newURL.length) {
@@ -3581,7 +3593,8 @@ onix.service("$location", function() {
 				data = data.replace("?", "");
 				data.split("&").forEach(function(item) {
 					var parts = item.split("=");
-					output[parts[0]] = decodeURIComponent(parts[1]);
+					var name = decodeURIComponent(parts[0]);
+					output[name] = decodeURIComponent(parts[1]);
 				});
 			}
 			return output;
@@ -4612,10 +4625,12 @@ onix.provider("$template", function() {
 	 */
 	var _conf = {
 		left: "{{",
-		right: "}}"
+		right: "}}",
+		elPrefix: "data-",
+		elDataBind: "data-bind"
 	};
 	/**
-	 * Set template config; you can use "left" {{ and "right" }} template delimeters.
+	 * Set template config; you can use "left" {{ and "right" }} template delimeters, elPrefix = "data-" and elDataBind = "data-bind"
 	 * 
 	 * @param {Object} confParam Object with new config
 	 * @member $templateProvider
@@ -4625,15 +4640,15 @@ onix.provider("$template", function() {
 			_conf[confParamKey] = confParam[confParamKey];
 		});
 	};
-	/**
-	 * Handle templates, binds events - syntax similar to moustache and angular template system.
-	 * $myQuery is used for cache record.
-	 *
-	 * @class $template
-	 */
 	this.$get = ["$common", "$promise", "$http", "$filter", function(
 				$common, $promise, $http, $filter) {
-		var $template = {
+		/**
+		 * Handle templates, binds events - syntax similar to moustache and angular template system.
+		 * $myQuery is used for cache record.
+		 *
+		 * @class $template
+		 */
+		var $template = function() {
 			/**
 			 * Template cache.
 			 *
@@ -4641,7 +4656,7 @@ onix.provider("$template", function() {
 			 * @member $template
 			 * @private
 			 */
-			_cache: {},
+			this._cache = {};
 			/**
 			 * Regular expressions for handle template variables.
 			 *
@@ -4649,13 +4664,13 @@ onix.provider("$template", function() {
 			 * @member $template
 			 * @private
 			 */
-			_RE: {
+			this._RE = {
 				VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
 				NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
 				STRINGS: /["'][^"']+["']/g,
 				JSONS: /[{][^}]+[}]/g,
 				ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
-			},
+			};
 			/**
 			 * Constants.
 			 * 
@@ -4663,277 +4678,275 @@ onix.provider("$template", function() {
 			 * @member $template
 			 * @private
 			 */
-			_CONST: {
+			this._CONST = {
 				FILTER_DELIMETER: "|",
 				FILTER_PARAM_DELIMETER: ":",
-				EL_PREFIX: "data-",
-				DATA_BIND: "data-bind",
 				TEMPLATE_SCRIPT_SELECTOR: "script[type='text/template']"
-			},
-			/**
-			 * Parse a function name from the string.
-			 *
-			 * @param  {String} value
-			 * @return {String}
-			 * @member $template
-			 * @private
-			 */
-			_parseFnName: function(value) {
-				value = value || "";
-				return value.match(/[a-zA-Z0-9_]+/)[0];
-			},
-			/**
-			 * Parse arguments from the string -> makes array from them.
-			 *
-			 * @param  {String} value
-			 * @param  {Object} config
-			 * @param  {Object} config.$event Event object
-			 * @param  {Object} config.$element Reference to element
-			 * @return {Array}
-			 * @member $template
-			 * @private
-			 */
-			_parseArgs: function(value, config) {
-				argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
-				var args = [];
-				var matches = argsValue.match(this._RE.ALL);
-				if (matches) {
-					var all = [];
-					matches.forEach(function(item) {
-						var value;
-						if (item.match(this._RE.STRINGS)) {
-							value = item.substr(1, item.length - 2)
-						}
-						else if (item.match(this._RE.NUMBERS)) {
-							value = parseFloat(item);
-						}
-						else if (item.match(this._RE.JSONS)) {
-							value = JSON.parse(item);
-						}
-						else if (item.match(this._RE.VARIABLE)) {
-							var variable = item.match(this._RE.VARIABLE)[0];
-							if (variable == "$event") {
-								value = config.event;
-							}
-							else if (variable == "$element") {
-								value = config.el;
-							}
-							else {
-								// todo - maybe eval with scope
-								value = null;
-							}
-						}
-						all.push({
-							value: value,
-							pos: argsValue.indexOf(item)
-						});
-					}, this);
-					if (all.length) {
-						all.sort(function(a, b) {
-							return a.pos - b.pos
-						}).forEach(function(item) {
-							args.push(item.value);
-						});
+			};
+			// template init
+			this._init();
+		};
+		/**
+		 * Parse a function name from the string.
+		 *
+		 * @param  {String} value
+		 * @return {String}
+		 * @member $template
+		 * @private
+		 */
+		$template.prototype._parseFnName = function(value) {
+			value = value || "";
+			return value.match(/[a-zA-Z0-9_]+/)[0];
+		};
+		/**
+		 * Parse arguments from the string -> makes array from them.
+		 *
+		 * @param  {String} value
+		 * @param  {Object} config
+		 * @param  {Object} config.$event Event object
+		 * @param  {Object} config.$element Reference to element
+		 * @return {Array}
+		 * @member $template
+		 * @private
+		 */
+		$template.prototype._parseArgs = function(value, config) {
+			argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
+			var args = [];
+			var matches = argsValue.match(this._RE.ALL);
+			if (matches) {
+				var all = [];
+				matches.forEach(function(item) {
+					var value;
+					if (item.match(this._RE.STRINGS)) {
+						value = item.substr(1, item.length - 2)
 					}
-				}
-				return args;
-			},
-			/**
-			 * Bind one single event to the element.
-			 * 
-			 * @param  {HTMLElement} el
-			 * @param  {Object} attr { name, value }
-			 * @param  {Function} scope
-			 * @member $template
-			 * @private
-			 */
-			_bindEvent: function(el, attr, scope) {
-				if (!el || !attr || !scope) return;
-				var eventName = attr.name.replace(this._CONST.EL_PREFIX, "");
-				var fnName = this._parseFnName(attr.value);
-				if (eventName && fnName in scope) {
-					el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
-						var args = templScope._parseArgs(attr.value, {
-							el: this,
-							event: event
-						});
-						scope[fnName].apply(scope, args);
-					}, this));
-				}
-			},
-			/**
-			 * Get element prefixed attributes.
-			 * 
-			 * @param  {HTMLElement} el
-			 * @return {Array}
-			 * @member $template
-			 * @private
-			 */
-			_getAttributes: function(el) {
-				var output = [];
-				if (el && "attributes" in el) {
-					Object.keys(el.attributes).forEach(function(attr) {
-						var item = el.attributes[attr];
-						if (item.name.indexOf(this._CONST.EL_PREFIX) != -1) {
-							output.push({
-								name: item.name,
-								value: item.value
-							});
+					else if (item.match(this._RE.NUMBERS)) {
+						value = parseFloat(item);
+					}
+					else if (item.match(this._RE.JSONS)) {
+						value = JSON.parse(item);
+					}
+					else if (item.match(this._RE.VARIABLE)) {
+						var variable = item.match(this._RE.VARIABLE)[0];
+						if (variable == "$event") {
+							value = config.event;
 						}
-					}, this);
-				}
-				return output;
-			},
-			/**
-			 * Init - get all templates from the page. Uses 'text/template' script with template data.
-			 * Each script has to have id and specifi type="text/template".
-			 *
-			 * @private
-			 * @member $template
-			 */
-			_init: function() {
-				onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function(item) {
-					this.add(item.id || "", item.innerHTML);
-				}, this);
-			},
-			/**
-			 * Add new item to the cache.
-			 *
-			 * @param {String} key 
-			 * @param {String} data
-			 * @member $template
-			 */
-			add: function(key, data) {
-				this._cache[key] = data;
-			},
-			/**
-			 * Compile one template - replaces all ocurances of {{ xxx }} by model.
-			 *
-			 * @param  {String} key Template key/name
-			 * @param  {Object} data Model
-			 * @return {String}
-			 * @member $template
-			 */
-			compile: function(key, data) {
-				var tmpl = this.get(key);
-				if (data) {
-					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
-					all.forEach(function(item) {
-						var itemSave = item;
-						item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
-						if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
-							var filterValue;
-							// filters
-							item.split(this._CONST.FILTER_DELIMETER).forEach(function(filterItem, ind) {
-								filterItem = filterItem.trim();
-								if (!ind) {
-									// value
-									if (filterItem in data) {
-										filterValue = data[filterItem];
-									}
-								}
-								else {
-									// preprocessing by filter
-									var args = [filterValue];
-									var filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
-									var filterName = "";
-									if (filterParts.length == 1) {
-										filterName = filterParts[0].trim();
-									}
-									else {
-										filterParts.forEach(function(filterPartItem, filterPartInd) {
-											filterPartItem = filterPartItem.trim();
-											if (!filterPartInd) {
-												filterName = filterPartItem;
-											}
-											else {
-												args.push(filterPartItem);
-											}
-										});
-									}
-									var filter = $filter(filterName);
-									filterValue = filter.apply(filter, args);
-								}
-							}, this);
-							tmpl = tmpl.replace(itemSave, filterValue || "");
+						else if (variable == "$element") {
+							value = config.el;
 						}
 						else {
-							// standard
-							var replaceValue = "";
-							item = item.trim();
-							if (item in data) {
-								replaceValue = data[item];
-							}
-							tmpl = tmpl.replace(itemSave, replaceValue);
+							// todo - maybe eval with scope
+							value = null;
 						}
-					}, this);
-				}
-				return tmpl;
-			},
-			/**
-			 * Get template from the cache.
-			 *
-			 * @param  {String} key Template key/name
-			 * @return {String}
-			 * @member $template
-			 */
-			get: function(key) {
-				return this._cache[key] || "";
-			},
-			/**
-			 * Bind all elements in the root element. Selectors all data-* and functions are binds against scope object.
-			 * For data-bind, scope has to have "addEls" function.
-			 * Supports: click, change, keydown, bind.
-			 *
-			 * @param  {HTMLElement} root Root element
-			 * @param  {Object} scope Scope which against will be binding used
-			 * @param  {Function} [addElsCb] Callback function with object with all data-bind objects
-			 * @member $template
-			 */
-			bindTemplate: function(root, scope, addElsCb) {
-				var allElements = onix.element("*", root);
-				if (allElements.len()) {
-					var newEls = {};
-					allElements.forEach(function(item) {
-						var attrs = this._getAttributes(item);
-						attrs.forEach(function(attr) {
-							if (attr.name == this._CONST.DATA_BIND) {
-								newEls[attr.value] = item;
-							}
-							else {
-								this._bindEvent(item, attr, scope);
-							}
-						}, this);
-					}, this);
-					if (addElsCb && typeof addElsCb === "function") {
-						addElsCb(newEls);
 					}
-				}
-			},
-			/**
-			 * Load template from the path, returns promise after load.
-			 *
-			 * @param  {String} key
-			 * @param  {String} path
-			 * @return {$promise}
-			 * @member $template
-			 */
-			load: function(key, path) {
-				return new $promise(function(resolve, reject) {
-					$http.createRequest({
-						url: path
-					}).then(function(data) {
-						this.add(key, data.data);
-						resolve();
-					}.bind(this), function(data) {
-						reject(data);
+					all.push({
+						value: value,
+						pos: argsValue.indexOf(item)
 					});
-				}.bind(this));
+				}, this);
+				if (all.length) {
+					all.sort(function(a, b) {
+						return a.pos - b.pos
+					}).forEach(function(item) {
+						args.push(item.value);
+					});
+				}
+			}
+			return args;
+		};
+		/**
+		 * Bind one single event to the element.
+		 * 
+		 * @param  {HTMLElement} el
+		 * @param  {Object} attr { name, value }
+		 * @param  {Function} scope
+		 * @member $template
+		 * @private
+		 */
+		$template.prototype._bindEvent = function(el, attr, scope) {
+			if (!el || !attr || !scope) return;
+			var eventName = attr.name.replace(_conf.elPrefix, "");
+			var fnName = this._parseFnName(attr.value);
+			if (eventName && fnName in scope) {
+				el.addEventListener(eventName, $common.bindWithoutScope(function(event, templScope) {
+					var args = templScope._parseArgs(attr.value, {
+						el: this,
+						event: event
+					});
+					scope[fnName].apply(scope, args);
+				}, this));
 			}
 		};
-		// template init
-		$template._init();
-		return $template;
+		/**
+		 * Get element prefixed attributes.
+		 * 
+		 * @param  {HTMLElement} el
+		 * @return {Array}
+		 * @member $template
+		 * @private
+		 */
+		$template.prototype._getAttributes = function(el) {
+			var output = [];
+			if (el && "attributes" in el) {
+				Object.keys(el.attributes).forEach(function(attr) {
+					var item = el.attributes[attr];
+					if (item.name.indexOf(_conf.elPrefix) != -1) {
+						output.push({
+							name: item.name,
+							value: item.value
+						});
+					}
+				}, this);
+			}
+			return output;
+		};
+		/**
+		 * Init - get all templates from the page. Uses 'text/template' script with template data.
+		 * Each script has to have id and specifi type="text/template".
+		 *
+		 * @private
+		 * @member $template
+		 */
+		$template.prototype._init = function() {
+			onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function(item) {
+				this.add(item.id || "", item.innerHTML);
+			}, this);
+		};
+		/**
+		 * Add new item to the cache.
+		 *
+		 * @param {String} key 
+		 * @param {String} data
+		 * @member $template
+		 */
+		$template.prototype.add = function(key, data) {
+			this._cache[key] = data;
+		};
+		/**
+		 * Compile one template - replaces all ocurances of {{ xxx }} by model.
+		 *
+		 * @param  {String} key Template key/name
+		 * @param  {Object} data Model
+		 * @return {String}
+		 * @member $template
+		 */
+		$template.prototype.compile = function(key, data) {
+			var tmpl = this.get(key);
+			if (data) {
+				var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
+				all.forEach(function(item) {
+					var itemSave = item;
+					item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
+					if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
+						var filterValue;
+						// filters
+						item.split(this._CONST.FILTER_DELIMETER).forEach(function(filterItem, ind) {
+							filterItem = filterItem.trim();
+							if (!ind) {
+								// value
+								if (filterItem in data) {
+									filterValue = data[filterItem];
+								}
+							}
+							else {
+								// preprocessing by filter
+								var args = [filterValue];
+								var filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
+								var filterName = "";
+								if (filterParts.length == 1) {
+									filterName = filterParts[0].trim();
+								}
+								else {
+									filterParts.forEach(function(filterPartItem, filterPartInd) {
+										filterPartItem = filterPartItem.trim();
+										if (!filterPartInd) {
+											filterName = filterPartItem;
+										}
+										else {
+											args.push(filterPartItem);
+										}
+									});
+								}
+								var filter = $filter(filterName);
+								filterValue = filter.apply(filter, args);
+							}
+						}, this);
+						tmpl = tmpl.replace(itemSave, filterValue || "");
+					}
+					else {
+						// standard
+						var replaceValue = "";
+						item = item.trim();
+						if (item in data) {
+							replaceValue = data[item];
+						}
+						tmpl = tmpl.replace(itemSave, replaceValue);
+					}
+				}, this);
+			}
+			return tmpl;
+		};
+		/**
+		 * Get template from the cache.
+		 *
+		 * @param  {String} key Template key/name
+		 * @return {String}
+		 * @member $template
+		 */
+		$template.prototype.get = function(key) {
+			return this._cache[key] || "";
+		};
+		/**
+		 * Bind all elements in the root element. Selectors all data-* and functions are binds against scope object.
+		 * For data-bind, scope has to have "addEls" function.
+		 * Supports: click, change, keydown, bind.
+		 *
+		 * @param  {HTMLElement} root Root element
+		 * @param  {Object} scope Scope which against will be binding used
+		 * @param  {Function} [addElsCb] Callback function with object with all data-bind objects
+		 * @member $template
+		 */
+		$template.prototype.bindTemplate = function(root, scope, addElsCb) {
+			var allElements = onix.element("*", root);
+			if (allElements.len()) {
+				var newEls = {};
+				allElements.forEach(function(item) {
+					var attrs = this._getAttributes(item);
+					attrs.forEach(function(attr) {
+						if (attr.name == _conf.elDataBind) {
+							newEls[attr.value] = item;
+						}
+						else {
+							this._bindEvent(item, attr, scope);
+						}
+					}, this);
+				}, this);
+				if (addElsCb && typeof addElsCb === "function") {
+					addElsCb(newEls);
+				}
+			}
+		};
+		/**
+		 * Load template from the path, returns promise after load.
+		 *
+		 * @param  {String} key
+		 * @param  {String} path
+		 * @return {$promise}
+		 * @member $template
+		 */
+		$template.prototype.load = function(key, path) {
+			return new $promise(function(resolve, reject) {
+				$http.createRequest({
+					url: path
+				}).then(function(data) {
+					this.add(key, data.data);
+					resolve();
+				}.bind(this), function(data) {
+					reject(data);
+				});
+			}.bind(this));
+		};
+		return new $template();
 	}];
 });
 onix.factory("$anonymizer", [
@@ -5985,90 +5998,81 @@ function(
 	};
 	return $anonymizer;
 }]);
-/**
- * Progress loader in the application.
- * 
- * @class $loader
- */
 onix.factory("$loader", [
 	"$dom",
 function(
 	$dom
 ) {
-	var $loader = {
-		/**
-		 * Create loader.
-		 *
-		 * @private
-		 * @member $loader
-		 */
-		_create: function() {
-			this._el = $dom.create({
-				el: "div",
-				"class": "loader"
-			});
-			// insert into the body on first position
-			document.body.insertBefore(this._el, document.body.firstChild);
-		},
-		/**
-		 * Loader init.
-		 *
-		 * @private
-		 * @member $loader
-		 */
-		_init: function() {
-			this._create();
-		},
-		/**
-		 * Start loader.
-		 *
-		 * @member $loader
-		 */
-		start: function() {
-			this._el.classList.add("start");
-		},
-		/**
-		 * End loader.
-		 *
-		 * @member $loader
-		 */
-		end: function() {
-			this._el.classList.remove("start");
-			this._el.classList.add("end");
-			setTimeout(function() {
-				this._el.classList.remove("end");
-				this._el.classList.add("hide");
-				setTimeout(function() {
-					this._el.classList.remove("hide");
-				}.bind(this), 350);
-			}.bind(this), 150);
-		},
-		/**
-		 * Get spinner - DOM or object.
-		 *
-		 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
-		 * @return {HTMLElement|Object}
-		 * @member $loader
-		 */
-		getSpinner: function(getObject) {
-			var children = [];
-			for (var i = 1; i < 6; i++) {
-				children.push({
-					el: "div",
-					"class": "rect" + i
-				});
-			}
-			var domConf = {
-				el: "div",
-				"class": "spinner",
-				child: children
-			};
-			return (getObject ? domConf : $dom.create(domConf));
-		}
+	/**
+	 * Progress loader in the application.
+	 * 
+	 * @class $loader
+	 */
+	var $loader = function() {
+		// loader init
+		this._create();
 	};
-	// loader init
-	$loader._init();
-	return $loader;
+	/**
+	 * Create loader.
+	 *
+	 * @private
+	 * @member $loader
+	 */
+	$loader.prototype._create = function() {
+		this._el = $dom.create({
+			el: "div",
+			"class": "loader"
+		});
+		// insert into the body on first position
+		document.body.insertBefore(this._el, document.body.firstChild);
+	};
+	/**
+	 * Start loader.
+	 *
+	 * @member $loader
+	 */
+	$loader.prototype.start = function() {
+		this._el.classList.add("start");
+	};
+	/**
+	 * End loader.
+	 *
+	 * @member $loader
+	 */
+	$loader.prototype.end = function() {
+		this._el.classList.remove("start");
+		this._el.classList.add("end");
+		setTimeout(function() {
+			this._el.classList.remove("end");
+			this._el.classList.add("hide");
+			setTimeout(function() {
+				this._el.classList.remove("hide");
+			}.bind(this), 350);
+		}.bind(this), 150);
+	};
+	/**
+	 * Get spinner - DOM or object.
+	 *
+	 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
+	 * @return {HTMLElement|Object}
+	 * @member $loader
+	 */
+	$loader.prototype.getSpinner = function(getObject) {
+		var children = [];
+		for (var i = 1; i < 6; i++) {
+			children.push({
+				el: "div",
+				"class": "rect" + i
+			});
+		}
+		var domConf = {
+			el: "div",
+			"class": "spinner",
+			child: children
+		};
+		return (getObject ? domConf : $dom.create(domConf));
+	};
+	return new $loader();
 }]);
 /**
  * $notify uses bootstrap alerts and provides additional functionality.
@@ -6315,9 +6319,9 @@ function(
 	 * @param  {HTMLElement} el Placeholder element
 	 * @param  {File[]} files
 	 * @param  {Object} [opts] Configuration
-	 * @param  {Number} [opts.maxSize] Max image size in px; the size is used for image scale
-	 * @param  {Number} [opts.count] How many images are processed simultinously
-	 * @param  {Boolean} [opts.createHolder] Create placeholder, see _createPreviewHolders function
+	 * @param  {Number} [opts.maxSize = 0] Max image size in px; the size is used for image scale
+	 * @param  {Number} [opts.count = 0] How many images are processed simultinously
+	 * @param  {Boolean} [opts.createHolder = false] Create placeholder, see _createPreviewHolders function
 	 * @member $previewImages
 	 */
 	this.show = function(el, files, optsArg) {
@@ -6381,8 +6385,8 @@ function(
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class "dropdown"
-	 * @param {Object} opts
-	 * @param {Boolean} opts.addCaption Add caption to select
+	 * @param {Object} [opts]
+	 * @param {Boolean} [opts.addCaption = false] Add caption to select
 	 * @member $select
 	 */
 	var $select = function(el, opts) {

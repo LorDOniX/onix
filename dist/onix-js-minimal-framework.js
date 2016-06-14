@@ -236,6 +236,7 @@ if (!Date.now) {
 	Date.now = function() { return +(new Date); }
 }
 onix = (function() {
+	/* ************************************* $module **************************** */
 	/**
 	 * Module object - handles one module object with services, factories etc.
 	 * This object cannot be used in dependency injection!
@@ -291,6 +292,7 @@ onix = (function() {
 	 * @type {Object}
 	 * @member $module
 	 * @private
+	 * @static
 	 */
 	$module.CONST = {
 		PROVIDER_NAME: "Provider",
@@ -313,6 +315,7 @@ onix = (function() {
 	 * @param  {Array|Function} param 
 	 * @return {Object} Parse object
 	 * @member $module
+	 * @static
 	 */
 	$module.parseParam = function(param) {
 		var fn;
@@ -343,6 +346,7 @@ onix = (function() {
 	 * @param  {String} name
 	 * @return {String}
 	 * @member $module
+	 * @static
 	 */
 	$module.getFilterName = function(name) {
 		name = name || "";
@@ -585,13 +589,14 @@ onix = (function() {
 	$module.prototype.directive = function() {
 		return this;
 	};
+	/* ************************************* $modules **************************** */
 	/**
 	 * Modules object - handles all modules in the application; runs object.
 	 * This object cannot be used in dependency injection!
 	 *
 	 * @class $modules
 	 */
-	var $modules = {
+	var $modules = function() {
 		/**
 		 * All modules array.
 		 *
@@ -599,7 +604,7 @@ onix = (function() {
 		 * @member $modules
 		 * @type {Array}
 		 */
-		_modules: [],
+		this._modules = [];
 		/**
 		 * All modules object - quick access.
 		 *
@@ -607,7 +612,7 @@ onix = (function() {
 		 * @member $modules
 		 * @type {Object}
 		 */
-		_modulesObj: {},
+		this._modulesObj = {};
 		/**
 		 * Modules constants.
 		 *
@@ -615,226 +620,229 @@ onix = (function() {
 		 * @member $modules
 		 * @type {Object}
 		 */
-		_CONST: {
+		this._CONST = {
 			MODULE_SEPARATOR: "::",
-		},
-		/**
-		 * Function which does nothing.
-		 *
-		 * @private
-		 * @member $modules
-		 */
-		_noop: function() {
-		},
-		/**
-		 * Event - Dom LOAD.
-		 *
-		 * @member $modules
-		 */
-		domLoad: function() {
-			var configs = [];
-			var runs = [];
-			this._modules.forEach(function(module) {
-				var error = false;
-				var dependencies = module.getDependencies();
-				dependencies.every(function(dep) {
-					if (!(dep in this._modulesObj)) {
-						console.error("Module '" + this._name + "' dependency '" + dep + "' not found!");
-						error = true;
-						return false;
-					}
-					else {
-						return true;
-					}
-				}, this);
-				if (!error) {
-					configs = configs.concat(module.getConfigs());
-					runs = runs.concat(module.getRuns());
-				}
-			}, this);
-			// run all configs
-			configs.forEach(function(config) {
-				this.run(config, true);
-			}, this);
-			// run all runs
-			runs.forEach(function(run) {
-				this.run(run);
-			}, this);
-		},
-		/**
-		 * Get object by his name.
-		 *
-		 * @param {String} name Object name
-		 * @return {Object} Object data
-		 * @member $modules
-		 * @private
-		 */
-		_getObject: function(name) {
-			var output = null;
-			var searchModuleName = "";
-			var searchObjectName = "";
-			if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
-				var parts = name.split(this._CONST.MODULE_SEPARATOR);
-				if (parts.length == 2) {
-					searchModuleName = parts[0];
-					searchObjectName = parts[1];
+		};
+		// bind DOM ready
+		document.addEventListener("DOMContentLoaded", this._domLoad.bind(this));
+	};
+	/**
+	 * Event - Dom LOAD.
+	 *
+	 * @member $modules
+	 * @private
+	 */
+	$modules.prototype._domLoad = function() {
+		var configs = [];
+		var runs = [];
+		this._modules.forEach(function(module) {
+			var error = false;
+			var dependencies = module.getDependencies();
+			dependencies.every(function(dep) {
+				if (!(dep in this._modulesObj)) {
+					console.error("Module '" + this._name + "' dependency '" + dep + "' not found!");
+					error = true;
+					return false;
 				}
 				else {
-					console.error("Get object " + name + " error! Wrong module separator use.");
-					return null;
+					return true;
 				}
+			}, this);
+			if (!error) {
+				configs = configs.concat(module.getConfigs());
+				runs = runs.concat(module.getRuns());
+			}
+		}, this);
+		// run all configs
+		configs.forEach(function(config) {
+			this.run(config, true);
+		}, this);
+		// run all runs
+		runs.forEach(function(run) {
+			this.run(run);
+		}, this);
+	};
+	/**
+	 * Get object by his name.
+	 *
+	 * @param {String} name Object name
+	 * @return {Object} Object data
+	 * @member $modules
+	 * @private
+	 */
+	$modules.prototype._getObject = function(name) {
+		var output = null;
+		var searchModuleName = "";
+		var searchObjectName = "";
+		if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
+			var parts = name.split(this._CONST.MODULE_SEPARATOR);
+			if (parts.length == 2) {
+				searchModuleName = parts[0];
+				searchObjectName = parts[1];
 			}
 			else {
-				searchObjectName = name;
-			}
-			this._modules.every(function(module) {
-				var moduleObjects = module.getObjects();
-				if (searchModuleName) {
-					if (module.getName() != searchModuleName) return true;
-					if (searchObjectName in moduleObjects) {
-						output = moduleObjects[searchObjectName];
-						return false;
-					}
-					else {
-						console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
-						return false;
-					}
-				}
-				else {
-					if (searchObjectName in moduleObjects) {
-						output = moduleObjects[searchObjectName];
-						return false;
-					}
-					else return true;
-				}
-			});
-			return output;
-		},
-		/**
-		 * Run object configuration; returns his cache (data).
-		 *
-		 * @param  {Object}  obj Object configuration
-		 * @param  {Boolean} [isConfig] Is config phase?
-		 * @param  {Array} [parent] Parent objects
-		 * @return {Object}
-		 * @member $modules
-		 */
-		run: function(obj, isConfig, parent) {
-			parent = parent || [];
-			if (parent.indexOf(obj.name) != -1) {
-				console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
+				console.error("Get object " + name + " error! Wrong module separator use.");
 				return null;
 			}
-			var inject = [];
-			if (obj.provider) {
-				var providerObj = this._getObject(obj.provider);
-				if (!providerObj.cache) {
-					var providerFn = providerObj.fn || this._noop;
-					providerObj.cache = new providerFn();
+		}
+		else {
+			searchObjectName = name;
+		}
+		this._modules.every(function(module) {
+			var moduleObjects = module.getObjects();
+			if (searchModuleName) {
+				if (module.getName() != searchModuleName) return true;
+				if (searchObjectName in moduleObjects) {
+					output = moduleObjects[searchObjectName];
+					return false;
 				}
-				var getFn = providerObj.cache["$get"] || this._noop;
-				var pp = $module.parseParam(getFn);
-				obj.fn = pp.fn;
-				obj.inject = pp.inject;
-				delete obj.provider;
-			}
-			if (obj.inject && obj.inject.length) {
-				obj.inject.forEach(function(objName) {
-					if (typeof objName === "string") {
-						var injObj = this._getObject(objName);
-						if (!injObj) {
-							console.error("Object name: " + objName + " not found!");
-							inject.push(null);
-						}
-						else {
-							inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
-						}
-					}
-					else if (typeof objName === "object") {
-						inject.push(objName);
-					}
-				}, this);
-			}
-			// config phase
-			if (isConfig) {
-				switch (obj.type) {
-					case $module.CONST.TYPE.PROVIDER:
-						if (!obj.cache) {
-							var fn = obj.fn || this._noop;
-							obj.cache = new fn();
-						}
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.CONSTANT:
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.CONFIG:
-						var fn = obj.fn || this._noop;
-						return fn.apply(fn, inject);
-						break;
-					default:
-						return null;
+				else {
+					console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
+					return false;
 				}
 			}
-			// run phase
 			else {
-				switch (obj.type) {
-					case $module.CONST.TYPE.FACTORY:
-					case $module.CONST.TYPE.FILTER:
-						if (!obj.cache) {
-							var fn = obj.fn || this._noop;
-							obj.cache = fn.apply(fn, inject);
-						}
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.SERVICE:
-						if (!obj.cache) {
-							var fn = obj.fn || this._noop;
-							var serviceObj = Object.create(fn.prototype);
-							fn.apply(serviceObj, inject);
-							obj.cache = serviceObj;
-						}
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.VALUE:
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.CONSTANT:
-						return obj.cache;
-						break;
-					case $module.CONST.TYPE.RUN:
-						var fn = obj.fn || this._noop;
-						return fn.apply(fn, inject);
-						break;
-					default:
-						return null;
+				if (searchObjectName in moduleObjects) {
+					output = moduleObjects[searchObjectName];
+					return false;
 				}
+				else return true;
 			}
-		},
-		/**
-		 * Add a new module to the application.
-		 * 
-		 * @param {String} name Module name
-		 * @param {Array} [dependencies] Module dependencies
-		 * @return {Object} Created module
-		 * @member $modules
-		 */
-		addModule: function(name, dependencies) {
-			var module = new $module(name, dependencies);
-			this._modulesObj[name] = module
-			this._modules.push(module);
-			return module;
+		});
+		return output;
+	};
+	/**
+	 * Function which does nothing.
+	 *
+	 * @member $modules
+	 */
+	$modules.prototype.noop = function() {
+	};
+	/**
+	 * Run object configuration; returns his cache (data).
+	 *
+	 * @param  {Object}  obj Object configuration
+	 * @param  {Boolean} [isConfig] Is config phase?
+	 * @param  {Array} [parent] Parent objects
+	 * @return {Object}
+	 * @member $modules
+	 */
+	$modules.prototype.run = function(obj, isConfig, parent) {
+		parent = parent || [];
+		if (parent.indexOf(obj.name) != -1) {
+			console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
+			return null;
+		}
+		var inject = [];
+		if (obj.provider) {
+			var providerObj = this._getObject(obj.provider);
+			if (!providerObj.cache) {
+				var providerFn = providerObj.fn || this.noop;
+				providerObj.cache = new providerFn();
+			}
+			var getFn = providerObj.cache["$get"] || this.noop;
+			var pp = $module.parseParam(getFn);
+			obj.fn = pp.fn;
+			obj.inject = pp.inject;
+			delete obj.provider;
+		}
+		if (obj.inject && obj.inject.length) {
+			obj.inject.forEach(function(objName) {
+				if (typeof objName === "string") {
+					var injObj = this._getObject(objName);
+					if (!injObj) {
+						console.error("Object name: " + objName + " not found!");
+						inject.push(null);
+					}
+					else {
+						inject.push(this.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+					}
+				}
+				else if (typeof objName === "object") {
+					inject.push(objName);
+				}
+			}, this);
+		}
+		// config phase
+		if (isConfig) {
+			switch (obj.type) {
+				case $module.CONST.TYPE.PROVIDER:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = new fn();
+					}
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.CONFIG:
+					var fn = obj.fn || this.noop;
+					return fn.apply(fn, inject);
+					break;
+				default:
+					return null;
+			}
+		}
+		// run phase
+		else {
+			switch (obj.type) {
+				case $module.CONST.TYPE.FACTORY:
+				case $module.CONST.TYPE.FILTER:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						obj.cache = fn.apply(fn, inject);
+					}
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.SERVICE:
+					if (!obj.cache) {
+						var fn = obj.fn || this.noop;
+						var serviceObj = Object.create(fn.prototype);
+						fn.apply(serviceObj, inject);
+						obj.cache = serviceObj;
+					}
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.VALUE:
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.CONSTANT:
+					return obj.cache;
+					break;
+				case $module.CONST.TYPE.RUN:
+					var fn = obj.fn || this.noop;
+					return fn.apply(fn, inject);
+					break;
+				default:
+					return null;
+			}
 		}
 	};
-	// bind DOM ready
-	document.addEventListener("DOMContentLoaded", $modules.domLoad.bind($modules));
+	/**
+	 * Add a new module to the application.
+	 * 
+	 * @param {String} name Module name
+	 * @param {Array} [dependencies] Module dependencies
+	 * @return {Object} Created module
+	 * @member $modules
+	 */
+	$modules.prototype.addModule = function(name, dependencies) {
+		var module = new $module(name, dependencies);
+		this._modulesObj[name] = module
+		this._modules.push(module);
+		return module;
+	};
+	// new instance from $modules class
+	var $modulesInst = new $modules();
+	/* ************************************* onix **************************** */
 	/**
 	 * Main framework object, which is created like new module with name 'onix'.
 	 * Module has addtional functions.
 	 * 
 	 * @class onix
 	 */
-	var onix = $modules.addModule("onix");
+	var onix = $modulesInst.addModule("onix");
 	/**
 	 * Add a new module to the application.
 	 * 
@@ -844,30 +852,30 @@ onix = (function() {
 	 * @member onix
 	 */
 	onix.module = function(name, dependencies) {
-		return $modules.addModule(name, dependencies);
+		return $modulesInst.addModule(name, dependencies);
 	};
 	/**
 	 * Empty function.
 	 *
 	 * @member onix
 	 */
-	onix.noop = function() {
-	};
+	onix.noop = $modulesInst.noop;
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.6.0
-	 * date: 13. 6. 2016
+	 * version: 2.6.1
+	 * date: 14. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.6.0/13. 6. 2016\n'+
+'2.6.1/14. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
 '- Free for use in both personal and commercial projects\n');
 	};
+	/* ************************************* $di **************************** */
 	onix.factory("$di", function() {
 		/**
 		 * Helper factory for dependency injection and parsing function parameters.
@@ -908,7 +916,7 @@ onix = (function() {
 				}
 				// def. type
 				runObj.type = $module.CONST.TYPE.RUN;
-				return $modules.run(runObj);
+				return $modulesInst.run(runObj);
 			}
 		}
 	});
@@ -924,9 +932,6 @@ onix.factory("$filter", [
 function(
 	$di
 ) {
-	var emptyFilter = function(value) {
-		return value || "";
-	};
 	/**
 	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
 	 *
@@ -936,6 +941,9 @@ function(
 	 * @member $filter
 	 */
 	return function(filterName) {
+		var emptyFilter = function(value) {
+			return value || "";
+		};
 		if (!filterName) {
 			return emptyFilter;
 		}

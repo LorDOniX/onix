@@ -15,102 +15,92 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='$loader'>/**
-</span> * Progress loader in the application.
- * 
- * @class $loader
- */
-onix.factory(&quot;$loader&quot;, [
+  <pre class="prettyprint lang-js">onix.factory(&quot;$loader&quot;, [
 	&quot;$dom&quot;,
 function(
 	$dom
 ) {
-	var $loader = {
-<span id='$loader-method-_create'>		/**
-</span>		 * Create loader.
-		 *
-		 * @private
-		 * @member $loader
-		 */
-		_create: function() {
-			this._el = $dom.create({
-				el: &quot;div&quot;,
-				&quot;class&quot;: &quot;loader&quot;
-			});
-
-			// insert into the body on first position
-			document.body.insertBefore(this._el, document.body.firstChild);
-		},
-		
-<span id='$loader-method-_init'>		/**
-</span>		 * Loader init.
-		 *
-		 * @private
-		 * @member $loader
-		 */
-		_init: function() {
-			this._create();
-		},
-
-<span id='$loader-method-start'>		/**
-</span>		 * Start loader.
-		 *
-		 * @member $loader
-		 */
-		start: function() {
-			this._el.classList.add(&quot;start&quot;);
-		},
-
-<span id='$loader-method-end'>		/**
-</span>		 * End loader.
-		 *
-		 * @member $loader
-		 */
-		end: function() {
-			this._el.classList.remove(&quot;start&quot;);
-			this._el.classList.add(&quot;end&quot;);
-
-			setTimeout(function() {
-				this._el.classList.remove(&quot;end&quot;);
-				this._el.classList.add(&quot;hide&quot;);
-
-				setTimeout(function() {
-					this._el.classList.remove(&quot;hide&quot;);
-				}.bind(this), 350);
-			}.bind(this), 150);
-		},
-
-<span id='$loader-method-getSpinner'>		/**
-</span>		 * Get spinner - DOM or object.
-		 *
-		 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
-		 * @return {HTMLElement|Object}
-		 * @member $loader
-		 */
-		getSpinner: function(getObject) {
-			var children = [];
-
-			for (var i = 1; i &lt; 6; i++) {
-				children.push({
-					el: &quot;div&quot;,
-					&quot;class&quot;: &quot;rect&quot; + i
-				});
-			}
-
-			var domConf = {
-				el: &quot;div&quot;,
-				&quot;class&quot;: &quot;spinner&quot;,
-				child: children
-			};
-
-			return (getObject ? domConf : $dom.create(domConf));
-		}
+<span id='$loader'>	/**
+</span>	 * Progress loader in the application.
+	 * 
+	 * @class $loader
+	 */
+	var $loader = function() {
+		// loader init
+		this._create();
 	};
 
-	// loader init
-	$loader._init();
+<span id='$loader-method-_create'>	/**
+</span>	 * Create loader.
+	 *
+	 * @private
+	 * @member $loader
+	 */
+	$loader.prototype._create = function() {
+		this._el = $dom.create({
+			el: &quot;div&quot;,
+			&quot;class&quot;: &quot;loader&quot;
+		});
 
-	return $loader;
+		// insert into the body on first position
+		document.body.insertBefore(this._el, document.body.firstChild);
+	};
+	
+<span id='$loader-method-start'>	/**
+</span>	 * Start loader.
+	 *
+	 * @member $loader
+	 */
+	$loader.prototype.start = function() {
+		this._el.classList.add(&quot;start&quot;);
+	};
+
+<span id='$loader-method-end'>	/**
+</span>	 * End loader.
+	 *
+	 * @member $loader
+	 */
+	$loader.prototype.end = function() {
+		this._el.classList.remove(&quot;start&quot;);
+		this._el.classList.add(&quot;end&quot;);
+
+		setTimeout(function() {
+			this._el.classList.remove(&quot;end&quot;);
+			this._el.classList.add(&quot;hide&quot;);
+
+			setTimeout(function() {
+				this._el.classList.remove(&quot;hide&quot;);
+			}.bind(this), 350);
+		}.bind(this), 150);
+	};
+
+<span id='$loader-method-getSpinner'>	/**
+</span>	 * Get spinner - DOM or object.
+	 *
+	 * @param {Boolean} [getObject] True for object DOM configuration for $dom; default HTML node
+	 * @return {HTMLElement|Object}
+	 * @member $loader
+	 */
+	$loader.prototype.getSpinner = function(getObject) {
+		var children = [];
+
+		for (var i = 1; i &lt; 6; i++) {
+			children.push({
+				el: &quot;div&quot;,
+				&quot;class&quot;: &quot;rect&quot; + i
+			});
+		}
+
+		var domConf = {
+			el: &quot;div&quot;,
+			&quot;class&quot;: &quot;spinner&quot;,
+			child: children
+		};
+
+		return (getObject ? domConf : $dom.create(domConf));
+	};
+
+	return new $loader();
 }]);
 </pre>
 </body>

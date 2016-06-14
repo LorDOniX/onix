@@ -12,8 +12,8 @@ function(
 	 *
 	 * @class $select
 	 * @param {HTMLElement} el Where element has class "dropdown"
-	 * @param {Object} opts
-	 * @param {Boolean} opts.addCaption Add caption to select
+	 * @param {Object} [opts]
+	 * @param {Boolean} [opts.addCaption = false] Add caption to select
 	 * @member $select
 	 */
 	var $select = function(el, opts) {

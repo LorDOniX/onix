@@ -30,7 +30,7 @@ onix.service("$location", function() {
 			var newURL = [];
 
 			Object.keys(obj).forEach(function(key) {
-				newURL.push(key + "=" + encodeURIComponent(obj[key]));
+				newURL.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
 			});
 		}
 
@@ -66,8 +66,9 @@ onix.service("$location", function() {
 
 				data.split("&").forEach(function(item) {
 					var parts = item.split("=");
+					var name = decodeURIComponent(parts[0]);
 					
-					output[parts[0]] = decodeURIComponent(parts[1]);
+					output[name] = decodeURIComponent(parts[1]);
 				});
 			}
 

@@ -47,7 +47,7 @@ onix.service(&quot;$location&quot;, function() {
 			var newURL = [];
 
 			Object.keys(obj).forEach(function(key) {
-				newURL.push(key + &quot;=&quot; + encodeURIComponent(obj[key]));
+				newURL.push(encodeURIComponent(key) + &quot;=&quot; + encodeURIComponent(obj[key]));
 			});
 		}
 
@@ -83,8 +83,9 @@ onix.service(&quot;$location&quot;, function() {
 
 				data.split(&quot;&amp;&quot;).forEach(function(item) {
 					var parts = item.split(&quot;=&quot;);
+					var name = decodeURIComponent(parts[0]);
 					
-					output[parts[0]] = decodeURIComponent(parts[1]);
+					output[name] = decodeURIComponent(parts[1]);
 				});
 			}
 

@@ -122,7 +122,7 @@ function(
 
 			url = this._updateURL(url, config.getData);
 
-			request.onerror = function () { reject(); };
+			request.onerror = function (err) { reject(err); };
 			request.open(method, url, true);
 			request.onreadystatechange = function() {
 				if (request.readyState == 4) {
@@ -185,7 +185,7 @@ function(
 				}
 			}
 			catch (err) {
-				reject();
+				reject(err);
 			}
 		}.bind(this));
 	};

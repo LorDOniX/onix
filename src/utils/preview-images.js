@@ -131,9 +131,9 @@ function(
 	 * @param  {HTMLElement} el Placeholder element
 	 * @param  {File[]} files
 	 * @param  {Object} [opts] Configuration
-	 * @param  {Number} [opts.maxSize] Max image size in px; the size is used for image scale
-	 * @param  {Number} [opts.count] How many images are processed simultinously
-	 * @param  {Boolean} [opts.createHolder] Create placeholder, see _createPreviewHolders function
+	 * @param  {Number} [opts.maxSize = 0] Max image size in px; the size is used for image scale
+	 * @param  {Number} [opts.count = 0] How many images are processed simultinously
+	 * @param  {Boolean} [opts.createHolder = false] Create placeholder, see _createPreviewHolders function
 	 * @member $previewImages
 	 */
 	this.show = function(el, files, optsArg) {

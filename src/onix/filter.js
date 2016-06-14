@@ -8,10 +8,6 @@ onix.factory("$filter", [
 function(
 	$di
 ) {
-	var emptyFilter = function(value) {
-		return value || "";
-	};
-
 	/**
 	 * Return filter by his name or returns empty filter. Filter name is concatenation of $filter + Filter name.
 	 *
@@ -21,6 +17,10 @@ function(
 	 * @member $filter
 	 */
 	return function(filterName) {
+		var emptyFilter = function(value) {
+			return value || "";
+		};
+		
 		if (!filterName) {
 			return emptyFilter;
 		}

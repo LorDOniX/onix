@@ -10,7 +10,7 @@ onix.service("$dom", function() {
 	 * @param  {Object} config
 	 * @param  {String} config.el Element name
 	 * @param  {Object} config.attrs Atributes
-	 * @param  {Array} config.child Child nodes
+	 * @param  {Array|Object} config.child Child nodes
 	 * @param  {Array} config.events Bind events
 	 * @param  {String|Array} config.class Add CSS class/es
 	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
@@ -38,7 +38,13 @@ onix.service("$dom", function() {
 					break;
 
 				case "child":
-					config.child.forEach(function(child) {
+					var value = config.child;
+
+					if (!Array.isArray(value)) {
+						value = [value];
+					}
+					
+					value.forEach(function(child) {
 						el.appendChild(this.create(child, exported));
 					}, this);
 					break;
