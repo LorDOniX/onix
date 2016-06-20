@@ -47,9 +47,10 @@ onix.factory("$event", function() {
 	 * 
 	 * @param  {String} name 
 	 * @param  {Function} [fn]
+	 * @param  {Object|Function} [scope]
 	 * @member $event
 	 */
-	$event.prototype.off = function (name, fn) {
+	$event.prototype.off = function (name, fn, scope) {
 		if (!name) return;
 
 		var len = this._allEvents.length - 1;
@@ -59,7 +60,7 @@ onix.factory("$event", function() {
 
 			if (item.name != name) continue;
 
-			if (!fn || (fn && item.fn == fn)) {
+			if ((!fn || fn == item.fn) && (!scope || scope == item.scope)) {
 				this._allEvents.splice(i, 1);
 			}
 		}

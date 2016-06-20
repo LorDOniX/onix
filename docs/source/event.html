@@ -64,9 +64,10 @@
 	 * 
 	 * @param  {String} name 
 	 * @param  {Function} [fn]
+	 * @param  {Object|Function} [scope]
 	 * @member $event
 	 */
-	$event.prototype.off = function (name, fn) {
+	$event.prototype.off = function (name, fn, scope) {
 		if (!name) return;
 
 		var len = this._allEvents.length - 1;
@@ -76,7 +77,7 @@
 
 			if (item.name != name) continue;
 
-			if (!fn || (fn &amp;&amp; item.fn == fn)) {
+			if ((!fn || fn == item.fn) &amp;&amp; (!scope || scope == item.scope)) {
 				this._allEvents.splice(i, 1);
 			}
 		}

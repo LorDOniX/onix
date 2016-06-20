@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.6.3 (20. 6. 2016)
+
+* $event - add scope for .off method
+
 ## 2.6.2 (14. 6. 2016)
 
 * $slider - input keyup bugfix

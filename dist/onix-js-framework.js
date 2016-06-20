@@ -1579,13 +1579,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.6.2
-	 * date: 14. 6. 2016
+	 * version: 2.6.3
+	 * date: 20. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.6.2/14. 6. 2016\n'+
+'2.6.3/20. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2378,15 +2378,16 @@ onix.factory("$event", function() {
 	 * 
 	 * @param  {String} name 
 	 * @param  {Function} [fn]
+	 * @param  {Object|Function} [scope]
 	 * @member $event
 	 */
-	$event.prototype.off = function (name, fn) {
+	$event.prototype.off = function (name, fn, scope) {
 		if (!name) return;
 		var len = this._allEvents.length - 1;
 		for (var i = len; i >= 0; i--) {
 			var item = this._allEvents[i];
 			if (item.name != name) continue;
-			if (!fn || (fn && item.fn == fn)) {
+			if ((!fn || fn == item.fn) && (!scope || scope == item.scope)) {
 				this._allEvents.splice(i, 1);
 			}
 		}
