@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.6.5 (22. 6. 2016)
+
+* $crop - style fix
+
 ## 2.6.4 (22. 6. 2016)
 
 * fix bundler EOL on windows
