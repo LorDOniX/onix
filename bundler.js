@@ -9,6 +9,7 @@ var UglifyJS = require("uglify-js");
 var filesJson = require("./src/files");
 
 const EOL = require("os").EOL;
+const PATH_SEP = require("path").sep;
 
 // dont change watch paths order! - see watcher
 const _CONST = {
@@ -347,6 +348,11 @@ class Bundler {
 		this._watcher.setCallback((eventName, buffer) => {
 			if (buffer.length == 1) {
 				let path = buffer[0];
+				// path parts
+				let parts = path.split(PATH_SEP);
+
+				// set unix format
+				path = parts.join("/");
 
 				if (_JS_FILES.indexOf(path) != -1) {
 					Common.readFile(path).then((data) => {

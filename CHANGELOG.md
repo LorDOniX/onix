@@ -1,5 +1,10 @@
 # Change Log
 
+## unreleased 2.6.4 (21. 6. 2016)
+
+* fix bundler EOL on windows
+* fix bundler watch
+
 ## 2.6.3 (20. 6. 2016)
 
 * $event - add scope for .off method
