@@ -8,6 +8,8 @@ var Less = require('less');
 var UglifyJS = require("uglify-js");
 var filesJson = require("./src/files");
 
+const EOL = require("os").EOL;
+
 // dont change watch paths order! - see watcher
 const _CONST = {
 	WATCH_PATHS: [
@@ -399,7 +401,7 @@ class Bundler {
 			});
 
 			// clear blank lines
-			let outputStr = output.join("\n").replace(/(^[ \t]*\n)/gm, "");
+			let outputStr = output.join(EOL).replace(/(^[ \t]*\n)/gm, "");
 
 			Common.writeFile(outputFile, outputStr).then(() => {
 				Common.col("Write JS {0} {1}", outputFile, Common.humanLength(outputStr.length));
@@ -490,7 +492,7 @@ class Bundler {
 	_parseOnixJSFile() {
 		let path = this._getOnixJSPath();
 		let data = this._filesCache[path] || "";
-		let lines = data.split("\n");
+		let lines = data.split(EOL);
 		let output = {
 			version: "",
 			date: ""
@@ -530,7 +532,7 @@ class Bundler {
 			output.push("/**");
 		}
 		
-		let lines = headerData.split("\n");
+		let lines = headerData.split(EOL);
 		let minPh = addMinimal ? " * minimal version: contains [" + filesJson.minimal.join(", ") + "]" : "";
 
 		lines.forEach((line, ind) => {
