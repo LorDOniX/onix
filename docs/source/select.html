@@ -142,7 +142,7 @@ function(
 	 */
 	$select.prototype._click = function() {
 		this._removeAllOpened();
-		window.removeEventListener(&quot;click&quot;, this._binds.click);
+		document.removeEventListener(&quot;click&quot;, this._binds.click);
 	};
 
 <span id='$select-method-_captionClick'>	/**
@@ -162,11 +162,11 @@ function(
 
 		if (isOpen) {
 			// outside click
-			window.removeEventListener(&quot;click&quot;, scope._binds.click);
+			document.removeEventListener(&quot;click&quot;, scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener(&quot;click&quot;, scope._binds.click);
+			document.addEventListener(&quot;click&quot;, scope._binds.click);
 
 			scope._el.classList.add(scope._CONST.OPEN_CLASS);
 		}

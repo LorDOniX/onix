@@ -197,6 +197,9 @@ onix.provider("$template", function() {
 				Object.keys(el.attributes).forEach(function(attr) {
 					var item = el.attributes[attr];
 
+					// ie8 fix
+					if (!item || typeof item !== "object" || !item.name) return;
+
 					if (item.name.indexOf(_conf.elPrefix) != -1) {
 						output.push({
 							name: item.name,

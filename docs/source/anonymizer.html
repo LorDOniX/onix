@@ -21,12 +21,14 @@
 	&quot;$loader&quot;,
 	&quot;$promise&quot;,
 	&quot;$common&quot;,
+	&quot;$features&quot;,
 function(
 	$math,
 	$event,
 	$loader,
 	$promise,
-	$common
+	$common,
+	$features
 ) {
 <span id='$anonymizer'>	/**
 </span>	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -49,17 +51,15 @@ function(
 	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
-		// is canvas available?
-		this._hasCanvas = !!document.createElement(&quot;canvas&quot;).getContext;
-
-		if (!this._hasCanvas) {
-			console.error(&quot;Canvas is not available!&quot;);
-			return null;
-		}
-		
 		// event init
 		this._eventInit();
 
+		// is canvas available?
+		if (!$features.CANVAS) {
+			console.error(&quot;Canvas is not available!&quot;);
+			return;
+		}
+		
 		// parent reference
 		this._parent = parent;
 		this._parent.classList.add(&quot;anonymizer&quot;);

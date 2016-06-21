@@ -1,9 +1,14 @@
 # Change Log
 
-## unreleased 2.6.4 (21. 6. 2016)
+## 2.6.4 (22. 6. 2016)
 
 * fix bundler EOL on windows
 * fix bundler watch
+* ie8 fixes (catch, export key words); $template getAttributes method
+* polyfills - fix add/remove eventListener for IE8
+* $features - browser features constants
+* $select - window -> document
+* $crop - setCenter is not part of constructor
 
 ## 2.6.3 (20. 6. 2016)
 

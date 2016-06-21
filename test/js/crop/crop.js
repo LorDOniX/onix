@@ -35,6 +35,8 @@ function(
 			height: parEl.offsetHeight
 		});
 
+		this.setCenter();
+
 		this._cropper.show();
 	};
 

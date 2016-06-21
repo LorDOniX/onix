@@ -125,7 +125,7 @@ function(
 	 */
 	$select.prototype._click = function() {
 		this._removeAllOpened();
-		window.removeEventListener("click", this._binds.click);
+		document.removeEventListener("click", this._binds.click);
 	};
 
 	/**
@@ -145,11 +145,11 @@ function(
 
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", scope._binds.click);
+			document.removeEventListener("click", scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", scope._binds.click);
+			document.addEventListener("click", scope._binds.click);
 
 			scope._el.classList.add(scope._CONST.OPEN_CLASS);
 		}

@@ -4,12 +4,14 @@ onix.factory("$anonymizer", [
 	"$loader",
 	"$promise",
 	"$common",
+	"$features",
 function(
 	$math,
 	$event,
 	$loader,
 	$promise,
-	$common
+	$common,
+	$features
 ) {
 	/**
 	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -32,17 +34,15 @@ function(
 	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
-		// is canvas available?
-		this._hasCanvas = !!document.createElement("canvas").getContext;
-
-		if (!this._hasCanvas) {
-			console.error("Canvas is not available!");
-			return null;
-		}
-		
 		// event init
 		this._eventInit();
 
+		// is canvas available?
+		if (!$features.CANVAS) {
+			console.error("Canvas is not available!");
+			return;
+		}
+		
 		// parent reference
 		this._parent = parent;
 		this._parent.classList.add("anonymizer");

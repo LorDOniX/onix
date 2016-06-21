@@ -83,9 +83,6 @@ function(
 
 		this._create();
 
-		// set center
-		this.setCenter();
-
 		// crop is by default hidden
 		this.hide();
 	};
@@ -240,7 +237,8 @@ function(
 		e.stopPropagation();
 		e.preventDefault();
 
-		var target = e ? e.target : null;
+		// ie8
+		var target = e.target || e.srcElement;
 
 		this._type = target.getAttribute("class");
 

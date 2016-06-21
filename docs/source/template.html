@@ -214,6 +214,9 @@
 				Object.keys(el.attributes).forEach(function(attr) {
 					var item = el.attributes[attr];
 
+					// ie8 fix
+					if (!item || typeof item !== &quot;object&quot; || !item.name) return;
+
 					if (item.name.indexOf(_conf.elPrefix) != -1) {
 						output.push({
 							name: item.name,

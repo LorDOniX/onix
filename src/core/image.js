@@ -5,26 +5,11 @@
  */
 onix.service("$image", [
 	"$promise",
+	"$features",
 function(
-	$promise
+	$promise,
+	$features
 ) {
-	/**
-	 * FileReader is available.
-	 *
-	 * @private
-	 * @member $image
-	 * @type {Boolean}
-	 */
-	this._hasFileReader = "FileReader" in window;
-
-	/**
-	 * Canvas is available.
-	 *
-	 * @private
-	 * @member $image
-	 * @type {Boolean}
-	 */
-	this._hasCanvas = !!document.createElement("canvas").getContext;
 
 	/**
 	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
@@ -36,7 +21,7 @@ function(
 	 */
 	this.readFromFile = function(file, maxSize) {
 		return new $promise(function(resolve, reject) {
-			if (!this._hasFileReader) {
+			if (!$features.FILE_READER) {
 				reject();
 				return;
 			}
@@ -151,7 +136,7 @@ function(
 			opts[key] = optsArg[key];
 		}
 
-		if (!this._hasCanvas) return null;
+		if (!$features.CANVAS) return null;
 
 		var canvas = document.createElement("canvas");
 		var ctx = canvas.getContext("2d");
@@ -335,4 +320,5 @@ function(
 			return {};
 		}
 	};
+	
 }]);

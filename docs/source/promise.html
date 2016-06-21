@@ -144,14 +144,14 @@
 		return this;
 	};
 
-<span id='$promise-method-catch'>	/**
+<span id='$promise-method-prototype["catch"]'>	/**
 </span>	 * After promise reject call then rejectCb.
 	 *
 	 * @chainable
 	 * @param  {Function} rejectCb Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.catch = function(rejectCb) {
+	$promise.prototype[&quot;catch&quot;] = function(rejectCb) {
 		this._funcs.push({
 			fn: rejectCb,
 			isCatch: true

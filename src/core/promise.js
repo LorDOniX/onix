@@ -134,7 +134,7 @@ onix.factory("$promise", function() {
 	 * @param  {Function} rejectCb Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.catch = function(rejectCb) {
+	$promise.prototype["catch"] = function(rejectCb) {
 		this._funcs.push({
 			fn: rejectCb,
 			isCatch: true

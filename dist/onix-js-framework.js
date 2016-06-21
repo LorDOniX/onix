@@ -143,23 +143,52 @@ if (!("addEventListener" in document)) {
 	var w = Window.prototype;
 	var h = HTMLDocument.prototype;
 	var e = Element.prototype;
-	w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
+	document["addEventListener"] = w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
+		if (!this.__eventListeners) {
+			this.__eventListeners = {};
+		}
 		if (eventName == "DOMContentLoaded") {
-			document.attachEvent("onreadystatechange", function() {
+			this.attachEvent("onreadystatechange", function() {
 				if (document.readyState === "complete") {
 					listener();
 				}
 			});
 		}
 		else {
-			var obj = this;
-			this.attachEvent("on" + eventName, function() {
-				return listener.apply(obj, arguments);
+			if (!this.__eventListeners[eventName]) {
+				this.__eventListeners[eventName] = [];
+			}
+			var fn = function() {
+				return listener.apply(this, arguments);
+			}.bind(this);
+			this.__eventListeners[eventName].push({
+				fn: fn,
+				listener: listener
 			});
+			this.attachEvent("on" + eventName, fn);
 		}
 	};
-	w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
-		return this.detachEvent("on" + eventName, listener);
+	document["removeEventListener"] = w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
+		var all = this.__eventListeners || {};
+		var items = all[eventName] || [];
+		var fn = null;
+		var pos = -1;
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			if (item.listener == listener) {
+				fn = item.fn;
+				pos = i;
+				break;
+			}
+		}
+		if (fn) {
+			items.splice(pos, 1);
+			if (!items.length) {
+				delete all[eventName];
+			}
+			return this.detachEvent("on" + eventName, fn);
+		}
+		else return null;
 	};
 }
 if (!("classList" in document.documentElement) && window.Element) {
@@ -1579,13 +1608,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.6.3
-	 * date: 20. 6. 2016
+	 * version: 2.6.4
+	 * date: 22. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.6.3/20. 6. 2016\n'+
+'2.6.4/22. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -3048,25 +3077,11 @@ onix.config(["$i18nProvider", function($i18nProvider) {
  */
 onix.service("$image", [
 	"$promise",
+	"$features",
 function(
-	$promise
+	$promise,
+	$features
 ) {
-	/**
-	 * FileReader is available.
-	 *
-	 * @private
-	 * @member $image
-	 * @type {Boolean}
-	 */
-	this._hasFileReader = "FileReader" in window;
-	/**
-	 * Canvas is available.
-	 *
-	 * @private
-	 * @member $image
-	 * @type {Boolean}
-	 */
-	this._hasCanvas = !!document.createElement("canvas").getContext;
 	/**
 	 * Read one image file - gets canvas with it. EXIF is readed, you can specific max size for image scale.
 	 *
@@ -3077,7 +3092,7 @@ function(
 	 */
 	this.readFromFile = function(file, maxSize) {
 		return new $promise(function(resolve, reject) {
-			if (!this._hasFileReader) {
+			if (!$features.FILE_READER) {
 				reject();
 				return;
 			}
@@ -3174,7 +3189,7 @@ function(
 		for (var key in optsArg) {
 			opts[key] = optsArg[key];
 		}
-		if (!this._hasCanvas) return null;
+		if (!$features.CANVAS) return null;
 		var canvas = document.createElement("canvas");
 		var ctx = canvas.getContext("2d");
 		var draw = true;
@@ -4356,7 +4371,7 @@ onix.factory("$promise", function() {
 	 * @param  {Function} rejectCb Reject function
 	 * @member $promise
 	 */
-	$promise.prototype.catch = function(rejectCb) {
+	$promise.prototype["catch"] = function(rejectCb) {
 		this._funcs.push({
 			fn: rejectCb,
 			isCatch: true
@@ -4791,6 +4806,8 @@ onix.provider("$template", function() {
 			if (el && "attributes" in el) {
 				Object.keys(el.attributes).forEach(function(attr) {
 					var item = el.attributes[attr];
+					// ie8 fix
+					if (!item || typeof item !== "object" || !item.name) return;
 					if (item.name.indexOf(_conf.elPrefix) != -1) {
 						output.push({
 							name: item.name,
@@ -4950,18 +4967,42 @@ onix.provider("$template", function() {
 		return new $template();
 	}];
 });
+/**
+ * Browser features.
+ * 
+ * @class $features
+ */
+onix.service("$features", function() {
+	// ------------------------ public ----------------------------------------
+	/**
+	 * FileReader is available.
+	 *
+	 * @member $features
+	 * @type {Boolean}
+	 */
+	this.FILE_READER = "FileReader" in window;
+	/**
+	 * Canvas is available.
+	 *
+	 * @member $features
+	 * @type {Boolean}
+	 */
+	this.CANVAS = !!document.createElement("canvas").getContext;
+});
 onix.factory("$anonymizer", [
 	"$math",
 	"$event",
 	"$loader",
 	"$promise",
 	"$common",
+	"$features",
 function(
 	$math,
 	$event,
 	$loader,
 	$promise,
-	$common
+	$common,
+	$features
 ) {
 	/**
 	 * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -4984,14 +5025,13 @@ function(
 	 * @class $anonymizer
 	 */
 	var $anonymizer = function(parent, optsArg) {
-		// is canvas available?
-		this._hasCanvas = !!document.createElement("canvas").getContext;
-		if (!this._hasCanvas) {
-			console.error("Canvas is not available!");
-			return null;
-		}
 		// event init
 		this._eventInit();
+		// is canvas available?
+		if (!$features.CANVAS) {
+			console.error("Canvas is not available!");
+			return;
+		}
 		// parent reference
 		this._parent = parent;
 		this._parent.classList.add("anonymizer");
@@ -6480,7 +6520,7 @@ function(
 	 */
 	$select.prototype._click = function() {
 		this._removeAllOpened();
-		window.removeEventListener("click", this._binds.click);
+		document.removeEventListener("click", this._binds.click);
 	};
 	/**
 	 * Event - click on caption.
@@ -6496,11 +6536,11 @@ function(
 		scope._binds.removeAllOpened();
 		if (isOpen) {
 			// outside click
-			window.removeEventListener("click", scope._binds.click);
+			document.removeEventListener("click", scope._binds.click);
 		}
 		else {
 			// outside click
-			window.addEventListener("click", scope._binds.click);
+			document.addEventListener("click", scope._binds.click);
 			scope._el.classList.add(scope._CONST.OPEN_CLASS);
 		}
 	};
@@ -7042,8 +7082,6 @@ function(
 		};
 		this._dom = {};
 		this._create();
-		// set center
-		this.setCenter();
 		// crop is by default hidden
 		this.hide();
 	};
@@ -7175,7 +7213,8 @@ function(
 	$crop.prototype._mouseDown = function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		var target = e ? e.target : null;
+		// ie8
+		var target = e.target || e.srcElement;
 		this._type = target.getAttribute("class");
 		switch (this._type) {
 			case "crop-top":

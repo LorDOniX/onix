@@ -164,25 +164,62 @@ if (!("addEventListener" in document)) {
 	var h = HTMLDocument.prototype;
 	var e = Element.prototype;
 
-	w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
+	document["addEventListener"] = w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
+		if (!this.__eventListeners) {
+			this.__eventListeners = {};
+		}
+
 		if (eventName == "DOMContentLoaded") {
-			document.attachEvent("onreadystatechange", function() {
+			this.attachEvent("onreadystatechange", function() {
 				if (document.readyState === "complete") {
 					listener();
 				}
 			});
 		}
 		else {
-			var obj = this;
+			if (!this.__eventListeners[eventName]) {
+				this.__eventListeners[eventName] = [];
+			}
 
-			this.attachEvent("on" + eventName, function() {
-				return listener.apply(obj, arguments);
+			var fn = function() {
+				return listener.apply(this, arguments);
+			}.bind(this);
+
+			this.__eventListeners[eventName].push({
+				fn: fn,
+				listener: listener
 			});
+
+			this.attachEvent("on" + eventName, fn);
 		}
 	};
 
-	w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
-		return this.detachEvent("on" + eventName, listener);
+	document["removeEventListener"] = w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
+		var all = this.__eventListeners || {};
+		var items = all[eventName] || [];
+		var fn = null;
+		var pos = -1;
+
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+
+			if (item.listener == listener) {
+				fn = item.fn;
+				pos = i;
+				break;
+			}
+		}
+
+		if (fn) {
+			items.splice(pos, 1);
+
+			if (!items.length) {
+				delete all[eventName];
+			}
+			
+			return this.detachEvent("on" + eventName, fn);
+		}
+		else return null;
 	};
 }
 

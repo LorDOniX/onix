@@ -4,11 +4,13 @@ anonymizerApp.run([
 	"$slider",
 	"$anonymizer",
 	"$template",
+	"$features",
 	"MainMenu",
 function(
 	$slider,
 	$anonymizer,
 	$template,
+	$features,
 	MainMenu
 ) {
 	var HP = function() {
@@ -41,6 +43,12 @@ function(
 			canWidth: 1024,
 			canHeight: 512
 		});
+
+		if (!$features.CANVAS) {
+			alert("Canvas is not available!");
+			return;
+		}
+
 		//this._anonymizer.loadImage("/img/praha.jpg");
 		this._anonymizer.loadImage("/img/pano.jpg");
 
@@ -50,10 +58,6 @@ function(
 		}, this);
 
 		this._setEntity();
-
-		setTimeout(function() {
-			//this._anonymizer.syncPort(800,400);
-		}.bind(this), 3000);
 	};
 
 	HP.prototype.zoomPlus = function() {
@@ -92,7 +96,7 @@ function(
 		this._anonymizer.removeAll();
 	};
 
-	HP.prototype.export = function() {
+	HP.prototype["export"] = function() {
 		console.log(this._anonymizer.exportEntites());
 	};
 	
