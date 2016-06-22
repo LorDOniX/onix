@@ -1,5 +1,9 @@
 # Change Log
 
+## unreleased
+
+* es6 bundler.js option
+
 ## 2.6.5 (22. 6. 2016)
 
 * $crop - style fix

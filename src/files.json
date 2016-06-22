@@ -40,5 +40,9 @@
 		"utils/select.js",
 		"utils/slider.js",
 		"utils/crop.js"
+	],
+	"es6_skip": [
+		"libs/polyfills.js",
+		"libs/exif.js"
 	]
 }
