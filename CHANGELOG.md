@@ -1,8 +1,10 @@
 # Change Log
 
-## unreleased
+## 2.6.6 (22. 6. 2016)
 
 * es6 bundler.js option
+* $crop - fitToArea method; setDim change;
+* $image - getCanvas change;
 
 ## 2.6.5 (22. 6. 2016)
 

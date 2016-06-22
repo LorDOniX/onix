@@ -39,7 +39,7 @@ function(
 				var exif = null;
 
 				// exif only for jpeg
-				if (file.type != "png") {
+				if (file.type == "image/jpeg" || file.type == "image/pjpeg") {
 					exif = this.getEXIF(binaryData);
 				}
 
@@ -47,6 +47,7 @@ function(
 
 				img.onload = function() {
 					var imd = this.getImageDim(img, maxSize);
+					
 					var canvas = this.getCanvas(img, {
 						width: imd.width,
 						height: imd.height,
@@ -113,23 +114,25 @@ function(
 	};
 
 	/**
-	 * Get image canvas - read input img, create canvas with it.
+	 * Get canvas from image/canvas - read input imgData, create canvas with it.
 	 *
-	 * @param  {Image} img
+	 * @param  {Image} imgData
 	 * @param  {Object} [optsArg] Variable options
 	 * @param  {Number} [optsArg.width] Output canvas width
 	 * @param  {Number} [optsArg.height] Output canvas height
-	 * @param  {Number} [optsArg.orientation] EXIF orientation
+	 * @param  {Number} [optsArg.orientation = 0] EXIF orientation; degrees 90, 180, 270 CCW
 	 * @param  {Boolean} [optsArg.scaled = false]
+	 * @param  {Canvas} [optsArg.canvas = null] Do not create canvas - use canvas from options
 	 * @return {Canvas}
 	 * @member $image
 	 */
-	this.getCanvas = function(img, optsArg) {
+	this.getCanvas = function(imgData, optsArg) {
 		var opts = {
-			width: img.width || 0,
-			height: img.height || 0,
+			width: imgData.width || 0,
+			height: imgData.height || 0,
 			orientation: 0,
-			scaled: false
+			scaled: false,
+			canvas: null
 		};
 
 		for (var key in optsArg) {
@@ -138,12 +141,12 @@ function(
 
 		if (!$features.CANVAS) return null;
 
-		var canvas = document.createElement("canvas");
-		var ctx = canvas.getContext("2d");
-		var draw = true;
-
+		var canvas = opts.canvas || document.createElement("canvas");
 		canvas.width = opts.width;
 		canvas.height = opts.height;
+
+		var ctx = canvas.getContext("2d");
+		var draw = true;
 
 		// rotate
 		if (opts.orientation) {
@@ -154,6 +157,7 @@ function(
 					ctx.scale(-1, 1);
 					break;
 
+				case 180:
 				case 3:
 					// 180° rotate left
 					ctx.translate(opts.width, opts.height);
@@ -175,11 +179,12 @@ function(
 
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
 
+				case 90:
 				case 6:
 					// 90° rotate right
 					canvas.width = opts.height;
@@ -189,7 +194,7 @@ function(
 					
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
@@ -204,11 +209,12 @@ function(
 
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
 
+				case 270:
 				case 8:
 					// 90° rotate left
 					canvas.width = opts.height;
@@ -218,7 +224,7 @@ function(
 
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 			}
@@ -228,10 +234,10 @@ function(
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			if (opts.scaled) {
-				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+				ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.width, canvas.height);
 			}
 			else {
-				ctx.drawImage(img, 0, 0);
+				ctx.drawImage(imgData, 0, 0);
 			}
 		}
 

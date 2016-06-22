@@ -1608,13 +1608,13 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.6.5
+	 * version: 2.6.6
 	 * date: 22. 6. 2016
 	 * @member onix
 	 */
 	onix.info = function() {
 		console.log('OnixJS framework\n'+
-'2.6.5/22. 6. 2016\n'+
+'2.6.6/22. 6. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -3107,7 +3107,7 @@ function(
 				var binaryDataArray = new Uint8Array(binaryData);
 				var exif = null;
 				// exif only for jpeg
-				if (file.type != "png") {
+				if (file.type == "image/jpeg" || file.type == "image/pjpeg") {
 					exif = this.getEXIF(binaryData);
 				}
 				var img = new Image();
@@ -3168,33 +3168,35 @@ function(
 		return output;
 	};
 	/**
-	 * Get image canvas - read input img, create canvas with it.
+	 * Get canvas from image/canvas - read input imgData, create canvas with it.
 	 *
-	 * @param  {Image} img
+	 * @param  {Image} imgData
 	 * @param  {Object} [optsArg] Variable options
 	 * @param  {Number} [optsArg.width] Output canvas width
 	 * @param  {Number} [optsArg.height] Output canvas height
-	 * @param  {Number} [optsArg.orientation] EXIF orientation
+	 * @param  {Number} [optsArg.orientation = 0] EXIF orientation; degrees 90, 180, 270 CCW
 	 * @param  {Boolean} [optsArg.scaled = false]
+	 * @param  {Canvas} [optsArg.canvas = null] Do not create canvas - use canvas from options
 	 * @return {Canvas}
 	 * @member $image
 	 */
-	this.getCanvas = function(img, optsArg) {
+	this.getCanvas = function(imgData, optsArg) {
 		var opts = {
-			width: img.width || 0,
-			height: img.height || 0,
+			width: imgData.width || 0,
+			height: imgData.height || 0,
 			orientation: 0,
-			scaled: false
+			scaled: false,
+			canvas: null
 		};
 		for (var key in optsArg) {
 			opts[key] = optsArg[key];
 		}
 		if (!$features.CANVAS) return null;
-		var canvas = document.createElement("canvas");
-		var ctx = canvas.getContext("2d");
-		var draw = true;
+		var canvas = opts.canvas || document.createElement("canvas");
 		canvas.width = opts.width;
 		canvas.height = opts.height;
+		var ctx = canvas.getContext("2d");
+		var draw = true;
 		// rotate
 		if (opts.orientation) {
 			switch (opts.orientation) {
@@ -3203,6 +3205,7 @@ function(
 					ctx.translate(opts.width, 0);
 					ctx.scale(-1, 1);
 					break;
+				case 180:
 				case 3:
 					// 180° rotate left
 					ctx.translate(opts.width, opts.height);
@@ -3221,10 +3224,11 @@ function(
 					ctx.scale(1, -1);
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
+				case 90:
 				case 6:
 					// 90° rotate right
 					canvas.width = opts.height;
@@ -3233,7 +3237,7 @@ function(
 					ctx.translate(0, -opts.height);
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
@@ -3246,10 +3250,11 @@ function(
 					ctx.scale(-1, 1);
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 					break;
+				case 270:
 				case 8:
 					// 90° rotate left
 					canvas.width = opts.height;
@@ -3258,7 +3263,7 @@ function(
 					ctx.translate(-opts.width, 0);
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
-						ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.height, canvas.width);
+						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
 						draw = false;
 					}
 			}
@@ -3266,10 +3271,10 @@ function(
 		if (draw) {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			if (opts.scaled) {
-				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+				ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.width, canvas.height);
 			}
 			else {
-				ctx.drawImage(img, 0, 0);
+				ctx.drawImage(imgData, 0, 0);
 			}
 		}
 		return canvas;
@@ -7021,18 +7026,14 @@ function(
 	 * Crop - this class is used for selection crop above the image/element.
 	 * 
 	 * @param {Object} [options] Configuration
-	 * @param {Number} [options.canWidth] Canvas width
-	 * @param {Number} [options.canHeight] Canvas height
-	 * @param {Number} [options.zoom = 100] start zoom in [%]
-	 * @param {Number} [options.minZoom = 20] min zoom in [%]
-	 * @param {Number} [options.maxZoom = 100] max zoom in [%]
-	 * @param {Number} [options.zoomStep = 10] How many [%] add/dec with zoom change
-	 * @param {Number} [options.zoomMoveStep = 1] Under 100% multiplier for faster image movement
-	 * @param {Object} [options.curEntity = $anonymizer.ENTITES.CIRCLE] Start entity from $anonymizer.ENTITES
-	 * @param {Number} [options.showPreview = true] Show preview - image overview
-	 * @param {Number} [options.previewLeft = 17] Preview location from left top corner, axe x [px]
-	 * @param {Number} [options.previewTop = 17] Preview location from left top corner, axe y [px]
-	 * @param {Number} [options.previewWidth = 200] Preview image width [px]
+	 * @param {Number} [options.width = 250] Crop width
+	 * @param {Number} [options.height = 250] Crop height
+	 * @param {Number} [options.minWidth = 10] Crop min width, always higher than 0!
+	 * @param {Number} [options.minHeight = 10] Crop min height, always higher than 0!
+	 * @param {Number} [options.maxWidth = Infinity] Crop max width
+	 * @param {Number} [options.maxHeight = Infinity] Crop max height
+	 * @param {Boolean} [options.resizable = true] Crop can be resizabled by points
+	 * @param {Number} [options.aspectRatio = 0] Crop aspect ratio for width / height
 	 * @class $crop
 	 */
 	var $crop = function(options) {
@@ -7043,11 +7044,11 @@ function(
 			width: 250, // initial size
 			height: 250,
 			minWidth: 10,
-			minHeight: 10, // always higher than 0! if resizable=true
+			minHeight: 10, //  if resizable=true
 			maxWidth: Infinity,
 			maxHeight: Infinity,
 			resizable: true,
-			aspectRatio: null
+			aspectRatio: 0
 		};
 		for (var op in options) {
 			this._options[op] = options[op];
@@ -7082,6 +7083,7 @@ function(
 		};
 		this._dom = {};
 		this._create();
+		this._dom.container.addEventListener("mousedown", this._binds.mouseDown);
 		// crop is by default hidden
 		this.hide();
 	};
@@ -7137,7 +7139,6 @@ function(
 			}],
 			_exported: "container"
 		}, this._dom);
-		this._dom.container.addEventListener("mousedown", this._binds.mouseDown);
 	};
 	/**
 	 * Set crop center above his area.
@@ -7168,12 +7169,14 @@ function(
 	 */
 	$crop.prototype._alignPoints = function() {
 		var p = this._points;
-		p.nw.x = $math.setRange(p.nw.x, 0, this._dim.areaWidth - this._dim.width);
-		p.sw.x = $math.setRange(p.sw.x, 0, this._dim.areaWidth - this._dim.width);
+		var w = this._dim.areaWidth - this._dim.width;
+		var h = this._dim.areaHeight - this._dim.height;
+		p.nw.x = $math.setRange(p.nw.x, 0, w);
+		p.sw.x = $math.setRange(p.sw.x, 0, w);
 		p.ne.x = $math.setRange(p.ne.x, this._dim.width, this._dim.areaWidth);
 		p.se.x = $math.setRange(p.se.x, this._dim.width, this._dim.areaWidth);
-		p.nw.y = $math.setRange(p.nw.y, 0, this._dim.areaHeight - this._dim.height);
-		p.ne.y = $math.setRange(p.ne.y, 0, this._dim.areaHeight - this._dim.height);
+		p.nw.y = $math.setRange(p.nw.y, 0, h);
+		p.ne.y = $math.setRange(p.ne.y, 0, h);
 		p.sw.y = $math.setRange(p.sw.y, this._dim.height, this._dim.areaHeight);
 		p.se.y = $math.setRange(p.se.y, this._dim.height, this._dim.areaHeight);
 	};
@@ -7369,6 +7372,35 @@ function(
 		this._redraw();
 	};
 	/**
+	 * Fit crop to whole area and center him on the screen.
+	 * 
+	 * @member $crop
+	 */
+	$crop.prototype.fitToArea = function() {
+		var width;
+		var height;
+		if (this._options.aspectRatio) {
+			var ratio = this._options.aspectRatio;
+			// try width
+			width = this._dim.areaWidth;
+			height = Math.round(width / ratio);
+			// try height
+			if (height > this._dim.areaHeight) {
+				height = this._dim.areaHeight;
+				width = Math.round(height * ratio);
+			}
+		}
+		else {
+			width = Math.min(this._options.maxWidth, this._dim.areaWidth);
+			height = Math.min(this._options.maxHeight, this._dim.areaHeight);
+		}
+		// update dimensions
+		this._dim.width = width;
+		this._dim.height = height;
+		// center and redraw
+		this.setCenter();
+	};
+	/**
 	 * Remove crop from DOM.
 	 * 
 	 * @member $crop
@@ -7378,6 +7410,7 @@ function(
 		if (c.parentNode) {
 			c.parentNode.removeChild(c);
 		}
+		this._dom.container.removeEventListener("mousedown", this._binds.mouseDown);
 	};
 	/**
 	 * Get crop root el.
@@ -7389,31 +7422,23 @@ function(
 		return this._dom.container;
 	};
 	/**
-	 * Set crop dimensions.
+	 * Set crop area dimensions.
 	 * 
-	 * @param {Object} dim
-	 * @param {Number} dim.width Area width
-	 * @param {Number} dim.height Area height
+	 * @param {Object} [dim]
+	 * @param {Number} [dim.areaWidth] Area width
+	 * @param {Number} [dim.areaHeight] Area height
 	 * @member $crop
 	 */
 	$crop.prototype.setDim = function(dim) {
-		if (!dim) {
-			return;
+		dim = dim || {};
+		if (dim.areaWidth) {
+			this._dim.areaWidth = dim.areaWidth;
+			this._dom.container.style.width = this._dim.areaWidth + "px";
 		}
-		var areaWidth = dim.width;
-		var areaHeight = dim.height;
-		this._dim.areaWidth = areaWidth;
-		this._dim.areaHeight = areaHeight;
-		this._dom.container.style.width = areaWidth + "px";
-		this._dom.container.style.height = areaHeight + "px";
-		var width = Math.min(this._dim.width, this._dim.areaWidth);
-		var height = Math.min(this._dim.height, this._dim.areaHeight);
-		if (this._options.aspectRatio) {
-			height = Math.round(width / this._options.aspectRatio);
+		if (dim.areaHeight) {
+			this._dim.areaHeight = dim.areaHeight;
+			this._dom.container.style.height = this._dim.areaHeight + "px";
 		}
-		this._dim.width = width;
-		this._dim.height = height;
-		this.setCenter();
 	};
 	/**
 	 * Show crop.

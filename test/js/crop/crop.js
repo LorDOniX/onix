@@ -20,9 +20,9 @@ function(
 		}.bind(this));
 
 		this._cropper = new $crop({
-			minWidth: 1024 / 10,
-			minHeight: 583 / 10,
-			aspectRatio: 3/2
+			minWidth: 40,
+			minHeight: 40,
+			aspectRatio: 1
 		});
 
 		var cont = this._cropper.getContainer();
@@ -31,8 +31,8 @@ function(
 		parEl.appendChild(cont);
 
 		this._cropper.setDim({
-			width: parEl.offsetWidth,
-			height: parEl.offsetHeight
+			areaWidth: parEl.offsetWidth,
+			areaHeight: parEl.offsetHeight
 		});
 
 		this.setCenter();
@@ -42,6 +42,10 @@ function(
 
 	Cropper.prototype.setCenter = function() {
 		this._cropper.setCenter();
+	};
+
+	Cropper.prototype.fitToArea = function() {
+		this._cropper.fitToArea();
 	};
 
 	Cropper.prototype.backup = function() {
