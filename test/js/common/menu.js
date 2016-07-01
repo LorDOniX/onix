@@ -1,10 +1,6 @@
 menuModule = onix.module("menu");
 
-menuModule.service("MainMenu", [
-	"$dom",
-function(
-	$dom
-) {
+menuModule.service("MainMenu", function() {
 	this.PAGES = {
 		HOME: {
 			name: "Home page",
@@ -26,6 +22,49 @@ function(
 			name: "Test",
 			url: "/test"
 		}
+	};
+
+	this._createFromObj = function(config) {
+		var el = document.createElement(config.el);
+
+		Object.keys(config).forEach(function(key) {
+			var value;
+
+			switch (key) {
+				case "el":
+					break;
+
+				case "child":
+					value = config.child;
+
+					if (!Array.isArray(value)) {
+						value = [value];
+					}
+					
+					value.forEach(function(child) {
+						el.appendChild(this._createFromObj(child));
+					}, this);
+					break;
+
+				case "class":
+					value = config["class"];
+
+					if (typeof value === "string") {
+						el.classList.add(value);
+					}
+					else if (Array.isArray(value)) {
+						value.forEach(function(item) {
+							el.classList.add(item);
+						});
+					}
+					break;
+
+				default:
+					el[key] = config[key];
+			}
+		}, this);
+
+		return el;
 	};
 
 	this.create = function(activePage) {
@@ -57,7 +96,7 @@ function(
 			pagesLi.push(pageObj);
 		});
 
-		var menuEl = $dom.create({
+		var menuEl = this._createFromObj({
 			el: "div",
 			"class": ["navbar", "navbar-default"],
 			child: [{
@@ -87,4 +126,4 @@ function(
 
 		document.body.insertBefore(menuEl, document.body.firstChild);
 	};
-}]);
+});

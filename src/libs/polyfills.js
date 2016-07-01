@@ -31,6 +31,71 @@ if(!Array.isArray) {
 	};
 }
 
+/**
+ * Shim for "fixing" IE's lack of support (IE < 9) for applying slice
+ * on host objects like NamedNodeMap, NodeList, and HTMLCollection
+ * (technically, since host objects have been implementation-dependent,
+ * at least before ES6, IE hasn't needed to work this way).
+ * Also works on strings, fixes IE < 9 to allow an explicit undefined
+ * for the 2nd argument (as in Firefox), and prevents errors when
+ * called on other DOM objects.
+ */
+(function () {
+  'use strict';
+  var _slice = Array.prototype.slice;
+
+  try {
+    // Can't be used with DOM elements in IE < 9
+    _slice.call(document.documentElement);
+  } catch (e) { // Fails in IE < 9
+    // This will work for genuine arrays, array-like objects, 
+    // NamedNodeMap (attributes, entities, notations),
+    // NodeList (e.g., getElementsByTagName), HTMLCollection (e.g., childNodes),
+    // and will not fail on other DOM objects (as do DOM elements in IE < 9)
+    Array.prototype.slice = function(begin, end) {
+      // IE < 9 gets unhappy with an undefined end argument
+      end = (typeof end !== 'undefined') ? end : this.length;
+
+      // For native Array objects, we use the native slice function
+      if (Object.prototype.toString.call(this) === '[object Array]'){
+        return _slice.call(this, begin, end); 
+      }
+
+      // For array like object we handle it ourselves.
+      var i, cloned = [],
+        size, len = this.length;
+
+      // Handle negative value for "begin"
+      var start = begin || 0;
+      start = (start >= 0) ? start : Math.max(0, len + start);
+
+      // Handle negative value for "end"
+      var upTo = (typeof end == 'number') ? Math.min(end, len) : len;
+      if (end < 0) {
+        upTo = len + end;
+      }
+
+      // Actual expected size of the slice
+      size = upTo - start;
+
+      if (size > 0) {
+        cloned = new Array(size);
+        if (this.charAt) {
+          for (i = 0; i < size; i++) {
+            cloned[i] = this.charAt(start + i);
+          }
+        } else {
+          for (i = 0; i < size; i++) {
+            cloned[i] = this[start + i];
+          }
+        }
+      }
+
+      return cloned;
+    };
+  }
+}());
+
 if (!Array.prototype.forEach) { 
 	Array.prototype.forEach = function(cb, _this) {
 	    var len = this.length;
@@ -70,82 +135,6 @@ if (!("console" in window)) {
 	["log", "warn", "error", "clear", "info"].forEach(function(name) {
 		window.console[name] = emptyFn;
 	});
-}
-
-if (!Object.keys) {
-	/**
-	 * Object.keys dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
-	 */
-	Object.keys = (function () {
-		'use strict';
-
-		var hasOwnProperty = Object.prototype.hasOwnProperty,
-			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
-			dontEnums = [
-				'toString',
-				'toLocaleString',
-				'valueOf',
-				'hasOwnProperty',
-				'isPrototypeOf',
-				'propertyIsEnumerable',
-				'constructor'
-			],
-			dontEnumsLength = dontEnums.length;
-
-		return function (obj) {
-			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
-				throw new TypeError('Object.keys called on non-object');
-			}
-
-			var result = [], prop, i;
-
-			for (prop in obj) {
-				if (hasOwnProperty.call(obj, prop)) {
-					result.push(prop);
-				}
-			}
-
-			if (hasDontEnumBug) {
-				for (i = 0; i < dontEnumsLength; i++) {
-					if (hasOwnProperty.call(obj, dontEnums[i])) {
-						result.push(dontEnums[i]);
-					}
-				}
-			}
-			return result;
-		};
-	}());
-}
-
-(function() {
-  if(navigator.appVersion.indexOf('MSIE 8') > 0) {
-    var _slice = Array.prototype.slice;
-    Array.prototype.slice = function() {
-      if(this instanceof Array) {
-        return _slice.apply(this, arguments);
-      } else {
-        var result = [];
-        var start = (arguments.length >= 1) ? arguments[0] : 0;
-        var end = (arguments.length >= 2) ? arguments[1] : this.length;
-        for(var i=start; i<end; i++) {
-          result.push(this[i]);
-        }
-        return result;
-      }
-    };
-  }
-})();
-
-if (!Object.create) {
-	/**
-	 * Object.create dle ES5 - https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
-	 */
-	Object.create = function (o) {
-		if (arguments.length > 1) { throw new Error("Object.create polyfill only accepts the first parameter"); }
-		var tmp = function() {};
-		tmp.prototype = o;
-		return new tmp();
-	};
 }
 
 if (!Function.prototype.bind) {

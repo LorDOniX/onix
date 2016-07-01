@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.7.1 (1. 7. 2016)
+
+* add es5-sham polyfill
+* polyfills.js - add slice.call, Object.create -> sham;
+* bundler - fix ES6 transpilation with "dist"
+* test menu - remove dependency on $dom
+* fixes for older browsers
+
 ## 2.7.0 (1. 7. 2016)
 
 * ES6 (Babel) all src files + home test files; inheritance over extends keyword

@@ -25,8 +25,3 @@ navigate to dist/ folder
 # Application workflow
 
 * like angular js way
-
-# Whats not the same like in Angular
-
-* controllers - not implemented
-* directives - not implemented

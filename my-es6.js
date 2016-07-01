@@ -273,9 +273,11 @@ class MyES6 {
 				parts.push(this._getCacheItem(file).data);
 			});
 
-			if (run == "dev") {
+			// concat all data together
+			if (run == "dev" || !dataItem.ES6) {
 				output.push(parts.join(EOL));
 			}
+			// babel whole part - not single file
 			else if (run == "dist") {
 				// babel
 				let allData = parts.join(EOL);
