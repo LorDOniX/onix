@@ -1,5 +1,10 @@
 # Change Log
 
+## not released
+
+* bundler - add websocket
+* reload -server - dynamic update from bundler to test site
+
 ## 2.7.1 (1. 7. 2016)
 
 * add es5-sham polyfill

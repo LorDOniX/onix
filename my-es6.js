@@ -10,14 +10,16 @@ var TimeStop = require("./time-stop");
 const EOL = require("os").EOL;
 
 class MyES6 {
-	constructor(config, header) {
+	constructor(config, header, reload) {
 		this._config = config || {};
 		this._header = header || {};
+		this._reload = reload || {};
 		this._distCache = {};
 		this._usedPaths = [];
 		this._force = false;
 		this._cache = Common.fileExists(config.cache) ? require("./" + config.cache) : {};
 		this._onixjsData = null;
+		this._reloadSet = false;
 		this._timeStop = new TimeStop();
 	}
 
@@ -98,9 +100,15 @@ class MyES6 {
 				}
 			});
 
+			// reload server
+			if (bundle.reload) {
+				// append to the files
+				allFiles.push(this._reload.file);
+			}
+
 			// add header
 			if (bundle.header) {
-				// append to the last position
+				// append to the files
 				allFiles.push(this._header.file);
 			}
 
@@ -110,7 +118,13 @@ class MyES6 {
 				all.forEach((file) => {
 					if (bundle.header && file.path == this._header.file) {
 						this._setFileCache(file.path, file.data);
+
 						this._setOnixjsData();
+					}
+					else if (bundle.reload && file.path == this._reload.file) {
+						this._setFileCache(file.path, file.data);
+
+						this._setReloadData();
 					}
 					else {
 						let transpile = run == "dev" && es6Files.indexOf(file.path) != -1;
@@ -221,6 +235,20 @@ class MyES6 {
 		return output.join(joiner);
 	}
 
+	_setReloadData() {
+		if (!this._reload || this._reloadSet) return;
+
+		let data = this._getCacheItem(this._reload.file).data;
+
+		// replace server & port
+		data = data.replace(this._reload.serverPH, this._reload.server).replace(this._reload.portPH, this._reload.port);
+
+		// update cache
+		this._cache[this._reload.file].data = data;
+		
+		this._reloadSet = true;
+	}
+
 	_setOnixjsData() {
 		if (!this._header || this._onixjsData) return;
 
@@ -299,6 +327,11 @@ class MyES6 {
 
 		if (run == "dist") {
 			Common.col("ES6 transpilation takes {0}", this._timeStop.end("ES6Parts"));
+		}
+		// dev & reload
+		else if (bundle.reload && this._reload) {
+			// append reload server to the end
+			output.push(this._getCacheItem(this._reload.file).data);
 		}
 
 		let outputData = output.join(EOL);

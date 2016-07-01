@@ -7,6 +7,8 @@ var Common = require("./common");
 var MyES6 = require("./my-es6");
 var MyLess = require("./my-less");
 var Watcher = require("./watcher");
+var Websocket = require("./websocket");
+var pathObj = require("path");
 
 var CONF = require("./conf");
 
@@ -14,11 +16,17 @@ class Bundler {
 	constructor() {
 		this._args = this._getArgs();
 		this._watchBundles = [];
+		this._runServerReq = 0;
 		this._bundles = CONF.bundles || [];
 
-		this._myES6 = new MyES6(CONF.ES6, CONF.header);
+		this._myES6 = new MyES6(CONF.ES6, CONF.header, CONF.reload);
 		this._myLess = new MyLess();
 		this._watcher = new Watcher();
+		this._websocket = new Websocket();
+
+		if (CONF.reload) {
+			this._websocket.setPort(CONF.reload.port);
+		}
 
 		Common.col("Bundler help");
 		Common.col("------------");
@@ -39,7 +47,7 @@ class Bundler {
 		// pre files operations
 		switch (firstArg) {
 			case "watch":
-				this._dev("watcher");
+				this._dev("watch");
 				break;
 
 			case "dev":
@@ -60,7 +68,7 @@ class Bundler {
 
 			default:
 				// default is watch
-				this._dev("watcher");
+				this._dev("watch");
 		}
 	}
 
@@ -103,8 +111,16 @@ class Bundler {
 			this._myES6.getOnixInfo();
 
 			switch (runAfter) {
-				case "watcher":
+				case "watch":
 					this._setWatcher();
+
+					// run server?
+					if (this._runServerReq) {
+						this._websocket.start();
+					}
+					else {
+						this._websocket.disable();
+					}
 					break;
 			}
 		});
@@ -144,7 +160,26 @@ class Bundler {
 					if (bundle.watchPath == path) {
 						Common.col("-");
 						Common.col("File change {0}:", file);
-						Common.chainPromises([this._runBundle(bundle, "dev")]);
+						Common.chainPromises([this._runBundle(bundle, "dev")]).then(ok => {
+							let sendObj = {
+								id: bundle.id,
+								operation: "",
+								data: {}
+							};
+							
+							switch (bundle.type) {
+								case "js":
+									sendObj.operation = "refresh-page";
+									break;
+
+								case "less":
+									sendObj.operation = "refresh-css";
+									sendObj.data.file = pathObj.basename(bundle.output);
+									break;
+							}
+
+							this._websocket.send(sendObj);
+						});
 
 						return false;
 					}
@@ -221,10 +256,16 @@ class Bundler {
 		this._myES6.clearCache();
 	}
 
-	//
 	_runBundle(bundle, run) {
-		if (run == "dev" && bundle.watchPath) {
-			this._watchBundles.push(bundle);
+		// add watch paths and reloads requests
+		if (run == "dev") {
+			if (bundle.watchPath) {
+				this._watchBundles.push(bundle);
+			}
+
+			if (bundle.reload) {
+				this._runServerReq++;
+			}
 		}
 
 		return {

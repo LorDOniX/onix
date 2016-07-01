@@ -15,6 +15,13 @@
 		"datePH": "{DATE}",
 		"onixPH": "\"{ONIX_INFO}\""
 	},
+	"reload": {
+		"file": "reload-server.js",
+		"server": "localhost",
+		"port": 8200,
+		"serverPH": "{SERVER}",
+		"portPH": "{PORT_NUMBER}"
+	},
 	"bundles": [{
 		"id": "minimal",
 		"run": ["dist"],
@@ -40,6 +47,7 @@
 		"run": ["dev", "dist"],
 		"type": "js",
 		"header": true,
+		"reload": true,
 		"watchPath": "src/",
 		"output": "dist/onix-js-framework.js",
 		"outputMin": "dist/onix-js-framework.min.js",
