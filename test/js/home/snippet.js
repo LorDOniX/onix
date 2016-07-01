@@ -1,109 +1,117 @@
 homeApp.factory("Snippet", [
 	"$template",
 	"$common",
+	"$event",
 function(
 	$template,
-	$common
+	$common,
+	$event
 ) {
 	/**
 	 * Snippet
 	 */
-	var Snippet = function() {
-	};
+	class Snippet extends $event {
+		constructor(config) {
+			super();
 
-	/**
-	 * Constructor for snippet.
-	 *
-	 * @param {Object} config Config for snippet
-	 * @param {Object} parent Parent object
-	 */
-	Snippet.prototype._constructor = function(config, parent) {
-		// Object for data-bind elements references
-		this._els = {};
+			// event init
+			this._eventInit();
+		}
 
-		this._config = config || {};
-		this._parent = parent;
-		this._root = this._create(config);
+		/**
+		 * Constructor for snippet.
+		 *
+		 * @param {Object} config Config for snippet
+		 * @param {Object} parent Parent object
+		 */
+		_constructor(config, parent) {
+			// Object for data-bind elements references
+			this._els = {};
 
-		$template.bindTemplate(this._root, this, this._addEls.bind(this));
+			this._config = config || {};
+			this._parent = parent;
+			this._root = this._create(config);
 
-		this._show();
-	};
+			$template.bindTemplate(this._root, this, this._addEls.bind(this));
 
-	/**
-	 * Add new els to this._els; this function can be called from $template
-	 *
-	 * @param {Object} newEls { key, value - node element}
-	 */
-	Snippet.prototype._addEls = function(newEls) {
-		$common.extend(this._els, newEls || {});
-	};
+			this._show();
+		}
 
-	/**
-	 * Get Snippet config.
-	 *
-	 * @return {Object}
-	 */
-	Snippet.prototype._getConfig = function() {
-		return this._config;
-	};
+		/**
+		 * Add new els to this._els; this function can be called from $template
+		 *
+		 * @param {Object} newEls { key, value - node element}
+		 */
+		_addEls(newEls) {
+			$common.extend(this._els, newEls || {});
+		}
 
-	/**
-	 * Get snippet element.
-	 *
-	 * @param  {String} name
-	 * @return {NodeElement}
-	 */
-	Snippet.prototype._getEl = function(name) {
-		return this._els[name];
-	};
+		/**
+		 * Get Snippet config.
+		 *
+		 * @return {Object}
+		 */
+		_getConfig() {
+			return this._config;
+		}
 
-	/**
-	 * Get snippet parent.
-	 *
-	 * @return {NodeElement}
-	 */
-	Snippet.prototype._getParent = function() {
-		return this._parent;
-	};
+		/**
+		 * Get snippet element.
+		 *
+		 * @param  {String} name
+		 * @return {NodeElement}
+		 */
+		_getEl(name) {
+			return this._els[name];
+		}
 
-	/**
-	 * Abstract method. Create root element.
-	 *
-	 * @param  {Object} config
-	 */
-	Snippet.prototype._create = function(config) {
-		return null;
-	};
+		/**
+		 * Get snippet parent.
+		 *
+		 * @return {NodeElement}
+		 */
+		_getParent() {
+			return this._parent;
+		}
 
-	/**
-	 * Abstract method.
-	 */
-	Snippet.prototype._show = function() {
-	};
+		/**
+		 * Abstract method. Create root element.
+		 *
+		 * @param  {Object} config
+		 */
+		_create(config) {
+			return null;
+		}
 
-	/**
-	 * Is snippet locked for change?
-	 *
-	 * @return {Boolean}
-	 */
-	Snippet.prototype.isLocked = function() {
-		return false;
-	};
+		/**
+		 * Abstract method.
+		 */
+		_show() {
+		}
 
-	/**
-	 * Return root el.
-	 *
-	 * @return {HTMLElement}
-	 */
-	Snippet.prototype.getRoot = function() {
-		return this._root;
-	};
+		/**
+		 * Is snippet locked for change?
+		 *
+		 * @return {Boolean}
+		 */
+		isLocked() {
+			return false;
+		}
 
-	/**
-	 * Destroy snippet.
-	 */
-	Snippet.prototype.destructor = function() {
+		/**
+		 * Return root el.
+		 *
+		 * @return {HTMLElement}
+		 */
+		getRoot() {
+			return this._root;
+		}
+
+		/**
+		 * Destroy snippet.
+		 */
+		destructor() {
+		}
 	};
 
 	return Snippet;

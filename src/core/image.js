@@ -20,35 +20,36 @@ function(
 	 * @member $image
 	 */
 	this.readFromFile = function(file, maxSize) {
-		return new $promise(function(resolve, reject) {
+		return new $promise((resolve, reject) => {
 			if (!$features.FILE_READER) {
 				reject();
+
 				return;
 			}
 
-			var reader = new FileReader();
-			var output = {
+			let reader = new FileReader();
+			let output = {
 				img: null,
 				exif: null,
 				canvas: null
 			};
 
-			reader.onload = function(e) {
-				var binaryData = reader.result;
-				var binaryDataArray = new Uint8Array(binaryData);
-				var exif = null;
+			reader.onload = (e) => {
+				let binaryData = reader.result;
+				let binaryDataArray = new Uint8Array(binaryData);
+				let exif = null;
 
 				// exif only for jpeg
 				if (file.type == "image/jpeg" || file.type == "image/pjpeg") {
 					exif = this.getEXIF(binaryData);
 				}
 
-				var img = new Image();
+				let img = new Image();
 
-				img.onload = function() {
-					var imd = this.getImageDim(img, maxSize);
+				img.onload = () => {
+					let imd = this.getImageDim(img, maxSize);
 					
-					var canvas = this.getCanvas(img, {
+					let canvas = this.getCanvas(img, {
 						width: imd.width,
 						height: imd.height,
 						orientation: exif ? exif.Orientation : 0,
@@ -60,13 +61,13 @@ function(
 					output.canvas = canvas;
 
 					resolve(output);
-				}.bind(this);
+				};
 
 				img.src = this.fileToBase64(file.type, binaryDataArray);
-			}.bind(this);
+			};
 
 			reader.readAsArrayBuffer(file);
-		}.bind(this));
+		});
 	};
 
 	/**
@@ -78,11 +79,12 @@ function(
 	 * @member $image
 	 */
 	this.getImageDim = function(img, maxSize) {
-		var maxSize = maxSize || 0;
-		var largeWidth = maxSize > 0 && img.width > maxSize;
-		var largeHeight = maxSize > 0 && img.height > maxSize;
+		maxSize = maxSize || 0;
+		
+		let largeWidth = maxSize > 0 && img.width > maxSize;
+		let largeHeight = maxSize > 0 && img.height > maxSize;
 
-		var output = {
+		let output = {
 			width: img.width,
 			height: img.height,
 			scale: 1
@@ -90,8 +92,8 @@ function(
 
 		if (largeWidth || largeHeight) {
 			// resize picture
-			var imgWidth = img.width;
-			var imgHeight = img.height;
+			let imgWidth = img.width;
+			let imgHeight = img.height;
 
 			// portrait x landscape
 			if (img.width > img.height) {
@@ -127,7 +129,7 @@ function(
 	 * @member $image
 	 */
 	this.getCanvas = function(imgData, optsArg) {
-		var opts = {
+		let opts = {
 			width: imgData.width || 0,
 			height: imgData.height || 0,
 			orientation: 0,
@@ -135,18 +137,20 @@ function(
 			canvas: null
 		};
 
-		for (var key in optsArg) {
+		for (let key in optsArg) {
 			opts[key] = optsArg[key];
 		}
 
-		if (!$features.CANVAS) return null;
+		if (!$features.CANVAS) {
+			return null;
+		}
 
-		var canvas = opts.canvas || document.createElement("canvas");
+		let canvas = opts.canvas || document.createElement("canvas");
 		canvas.width = opts.width;
 		canvas.height = opts.height;
 
-		var ctx = canvas.getContext("2d");
-		var draw = true;
+		let ctx = canvas.getContext("2d");
+		let draw = true;
 
 		// rotate
 		if (opts.orientation) {
@@ -180,6 +184,7 @@ function(
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
+
 						draw = false;
 					}
 					break;
@@ -195,6 +200,7 @@ function(
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
+
 						draw = false;
 					}
 					break;
@@ -210,6 +216,7 @@ function(
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
+
 						draw = false;
 					}
 					break;
@@ -225,6 +232,7 @@ function(
 					if (opts.scaled) {
 						ctx.clearRect(0, 0, canvas.width, canvas.height);
 						ctx.drawImage(imgData, 0, 0, imgData.width, imgData.height, 0, 0, canvas.height, canvas.width);
+
 						draw = false;
 					}
 			}
@@ -253,10 +261,10 @@ function(
 	 * @member $image
 	 */
 	this.fileToBase64 = function(fileType, binaryData) {
-		var length = binaryData.length;
-		var output = "";
+		let length = binaryData.length;
+		let output = "";
 
-		for (var i = 0; i < length; i += 1) {
+		for (let i = 0; i < length; i += 1) {
 			output += String.fromCharCode(binaryData[i]);
 		}
 
@@ -271,10 +279,7 @@ function(
 	 * @member $image
 	 */
 	this.isPicture = function(file) {
-		if (file) {
-			return (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
-		}
-		else return false;
+		return file && (file.type == "image/jpeg" || file.type == "image/pjpeg" || file.type == "image/png");
 	};
 
 	/**
@@ -285,11 +290,11 @@ function(
 	 * @member $image
 	 */
 	this.getPictureFiles = function(files) {
-		var pictureFiles = [];
+		let pictureFiles = [];
 
 		if (files && files.length) {
-			for (var i = 0; i < files.length; i++) {
-				var item = files[i];
+			for (let i = 0; i < files.length; i++) {
+				let item = files[i];
 
 				if (this.isPicture(item)) {
 					pictureFiles.push(item);
@@ -326,5 +331,4 @@ function(
 			return {};
 		}
 	};
-	
 }]);

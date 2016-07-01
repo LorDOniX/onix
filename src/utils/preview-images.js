@@ -24,15 +24,17 @@ function(
 	 * @member $previewImages
 	 */
 	this._createPreview = function(file, maxSize) {
-		var exported = {};
+		let exported = {};
 
-		var cont = $dom.create({
+		let cont = $dom.create({
 			el: "span",
 			"class": ["preview-item", "preview-loading"],
 			child: [{
 				el: "span",
 				"class": "canvas-cover",
-				child: [$loader.getSpinner(true)],
+				child: [
+					$loader.getSpinner(true)
+				],
 				style: "height: " + (maxSize || 100) + "px",
 				_exported: "canvasCover"
 			}, {
@@ -60,7 +62,7 @@ function(
 	this._createPreviewHolders = function(el, count) {
 		if (!el || (count != 4 && count != 7)) return;
 
-		var exported = {};
+		let exported = {};
 
 		// placeholder for 7 images
 		if (count == 7) {
@@ -74,10 +76,10 @@ function(
 			}, exported));
 		}
 
-		var child = [];
-		var childCount = count == 7 ? 6 : 4;
+		let child = [];
+		let childCount = count == 7 ? 6 : 4;
 
-		for (var i = 0; i < childCount; i++) {
+		for (let i = 0; i < childCount; i++) {
 			child.push({
 				el: "span",
 				_exported: "img_0" + i
@@ -90,7 +92,7 @@ function(
 			child: child
 		}, exported));
 
-		for (var i = 0; i < count; i++) {
+		for (let i = 0; i < count; i++) {
 			this._dom["img_0" + i] = exported["img_0" + i];
 		}
 	};
@@ -102,11 +104,12 @@ function(
 	 * @param  {Object} previewObj Object with file and preview ID
 	 * @param  {Number} maxSize Max image size in px
 	 * @param  {Function} jobDone Function which indicates that job is done
+	 * @member $previewImages
 	 */
 	this._jobTask = function(previewObj, maxSize, jobDone) {
-		var file = previewObj.file;
-		var previewID = previewObj.previewID;
-		var preview = this._createPreview(file, maxSize);
+		let file = previewObj.file;
+		let previewID = previewObj.previewID;
+		let preview = this._createPreview(file, maxSize);
 		
 		// append
 		if (previewID in this._dom) {
@@ -116,7 +119,7 @@ function(
 			this._dom.previewItems.appendChild(preview.cont);
 		}
 
-		$image.readFromFile(file, maxSize).then(function(readFileObj) {
+		$image.readFromFile(file, maxSize).then(readFileObj => {
 			preview.cont.classList.remove("preview-loading");
 			preview.canvasCover.innerHTML = "";
 			preview.canvasCover.appendChild(readFileObj.canvas);
@@ -143,13 +146,13 @@ function(
 		// add class
 		el.classList.add("preview-images");
 
-		var opts = {
+		let opts = {
 			maxSize: 0,
 			count: 0,
 			createHolder: false
 		};
 
-		for (var key in optsArg) {
+		for (let key in optsArg) {
 			opts[key] = optsArg[key];
 		}
 
@@ -157,8 +160,8 @@ function(
 			previewItems: el
 		};
 
-		var pictureFiles = $image.getPictureFiles(files);
-		var count = pictureFiles.length;
+		let pictureFiles = $image.getPictureFiles(files);
+		let count = pictureFiles.length;
 
 		if (count) {
 			// create placeholder?
@@ -166,17 +169,17 @@ function(
 				this._createPreviewHolders(el, count);
 			}
 
-			var jobsArray = [];
+			let jobsArray = [];
 
 			// sort by name, make previewID - only for 7 pictures
-			pictureFiles = pictureFiles.sort(function(a, b) {
+			pictureFiles = pictureFiles.sort((a, b) => {
 				if (a.name < b.name)
 					return -1;
 				else if (a.name > b.name)
 					return 1;
 				else 
 					return 0;
-			}).forEach(function(pf, ind) {
+			}).forEach((pf, ind) => {
 				jobsArray.push({
 					task: this._jobTask,
 					scope: this,
@@ -185,7 +188,7 @@ function(
 						previewID: "img_0" + ind
 					}, opts.maxSize]
 				});
-			}, this);
+			});
 
 			// run jobs array
 			$job.multipleJobs(jobsArray, opts.count);

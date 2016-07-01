@@ -5,7 +5,7 @@
  */
 onix.factory("$localStorage", function() {
 	// localStorage provider
-	var provider = ("localStorage" in window) ? localStorage : {
+	let provider = ("localStorage" in window) ? localStorage : {
 		_data: {},
 
 		setItem: function(key, value) {

@@ -1,65 +1,73 @@
 homeApp.factory("Page", [
 	"$template",
 	"$common",
+	"$event",
 function(
 	$template,
-	$common
+	$common,
+	$event
 ) {
 	/**
 	 * Page
 	 */
-	var Page = function() {
-	};
+	class Page extends $event {
+		constructor() {
+			super();
 
-	/**
-	 * Constructor for page.
-	 *
-	 * @param {Object} Page config
-	 */
-	Page.prototype._constructor = function(config) {
-		var root = onix.element("body").html($template.compile(config.templ || "", this));
+			// event init
+			this._eventInit();
+		}
 
-		// Object for data-bind elements references
-		this._els = {};
+		/**
+		 * Constructor for page.
+		 *
+		 * @param {Object} Page config
+		 */
+		_constructor(config) {
+			var root = onix.element("body").html($template.compile(config.templ || "", this));
 
-		// each page contanins only one page div
-		$template.bindTemplate(root, this, this._addEls.bind(this));
+			// Object for data-bind elements references
+			this._els = {};
 
-		this._show();
-	};
+			// each page contanins only one page div
+			$template.bindTemplate(root, this, this._addEls.bind(this));
 
-	/**
-	 * Add new els to this._els; this function can be called from $template
-	 *
-	 * @param {Object} newEls { key, value - node element}
-	 */
-	Page.prototype._addEls = function(newEls) {
-		$common.extend(this._els, newEls || {});
-	};
+			this._show();
+		}
 
-	/**
-	 * Get page config.
-	 *
-	 * @return {Object}
-	 */
-	Page.prototype._getConfig = function() {
-		return this._config;
-	};
+		/**
+		 * Add new els to this._els; this function can be called from $template
+		 *
+		 * @param {Object} newEls { key, value - node element}
+		 */
+		_addEls(newEls) {
+			$common.extend(this._els, newEls || {});
+		}
 
-	/**
-	 * Get page element.
-	 *
-	 * @param  {String} name
-	 * @return {NodeElement}
-	 */
-	Page.prototype._getEl = function(name) {
-		return this._els[name];
-	};
+		/**
+		 * Get page config.
+		 *
+		 * @return {Object}
+		 */
+		_getConfig() {
+			return this._config;
+		}
 
-	/**
-	 * Abstract method.
-	 */
-	Page.prototype._show = function() {
+		/**
+		 * Get page element.
+		 *
+		 * @param  {String} name
+		 * @return {NodeElement}
+		 */
+		_getEl(name) {
+			return this._els[name];
+		}
+
+		/**
+		 * Abstract method.
+		 */
+		_show() {
+		}
 	};
 
 	return Page;

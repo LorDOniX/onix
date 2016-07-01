@@ -6,7 +6,7 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _langs = {};
+	let _langs = {};
 
 	/**
 	 * Current language-
@@ -15,7 +15,7 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _currentLang = "";
+	let _currentLang = "";
 
 	/**
 	 * Bind global _ as translation function-
@@ -24,7 +24,7 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _bindGlobalTranslation = true;
+	let _bindGlobalTranslation = true;
 
 	/**
 	 * Replace translated text by object. This functions is implementation of message format object replace inside the string.
@@ -35,34 +35,34 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _transReplace = function(translate, replace) {
+	let _transReplace = function(translate, replace) {
 		translate = translate || "";
 		replace = replace || {};
 
-		var replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
+		let replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
 
 		if (replaceParts) {
-			var finalReplace = {};
+			let finalReplace = {};
 
-			replaceParts.forEach(function(part) {
-				var key = part;
+			replaceParts.forEach(part => {
+				let key = part;
 
 				if (key.length > 2) {
 					key = key.substr(1, key.length - 2);
 				}
 
 				// multi
-				var parts = key.split(",");
-				var name = parts[0].trim();
-				var multiPartsObj = {};
+				let parts = key.split(",");
+				let name = parts[0].trim();
+				let multiPartsObj = {};
 
 				if (parts.length == 2) {
-					var multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
+					let multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
 
 					if (multiParts) {
-						multiParts.forEach(function(mpart) {
-							var mpartSplits = mpart.split("{");
-							var mpartValue = mpartSplits[1];
+						multiParts.forEach(mpart => {
+							let mpartSplits = mpart.split("{");
+							let mpartValue = mpartSplits[1];
 							mpartValue = mpartValue.substr(0, mpartValue.length - 1);
 
 							multiPartsObj[mpartSplits[0].trim()] = mpartValue;
@@ -70,10 +70,10 @@ onix.provider("$i18n", function() {
 					}
 				}
 
-				var replaceValue = name in replace ? replace[name] : "";
+				let replaceValue = name in replace ? replace[name] : "";
 
 				if (typeof replaceValue === "number" && Object.keys(multiPartsObj).length) {
-					var multiKey;
+					let multiKey;
 
 					switch (replaceValue) {
 						case 1:
@@ -96,7 +96,7 @@ onix.provider("$i18n", function() {
 				finalReplace[part] = replaceValue;
 			});
 
-			Object.keys(finalReplace).forEach(function(key) {
+			Object.keys(finalReplace).forEach(key => {
 				translate = translate.replace(new RegExp(key, "g"), finalReplace[key]);
 			});
 		}
@@ -113,25 +113,29 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _getText = function(key, replace) {
+	let _getText = function(key, replace) {
 		key = key || "";
-		var lObj = _langs[_currentLang];
-		var translate = "";
+
+		let lObj = _langs[_currentLang];
+		let translate = "";
 
 		if (lObj) {
-			var parts = key.split(".");
-			var len = parts.length;
+			let parts = key.split(".");
+			let len = parts.length;
 
-			parts.every(function(item, ind) {
+			parts.every((item, ind) => {
 				if (item in lObj) {
 					lObj = lObj[item];
 
 					if (ind == len - 1) {
 						translate = lObj;
+
 						return false;
 					}
 				}
-				else return false;
+				else {
+					return false;
+				}
 
 				// go on
 				return true;
@@ -149,7 +153,7 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _addLanguage = function(lang, data) {
+	let _addLanguage = function(lang, data) {
 		if (!lang || !data) return;
 
 		if (!_langs[lang]) {
@@ -157,7 +161,7 @@ onix.provider("$i18n", function() {
 		}
 
 		// merge
-		Object.keys(data).forEach(function(key) {
+		Object.keys(data).forEach(key => {
 			_langs[lang][key] = data[key];
 		});
 	};
@@ -169,7 +173,7 @@ onix.provider("$i18n", function() {
 	 * @member $i18nProvider
 	 * @private
 	 */
-	var _setLanguage = function(lang) {
+	let _setLanguage = function(lang) {
 		_currentLang = lang || "";
 	};
 
@@ -222,16 +226,22 @@ onix.provider("$i18n", function() {
 			window._ = _getText;
 		}
 	};
-
+	
 	/**
-	 * Language support, string translation with support for message format syntax.
+	 * Function that creates $i18n.
 	 * 
-	 * @class $i18n
+	 * @member $i18nProvider
+	 * @return {Array}
 	 */
 	this.$get = ["$http", "$promise", function(
 				$http, $promise) {
 		
-		var $i18n = {
+		/**
+		 * Language support, string translation with support for message format syntax.
+		 * 
+		 * @class $i18n
+		 */
+		class $i18n {
 			/**
 			 * Get text function. Translate for the current language and the key.
 			 *
@@ -239,10 +249,11 @@ onix.provider("$i18n", function() {
 			 * @param  {Object} [replace] Replace all {} in the string
 			 * @return {String}
 			 * @member $i18n
+			 * @method _
 			 */
-			_: function(key, replace) {
+			_(key, replace) {
 				return _getText(key, replace);
-			},
+			}
 
 			/**
 			 * Add a new language.
@@ -250,40 +261,44 @@ onix.provider("$i18n", function() {
 			 * @param {String} lang Language key
 			 * @param {Object} data
 			 * @member $i18n
+			 * @method addLanguage
 			 */
-			addLanguage: function(lang, data) {
+			addLanguage(lang, data) {
 				_addLanguage(lang, data);
-			},
+			}
 
 			/**
 			 * Set new language by his key.
 			 *
 			 * @param {String} lang Language key
 			 * @member $i18n
+			 * @method setLanguage
 			 */
-			setLanguage: function(lang) {
+			setLanguage(lang) {
 				_setLanguage(lang);
-			},
+			}
 
 			/**
 			 * Get current language key.
 			 *
 			 * @return {String} Language key
 			 * @member $i18n
+			 * @method getLanguage
 			 */
-			getLanguage: function(lang) {
+			getLanguage(lang) {
 				return _currentLang;
-			},
+			}
 
 			/**
 			 * Get all languages keys.
 			 *
 			 * @return {Array[String]} Languages keys
 			 * @member $i18n
+			 * @method getAllLanguages
 			 */
-			getAllLanguages: function(lang) {
+			getAllLanguages(lang) {
 				return Object.keys(_langs);
-			},
+			}
 
 			/**
 			 * Load language from the file.
@@ -292,30 +307,29 @@ onix.provider("$i18n", function() {
 			 * @param  {String} url  Path to the file
 			 * @return {$promise}
 			 * @member $i18n
+			 * @method loadLanguage
 			 */
-			loadLanguage: function(lang, url) {
-				return new $promise(function(resolve, reject) {
+			loadLanguage(lang, url) {
+				return new $promise((resolve, reject) => {
 					$http.createRequest({
 						url: url
-					}).then(function(data) {
-						_addLanguage(lang, data.data);
+					}).then(okData => {
+						_addLanguage(lang, okData.data);
+
 						resolve();
-					}, function(data) {
-						reject(data);
+					}, errorData => {
+						reject(errorData);
 					});
 				});
 			}
 		};
 
-		return $i18n;
+		return new $i18n();
 	}];
 });
 
 /**
  * Provider for registering _ translate object.
- *
- * @private
- * @member onix
  */
 onix.config(["$i18nProvider", function($i18nProvider) {
 	$i18nProvider.postProcess();

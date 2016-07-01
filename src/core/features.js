@@ -21,5 +21,4 @@ onix.service("$features", function() {
 	 * @type {Boolean}
 	 */
 	this.CANVAS = !!document.createElement("canvas").getContext;
-	
 });

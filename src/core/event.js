@@ -4,110 +4,114 @@ onix.factory("$event", function() {
 	 * 
  	 * @class $event
  	 */
-	var $event = function() {
-	};
-
-	/**
-	 * Init event functionality.
-	 * 
-	 * @member $event
-	 * @private
-	 */
-	$event.prototype._eventInit = function() {
+	class $event {
 		/**
-		 * All events. { name: name, event: function, scope, [once] }
+		 * Init event functionality.
 		 * 
-		 * @type {Array}
 		 * @member $event
 		 * @private
+		 * @method _eventInit
 		 */
-		this._allEvents = [];
-	};
+		_eventInit() {
+			/**
+			 * All events. { name: name, event: function, scope, [once] }
+			 * 
+			 * @type {Array}
+			 * @member $event
+			 * @private
+			 */
+			this._allEvents = [];
+		}
 
-	/**
-	 * Add new event to the stack.
-	 * 
-	 * @param  {String} name 
-	 * @param  {Function} fn
-	 * @param  {Object|Function} [scope]
-	 * @member $event
-	 */
-	$event.prototype.on = function (name, fn, scope) {
-		if (arguments.length < 2) return;
+		/**
+		 * Add new event to the stack.
+		 * 
+		 * @param  {String} name 
+		 * @param  {Function} fn
+		 * @param  {Object|Function} [scope]
+		 * @member $event
+		 * @method on
+		 */
+		on(name, fn, scope) {
+			if (!name || !fn) return;
 
-		this._allEvents.push({ 
-			name: name,
-			fn: fn,
-			scope: scope
-		});
-	};
+			this._allEvents.push({ 
+				name: name,
+				fn: fn,
+				scope: scope
+			});
+		}
 
-	/**
-	 * Remove event from the stack.
-	 * 
-	 * @param  {String} name 
-	 * @param  {Function} [fn]
-	 * @param  {Object|Function} [scope]
-	 * @member $event
-	 */
-	$event.prototype.off = function (name, fn, scope) {
-		if (!name) return;
+		/**
+		 * Remove event from the stack.
+		 * 
+		 * @param  {String} name 
+		 * @param  {Function} [fn]
+		 * @param  {Object|Function} [scope]
+		 * @member $event
+		 * @method off
+		 */
+		off(name, fn, scope) {
+			if (!name) return;
 
-		var len = this._allEvents.length - 1;
+			let len = this._allEvents.length - 1;
 
-		for (var i = len; i >= 0; i--) {
-			var item = this._allEvents[i];
+			for (let i = len; i >= 0; i--) {
+				let item = this._allEvents[i];
 
-			if (item.name != name) continue;
+				if (item.name != name) continue;
 
-			if ((!fn || fn == item.fn) && (!scope || scope == item.scope)) {
-				this._allEvents.splice(i, 1);
+				if ((!fn || fn == item.fn) && (!scope || scope == item.scope)) {
+					this._allEvents.splice(i, 1);
+				}
 			}
 		}
-	};
 
-	/**
-	 * Add one time event to the stack.
-	 * 
-	 * @param  {String} name
-	 * @param  {Function} [fn]
-	 * @param  {Object|Function} [scope]
-	 * @member $event
-	 */
-	$event.prototype.once = function (name, fn, scope) {
-		if (arguments.length < 2) return;
+		/**
+		 * Add one time event to the stack.
+		 * 
+		 * @param  {String} name
+		 * @param  {Function} [fn]
+		 * @param  {Object|Function} [scope]
+		 * @member $event
+		 * @method once
+		 */
+		once(name, fn, scope) {
+			if (!name || !fn) return;
 
-		this._allEvents.push({ 
-			name: name,
-			fn: fn,
-			scope: scope,
-			once: true
-		});
-	};
+			this._allEvents.push({ 
+				name: name,
+				fn: fn,
+				scope: scope,
+				once: true
+			});
+		}
 
-	/**
-	 * Trigger event with arguments 0..n.
-	 * 
-	 * @param  {String} name
-	 * @member $event
-	 */
-	$event.prototype.trigger = function (name) {
-		if (!name) return;
-		
-		var args = Array.prototype.slice.call(arguments, 1);
-		var len = this._allEvents.length - 1;
+		/**
+		 * Trigger event with arguments 0..n.
+		 * 
+		 * @param  {String} name
+		 * @member $event
+		 * @method trigger
+		 */
+		trigger(name) {
+			if (!name) return;
+			
+			let args = Array.prototype.slice.call(arguments, 1);
+			let len = this._allEvents.length - 1;
 
-		for (var i = len; i >= 0; i--) {
-			var item = this._allEvents[i];
+			for (let i = len; i >= 0; i--) {
+				let item = this._allEvents[i];
 
-			if (item.name != name) continue;
+				if (item.name != name) continue;
 
-			// call fn
-			item.fn.apply(item.scope || this, args);
+				// call fn
+				item.fn.apply(item.scope || this, args);
 
-			// once event
-			if (item.once) {
-				this._allEvents.splice(i, 1);
+				// once event
+				if (item.once) {
+					this._allEvents.splice(i, 1);
+				}
 			}
 		}
 	};

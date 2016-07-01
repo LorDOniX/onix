@@ -6,9 +6,11 @@
 onix.service("$http", [
 	"$promise",
 	"$common",
+	"$location",
 function(
 	$promise,
-	$common
+	$common,
+	$location
 ) {
 	/**
 	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects.
@@ -20,16 +22,16 @@ function(
 	 * @private
 	 */
 	this._preparePostData = function(data) {
-		var formData = new FormData();
+		let formData = new FormData();
 
 		if (data) {
 			if (Array.isArray(data)) {
-				data.forEach(function(item) {
+				data.forEach(item => {
 					formData.append(item.name, item.value);
 				});
 			}
 			else {
-				Object.keys(data).forEach(function(key) {
+				Object.keys(data).forEach(key => {
 					formData.append(key, data[key]);
 				});
 			}
@@ -48,16 +50,10 @@ function(
 	 * @private
 	 */
 	this._updateURL = function(url, data) {
-		if (data) {
-			var add = [];
+		let getURL = $location.objToURL(data);
 
-			if (Array.isArray(data)) {
-				data.forEach(function(item) {
-					add.push(item.name + "=" + encodeURIComponent(item.value));
-				});
-
-				url += (url.indexOf("?") == -1 ? "?" : "") + add.join("&");
-			}
+		if (getURL) {
+			url += (url.indexOf("?") == -1 ? "?" : "") + getURL;
 		}
 
 		return url;
@@ -100,20 +96,19 @@ function(
 	 * @param  {String} config.url URL
 	 * @param  {String} [config.method] Method from $http.METHOD
 	 * @param  {String} [config.postType] Post type from $http.POST_TYPES
-	 * @param  {Array} [config.getData] Data, which will be send in the url (GET)
+	 * @param  {Object|Array} [config.getData] Data, which will be send in the url (GET)
 	 * @param  {Object|FormData} [config.postData] Post data
 	 * @param  {Object} [config.headers] Additional headers
 	 * @return {$promise}
 	 * @member $http
 	 */
 	this.createRequest = function(config) {
-		return new $promise(function(resolve, reject) {
-			var request = new XMLHttpRequest();
-
+		return new $promise((resolve, reject) => {
 			config = config || {};
 
-			var method = config.method || this.METHOD.GET;
-			var url = config.url || "";
+			let request = new XMLHttpRequest();
+			let method = config.method || this.METHOD.GET;
+			let url = config.url || "";
 
 			if (!url) {
 				reject();
@@ -122,13 +117,13 @@ function(
 
 			url = this._updateURL(url, config.getData);
 
-			request.onerror = function (err) { reject(err); };
+			request.onerror = (err) => { reject(err); };
 			request.open(method, url, true);
-			request.onreadystatechange = function() {
+			request.onreadystatechange = () => {
 				if (request.readyState == 4) {
-					var responseData = request.responseText || "";
-					var responseType = request.getResponseHeader("Content-Type");
-					var promiseData = null;
+					let responseData = request.responseText || "";
+					let responseType = request.getResponseHeader("Content-Type");
+					let promiseData = null;
 
 					if (responseType == "application/json") {
 						promiseData = responseData.length ? JSON.parse(responseData) : {};
@@ -137,7 +132,7 @@ function(
 						promiseData = responseData;
 					}
 					
-					var promiseObj = {
+					let promiseObj = {
 						status: request.status,
 						data: promiseData,
 						url: url,
@@ -159,10 +154,10 @@ function(
 
 			try {
 				// add headers
-				var headers = config.headers;
+				let headers = config.headers;
 				
 				if ($common.isObject(headers)) {
-					Object.keys(headers).forEach(function(headerName) {
+					Object.keys(headers).forEach(headerName => {
 						request.setRequestHeader(headerName, headers[headerName]);
 					});
 				}
@@ -171,7 +166,7 @@ function(
 					request.setRequestHeader('Accept', 'application/json');
 				}
 
-				var type = config.postType || this.POST_TYPES.JSON;
+				let type = config.postType || this.POST_TYPES.JSON;
 
 				if (config.postData && type == this.POST_TYPES.JSON) {
 					request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
@@ -187,6 +182,6 @@ function(
 			catch (err) {
 				reject(err);
 			}
-		}.bind(this));
+		});
 	};
 }]);

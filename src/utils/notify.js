@@ -1,8 +1,4 @@
-/**
- * $notify uses bootstrap alerts and provides additional functionality.
- * 
- * @class $notify
- */
+
 onix.service("$notify", [
 	"$common",
 	"$promise",
@@ -11,127 +7,137 @@ function(
 	$promise
 ) {
 	/**
+	 * $notify uses bootstrap alerts and provides additional functionality.
 	 * Create notification object from the element.
-	 * 
+	 *
 	 * @param {HTMLElement} el
-	 * @member $notify
+	 * @class $notify
 	 */
-	var $notify = function(el) {
-		this._el = el;
+	class $notify {
+		constructor(el) {
+			this._el = el;
 
-		this._HIDE_TIMEOUT = 1500; // [ms]
+			this._HIDE_TIMEOUT = 1500; // [ms]
 
-		this._options = {
-			"ok": "alert-success",
-			"error": "alert-danger",
-			"info": "alert-info",
-			"warn": "alert-warning"
-		};
+			this._options = {
+				"ok": "alert-success",
+				"error": "alert-danger",
+				"info": "alert-info",
+				"warn": "alert-warning"
+			};
 
-		return this;
-	};
-
-	/**
-	 * Set value to the notify element.
-	 *
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
-	 * @private
-	 */
-	$notify.prototype._setValue = function(txt) {
-		if ($common.isElement(txt)) {
-			onix.element(this._el).empty().append(txt);
+			return this;
 		}
-		else if (typeof txt === "string") {
-			this._el.innerHTML = txt;
+
+		/**
+		 * Set value to the notify element.
+		 *
+		 * @param  {String|HTMLElement} txt
+		 * @member $notify
+		 * @method _setValue
+		 * @private
+		 */
+		_setValue(txt) {
+			if ($common.isElement(txt)) {
+				onix.element(this._el).empty().append(txt);
+			}
+			else if (typeof txt === "string") {
+				this._el.innerHTML = txt;
+			}
 		}
-	};
 
-	/**
-	 * Reset CSS classes.
-	 *
-	 * @member $notify
-	 */
-	$notify.prototype.reset = function() {
-		Object.keys(this._options).forEach(function(key) {
-			this._el.classList.remove(this._options[key]);
-		}.bind(this));
+		/**
+		 * Reset CSS classes.
+		 *
+		 * @method reset
+		 * @member $notify
+		 */
+		reset() {
+			Object.keys(this._options).forEach(key => {
+				this._el.classList.remove(this._options[key]);
+			});
 
-		return this;
-	};
+			return this;
+		}
 
-	/**
-	 * Show OK state.
-	 * 
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
-	 */
-	$notify.prototype.ok = function(txt) {
-		this._el.classList.add(this._options["ok"]);
-		
-		this._setValue(txt);
+		/**
+		 * Show OK state.
+		 * 
+		 * @param  {String|HTMLElement} txt
+		 * @method ok
+		 * @member $notify
+		 */
+		ok(txt) {
+			this._el.classList.add(this._options.ok);
+			
+			this._setValue(txt);
 
-		return this;
-	};
+			return this;
+		}
 
-	/**
-	 * Show ERROR state.
-	 * 
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
-	 */
-	$notify.prototype.error = function(txt) {
-		this._el.classList.add(this._options["error"]);
-		
-		this._setValue(txt);
+		/**
+		 * Show ERROR state.
+		 * 
+		 * @param  {String|HTMLElement} txt
+		 * @method error
+		 * @member $notify
+		 */
+		error(txt) {
+			this._el.classList.add(this._options.error);
+			
+			this._setValue(txt);
 
-		return this;
-	};
+			return this;
+		}
 
-	/**
-	 * Show INFO state.
-	 *
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
-	 */
-	$notify.prototype.info = function(txt) {
-		this._el.classList.add(this._options["info"]);
-		
-		this._setValue(txt);
+		/**
+		 * Show INFO state.
+		 *
+		 * @param  {String|HTMLElement} txt
+		 * @method info
+		 * @member $notify
+		 */
+		info(txt) {
+			this._el.classList.add(this._options.info);
+			
+			this._setValue(txt);
 
-		return this;
-	};
+			return this;
+		}
 
-	/**
-	 * Show WARNING state.
-	 *
-	 * @param  {String|HTMLElement} txt
-	 * @member $notify
-	 */
-	$notify.prototype.warn = function(txt) {
-		this._el.classList.add(this._options["warn"]);
-		
-		this._setValue(txt);
+		/**
+		 * Show WARNING state.
+		 *
+		 * @param  {String|HTMLElement} txt
+		 * @method warn
+		 * @member $notify
+		 */
+		warn(txt) {
+			this._el.classList.add(this._options.warn);
+			
+			this._setValue(txt);
 
-		return this;
-	};
+			return this;
+		}
 
-	/**
-	 * Hide alert after timeout and returns promise at the end of operation.
-	 * Default timeout is 1500 ms.
-	 *
-	 * @param {Number} [timeout] Hide timeout in [ms]
-	 * @return {$promise}
-	 * @member $notify
-	 */
-	$notify.prototype.hide = function(timeout) {
-		return new $promise(function(resolve) {
-			setTimeout(function() {
-				this.reset();
-				
-				resolve();
-			}.bind(this), timeout || this._HIDE_TIMEOUT);
-		}.bind(this));
+		/**
+		 * Hide alert after timeout and returns promise at the end of operation.
+		 * Default timeout is 1500 ms.
+		 *
+		 * @param {Number} [timeout] Hide timeout in [ms]
+		 * @return {$promise}
+		 * @method hide
+		 * @member $notify
+		 */
+		hide(timeout) {
+			return new $promise(resolve => {
+				setTimeout(() => {
+					this.reset();
+					
+					resolve();
+				}, timeout || this._HIDE_TIMEOUT);
+			});
+		}
 	};
 
 	/**

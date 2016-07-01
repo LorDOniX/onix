@@ -16,13 +16,15 @@ onix.service("$date", function() {
 	this.dateENtoCS = function(enDate) {
 		enDate = enDate || "";
 
-		var parts = enDate.split("-");
+		let parts = enDate.split("-");
 
 		if (parts.length == 3) {
 			// delete first 0
 			return [parts[2].replace(/^0/, ""), parts[1].replace(/^0/, ""), parts[0]].join(". ");
 		}
-		else return "";
+		else {
+			return "";
+		}
 	};
 
 	/**
@@ -38,12 +40,12 @@ onix.service("$date", function() {
 		// day. month. year 31. 12. 2015
 		csDate = csDate || "";
 
-		var parts = csDate.split(".");
+		let parts = csDate.split(".");
 
 		if (parts.length == 3) {
-			var year = parts[2].trim();
-			var month = parts[1].trim();
-			var date = parts[0].trim();
+			let year = parts[2].trim();
+			let month = parts[1].trim();
+			let date = parts[0].trim();
 
 			// add 0 from left
 			date = date.length == 1 ? "0" + date : date;
@@ -51,7 +53,9 @@ onix.service("$date", function() {
 
 			return [year, month, date].join("-");
 		}
-		else return "";
+		else {
+			return "";
+		}
 	};
 
 
@@ -79,7 +83,7 @@ onix.service("$date", function() {
 	this.addDays = function(date, days) {
 		days = days || 0;
 
-		var addTime = 1000 * 60 * 60 * 24 * days;
+		let addTime = 1000 * 60 * 60 * 24 * days;
 
 		return new Date(date.getTime() + addTime);
 	};

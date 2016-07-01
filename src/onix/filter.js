@@ -17,7 +17,7 @@ function(
 	 * @member $filter
 	 */
 	return function(filterName) {
-		var emptyFilter = function(value) {
+		let emptyFilter = (value) => {
 			return value || "";
 		};
 		
@@ -25,14 +25,12 @@ function(
 			return emptyFilter;
 		}
 
-		// get filter name
-		filterName = $di.getFilterName(filterName);
-
 		return $di.run({
-			fn: function(moduleObj) {
+			fn: (moduleObj) => {
 				return moduleObj || emptyFilter;
 			},
-			inject: [filterName]
+			// get filter name for injection
+			inject: [$di.getFilterName(filterName)]
 		});
 	};
 }]);

@@ -17,11 +17,11 @@ function(
 	 * @private
 	 */
 	this._objCopy = function(dest, source) {
-		Object.keys(source).forEach(function(prop) {
+		Object.keys(source).forEach(prop => {
 			if (source.hasOwnProperty(prop)) {
 				dest[prop] = this.cloneValue(source[prop]);
 			}
-		}.bind(this));
+		});
 	};
 
 	/**
@@ -37,12 +37,12 @@ function(
 	 * @member $common
 	 */
 	this._chainPromisesInner = function(opts, resolve, outArray) {
-		var firstItem = opts.shift();
+		let firstItem = opts.shift();
 
 		if (firstItem) {
 			// string or function itself
-			var fn;
-			var error = false;
+			let fn;
+			let error = false;
 
 			switch (typeof firstItem.method) {
 				case "string":
@@ -65,15 +65,15 @@ function(
 			}
 
 			if (!error) {
-				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function(data) {
+				fn.apply(firstItem.scope || fn, firstItem.args || []).then((data) => {
 					outArray.push(data);
 
 					this._chainPromisesInner(opts, resolve, outArray);
-				}.bind(this), function(err) {
+				}, (err) => {
 					outArray.push(err);
 
 					this._chainPromisesInner(opts, resolve, outArray);
-				}.bind(this));
+				});
 			}
 			else {
 				resolve(outArray);
@@ -92,7 +92,7 @@ function(
 	 * @member $common
 	 */
 	this.confirm = function(txt) {
-		return new $promise(function(resolve, reject) {
+		return new $promise((resolve, reject) => {
 			if (confirm(txt)) {
 				resolve();
 			}
@@ -109,12 +109,12 @@ function(
 	 * @member $common
 	 */
 	this.merge = function() {
-		var count = arguments.length;
-		var dest = {};
+		let count = arguments.length;
+		let dest = {};
 		
 		if (count > 0) {
-			for (var i = 0; i < count; i++) {
-				var source = arguments[i];
+			for (let i = 0; i < count; i++) {
+				let source = arguments[i];
 
 				this._objCopy(dest, source);
 			}
@@ -155,11 +155,11 @@ function(
 			case "object":
 				if (Array.isArray(value)) {
 					// array
-					var newArray = [];
+					let newArray = [];
 
-					value.forEach(function(item) {
+					value.forEach(item => {
 						newArray.push(this.cloneValue(item, lvl + 1));
-					}, this);
+					});
 
 					return newArray;
 				}
@@ -173,13 +173,13 @@ function(
 				}
 				else if (value) {
 					// object
-					var newObj = {};
+					let newObj = {};
 
-					Object.keys(value).forEach(function(prop) {
+					Object.keys(value).forEach(prop => {
 						if (value.hasOwnProperty(prop)) {
 							newObj[prop] = this.cloneValue(value[prop], lvl + 1);
 						}
-					}.bind(this));
+					});
 
 					return newObj;
 				}
@@ -205,23 +205,23 @@ function(
 	 */
 	this.inherit = function() {
 		// first is source, rest is inherit classess
-		var args = arguments;
+		let args = arguments;
 
 		if (args.length < 2) return;
 
-		var source = args[0].prototype;
-		var inherits = Array.prototype.slice.call(args, 1);
+		let source = args[0].prototype;
+		let inherits = Array.prototype.slice.call(args, 1);
 
 		// all inherits items
-		inherits.forEach(function(inhItem) {
+		inherits.forEach(inhItem => {
 			// iterate prototype items
-			for (var p in inhItem.prototype) {
+			for (let p in inhItem.prototype) {
 				source[p] = typeof inhItem.prototype[p] != "object"
 					? inhItem.prototype[p]
 					: JSON.parse(JSON.stringify(inhItem.prototype[p]));
 
 			}
-		}, this);
+		});
 	};
 
 	/**
@@ -232,11 +232,12 @@ function(
 	 * @member $common
 	 */
 	this.bindWithoutScope = function(cb) {
-		var bindArgs = Array.prototype.slice.call(arguments, 1);
+		let bindArgs = Array.prototype.slice.call(arguments, 1);
 
 		return function () {
-			var internalArgs = Array.prototype.slice.call(arguments, 0);
-			var args = Array.prototype.concat(internalArgs, bindArgs);
+			let internalArgs = Array.prototype.slice.call(arguments, 0);
+			let args = Array.prototype.concat(internalArgs, bindArgs);
+
 			return cb.apply(this, args);
 		};
 	};
@@ -250,10 +251,10 @@ function(
 	 * @member $common
 	 */
 	this.nodesForEach = function(nodes, cb, scope) {
-		cb = cb || function() {};
+		if (typeof cb !== "function") return;
 		
 		if (nodes) {
-			Array.prototype.slice.call(nodes).forEach(function(item, ind) {
+			Array.prototype.slice.call(nodes).forEach((item, ind) => {
 				cb.apply(scope || cb, [item, ind]);
 			});
 		}
@@ -262,16 +263,17 @@ function(
 	/**
 	 * Reverse for each.
 	 *
-	 * @param  {Array} arr
+	 * @param {Array} arr
 	 * @param {Function} cb
-	 * @param {Function} scope
+	 * @param {Function} [scope]
 	 * @member $common
 	 */
-	this.reverseForEach = function (arr, cb, scope) {
-		arr = arr || [];
-		cb = cb || function() {};
+	this.reverseForEach = function(arr, cb, scope) {
+		if (typeof cb !== "function") return;
 
-		for (var i = arr.length - 1; i >= 0; i--) {
+		arr = arr || [];
+
+		for (let i = arr.length - 1; i >= 0; i--) {
 			cb.apply(scope || this, [arr[i], i]);
 		}
 	};
@@ -283,7 +285,7 @@ function(
 	 * @return {Number}
 	 * @member $common
 	 */
-	this.hxToDe = function(hex) {
+	this.hexToD = function(hex) {
 		hex = hex.toLowerCase();
 
 		switch (hex) {
@@ -317,16 +319,16 @@ function(
 
 			if (hexColor.length == 3) {
 				return {
-					r: this.hxToDe(hexColor[0]) * 16 + this.hxToDe(hexColor[0]),
-					g: this.hxToDe(hexColor[1]) * 16 + this.hxToDe(hexColor[1]),
-					b: this.hxToDe(hexColor[2]) * 16 + this.hxToDe(hexColor[2])
+					r: this.hexToD(hexColor[0]) * 16 + this.hexToD(hexColor[0]),
+					g: this.hexToD(hexColor[1]) * 16 + this.hexToD(hexColor[1]),
+					b: this.hexToD(hexColor[2]) * 16 + this.hexToD(hexColor[2])
 				};
 			}
 			else {
 				return {
-					r: this.hxToDe(hexColor[0]) * 16 + this.hxToDe(hexColor[1]),
-					g: this.hxToDe(hexColor[2]) * 16 + this.hxToDe(hexColor[3]),
-					b: this.hxToDe(hexColor[4]) * 16 + this.hxToDe(hexColor[5])
+					r: this.hexToD(hexColor[0]) * 16 + this.hexToD(hexColor[1]),
+					g: this.hexToD(hexColor[2]) * 16 + this.hexToD(hexColor[3]),
+					b: this.hexToD(hexColor[4]) * 16 + this.hexToD(hexColor[5])
 				};
 			}
 		}
@@ -365,11 +367,11 @@ function(
 	 * @member $common
 	 */
 	this.col = function() {
-		var args = Array.prototype.slice.call(arguments);
-		var output = "";
-		var params = {};
+		let args = Array.prototype.slice.call(arguments);
+		let output = "";
+		let params = {};
 
-		args.forEach(function(arg, ind) {
+		args.forEach((arg, ind) => {
 			if (ind == 0) {
 				output = arg;
 			}
@@ -378,7 +380,7 @@ function(
 			}
 		});
 
-		Object.keys(params).forEach(function(param) {
+		Object.keys(params).forEach(param => {
 			output = output.replace(new RegExp(param, "g"), params[param]);
 		});
 
@@ -399,12 +401,12 @@ function(
 			return "null";
 		}
 
-		var lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1000)) : 0;
-		var sizes = ["", "K", "M", "G", "T"];
+		let lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1000)) : 0;
+		let sizes = ["", "K", "M", "G", "T"];
 
 		lv = Math.min(sizes.length, lv);
 		
-		var value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
+		let value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
 
 		return value + " " + sizes[lv] + "B";
 	};
@@ -420,8 +422,21 @@ function(
 	 * @member $common
 	 */
 	this.chainPromises = function(opts) {
-		return new $promise(function(resolve) {
+		return new $promise(resolve => {
 			this._chainPromisesInner(opts, resolve, []);
-		}.bind(this));
+		});
+	};
+
+	/**
+	 * Cancel event and his propagation.
+	 * 
+	 * @param  {Event} e
+	 * @member $common
+	 */
+	this.cancelEvents = function(e) {
+		if (e) {
+			e.stopPropagation();
+			e.preventDefault();
+		}
 	};
 }]);

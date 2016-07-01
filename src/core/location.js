@@ -16,28 +16,40 @@ onix.service("$location", function() {
 	};
 
 	/**
-	 * Create a new search url.
+	 * Create a new search url. This method appends ? to the start of the url.
 	 * 
 	 * @param  {Object} obj
 	 * @return {String}
 	 * @member $location
 	 */
 	this.createSearchURL = function(obj) {
-		var newURL = [];
+		let url = this.objToURL(obj);
 
-		if (obj) {
-			// write
-			var newURL = [];
+		return url ? "?" + url : "";
+	};
 
-			Object.keys(obj).forEach(function(key) {
-				newURL.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
+	/**
+	 * Object to url.
+	 * 
+	 * @param  {Array|Object} { name: x, value: y} | obj Mapping key -> name, value -> value.
+	 * @return {String}
+	 * @member $location
+	 */
+	this.objToURL = function(obj) {
+		let url = [];
+
+		if (Array.isArray(obj)) {
+			obj.forEach(item => {
+				url.push(encodeURIComponent(item.name) + "=" + encodeURIComponent(item.value));
+			});
+		}
+		else if (typeof obj === "object") {
+			Object.keys(obj).forEach(key => {
+				url.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
 			});
 		}
 
-		if (newURL.length) {
-			return "?" + newURL.join("&");
-		}
-		else return "";
+		return url.join("&");
 	};
 
 	/**
@@ -50,7 +62,7 @@ onix.service("$location", function() {
 	this.search = function(obj) {
 		if (obj) {
 			// write
-			var newURL = this.createSearchURL(obj);
+			let newURL = this.createSearchURL(obj);
 
 			if (newURL) {
 				window.location.search = newURL;
@@ -58,15 +70,15 @@ onix.service("$location", function() {
 		}
 		else {
 			// read
-			var data = location.search;
-			var output = {};
+			let data = location.search;
+			let output = {};
 
 			if (data) {
 				data = data.replace("?", "");
 
-				data.split("&").forEach(function(item) {
-					var parts = item.split("=");
-					var name = decodeURIComponent(parts[0]);
+				data.split("&").forEach(item => {
+					let parts = item.split("=");
+					let name = decodeURIComponent(parts[0]);
 					
 					output[name] = decodeURIComponent(parts[1]);
 				});
@@ -85,5 +97,4 @@ onix.service("$location", function() {
 	this.get = function() {
 		return window.location.pathname;
 	};
-	
 });

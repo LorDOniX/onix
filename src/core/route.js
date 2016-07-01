@@ -42,13 +42,13 @@ function(
 	 * @member $route
 	 */
 	this._setRouteParams = function(routeParams) {
-		Object.keys($routeParams).forEach(function(key) {
+		Object.keys($routeParams).forEach(key => {
 			delete $routeParams[key];
 		});
 
 		routeParams = routeParams || {};
 
-		Object.keys(routeParams).forEach(function(key) {
+		Object.keys(routeParams).forEach(key => {
 			$routeParams[key] = routeParams[key];
 		});
 	};
@@ -103,7 +103,7 @@ function(
 	 * @member $route
 	 */
 	this._runController = function(contr, routeParams) {
-		var pp = $di.parseParam(contr);
+		let pp = $di.parseParam(contr);
 
 		this._setRouteParams(routeParams);
 
@@ -119,12 +119,12 @@ function(
 	 * @member $route
 	 */
 	this.go = function() {
-		var path = $location.get();
-		var find = false;
-		var config = null;
-		var data = {};
+		let path = $location.get();
+		let find = false;
+		let config = null;
+		let data = {};
 
-		this._routes.every(function(item) {
+		this._routes.every(item => {
 			if (path.match(new RegExp(item.url))) {
 				config = item.config;
 				find = true;
@@ -141,13 +141,13 @@ function(
 		}
 
 		if (config) {
-			var templateId = "";
-			var templateUrl = null;
-			var contr = null;
-			var routeParams = {};
+			let templateId = "";
+			let templateUrl = null;
+			let contr = null;
+			let routeParams = {};
 
-			Object.keys(config).forEach(function(key) {
-				var value = config[key];
+			Object.keys(config).forEach(key => {
+				let value = config[key];
 
 				switch (key) {
 					case "templateId":
@@ -167,17 +167,18 @@ function(
 				}
 			});
 
-			if (templateUrl) {
-				$template.load(config.templateId || config.templateUrl, config.templateUrl).then(function() {
-					if (contr) {
-						this._runController(contr, routeParams);
-					}
-				}.bind(this));
-			}
-			else {
+			// run controller function
+			let runController = () => {
 				if (contr) {
 					this._runController(contr, routeParams);
 				}
+			};
+
+			if (templateUrl) {
+				$template.load(config.templateId || config.templateUrl, config.templateUrl).then(runController);
+			}
+			else {
+				runController();
 			}
 		}
 	};

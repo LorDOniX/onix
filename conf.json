@@ -1,0 +1,119 @@
+{
+	"ES6": {
+		"cache": "cache.json",
+		"presets": ["babel-preset-es2015"]
+	},
+	"header": {
+		"file": "HEADER",
+		"onix": "src/onix/onix.js",
+		"version": "version: ",
+		"date": "date: ",
+		"minimal": " * minimal version: contains [{MINIMAL}]",
+		"minimalPH": "{MINIMAL}",
+		"versionPH": "{VERSION}",
+		"datePH": "{DATE}",
+		"onixPH": "\"{ONIX_INFO}\""
+	},
+	"bundles": [{
+		"id": "minimal",
+		"run": ["dist"],
+		"type": "js",
+		"minimal": true,
+		"header": true,
+		"output": "dist/onix-js-minimal-framework.js",
+		"outputMin": "dist/onix-js-minimal-framework.min.js",
+		"data": [{
+			"files": [
+				"src/libs/polyfills.js"
+			]
+		}, {
+			"ES6": true,
+			"files": [
+				"src/onix/onix.js",
+				"src/onix/filter.js"
+			]
+		}]
+	}, {
+		"id": "onix",
+		"run": ["dev", "dist"],
+		"type": "js",
+		"header": true,
+		"watchPath": "src/",
+		"output": "dist/onix-js-framework.js",
+		"outputMin": "dist/onix-js-framework.min.js",
+		"data": [{
+			"files": [
+				"src/libs/polyfills.js",
+				"src/libs/exif.js"
+			]
+		}, {
+			"ES6": true,
+			"files": [
+				"src/onix/onix.js",
+				"src/onix/filter.js",
+
+				"src/core/common.js",
+				"src/core/cookie.js",
+				"src/core/date.js",
+				"src/core/dom.js",
+				"src/core/event.js",
+				"src/core/resize.js",
+				"src/core/filters.js",
+				"src/core/http.js",
+				"src/core/i18n.js",
+				"src/core/image.js",
+				"src/core/job.js",
+				"src/core/local-storage.js",
+				"src/core/location.js",
+				"src/core/math.js",
+				"src/core/my-query.js",
+				"src/core/promise.js",
+				"src/core/route.js",
+				"src/core/routeParams.js",
+				"src/core/template.js",
+				"src/core/features.js",
+				
+				"src/utils/anonymizer.js",
+				"src/utils/loader.js",
+				"src/utils/notify.js",
+				"src/utils/preview-images.js",
+				"src/utils/select.js",
+				"src/utils/slider.js",
+				"src/utils/crop.js"
+			]
+		}]
+	}, {
+		"id": "less",
+		"run": ["dev", "dist"],
+		"type": "less",
+		"watchPath": "less/",
+		"source": "less/onix.less",
+		"output": "dist/onix.css"
+	}, {
+		"id": "homejs",
+		"run": ["dev"],
+		"type": "js",
+		"watchPath": "test/js/home/",
+		"output": "test/js/home.js",
+		"data": [{
+			"ES6": true,
+			"files": [
+				"test/js/common/menu.js",
+				"test/js/home/my-module.js",
+				"test/js/home/home.js",
+				"test/js/home/home-resource.js",
+				"test/js/home/home-page.js",
+				"test/js/home/home-snippet.js",
+				"test/js/home/page.js",
+				"test/js/home/snippet.js"
+			]
+		}]
+	}, {
+		"id": "testless",
+		"run": ["dev", "dist"],
+		"type": "less",
+		"watchPath": "test/less/",
+		"source": "test/less/main.less",
+		"output": "test/css/main.css"
+	}]
+}

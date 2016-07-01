@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.7.0 (1. 7. 2016)
+
+* ES6 (Babel) all src files + home test files; inheritance over extends keyword
+* bundler rewrite; split to class files; cache for faster transpilation
+* $promise - flattening
+* $common - cancelEvents method
+* $location - objToURL method
+* jsduck - now only from one file, output is in the file
+
 ## 2.6.6 (22. 6. 2016)
 
 * es6 bundler.js option

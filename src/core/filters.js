@@ -12,11 +12,13 @@ onix.filter("lowercase", function() {
 	 * @return {String|Object}
 	 * @member $filterLowercase
 	 */
-	return function(input) {
+	return (input) => {
 		if (typeof input === "string") {
 			return input.toLowerCase();
 		}
-		else return input;
+		else {
+			return input;
+		}
 	};
 });
 
@@ -34,11 +36,13 @@ onix.filter("uppercase", function() {
 	 * @return {String|Object}
 	 * @member $filterUppercase
 	 */
-	return function(input) {
+	return (input) => {
 		if (typeof input === "string") {
 			return input.toUpperCase();
 		}
-		else return input;
+		else {
+			return input;
+		}
 	};
 });
 
@@ -57,9 +61,9 @@ onix.filter("json", function() {
 	 * @return {String}
 	 * @member $filterJson
 	 */
-	return function(obj, spacing) {
+	return (obj, spacing) => {
 		if (typeof obj === "object") {
-			var space = null;
+			let space = null;
 
 			if (spacing) {
 				spacing = parseInt(spacing, 10);
@@ -68,6 +72,8 @@ onix.filter("json", function() {
 
 			return JSON.stringify(obj, null, space);
 		}
-		else return obj;
+		else {
+			return obj;
+		}
 	};
 });

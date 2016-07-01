@@ -7,17 +7,19 @@ function(
 	Snippet,
 	TestFromModule
 ) {
-	var HomeSnippet = function(config, parent) {
-		this._constructor(config, parent);
+	class HomeSnippet extends Snippet {
+		constructor(config, parent) {
+			super();
 
-		TestFromModule.test();
-	};
+			this._constructor(config, parent);
 
-	$common.inherit(HomeSnippet, Snippet);
+			TestFromModule.test();
+		}
 
-	HomeSnippet.prototype.dirTest = function() {
-		console.log("HomeDir dirTest function()");
-	};
+		dirTest() {
+			console.log("HomeDir dirTest function()");
+		}
+	}
 
 	return HomeSnippet;
 }]);

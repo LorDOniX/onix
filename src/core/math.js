@@ -32,14 +32,14 @@ onix.service("$math", function() {
 	 * @member $math
 	 */
 	this.isBBoxIntersection = function(bbox1, bbox2) {
-		var ltx = Math.max(bbox1.x, bbox2.x);
-		var lty = Math.max(bbox1.y, bbox2.y);
-		var rbx = Math.min(bbox1.x + bbox1.width, bbox2.x + bbox2.width);
-		var rby = Math.min(bbox1.y + bbox1.height, bbox2.y + bbox2.height);
+		let ltx = Math.max(bbox1.x, bbox2.x);
+		let lty = Math.max(bbox1.y, bbox2.y);
+		let rbx = Math.min(bbox1.x + bbox1.width, bbox2.x + bbox2.width);
+		let rby = Math.min(bbox1.y + bbox1.height, bbox2.y + bbox2.height);
 
 		// width and height of intesection has to be higher than 0
-		var width = Math.abs(rbx - ltx);
-		var height = Math.abs(rby - lty);
+		let width = Math.abs(rbx - ltx);
+		let height = Math.abs(rby - lty);
 
 		if (ltx <= rbx && lty <= rby && width * height > 0) {
 			return true;
@@ -59,13 +59,13 @@ onix.service("$math", function() {
 	 * @member $math
 	 */
 	this.getBBox = function(points) {
-		var minX = Infinity;
-		var minY = Infinity;
-		var maxX = -Infinity;
-		var maxY = -Infinity;
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
 
 		// for each point
-		for (var i = 0; i < points.length; i++) {
+		for (let i = 0; i < points.length; i++) {
 			minX = Math.min(points[i].x, minX);
 			minY = Math.min(points[i].y, minY);
 			maxX = Math.max(points[i].x, maxX);
@@ -111,20 +111,22 @@ onix.service("$math", function() {
 	 * @member $math
 	 */
 	this.linesIntersection = function(firstLine, secondLine) {
-		var TOLERANCE = 0.000001;
+		let TOLERANCE = 0.000001;
 
-		var a = this.det2(firstLine.x1 - firstLine.x2, firstLine.y1 - firstLine.y2, secondLine.x1 - secondLine.x2, secondLine.y1 - secondLine.y2);
-		if (Math.abs(a) < TOLERANCE) return null; // lines are parallel
+		let a = this.det2(firstLine.x1 - firstLine.x2, firstLine.y1 - firstLine.y2, secondLine.x1 - secondLine.x2, secondLine.y1 - secondLine.y2);
+		
+		// lines are parallel
+		if (Math.abs(a) < TOLERANCE) { return null; }
 
-		var d1 = this.det2(firstLine.x1, firstLine.y1, firstLine.x2, firstLine.y2);
-		var d2 = this.det2(secondLine.x1, secondLine.y1, secondLine.x2, secondLine.y2);
-		var x = this.det2(d1, firstLine.x1 - firstLine.x2, d2, secondLine.x1 - secondLine.x2) / a;
-		var y = this.det2(d1, firstLine.y1 - firstLine.y2, d2, secondLine.y1 - secondLine.y2) / a;
+		let d1 = this.det2(firstLine.x1, firstLine.y1, firstLine.x2, firstLine.y2);
+		let d2 = this.det2(secondLine.x1, secondLine.y1, secondLine.x2, secondLine.y2);
+		let x = this.det2(d1, firstLine.x1 - firstLine.x2, d2, secondLine.x1 - secondLine.x2) / a;
+		let y = this.det2(d1, firstLine.y1 - firstLine.y2, d2, secondLine.y1 - secondLine.y2) / a;
 
-		if (x < Math.min(firstLine.x1, firstLine.x2) - TOLERANCE || x > Math.max(firstLine.x1, firstLine.x2) + TOLERANCE) return null
-		if (y < Math.min(firstLine.y1, firstLine.y2) - TOLERANCE || y > Math.max(firstLine.y1, firstLine.y2) + TOLERANCE) return null
-		if (x < Math.min(secondLine.x1, secondLine.x2) - TOLERANCE || x > Math.max(secondLine.x1, secondLine.x2) + TOLERANCE) return null
-		if (y < Math.min(secondLine.y1, secondLine.y2) - TOLERANCE || y > Math.max(secondLine.y1, secondLine.y2) + TOLERANCE) return null
+		if (x < Math.min(firstLine.x1, firstLine.x2) - TOLERANCE || x > Math.max(firstLine.x1, firstLine.x2) + TOLERANCE) { return null; }
+		if (y < Math.min(firstLine.y1, firstLine.y2) - TOLERANCE || y > Math.max(firstLine.y1, firstLine.y2) + TOLERANCE) { return null; }
+		if (x < Math.min(secondLine.x1, secondLine.x2) - TOLERANCE || x > Math.max(secondLine.x1, secondLine.x2) + TOLERANCE) { return null; }
+		if (y < Math.min(secondLine.y1, secondLine.y2) - TOLERANCE || y > Math.max(secondLine.y1, secondLine.y2) + TOLERANCE) { return null; }
 
 		return {
 			x: Math.round(x),
@@ -171,12 +173,12 @@ onix.service("$math", function() {
 	 * @member $math
 	 */
 	this.zoomToDistance = function(zoom, horFOV, height) {
-		var resolution = this._CONST.ZOOM / Math.pow(2, zoom); // m/px
-		var halfHeight = height / 2;
-		var y = Math.floor(resolution * halfHeight);
+		let resolution = this._CONST.ZOOM / Math.pow(2, zoom); // m/px
+		let halfHeight = height / 2;
+		let y = Math.floor(resolution * halfHeight);
 
 		// we need a half - its in degrees - thats why / 2 * / 180 for radians [rad]; vertical fov -> we need height
-		var alfa = horFOV / 360 * Math.PI;
+		let alfa = horFOV / 360 * Math.PI;
 
 		return Math.floor(y / Math.tan(alfa));
 	};
@@ -191,9 +193,9 @@ onix.service("$math", function() {
 	 * @member $math
 	 */
 	this.distanceToZoom = function(distance, horFOV, height) {
-		var alfa = horFOV / 360 * Math.PI;
-		var y = Math.tan(alfa) * distance;
-		var mPPx = 2 * y / height; // distance / half of height; meters per pixel
+		let alfa = horFOV / 360 * Math.PI;
+		let y = Math.tan(alfa) * distance;
+		let mPPx = 2 * y / height; // distance / half of height; meters per pixel
 
 		return Math.floor(this.log2(this._CONST.ZOOM / mPPx));
 	};
@@ -208,9 +210,9 @@ onix.service("$math", function() {
 	 * @member $math
 	 */
 	this.movePointByAngle = function(point, angle) {
-		var rad = (360 - angle) / 180 * Math.PI;
-		var x = point.x;
-		var y = point.y;
+		let rad = (360 - angle) / 180 * Math.PI;
+		let x = point.x;
+		let y = point.y;
 
 		point.x = x * Math.cos(rad) - y * Math.sin(rad);
 		point.y = x * Math.sin(rad) + y * Math.cos(rad)
@@ -230,7 +232,7 @@ onix.service("$math", function() {
 	 */
 	this.movePointByVector = function(point, vector, angle) {
 		// because overwrite reference object
-		var vectorSave = {
+		let vectorSave = {
 			x: vector.x,
 			y: vector.y
 		};

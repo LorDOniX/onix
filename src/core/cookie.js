@@ -38,14 +38,14 @@ function(
 	this.set = function(name, value, optsArg) {
 		if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
 
-		var opts = {
+		let opts = {
 			expiration: $date.addDays(new Date(), 30),
 			path: "",
 			domain: "",
 			secure: ""
 		};
 
-		var expires = "";
+		let expires = "";
 		
 		if (opts.expiration) {
 			switch (opts.expiration.constructor) {
@@ -79,16 +79,17 @@ function(
 	this.get = function(name) {
 		name = name || "";
 
-		var cookieValue = null;
+		let cookieValue = null;
 
 		if (document.cookie && document.cookie != '') {
-			var cookies = document.cookie.split(';');
+			let cookies = document.cookie.split(';');
 
-			cookies.every(function(cookie) {
+			cookies.every(cookie => {
 				cookie = cookie.trim();
 
 				if (cookie.substring(0, name.length + 1) == (name + '=')) {
 					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+
 					return false;
 				}
 				else return true;
@@ -114,6 +115,7 @@ function(
 		}
 
 		document.cookie = encodeURIComponent(name) + "=; expires=" + this._CONST.EXPIRES.MIN + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+
 		return true;
 	};
 
