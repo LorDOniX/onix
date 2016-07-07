@@ -141,6 +141,10 @@ class MyES6 {
 					Common.col("ES6 transpilation: {0} files takes {1}, {2} cached, all files count {3}",
 								es6Files.length, this._timeStop.end("ES6"), cached, allFilesCount);
 				}
+				else if (run == "dist") {
+					// dist -> always rewrite
+					this._force = true;
+				}
 
 				if (cached == allFilesCount && !this._force) {
 					Common.col("All files are cached - no change!");
@@ -154,7 +158,7 @@ class MyES6 {
 					Common.writeFile(bundle.output, devData).then(() => {
 						Common.col("Write JS {0} {1}", bundle.output, Common.formatSize(devData.length));
 
-						if (bundle.outputMin) {
+						if (run == "dist" && bundle.outputMin) {
 							// min. version
 							let distData = this._getData(bundle, run, true);
 
@@ -345,9 +349,8 @@ class MyES6 {
 		outputData = outputData.replace(/"use strict";/g, "").replace(/(^[ \t]*\n)/gm, "");
 
 		// compress
-		if (compress) {
+		if (run == "dist" && compress) {
 			let headerData = hasHeader ? this._getHeader(true, bundle) : "";
-
 			outputData = headerData + this._getMinData(outputData);
 		}
 
@@ -374,6 +377,10 @@ class MyES6 {
 		}
 		catch (err) {
 			Common.col("UglifyJS error {0}", err.message);
+
+			if ("line" in err && "col" in err) {
+				Common.col("Line {0} col {1}", err.line, err.col);
+			}
 
 			return "";
 		}

@@ -1,9 +1,13 @@
 # Change Log
 
-## not released
+## 2.7.2 (7. 7. 2016)
 
 * bundler - add websocket
 * reload -server - dynamic update from bundler to test site
+* $features - localStorage test
+* $localStorage - update with $features
+* test for $localStorage
+$ windows update - EOL, watcher
 
 ## 2.7.1 (1. 7. 2016)
 

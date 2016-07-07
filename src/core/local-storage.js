@@ -3,9 +3,14 @@
  * 
  * @class $localStorage
  */
-onix.factory("$localStorage", function() {
+onix.factory("$localStorage", [
+	"$features",
+function(
+	$features
+) {
+
 	// localStorage provider
-	let provider = ("localStorage" in window) ? localStorage : {
+	let provider = $features.LOCAL_STORAGE ? window.localStorage : {
 		_data: {},
 
 		setItem: function(key, value) {
@@ -63,4 +68,4 @@ onix.factory("$localStorage", function() {
 			provider.removeItem(key);
 		}
 	};
-});
+}]);

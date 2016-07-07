@@ -13,6 +13,7 @@ homeApp.factory("HomePage", [
 	"$routeParams",
 	"$select",
 	"$template",
+	"$localStorage",
 	"HomeResource",
 	"HomeSnippet",
 	"MainMenu",
@@ -33,6 +34,7 @@ function(
 	$routeParams,
 	$select,
 	$template,
+	$localStorage,
 	HomeResource,
 	HomeSnippet,
 	MainMenu,
@@ -344,7 +346,7 @@ function(
 
 				this._promiseFlatteningTest2();
 			});
-		};
+		}
 
 		_promiseFlatteningTest2() {
 			console.log("pp test 2");
@@ -369,7 +371,24 @@ function(
 				console.log("val3");
 				console.log(val3);
 			});
-		};
+		}
+
+		locStor() {
+			let LS_KEY = "myLocalStorage";
+			let value = "xyz";
+
+			$common.col("Set localStorage {0} with value {1}", LS_KEY, value);
+
+			$localStorage.set(LS_KEY, value);
+
+			$common.col("Get localStorage {0} = {1}", LS_KEY, $localStorage.get(LS_KEY))
+
+			$common.col("Remove localStorage {0}", LS_KEY);
+
+			$localStorage.remove(LS_KEY);
+
+			$common.col("Get localStorage {0} = {1}", LS_KEY, $localStorage.get(LS_KEY))
+		}
 
 		allTests() {
 			console.log("Running all tests...");
@@ -384,6 +403,7 @@ function(
 			this.promiseTest();
 			this.mathAndDate();
 			this.promiseFlattening();
+			this.locStor();
 		}
 	}
 

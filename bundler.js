@@ -2,7 +2,6 @@
 "use strict";
 
 var exec = require('child_process').exec;
-var UglifyJS = require("uglify-js");
 var Common = require("./common");
 var MyES6 = require("./my-es6");
 var MyLess = require("./my-less");
@@ -144,7 +143,9 @@ class Bundler {
 
 		this._watcher.setCallback((eventName, buffer) => {
 			if (eventName == "file-change" && buffer.length == 1) {
-				this._fileUpdate(buffer[0]);
+				let file = buffer[0].split(pathObj.sep).join("/");
+
+				this._fileUpdate(file);
 			}
 		});
 

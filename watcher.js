@@ -27,7 +27,7 @@ class Watcher {
 	 * @param {Function} cb
 	 */
 	setCallback(cb) {
-		this._cb = cb || () => {};
+		this._cb = cb;
 	}
 
 	/**

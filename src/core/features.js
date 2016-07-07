@@ -21,4 +21,22 @@ onix.service("$features", function() {
 	 * @type {Boolean}
 	 */
 	this.CANVAS = !!document.createElement("canvas").getContext;
+
+	// local storage
+	var locStor = true;
+
+	try {
+		window.localStorage;
+	}
+	catch (err) {
+		locStor = false;
+	}
+
+	/**
+	 * Local storage is available.
+	 *
+	 * @member $features
+	 * @type {Boolean}
+	 */
+	this.LOCAL_STORAGE = locStor;
 });

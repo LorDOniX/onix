@@ -1515,10 +1515,8 @@ if (!Object.isExtensible) {
 		});
 	}
 }.call(this));
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+function _classCallCheck2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
 	/* ************************************* $module **************************** */
 	/**
@@ -1535,7 +1533,7 @@ onix = function () {
    * @param  {Array} dependencies Other modules dependencies
    */
 		function $module(name, dependencies) {
-			_classCallCheck(this, $module);
+			_classCallCheck2(this, $module);
 			/**
     * All objects.
     *
@@ -1908,8 +1906,8 @@ onix = function () {
   */
 	var $modules = function () {
 		function $modules() {
-			var _this = this;
-			_classCallCheck(this, $modules);
+			var _this7 = this;
+			_classCallCheck2(this, $modules);
 			/**
     * All modules array.
     *
@@ -1938,7 +1936,7 @@ onix = function () {
 			};
 			// bind DOM ready
 			document.addEventListener("DOMContentLoaded", function () {
-				_this._domLoad();
+				_this7._domLoad();
 			});
 		}
 		/**
@@ -1949,15 +1947,15 @@ onix = function () {
    * @method _domLoad
    */
 		$modules.prototype._domLoad = function _domLoad() {
-			var _this2 = this;
+			var _this8 = this;
 			var configs = [];
 			var runs = [];
 			this._modules.forEach(function (module) {
 				var error = false;
 				var dependencies = module.getDependencies();
 				dependencies.every(function (dep) {
-					if (!(dep in _this2._modulesObj)) {
-						console.error("Module '" + _this2._name + "' dependency '" + dep + "' not found!");
+					if (!(dep in _this8._modulesObj)) {
+						console.error("Module '" + _this8._name + "' dependency '" + dep + "' not found!");
 						error = true;
 						return false;
 					} else {
@@ -1971,11 +1969,11 @@ onix = function () {
 			});
 			// run all configs
 			configs.forEach(function (config) {
-				_this2.run(config, true);
+				_this8.run(config, true);
 			});
 			// run all runs
 			runs.forEach(function (run) {
-				_this2.run(run);
+				_this8.run(run);
 			});
 		};
 		/**
@@ -2041,7 +2039,7 @@ onix = function () {
    * @method run
    */
 		$modules.prototype.run = function run(obj, isConfig, parent) {
-			var _this3 = this;
+			var _this9 = this;
 			parent = parent || [];
 			if (parent.indexOf(obj.name) != -1) {
 				console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
@@ -2063,14 +2061,14 @@ onix = function () {
 			if (obj.inject && obj.inject.length) {
 				obj.inject.forEach(function (objName) {
 					if (typeof objName === "string") {
-						var injObj = _this3._getObject(objName);
+						var injObj = _this9._getObject(objName);
 						if (!injObj) {
 							console.error("Object name: " + objName + " not found!");
 							inject.push(null);
 						} else {
-							inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+							inject.push(_this9.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 						}
-					} else if ((typeof objName === "undefined" ? "undefined" : _typeof(objName)) === "object") {
+					} else if ((typeof objName === "undefined" ? "undefined" : _typeof2(objName)) === "object") {
 						inject.push(objName);
 					}
 				});
@@ -2182,8 +2180,8 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.7.1
-  * date: 1. 7. 2016
+  * version: 2.7.2
+  * date: 7. 7. 2016
   * @member onix
   * @static
   */
@@ -2271,6 +2269,11 @@ onix.factory("$filter", ["$di", function ($di) {
 		});
 	};
 }]);
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
 /**
  * Commom functions used in whole application.
  *
@@ -2286,10 +2289,10 @@ onix.service("$common", ["$promise", function ($promise) {
   * @private
   */
 	this._objCopy = function (dest, source) {
-		var _this4 = this;
+		var _this = this;
 		Object.keys(source).forEach(function (prop) {
 			if (source.hasOwnProperty(prop)) {
-				dest[prop] = _this4.cloneValue(source[prop]);
+				dest[prop] = _this.cloneValue(source[prop]);
 			}
 		});
 	};
@@ -2306,7 +2309,7 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this._chainPromisesInner = function (opts, resolve, outArray) {
-		var _this5 = this;
+		var _this2 = this;
 		var firstItem = opts.shift();
 		if (firstItem) {
 			// string or function itself
@@ -2332,10 +2335,10 @@ onix.service("$common", ["$promise", function ($promise) {
 			if (!error) {
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function (data) {
 					outArray.push(data);
-					_this5._chainPromisesInner(opts, resolve, outArray);
+					_this2._chainPromisesInner(opts, resolve, outArray);
 				}, function (err) {
 					outArray.push(err);
-					_this5._chainPromisesInner(opts, resolve, outArray);
+					_this2._chainPromisesInner(opts, resolve, outArray);
 				});
 			} else {
 				resolve(outArray);
@@ -2398,7 +2401,7 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.cloneValue = function (value, lvl) {
-		var _this6 = this;
+		var _this3 = this;
 		lvl = lvl || 1;
 		// recursive call threshold
 		if (lvl > 100) return null;
@@ -2409,7 +2412,7 @@ onix.service("$common", ["$promise", function ($promise) {
 						// array
 						var newArray = [];
 						value.forEach(function (item) {
-							newArray.push(_this6.cloneValue(item, lvl + 1));
+							newArray.push(_this3.cloneValue(item, lvl + 1));
 						});
 						return {
 							v: newArray
@@ -2428,7 +2431,7 @@ onix.service("$common", ["$promise", function ($promise) {
 						var newObj = {};
 						Object.keys(value).forEach(function (prop) {
 							if (value.hasOwnProperty(prop)) {
-								newObj[prop] = _this6.cloneValue(value[prop], lvl + 1);
+								newObj[prop] = _this3.cloneValue(value[prop], lvl + 1);
 							}
 						});
 						return {
@@ -2639,9 +2642,9 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.chainPromises = function (opts) {
-		var _this7 = this;
+		var _this4 = this;
 		return new $promise(function (resolve) {
-			_this7._chainPromisesInner(opts, resolve, []);
+			_this4._chainPromisesInner(opts, resolve, []);
 		});
 	};
 	/**
@@ -2864,7 +2867,7 @@ onix.service("$dom", function () {
   * @member $dom
   */
 	this.create = function (config, exported) {
-		var _this8 = this;
+		var _this = this;
 		var el = document.createElement(config.el);
 		Object.keys(config).forEach(function (key) {
 			var value = void 0;
@@ -2887,7 +2890,7 @@ onix.service("$dom", function () {
 						value = [value];
 					}
 					value.forEach(function (child) {
-						el.appendChild(_this8.create(child, exported));
+						el.appendChild(_this.create(child, exported));
 					});
 					break;
 				case "_exported":
@@ -2938,6 +2941,11 @@ onix.service("$dom", function () {
 		return output;
 	};
 });
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$event", function () {
 	/**
   * This class is used for extending existing objects and brings signal functionality.
@@ -3047,6 +3055,21 @@ onix.factory("$event", function () {
 	;
 	return $event;
 });
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
+function _possibleConstructorReturn(self, call) {
+	if (!self) {
+		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
+}
+function _inherits(subClass, superClass) {
+	if (typeof superClass !== "function" && superClass !== null) {
+		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
+	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
 onix.factory("$resize", ["$event", function ($event) {
 	// ------------------------ private ----------------------------------------
 	/**
@@ -3059,22 +3082,22 @@ onix.factory("$resize", ["$event", function ($event) {
 		function $resize() {
 			_classCallCheck(this, $resize);
 			// event init
-			var _this9 = _possibleConstructorReturn(this, _$event.call(this));
-			_this9._eventInit();
+			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			_this._eventInit();
 			/**
     * Is active?
     *
     * @member $resize
     * @private
     */
-			_this9._active = false;
+			_this._active = false;
 			/**
     * Resize object.
     *
     * @member $resize
     * @private
     */
-			_this9._resizeObj = {
+			_this._resizeObj = {
 				id: null,
 				timeout: 333
 			};
@@ -3084,11 +3107,11 @@ onix.factory("$resize", ["$event", function ($event) {
     * @member $resize
     * @private
     */
-			_this9._binds = {
-				resize: _this9._resize.bind(_this9),
-				resizeInner: _this9._resizeInner.bind(_this9)
+			_this._binds = {
+				resize: _this._resize.bind(_this),
+				resizeInner: _this._resizeInner.bind(_this)
 			};
-			return _this9;
+			return _this;
 		}
 		/**
    * Window resize event.
@@ -3142,6 +3165,11 @@ onix.factory("$resize", ["$event", function ($event) {
 	;
 	return new $resize();
 }]);
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
 /**
  * Filter - lowercase functionality.
  *
@@ -3302,17 +3330,17 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
   * @member $http
   */
 	this.createRequest = function (config) {
-		var _this10 = this;
+		var _this = this;
 		return new $promise(function (resolve, reject) {
 			config = config || {};
 			var request = new XMLHttpRequest();
-			var method = config.method || _this10.METHOD.GET;
+			var method = config.method || _this.METHOD.GET;
 			var url = config.url || "";
 			if (!url) {
 				reject();
 				return;
 			}
-			url = _this10._updateURL(url, config.getData);
+			url = _this._updateURL(url, config.getData);
 			request.onerror = function (err) {
 				reject(err);
 			};
@@ -3353,15 +3381,15 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
 							request.setRequestHeader(headerName, headers[headerName]);
 						});
 					}
-					if (method == _this10.METHOD.GET) {
+					if (method == _this.METHOD.GET) {
 						request.setRequestHeader('Accept', 'application/json');
 					}
-					var type = config.postType || _this10.POST_TYPES.JSON;
-					if (config.postData && type == _this10.POST_TYPES.JSON) {
+					var type = config.postType || _this.POST_TYPES.JSON;
+					if (config.postData && type == _this.POST_TYPES.JSON) {
 						request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 						request.send(JSON.stringify(config.postData));
-					} else if (config.postData && type == _this10.POST_TYPES.FORM_DATA) {
-						request.send(_this10._preparePostData(config.postData));
+					} else if (config.postData && type == _this.POST_TYPES.FORM_DATA) {
+						request.send(_this._preparePostData(config.postData));
 					} else {
 						request.send();
 					}
@@ -3372,6 +3400,11 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
 		});
 	};
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.provider("$i18n", function () {
 	/**
   * All langs data.
@@ -3684,7 +3717,7 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
   * @member $image
   */
 	this.readFromFile = function (file, maxSize) {
-		var _this11 = this;
+		var _this = this;
 		return new $promise(function (resolve, reject) {
 			if (!$features.FILE_READER) {
 				reject();
@@ -3702,12 +3735,12 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 				var exif = null;
 				// exif only for jpeg
 				if (file.type == "image/jpeg" || file.type == "image/pjpeg") {
-					exif = _this11.getEXIF(binaryData);
+					exif = _this.getEXIF(binaryData);
 				}
 				var img = new Image();
 				img.onload = function () {
-					var imd = _this11.getImageDim(img, maxSize);
-					var canvas = _this11.getCanvas(img, {
+					var imd = _this.getImageDim(img, maxSize);
+					var canvas = _this.getCanvas(img, {
 						width: imd.width,
 						height: imd.height,
 						orientation: exif ? exif.Orientation : 0,
@@ -3718,7 +3751,7 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 					output.canvas = canvas;
 					resolve(output);
 				};
-				img.src = _this11.fileToBase64(file.type, binaryDataArray);
+				img.src = _this.fileToBase64(file.type, binaryDataArray);
 			};
 			reader.readAsArrayBuffer(file);
 		});
@@ -3943,6 +3976,11 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 		}
 	};
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$job", ["$promise", function ($promise) {
 	/**
   * Factory for manage multiple tasks.
@@ -3987,17 +4025,17 @@ onix.factory("$job", ["$promise", function ($promise) {
    * @method start
    */
 		$job.prototype.start = function start() {
-			var _this12 = this;
+			var _this = this;
 			return new $promise(function (resolve, reject) {
-				if (_this12._isRunning || !_this12._tasks.length) {
+				if (_this._isRunning || !_this._tasks.length) {
 					reject();
 					return;
 				}
 				// job is running
-				_this12._isRunning = true;
+				_this._isRunning = true;
 				// because of pop
-				_this12._tasks.reverse();
-				_this12._doJob(resolve);
+				_this._tasks.reverse();
+				_this._doJob(resolve);
 			});
 		};
 		/**
@@ -4029,7 +4067,7 @@ onix.factory("$job", ["$promise", function ($promise) {
    * @method _doJob
    */
 		$job.prototype._doJob = function _doJob(resolve) {
-			var _this13 = this,
+			var _this2 = this,
 			    _arguments = arguments;
 			var rest = this._tasks.length;
 			if (rest == 0) {
@@ -4038,11 +4076,11 @@ onix.factory("$job", ["$promise", function ($promise) {
 			} else {
 				var job = this._tasks.pop();
 				job.task.apply(job.scope || job.task, job.args.concat(function () {
-					if (_this13._taskDone.cb) {
+					if (_this2._taskDone.cb) {
 						var doneFnArgs = Array.prototype.slice.call(_arguments, 0);
-						_this13._taskDone.cb.apply(_this13._taskDone.scope || _this13._taskDone.cb, doneFnArgs);
+						_this2._taskDone.cb.apply(_this2._taskDone.scope || _this2._taskDone.cb, doneFnArgs);
 					}
-					_this13._doJob(resolve);
+					_this2._doJob(resolve);
 				}));
 			}
 		};
@@ -4102,9 +4140,9 @@ onix.factory("$job", ["$promise", function ($promise) {
  * 
  * @class $localStorage
  */
-onix.factory("$localStorage", function () {
+onix.factory("$localStorage", ["$features", function ($features) {
 	// localStorage provider
-	var provider = "localStorage" in window ? localStorage : {
+	var provider = $features.LOCAL_STORAGE ? window.localStorage : {
 		_data: {},
 		setItem: function setItem(key, value) {
 			if (!key) return;
@@ -4153,7 +4191,12 @@ onix.factory("$localStorage", function () {
 			provider.removeItem(key);
 		}
 	};
-});
+}]);
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
 /**
  * Support class for location operations.
  * 
@@ -4215,7 +4258,7 @@ onix.service("$location", function () {
 				window.location.search = newURL;
 			}
 		} else {
-			var _ret6 = function () {
+			var _ret = function () {
 				// read
 				var data = location.search;
 				var output = {};
@@ -4231,7 +4274,7 @@ onix.service("$location", function () {
 					v: output
 				};
 			}();
-			if ((typeof _ret6 === "undefined" ? "undefined" : _typeof(_ret6)) === "object") return _ret6.v;
+			if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 		}
 	};
 	/**
@@ -4491,6 +4534,16 @@ onix.service("$math", function () {
 		}
 	};
 });
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$myQuery", function () {
 	/**
   * DOM manipulation in the style of jquery.
@@ -4547,16 +4600,16 @@ onix.factory("$myQuery", function () {
    * @method _setGetAll
    */
 		$myQuery.prototype._setGetAll = function _setGetAll(newValue, attr) {
-			var _this14 = this;
+			var _this = this;
 			if (newValue) {
 				this._operation(function (item) {
 					item[attr] = newValue;
 				});
 				return this;
 			} else {
-				var _ret7 = function () {
+				var _ret = function () {
 					var values = [];
-					_this14._operation(function (item) {
+					_this._operation(function (item) {
 						values.push(item[attr]);
 					});
 					if (!values.length) {
@@ -4573,7 +4626,7 @@ onix.factory("$myQuery", function () {
 						};
 					}
 				}();
-				if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
+				if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 			}
 		};
 		/**
@@ -4603,16 +4656,16 @@ onix.factory("$myQuery", function () {
    * @method attr
    */
 		$myQuery.prototype.attr = function attr(name, newValue) {
-			var _this15 = this;
+			var _this2 = this;
 			if (newValue) {
 				this._operation(function (item) {
 					item.setAttribute(name, newValue);
 				});
 				return this;
 			} else {
-				var _ret8 = function () {
+				var _ret2 = function () {
 					var values = [];
-					_this15._operation(function (item) {
+					_this2._operation(function (item) {
 						values.push(item.getAttribute(name));
 					});
 					if (!values.length) {
@@ -4629,7 +4682,7 @@ onix.factory("$myQuery", function () {
 						};
 					}
 				}();
-				if ((typeof _ret8 === "undefined" ? "undefined" : _typeof(_ret8)) === "object") return _ret8.v;
+				if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
 			}
 		};
 		/**
@@ -4914,6 +4967,11 @@ onix.factory("$myQuery", function () {
 onix.run(["$myQuery", function () {
 	// empty
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$promise", function () {
 	/**
   * ES6 promise implementation.
@@ -4985,7 +5043,7 @@ onix.factory("$promise", function () {
    * @method _resolveFuncs
    */
 		$promise.prototype._resolveFuncs = function _resolveFuncs() {
-			var _this16 = this;
+			var _this = this;
 			var len = this._thens.length;
 			var isCatch = this._state == this._STATES.REJECTED;
 			for (var i = 0; i < len; i++) {
@@ -4997,9 +5055,9 @@ onix.factory("$promise", function () {
 					// promise flattening
 					if (output) {
 						if (i != len - 1) {
-							var _ret9 = function () {
+							var _ret = function () {
 								var resolveCb = null;
-								var rest = _this16._thens.slice(i + 1);
+								var rest = _this._thens.slice(i + 1);
 								var prom = void 0;
 								if (output instanceof $promise) {
 									prom = output;
@@ -5016,7 +5074,7 @@ onix.factory("$promise", function () {
 								}
 								return "break";
 							}();
-							if (_ret9 === "break") break;
+							if (_ret === "break") break;
 						}
 					}
 				} catch (err) {
@@ -5262,7 +5320,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
   * @member $route
   */
 	this.go = function () {
-		var _this17 = this;
+		var _this = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
@@ -5304,7 +5362,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this17._runController(contr, routeParams);
+						_this._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {
@@ -5324,6 +5382,16 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 onix.factory("$routeParams", function () {
 	return {};
 });
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.provider("$template", function () {
 	/**
   * Configuration for template delimeters.
@@ -5428,7 +5496,7 @@ onix.provider("$template", function () {
     * @method _parseArgs
     */
 			$template.prototype._parseArgs = function _parseArgs(value, config) {
-				var _this18 = this;
+				var _this = this;
 				var argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
 				var args = [];
 				var matches = argsValue.match(this._RE.ALL);
@@ -5437,14 +5505,14 @@ onix.provider("$template", function () {
 						var all = [];
 						matches.forEach(function (item) {
 							var value = void 0;
-							if (item.match(_this18._RE.STRINGS)) {
+							if (item.match(_this._RE.STRINGS)) {
 								value = item.substr(1, item.length - 2);
-							} else if (item.match(_this18._RE.NUMBERS)) {
+							} else if (item.match(_this._RE.NUMBERS)) {
 								value = parseFloat(item);
-							} else if (item.match(_this18._RE.JSONS)) {
+							} else if (item.match(_this._RE.JSONS)) {
 								value = JSON.parse(item);
-							} else if (item.match(_this18._RE.VARIABLE)) {
-								var variable = item.match(_this18._RE.VARIABLE)[0];
+							} else if (item.match(_this._RE.VARIABLE)) {
+								var variable = item.match(_this._RE.VARIABLE)[0];
 								if (variable == "$event") {
 									value = config.event;
 								} else if (variable == "$element") {
@@ -5481,13 +5549,13 @@ onix.provider("$template", function () {
     * @method _bindEvent
     */
 			$template.prototype._bindEvent = function _bindEvent(el, attr, scope) {
-				var _this19 = this;
+				var _this2 = this;
 				if (!el || !attr || !scope) return;
 				var eventName = attr.name.replace(_conf.elPrefix, "");
 				var fnName = this._parseFnName(attr.value);
 				if (eventName && fnName in scope) {
 					el.addEventListener(eventName, function (event) {
-						var args = _this19._parseArgs(attr.value, {
+						var args = _this2._parseArgs(attr.value, {
 							el: el,
 							event: event
 						});
@@ -5530,9 +5598,9 @@ onix.provider("$template", function () {
     * @method _init
     */
 			$template.prototype._init = function _init() {
-				var _this20 = this;
+				var _this3 = this;
 				onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function (item) {
-					_this20.add(item.id || "", item.innerHTML);
+					_this3.add(item.id || "", item.innerHTML);
 				});
 			};
 			/**
@@ -5556,18 +5624,18 @@ onix.provider("$template", function () {
     * @method compile
     */
 			$template.prototype.compile = function compile(key, data) {
-				var _this21 = this;
+				var _this4 = this;
 				var tmpl = this.get(key);
 				if (data) {
 					var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
 					all.forEach(function (item) {
 						var itemSave = item;
 						item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
-						if (item.indexOf(_this21._CONST.FILTER_DELIMETER) != -1) {
+						if (item.indexOf(_this4._CONST.FILTER_DELIMETER) != -1) {
 							(function () {
 								var filterValue = void 0;
 								// filters
-								item.split(_this21._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
+								item.split(_this4._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
 									filterItem = filterItem.trim();
 									if (!ind) {
 										// value
@@ -5578,7 +5646,7 @@ onix.provider("$template", function () {
 										(function () {
 											// preprocessing by filter
 											var args = [filterValue];
-											var filterParts = filterItem.split(_this21._CONST.FILTER_PARAM_DELIMETER);
+											var filterParts = filterItem.split(_this4._CONST.FILTER_PARAM_DELIMETER);
 											var filterName = "";
 											if (filterParts.length == 1) {
 												filterName = filterParts[0].trim();
@@ -5635,18 +5703,18 @@ onix.provider("$template", function () {
     * @method bindTemplate
     */
 			$template.prototype.bindTemplate = function bindTemplate(root, scope, addElsCb) {
-				var _this22 = this;
+				var _this5 = this;
 				var allElements = onix.element("*", root);
 				if (allElements.len()) {
 					(function () {
 						var newEls = {};
 						allElements.forEach(function (item) {
-							var attrs = _this22._getAttributes(item);
+							var attrs = _this5._getAttributes(item);
 							attrs.forEach(function (attr) {
 								if (attr.name == _conf.elDataBind) {
 									newEls[attr.value] = item;
 								} else {
-									_this22._bindEvent(item, attr, scope);
+									_this5._bindEvent(item, attr, scope);
 								}
 							});
 						});
@@ -5666,12 +5734,12 @@ onix.provider("$template", function () {
     * @method load
     */
 			$template.prototype.load = function load(key, path) {
-				var _this23 = this;
+				var _this6 = this;
 				return new $promise(function (resolve, reject) {
 					$http.createRequest({
 						url: path
 					}).then(function (okData) {
-						_this23.add(key, okData.data);
+						_this6.add(key, okData.data);
 						resolve();
 					}, function (errorData) {
 						reject(errorData);
@@ -5705,7 +5773,36 @@ onix.service("$features", function () {
   * @type {Boolean}
   */
 	this.CANVAS = !!document.createElement("canvas").getContext;
+	// local storage
+	var locStor = true;
+	try {
+		window.localStorage;
+	} catch (err) {
+		locStor = false;
+	}
+	/**
+  * Local storage is available.
+  *
+  * @member $features
+  * @type {Boolean}
+  */
+	this.LOCAL_STORAGE = locStor;
 });
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
+function _possibleConstructorReturn(self, call) {
+	if (!self) {
+		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
+}
+function _inherits(subClass, superClass) {
+	if (typeof superClass !== "function" && superClass !== null) {
+		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
+	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
 onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common", "$features", function ($math, $event, $loader, $promise, $common, $features) {
 	/**
   * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -5727,22 +5824,22 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
   * @param {HTMLElement} [optsArg.entityPreview = null] Create entity preview? Parent for append.
   * @class $anonymizer
   */
-	var $anonymizer = function (_$event2) {
-		_inherits($anonymizer, _$event2);
+	var $anonymizer = function (_$event) {
+		_inherits($anonymizer, _$event);
 		function $anonymizer(parent, optsArg) {
 			_classCallCheck(this, $anonymizer);
 			// event init
-			var _this24 = _possibleConstructorReturn(this, _$event2.call(this));
-			_this24._eventInit();
+			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			_this._eventInit();
 			// is canvas available?
 			if (!$features.CANVAS) {
 				console.error("Canvas is not available!");
-				return _possibleConstructorReturn(_this24);
+				return _possibleConstructorReturn(_this);
 			}
 			// parent reference
-			_this24._parent = parent;
-			_this24._parent.classList.add("anonymizer");
-			_this24._opts = {
+			_this._parent = parent;
+			_this._parent.classList.add("anonymizer");
+			_this._opts = {
 				canWidth: parent.offsetWidth || 0,
 				canHeight: parent.offsetHeight || 0,
 				zoom: 100,
@@ -5758,59 +5855,59 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 				entityPreview: null
 			};
 			for (var key in optsArg) {
-				_this24._opts[key] = optsArg[key];
+				_this._opts[key] = optsArg[key];
 			}
 			// canvas width & height
-			_this24._canWidth = _this24._opts.canWidth;
-			_this24._canHeight = _this24._opts.canHeight;
+			_this._canWidth = _this._opts.canWidth;
+			_this._canHeight = _this._opts.canHeight;
 			// zoom
-			_this24._zoom = _this24._opts.zoom;
+			_this._zoom = _this._opts.zoom;
 			// zoom step
-			_this24._zoomStep = _this24._opts.zoomStep;
+			_this._zoomStep = _this._opts.zoomStep;
 			// step for zoom move
-			_this24._zoomMoveStep = 0;
+			_this._zoomMoveStep = 0;
 			// act. image width
-			_this24._curWidth = 0;
+			_this._curWidth = 0;
 			// act. image height
-			_this24._curHeight = 0;
+			_this._curHeight = 0;
 			// create main canvas
-			_this24._canvas = document.createElement("canvas");
-			_this24._canvas.width = _this24._canWidth;
-			_this24._canvas.height = _this24._canHeight;
+			_this._canvas = document.createElement("canvas");
+			_this._canvas.width = _this._canWidth;
+			_this._canvas.height = _this._canHeight;
 			// ctx of main canvas
-			_this24._ctx = _this24._canvas.getContext("2d");
+			_this._ctx = _this._canvas.getContext("2d");
 			// loaded image
-			_this24._img = null;
+			_this._img = null;
 			// original image width
-			_this24._imgWidth = 0;
+			_this._imgWidth = 0;
 			// original image height
-			_this24._imgHeight = 0;
+			_this._imgHeight = 0;
 			// canvas & ctx for create line
-			_this24._lineCanvas = null;
-			_this24._lineCanvasCtx = null;
+			_this._lineCanvas = null;
+			_this._lineCanvasCtx = null;
 			// canvas & ctx for preview of a entity
-			_this24._entityCanvas = null;
-			_this24._entityCanvasCtx = null;
+			_this._entityCanvas = null;
+			_this._entityCanvasCtx = null;
 			// entites to draw
-			_this24._entites = [];
+			_this._entites = [];
 			// image draw offset axe x
-			_this24._x = 0;
+			_this._x = 0;
 			// image draw offset axe y
-			_this24._y = 0;
+			_this._y = 0;
 			// threshold for click
-			_this24._THRESHOLD = {
+			_this._THRESHOLD = {
 				MIN: -1,
 				MAX: 1
 			};
 			// helper for mouse event
-			_this24._mouse = {
+			_this._mouse = {
 				startXSave: 0,
 				startYSave: 0,
 				startX: 0,
 				startY: 0,
 				bcr: null
 			};
-			_this24._flags = {
+			_this._flags = {
 				wasRightClick: false,
 				wasMove: false,
 				wasPreview: false,
@@ -5818,34 +5915,34 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 				wasImgMove: false
 			};
 			// binds
-			_this24._binds = {
-				mouseWheel: _this24._mouseWheel.bind(_this24),
-				mouseDown: _this24._mouseDown.bind(_this24),
-				mouseMove: _this24._mouseMove.bind(_this24),
-				mouseUp: _this24._mouseUp.bind(_this24),
-				mouseMoveLine: _this24._mouseMoveLine.bind(_this24),
-				mouseUpLine: _this24._mouseUpLine.bind(_this24),
-				contextMenu: _this24._cancelEvents.bind(_this24)
+			_this._binds = {
+				mouseWheel: _this._mouseWheel.bind(_this),
+				mouseDown: _this._mouseDown.bind(_this),
+				mouseMove: _this._mouseMove.bind(_this),
+				mouseUp: _this._mouseUp.bind(_this),
+				mouseMoveLine: _this._mouseMoveLine.bind(_this),
+				mouseUpLine: _this._mouseUpLine.bind(_this),
+				contextMenu: _this._cancelEvents.bind(_this)
 			};
 			// firefox
-			_this24._canvas.addEventListener("DOMMouseScroll", _this24._binds.mouseWheel);
+			_this._canvas.addEventListener("DOMMouseScroll", _this._binds.mouseWheel);
 			// others
-			_this24._canvas.addEventListener("mousewheel", _this24._binds.mouseWheel);
-			_this24._canvas.addEventListener("mousedown", _this24._binds.mouseDown);
-			_this24._canvas.addEventListener("contextmenu", _this24._binds.contextMenu);
+			_this._canvas.addEventListener("mousewheel", _this._binds.mouseWheel);
+			_this._canvas.addEventListener("mousedown", _this._binds.mouseDown);
+			_this._canvas.addEventListener("contextmenu", _this._binds.contextMenu);
 			// spinner - progress for image load
-			_this24._spinner = $loader.getSpinner();
-			parent.appendChild(_this24._spinner);
-			parent.appendChild(_this24._canvas);
+			_this._spinner = $loader.getSpinner();
+			parent.appendChild(_this._spinner);
+			parent.appendChild(_this._canvas);
 			// preview canvas
-			if (_this24._opts.entityPreview) {
-				_this24._entityCanvas = document.createElement("canvas");
-				_this24._entityCanvas.width = 300;
-				_this24._entityCanvas.height = 150;
-				_this24._entityCanvasCtx = _this24._entityCanvas.getContext("2d");
-				_this24._opts.entityPreview.appendChild(_this24._entityCanvas);
+			if (_this._opts.entityPreview) {
+				_this._entityCanvas = document.createElement("canvas");
+				_this._entityCanvas.width = 300;
+				_this._entityCanvas.height = 150;
+				_this._entityCanvasCtx = _this._entityCanvas.getContext("2d");
+				_this._opts.entityPreview.appendChild(_this._entityCanvas);
 			}
-			return _this24;
+			return _this;
 		}
 		/**
    * Scene redraw - clear, picture, entites.
@@ -5855,33 +5952,33 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
    * @member $anonymizer
    */
 		$anonymizer.prototype._redraw = function _redraw() {
-			var _this25 = this;
+			var _this2 = this;
 			// pictue
 			this._ctx.clearRect(0, 0, this._canWidth, this._canHeight);
 			this._ctx.drawImage(this._img, this._x, this._y, this._img.width, this._img.height, 0, 0, this._curWidth, this._curHeight);
 			// entites
 			if (this._entites.length) {
 				(function () {
-					var zc = _this25._zoom / 100;
-					var xc = _this25._x * zc;
-					var yc = _this25._y * zc;
-					_this25._entites.forEach(function (entity) {
+					var zc = _this2._zoom / 100;
+					var xc = _this2._x * zc;
+					var yc = _this2._y * zc;
+					_this2._entites.forEach(function (entity) {
 						var x = void 0;
 						var y = void 0;
 						switch (entity.id) {
 							case $anonymizer.ENTITES.CIRCLE.id:
 								var radius = Math.round(entity.value * zc);
-								x = Math.round(_this25._curWidth * entity.xRatio - xc);
-								y = Math.round(_this25._curHeight * entity.yRatio - yc);
-								_this25._drawCircle(_this25._ctx, x, y, radius);
+								x = Math.round(_this2._curWidth * entity.xRatio - xc);
+								y = Math.round(_this2._curHeight * entity.yRatio - yc);
+								_this2._drawCircle(_this2._ctx, x, y, radius);
 								break;
 							case $anonymizer.ENTITES.LINE.id:
 								var lineWidth = Math.round(entity.value * zc);
-								x = Math.round(_this25._curWidth * entity.xRatio - xc);
-								y = Math.round(_this25._curHeight * entity.yRatio - yc);
-								var x2 = Math.round(_this25._curWidth * entity.x2Ratio - xc);
-								var y2 = Math.round(_this25._curHeight * entity.y2Ratio - yc);
-								_this25._drawLine(_this25._ctx, x, y, x2, y2, lineWidth);
+								x = Math.round(_this2._curWidth * entity.xRatio - xc);
+								y = Math.round(_this2._curHeight * entity.yRatio - yc);
+								var x2 = Math.round(_this2._curWidth * entity.x2Ratio - xc);
+								var y2 = Math.round(_this2._curHeight * entity.y2Ratio - yc);
+								_this2._drawLine(_this2._ctx, x, y, x2, y2, lineWidth);
 								break;
 						}
 					});
@@ -6524,30 +6621,30 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
    * @member $anonymizer
    */
 		$anonymizer.prototype.loadImage = function loadImage(url) {
-			var _this26 = this;
+			var _this3 = this;
 			return new $promise(function (resolve, reject) {
-				_this26._setWhiteCanvas();
-				_this26._spinner.classList.remove("hide");
+				_this3._setWhiteCanvas();
+				_this3._spinner.classList.remove("hide");
 				var img = new Image();
 				img.addEventListener("load", function () {
-					_this26._spinner.classList.add("hide");
-					_this26._img = img;
-					_this26._imgWidth = img.width;
-					_this26._imgHeight = img.height;
-					_this26._zoom = _this26._opts.zoom;
-					_this26.trigger("zoom", _this26._zoom);
-					_this26._postZoom();
-					_this26._setCenter();
-					_this26._alignImgToCanvas();
-					_this26._drawEntityPreview();
-					_this26._redraw();
+					_this3._spinner.classList.add("hide");
+					_this3._img = img;
+					_this3._imgWidth = img.width;
+					_this3._imgHeight = img.height;
+					_this3._zoom = _this3._opts.zoom;
+					_this3.trigger("zoom", _this3._zoom);
+					_this3._postZoom();
+					_this3._setCenter();
+					_this3._alignImgToCanvas();
+					_this3._drawEntityPreview();
+					_this3._redraw();
 					resolve();
 				});
 				img.addEventListener("error", function () {
-					_this26._spinner.classList.add("hide");
-					_this26._img = null;
-					_this26._imgWidth = 0;
-					_this26._imgHeight = 0;
+					_this3._spinner.classList.add("hide");
+					_this3._img = null;
+					_this3._imgWidth = 0;
+					_this3._imgHeight = 0;
 					reject();
 				});
 				img.src = url || "";
@@ -6598,14 +6695,14 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
    * @method switchEntity
    */
 		$anonymizer.prototype.switchEntity = function switchEntity() {
-			var _this27 = this;
+			var _this4 = this;
 			var variants = Object.keys($anonymizer.ENTITES);
 			var priority = this._opts.curEntity.priority;
 			var selVariant = null;
 			var lowestVariant = null;
 			variants.forEach(function (variant) {
 				var varObj = $anonymizer.ENTITES[variant];
-				if (!selVariant && varObj.priority > _this27._opts.curEntity.priority) {
+				if (!selVariant && varObj.priority > _this4._opts.curEntity.priority) {
 					selVariant = varObj;
 				}
 				if (!lowestVariant || varObj.priority < lowestVariant.priority) {
@@ -6696,7 +6793,7 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
    * @method exportEntites
    */
 		$anonymizer.prototype.exportEntites = function exportEntites() {
-			var _this28 = this;
+			var _this5 = this;
 			var output = {
 				actions: [],
 				image: {
@@ -6709,18 +6806,18 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 					case $anonymizer.ENTITES.CIRCLE.id:
 						output.actions.push({
 							type: entity.id.toLowerCase(),
-							x: $math.setRange(Math.round(_this28._imgWidth * entity.xRatio), 0, _this28._imgWidth),
-							y: $math.setRange(Math.round(_this28._imgHeight * entity.yRatio), 0, _this28._imgHeight),
+							x: $math.setRange(Math.round(_this5._imgWidth * entity.xRatio), 0, _this5._imgWidth),
+							y: $math.setRange(Math.round(_this5._imgHeight * entity.yRatio), 0, _this5._imgHeight),
 							r: entity.value
 						});
 						break;
 					case $anonymizer.ENTITES.LINE.id:
 						output.actions.push({
 							type: entity.id.toLowerCase(),
-							x1: $math.setRange(Math.round(_this28._imgWidth * entity.xRatio), 0, _this28._imgWidth),
-							y1: $math.setRange(Math.round(_this28._imgHeight * entity.yRatio), 0, _this28._imgHeight),
-							x2: $math.setRange(Math.round(_this28._imgWidth * entity.x2Ratio), 0, _this28._imgWidth),
-							y2: $math.setRange(Math.round(_this28._imgHeight * entity.y2Ratio), 0, _this28._imgHeight),
+							x1: $math.setRange(Math.round(_this5._imgWidth * entity.xRatio), 0, _this5._imgWidth),
+							y1: $math.setRange(Math.round(_this5._imgHeight * entity.yRatio), 0, _this5._imgHeight),
+							x2: $math.setRange(Math.round(_this5._imgWidth * entity.x2Ratio), 0, _this5._imgWidth),
+							y2: $math.setRange(Math.round(_this5._imgHeight * entity.y2Ratio), 0, _this5._imgHeight),
 							width: entity.value
 						});
 						break;
@@ -6783,6 +6880,11 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 	};
 	return $anonymizer;
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$loader", ["$dom", function ($dom) {
 	/**
   * Progress loader in the application.
@@ -6826,14 +6928,14 @@ onix.factory("$loader", ["$dom", function ($dom) {
    * @method end
    */
 		$loader.prototype.end = function end() {
-			var _this29 = this;
+			var _this = this;
 			this._el.classList.remove("start");
 			this._el.classList.add("end");
 			setTimeout(function () {
-				_this29._el.classList.remove("end");
-				_this29._el.classList.add("hide");
+				_this._el.classList.remove("end");
+				_this._el.classList.add("hide");
 				setTimeout(function () {
-					_this29._el.classList.remove("hide");
+					_this._el.classList.remove("hide");
 				}, 350);
 			}, 150);
 		};
@@ -6865,6 +6967,11 @@ onix.factory("$loader", ["$dom", function ($dom) {
 	;
 	return new $loader();
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 	/**
   * $notify uses bootstrap alerts and provides additional functionality.
@@ -6908,9 +7015,9 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
    * @member $notify
    */
 		$notify.prototype.reset = function reset() {
-			var _this30 = this;
+			var _this = this;
 			Object.keys(this._options).forEach(function (key) {
-				_this30._el.classList.remove(_this30._options[key]);
+				_this._el.classList.remove(_this._options[key]);
 			});
 			return this;
 		};
@@ -6972,12 +7079,12 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
    * @member $notify
    */
 		$notify.prototype.hide = function hide(timeout) {
-			var _this31 = this;
+			var _this2 = this;
 			return new $promise(function (resolve) {
 				setTimeout(function () {
-					_this31.reset();
+					_this2.reset();
 					resolve();
-				}, timeout || _this31._HIDE_TIMEOUT);
+				}, timeout || _this2._HIDE_TIMEOUT);
 			});
 		};
 		return $notify;
@@ -7109,7 +7216,7 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
   * @member $previewImages
   */
 	this.show = function (el, files, optsArg) {
-		var _this32 = this;
+		var _this = this;
 		// clear previous
 		el.innerHTML = "";
 		// add class
@@ -7131,7 +7238,7 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 			(function () {
 				// create placeholder?
 				if (opts.createHolder) {
-					_this32._createPreviewHolders(el, count);
+					_this._createPreviewHolders(el, count);
 				}
 				var jobsArray = [];
 				// sort by name, make previewID - only for 7 pictures
@@ -7139,8 +7246,8 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 					if (a.name < b.name) return -1;else if (a.name > b.name) return 1;else return 0;
 				}).forEach(function (pf, ind) {
 					jobsArray.push({
-						task: _this32._jobTask,
-						scope: _this32,
+						task: _this._jobTask,
+						scope: _this,
 						args: [{
 							file: pf,
 							previewID: "img_0" + ind
@@ -7153,6 +7260,21 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 		}
 	};
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
+function _possibleConstructorReturn(self, call) {
+	if (!self) {
+		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
+}
+function _inherits(subClass, superClass) {
+	if (typeof superClass !== "function" && superClass !== null) {
+		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
+	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
 onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event, $dom) {
 	/**
   * $select uses bootstrap dropdown and provides additional functionality.
@@ -7162,20 +7284,20 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
   * @param {Object} [opts]
   * @param {Boolean} [opts.addCaption = false] Add caption to select
   */
-	var $select = function (_$event3) {
-		_inherits($select, _$event3);
+	var $select = function (_$event) {
+		_inherits($select, _$event);
 		function $select(el, opts) {
 			_classCallCheck(this, $select);
 			// event init
-			var _this33 = _possibleConstructorReturn(this, _$event3.call(this));
-			_this33._eventInit();
-			_this33._opts = {
+			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			_this._eventInit();
+			_this._opts = {
 				addCaption: false
 			};
 			for (var key in opts) {
-				_this33._opts[key] = opts[key];
+				_this._opts[key] = opts[key];
 			}
-			_this33._CONST = {
+			_this._CONST = {
 				CAPTION_SEL: ".dropdown-toggle",
 				OPTIONS_SEL: ".dropdown-menu a",
 				CARET_SEL: ".caret",
@@ -7183,18 +7305,18 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 				OPEN_CLASS: "open",
 				ACTIVE_CLASS: "active"
 			};
-			_this33._el = el;
-			_this33._optinsRef = [];
-			_this33._captionEl = null;
-			_this33.captionTextEl = null;
-			_this33._binds = {
-				captionClick: _this33._captionClick.bind(_this33),
-				choiceClick: _this33._choiceClick.bind(_this33),
-				removeAllOpened: _this33._removeAllOpened.bind(_this33),
-				click: _this33._click.bind(_this33)
+			_this._el = el;
+			_this._optinsRef = [];
+			_this._captionEl = null;
+			_this.captionTextEl = null;
+			_this._binds = {
+				captionClick: _this._captionClick.bind(_this),
+				choiceClick: _this._choiceClick.bind(_this),
+				removeAllOpened: _this._removeAllOpened.bind(_this),
+				click: _this._click.bind(_this)
 			};
-			_this33._bind();
-			return _this33;
+			_this._bind();
+			return _this;
 		}
 		/**
    * Bind clicks on the select.
@@ -7242,10 +7364,10 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
    * @method _removeAllOpened
    */
 		$select.prototype._removeAllOpened = function _removeAllOpened() {
-			var _this34 = this;
+			var _this2 = this;
 			// remove all
 			onix.element(this._CONST.OPEN_DROPDOWN_SEL).forEach(function (item) {
-				item.classList.remove(_this34._CONST.OPEN_CLASS);
+				item.classList.remove(_this2._CONST.OPEN_CLASS);
 			});
 		};
 		/**
@@ -7288,14 +7410,14 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
    * @method _bindChoices
    */
 		$select.prototype._bindChoices = function _bindChoices() {
-			var _this35 = this;
+			var _this3 = this;
 			onix.element(this._CONST.OPTIONS_SEL, this._el).forEach(function (option) {
-				option.addEventListener("click", _this35._binds.choiceClick);
+				option.addEventListener("click", _this3._binds.choiceClick);
 				// event ref
-				_this35._optinsRef.push({
+				_this3._optinsRef.push({
 					el: option,
 					event: "click",
-					fn: _this35._binds.choiceClick
+					fn: _this3._binds.choiceClick
 				});
 			});
 		};
@@ -7382,12 +7504,12 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
    * @method setAddCaption
    */
 		$select.prototype.setAddCaption = function setAddCaption() {
-			var _this36 = this;
+			var _this4 = this;
 			if (!this._opts.addCaption) return;
 			this._optinsRef.every(function (item) {
 				var parent = item.el.parentNode;
-				if (parent.classList.contains(_this36._CONST.ACTIVE_CLASS)) {
-					_this36._captionTextEl.innerHTML = item.el.innerHTML;
+				if (parent.classList.contains(_this4._CONST.ACTIVE_CLASS)) {
+					_this4._captionTextEl.innerHTML = item.el.innerHTML;
 					return false;
 				} else {
 					return true;
@@ -7399,6 +7521,21 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 	;
 	return $select;
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
+function _possibleConstructorReturn(self, call) {
+	if (!self) {
+		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
+}
+function _inherits(subClass, superClass) {
+	if (typeof superClass !== "function" && superClass !== null) {
+		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
+	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
 onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $event, $common, $math) {
 	/**
   * Slider - slider with input for selecting numbers from the range.
@@ -7411,54 +7548,54 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
   * @param {Number} [optsArg.timeout=333] Timeout for signal fire (keydown, move)
   * @class $slider
   */
-	var $slider = function (_$event4) {
-		_inherits($slider, _$event4);
+	var $slider = function (_$event) {
+		_inherits($slider, _$event);
 		function $slider(parent, optsArg) {
 			_classCallCheck(this, $slider);
 			// event init
-			var _this37 = _possibleConstructorReturn(this, _$event4.call(this));
-			_this37._eventInit();
-			_this37._parent = parent;
-			_this37._root = _this37._create();
-			_this37._opts = {
+			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			_this._eventInit();
+			_this._parent = parent;
+			_this._root = _this._create();
+			_this._opts = {
 				min: 0,
 				max: 100,
 				wheelStep: 1,
 				timeout: 333
 			};
 			for (var key in optsArg) {
-				_this37._opts[key] = optsArg[key];
+				_this._opts[key] = optsArg[key];
 			}
 			// selected value
-			_this37._value = null;
+			_this._value = null;
 			// signal change - helper
-			_this37._signalObj = {
+			_this._signalObj = {
 				id: null,
 				lastValue: null
 			};
-			parent.appendChild(_this37._root);
-			_this37._binds = {
-				keyUp: _this37._keyUp.bind(_this37),
-				click: _this37._click.bind(_this37),
-				mouseDownCaret: _this37._mouseDownCaret.bind(_this37),
-				mouseMove: _this37._mouseMove.bind(_this37),
-				mouseWheel: _this37._mouseWheel.bind(_this37),
-				mouseUp: _this37._mouseUp.bind(_this37),
-				sendSignalInner: _this37._sendSignalInner.bind(_this37)
+			parent.appendChild(_this._root);
+			_this._binds = {
+				keyUp: _this._keyUp.bind(_this),
+				click: _this._click.bind(_this),
+				mouseDownCaret: _this._mouseDownCaret.bind(_this),
+				mouseMove: _this._mouseMove.bind(_this),
+				mouseWheel: _this._mouseWheel.bind(_this),
+				mouseUp: _this._mouseUp.bind(_this),
+				sendSignalInner: _this._sendSignalInner.bind(_this)
 			};
-			_this37._mouse = {
+			_this._mouse = {
 				bcr: null
 			};
-			_this37._els.input.addEventListener("keyup", _this37._binds.keyUp);
-			_this37._els.tube.addEventListener("click", _this37._binds.click);
-			_this37._els.caret.addEventListener("mousedown", _this37._binds.mouseDownCaret);
+			_this._els.input.addEventListener("keyup", _this._binds.keyUp);
+			_this._els.tube.addEventListener("click", _this._binds.click);
+			_this._els.caret.addEventListener("mousedown", _this._binds.mouseDownCaret);
 			// firefox
-			_this37._els.lineHolder.addEventListener("DOMMouseScroll", _this37._binds.mouseWheel);
+			_this._els.lineHolder.addEventListener("DOMMouseScroll", _this._binds.mouseWheel);
 			// others
-			_this37._els.lineHolder.addEventListener("mousewheel", _this37._binds.mouseWheel);
+			_this._els.lineHolder.addEventListener("mousewheel", _this._binds.mouseWheel);
 			// def. max value
-			_this37.setValue(_this37._opts.max);
-			return _this37;
+			_this.setValue(_this._opts.max);
+			return _this;
 		}
 		/**
    * Create slider and his children.
@@ -7759,6 +7896,11 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
 	;
 	return $slider;
 }]);
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $common) {
 	/**
   *
@@ -7988,15 +8130,15 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
    * @method _mouseMove
    */
 		$crop.prototype._mouseMove = function _mouseMove(e) {
-			var _this38 = this;
+			var _this = this;
 			$common.cancelEvents(e);
 			var diffX = e.clientX - this._mouse.startX;
 			var diffY = e.clientY - this._mouse.startY;
 			if (this._type == "crop-middle") {
 				// move
 				Object.keys(this._points).forEach(function (key) {
-					_this38._points[key].x += diffX;
-					_this38._points[key].y += diffY;
+					_this._points[key].x += diffX;
+					_this._points[key].y += diffY;
 				});
 				this._alignPoints();
 				this._redraw();
@@ -8008,7 +8150,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 				}
 				if (this._resizeTest(diffX, diffY, group)) {
 					group.forEach(function (i) {
-						var point = _this38._points[i.type];
+						var point = _this._points[i.type];
 						// add diffx, diffy to all group members
 						point.x += i.x ? diffX : 0;
 						point.y += i.y ? diffY : 0;
@@ -8067,7 +8209,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
    * @method _resizeTest
    */
 		$crop.prototype._resizeTest = function _resizeTest(diffX, diffY, group) {
-			var _this39 = this;
+			var _this2 = this;
 			if (!this._options.aspectRatio) {
 				return false;
 			}
@@ -8092,8 +8234,8 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 			group.forEach(function (i) {
 				var point = points[i.type];
 				// add diffx, diffy to all group members
-				point.x = _this39._points[i.type].x + (i.x ? diffX : 0);
-				point.y = _this39._points[i.type].y + (i.y ? diffY : 0);
+				point.x = _this2._points[i.type].x + (i.x ? diffX : 0);
+				point.y = _this2._points[i.type].y + (i.y ? diffY : 0);
 			});
 			// min. and max. value
 			var size = this._getSize(points);

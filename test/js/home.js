@@ -175,7 +175,7 @@ homeApp.service("HomeResource", ["$http", "Config", function ($http, Config) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "$image", "$loader", "$math", "$previewImages", "$promise", "$resize", "$routeParams", "$select", "$template", "HomeResource", "HomeSnippet", "MainMenu", "Page", "myModule::TestFromModule", function ($common, $date, $event, $filter, $i18n, $image, $loader, $math, $previewImages, $promise, $resize, $routeParams, $select, $template, HomeResource, HomeSnippet, MainMenu, Page, TestFromModule) {
+homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "$image", "$loader", "$math", "$previewImages", "$promise", "$resize", "$routeParams", "$select", "$template", "$localStorage", "HomeResource", "HomeSnippet", "MainMenu", "Page", "myModule::TestFromModule", function ($common, $date, $event, $filter, $i18n, $image, $loader, $math, $previewImages, $promise, $resize, $routeParams, $select, $template, $localStorage, HomeResource, HomeSnippet, MainMenu, Page, TestFromModule) {
 	var HomePage = function (_Page) {
 		_inherits(HomePage, _Page);
 		function HomePage(config) {
@@ -451,6 +451,16 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 				console.log(val3);
 			});
 		};
+		HomePage.prototype.locStor = function locStor() {
+			var LS_KEY = "myLocalStorage";
+			var value = "xyz";
+			$common.col("Set localStorage {0} with value {1}", LS_KEY, value);
+			$localStorage.set(LS_KEY, value);
+			$common.col("Get localStorage {0} = {1}", LS_KEY, $localStorage.get(LS_KEY));
+			$common.col("Remove localStorage {0}", LS_KEY);
+			$localStorage.remove(LS_KEY);
+			$common.col("Get localStorage {0} = {1}", LS_KEY, $localStorage.get(LS_KEY));
+		};
 		HomePage.prototype.allTests = function allTests() {
 			console.log("Running all tests...");
 			this.buttonClick();
@@ -463,11 +473,13 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 			this.promiseTest();
 			this.mathAndDate();
 			this.promiseFlattening();
+			this.locStor();
 		};
 		return HomePage;
 	}(Page);
 	return HomePage;
 }]);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -476,18 +488,22 @@ homeApp.factory("HomeSnippet", ["$common", "Snippet", "TestFromModule", function
 		_inherits(HomeSnippet, _Snippet);
 		function HomeSnippet(config, parent) {
 			_classCallCheck(this, HomeSnippet);
-			var _this = _possibleConstructorReturn(this, _Snippet.call(this));
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeSnippet).call(this));
 			_this._constructor(config, parent);
 			TestFromModule.test();
 			return _this;
 		}
-		HomeSnippet.prototype.dirTest = function dirTest() {
-			console.log("HomeDir dirTest function()");
-		};
+		_createClass(HomeSnippet, [{
+			key: "dirTest",
+			value: function dirTest() {
+				console.log("HomeDir dirTest function()");
+			}
+		}]);
 		return HomeSnippet;
 	}(Snippet);
 	return HomeSnippet;
 }]);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -500,7 +516,7 @@ homeApp.factory("Page", ["$template", "$common", "$event", function ($template, 
 		function Page() {
 			_classCallCheck(this, Page);
 			// event init
-			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Page).call(this));
 			_this._eventInit();
 			return _this;
 		}
@@ -509,48 +525,60 @@ homeApp.factory("Page", ["$template", "$common", "$event", function ($template, 
    *
    * @param {Object} Page config
    */
-		Page.prototype._constructor = function _constructor(config) {
-			var root = onix.element("body").html($template.compile(config.templ || "", this));
-			// Object for data-bind elements references
-			this._els = {};
-			// each page contanins only one page div
-			$template.bindTemplate(root, this, this._addEls.bind(this));
-			this._show();
-		};
-		/**
-   * Add new els to this._els; this function can be called from $template
-   *
-   * @param {Object} newEls { key, value - node element}
-   */
-		Page.prototype._addEls = function _addEls(newEls) {
-			$common.extend(this._els, newEls || {});
-		};
-		/**
-   * Get page config.
-   *
-   * @return {Object}
-   */
-		Page.prototype._getConfig = function _getConfig() {
-			return this._config;
-		};
-		/**
-   * Get page element.
-   *
-   * @param  {String} name
-   * @return {NodeElement}
-   */
-		Page.prototype._getEl = function _getEl(name) {
-			return this._els[name];
-		};
-		/**
-   * Abstract method.
-   */
-		Page.prototype._show = function _show() {};
+		_createClass(Page, [{
+			key: "_constructor",
+			value: function _constructor(config) {
+				var root = onix.element("body").html($template.compile(config.templ || "", this));
+				// Object for data-bind elements references
+				this._els = {};
+				// each page contanins only one page div
+				$template.bindTemplate(root, this, this._addEls.bind(this));
+				this._show();
+			}
+			/**
+    * Add new els to this._els; this function can be called from $template
+    *
+    * @param {Object} newEls { key, value - node element}
+    */
+		}, {
+			key: "_addEls",
+			value: function _addEls(newEls) {
+				$common.extend(this._els, newEls || {});
+			}
+			/**
+    * Get page config.
+    *
+    * @return {Object}
+    */
+		}, {
+			key: "_getConfig",
+			value: function _getConfig() {
+				return this._config;
+			}
+			/**
+    * Get page element.
+    *
+    * @param  {String} name
+    * @return {NodeElement}
+    */
+		}, {
+			key: "_getEl",
+			value: function _getEl(name) {
+				return this._els[name];
+			}
+			/**
+    * Abstract method.
+    */
+		}, {
+			key: "_show",
+			value: function _show() {}
+		}]);
 		return Page;
 	}($event);
 	;
 	return Page;
 }]);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -563,7 +591,7 @@ homeApp.factory("Snippet", ["$template", "$common", "$event", function ($templat
 		function Snippet(config) {
 			_classCallCheck(this, Snippet);
 			// event init
-			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Snippet).call(this));
 			_this._eventInit();
 			return _this;
 		}
@@ -573,80 +601,101 @@ homeApp.factory("Snippet", ["$template", "$common", "$event", function ($templat
    * @param {Object} config Config for snippet
    * @param {Object} parent Parent object
    */
-		Snippet.prototype._constructor = function _constructor(config, parent) {
-			// Object for data-bind elements references
-			this._els = {};
-			this._config = config || {};
-			this._parent = parent;
-			this._root = this._create(config);
-			$template.bindTemplate(this._root, this, this._addEls.bind(this));
-			this._show();
-		};
-		/**
-   * Add new els to this._els; this function can be called from $template
-   *
-   * @param {Object} newEls { key, value - node element}
-   */
-		Snippet.prototype._addEls = function _addEls(newEls) {
-			$common.extend(this._els, newEls || {});
-		};
-		/**
-   * Get Snippet config.
-   *
-   * @return {Object}
-   */
-		Snippet.prototype._getConfig = function _getConfig() {
-			return this._config;
-		};
-		/**
-   * Get snippet element.
-   *
-   * @param  {String} name
-   * @return {NodeElement}
-   */
-		Snippet.prototype._getEl = function _getEl(name) {
-			return this._els[name];
-		};
-		/**
-   * Get snippet parent.
-   *
-   * @return {NodeElement}
-   */
-		Snippet.prototype._getParent = function _getParent() {
-			return this._parent;
-		};
-		/**
-   * Abstract method. Create root element.
-   *
-   * @param  {Object} config
-   */
-		Snippet.prototype._create = function _create(config) {
-			return null;
-		};
-		/**
-   * Abstract method.
-   */
-		Snippet.prototype._show = function _show() {};
-		/**
-   * Is snippet locked for change?
-   *
-   * @return {Boolean}
-   */
-		Snippet.prototype.isLocked = function isLocked() {
-			return false;
-		};
-		/**
-   * Return root el.
-   *
-   * @return {HTMLElement}
-   */
-		Snippet.prototype.getRoot = function getRoot() {
-			return this._root;
-		};
-		/**
-   * Destroy snippet.
-   */
-		Snippet.prototype.destructor = function destructor() {};
+		_createClass(Snippet, [{
+			key: "_constructor",
+			value: function _constructor(config, parent) {
+				// Object for data-bind elements references
+				this._els = {};
+				this._config = config || {};
+				this._parent = parent;
+				this._root = this._create(config);
+				$template.bindTemplate(this._root, this, this._addEls.bind(this));
+				this._show();
+			}
+			/**
+    * Add new els to this._els; this function can be called from $template
+    *
+    * @param {Object} newEls { key, value - node element}
+    */
+		}, {
+			key: "_addEls",
+			value: function _addEls(newEls) {
+				$common.extend(this._els, newEls || {});
+			}
+			/**
+    * Get Snippet config.
+    *
+    * @return {Object}
+    */
+		}, {
+			key: "_getConfig",
+			value: function _getConfig() {
+				return this._config;
+			}
+			/**
+    * Get snippet element.
+    *
+    * @param  {String} name
+    * @return {NodeElement}
+    */
+		}, {
+			key: "_getEl",
+			value: function _getEl(name) {
+				return this._els[name];
+			}
+			/**
+    * Get snippet parent.
+    *
+    * @return {NodeElement}
+    */
+		}, {
+			key: "_getParent",
+			value: function _getParent() {
+				return this._parent;
+			}
+			/**
+    * Abstract method. Create root element.
+    *
+    * @param  {Object} config
+    */
+		}, {
+			key: "_create",
+			value: function _create(config) {
+				return null;
+			}
+			/**
+    * Abstract method.
+    */
+		}, {
+			key: "_show",
+			value: function _show() {}
+			/**
+    * Is snippet locked for change?
+    *
+    * @return {Boolean}
+    */
+		}, {
+			key: "isLocked",
+			value: function isLocked() {
+				return false;
+			}
+			/**
+    * Return root el.
+    *
+    * @return {HTMLElement}
+    */
+		}, {
+			key: "getRoot",
+			value: function getRoot() {
+				return this._root;
+			}
+			/**
+    * Destroy snippet.
+    */
+		}, {
+			key: "destructor",
+			value: function destructor() {}
+		}]);
 		return Snippet;
 	}($event);
 	;
