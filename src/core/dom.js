@@ -59,7 +59,7 @@ function(
 						value = [value];
 					}
 					
-					value.forEach(child => {
+					value.forEach(item => {
 						el.addEventListener(item.event, item.fn);
 					});
 					break;

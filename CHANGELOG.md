@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.7.4 (8. 7. 2016)
+
+* $dom - bugfix
+
 ## 2.7.3 (8. 7. 2016)
 
 * $common - cssNameToJS method (uses $dom, $myQuery)

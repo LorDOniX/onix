@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.3/8. 7. 2016
+ * 2.7.4/8. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -2180,14 +2180,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.7.3
+  * version: 2.7.4
   * date: 8. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.3/8. 7. 2016\n'+
+'2.7.4/8. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2269,6 +2269,11 @@ onix.factory("$filter", ["$di", function ($di) {
 		});
 	};
 }]);
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
 /**
  * Commom functions used in whole application.
  *
@@ -2284,10 +2289,10 @@ onix.service("$common", ["$promise", function ($promise) {
   * @private
   */
 	this._objCopy = function (dest, source) {
-		var _this10 = this;
+		var _this = this;
 		Object.keys(source).forEach(function (prop) {
 			if (source.hasOwnProperty(prop)) {
-				dest[prop] = _this10.cloneValue(source[prop]);
+				dest[prop] = _this.cloneValue(source[prop]);
 			}
 		});
 	};
@@ -2304,13 +2309,13 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this._chainPromisesInner = function (opts, resolve, outArray) {
-		var _this11 = this;
+		var _this2 = this;
 		var firstItem = opts.shift();
 		if (firstItem) {
 			// string or function itself
 			var fn = void 0;
 			var error = false;
-			switch (_typeof2(firstItem.method)) {
+			switch (_typeof(firstItem.method)) {
 				case "string":
 					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
 						error = true;
@@ -2330,10 +2335,10 @@ onix.service("$common", ["$promise", function ($promise) {
 			if (!error) {
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function (data) {
 					outArray.push(data);
-					_this11._chainPromisesInner(opts, resolve, outArray);
+					_this2._chainPromisesInner(opts, resolve, outArray);
 				}, function (err) {
 					outArray.push(err);
-					_this11._chainPromisesInner(opts, resolve, outArray);
+					_this2._chainPromisesInner(opts, resolve, outArray);
 				});
 			} else {
 				resolve(outArray);
@@ -2396,24 +2401,24 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.cloneValue = function (value, lvl) {
-		var _this12 = this;
+		var _this3 = this;
 		lvl = lvl || 1;
 		// recursive call threshold
 		if (lvl > 100) return null;
-		switch (typeof value === "undefined" ? "undefined" : _typeof2(value)) {
+		switch (typeof value === "undefined" ? "undefined" : _typeof(value)) {
 			case "object":
 				if (Array.isArray(value)) {
-					var _ret2 = function () {
+					var _ret = function () {
 						// array
 						var newArray = [];
 						value.forEach(function (item) {
-							newArray.push(_this12.cloneValue(item, lvl + 1));
+							newArray.push(_this3.cloneValue(item, lvl + 1));
 						});
 						return {
 							v: newArray
 						};
 					}();
-					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof2(_ret2)) === "object") return _ret2.v;
+					if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 				} else if (value instanceof Date) {
 					// date
 					return new Date(value.getTime());
@@ -2421,19 +2426,19 @@ onix.service("$common", ["$promise", function ($promise) {
 					// element
 					return value;
 				} else if (value) {
-					var _ret3 = function () {
+					var _ret2 = function () {
 						// object
 						var newObj = {};
 						Object.keys(value).forEach(function (prop) {
 							if (value.hasOwnProperty(prop)) {
-								newObj[prop] = _this12.cloneValue(value[prop], lvl + 1);
+								newObj[prop] = _this3.cloneValue(value[prop], lvl + 1);
 							}
 						});
 						return {
 							v: newObj
 						};
 					}();
-					if ((typeof _ret3 === "undefined" ? "undefined" : _typeof2(_ret3)) === "object") return _ret3.v;
+					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
 				} else {
 					// null
 					return null;
@@ -2462,7 +2467,7 @@ onix.service("$common", ["$promise", function ($promise) {
 		inherits.forEach(function (inhItem) {
 			// iterate prototype items
 			for (var p in inhItem.prototype) {
-				source[p] = _typeof2(inhItem.prototype[p]) != "object" ? inhItem.prototype[p] : JSON.parse(JSON.stringify(inhItem.prototype[p]));
+				source[p] = _typeof(inhItem.prototype[p]) != "object" ? inhItem.prototype[p] : JSON.parse(JSON.stringify(inhItem.prototype[p]));
 			}
 		});
 	};
@@ -2583,7 +2588,7 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.isObject = function (item) {
-		return (typeof item === "undefined" ? "undefined" : _typeof2(item)) === "object" && !Array.isArray(item) && item !== null;
+		return (typeof item === "undefined" ? "undefined" : _typeof(item)) === "object" && !Array.isArray(item) && item !== null;
 	};
 	/**
   * Cover function for console.log, which allows to replace {0..n} occurences inside string.
@@ -2637,9 +2642,9 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.chainPromises = function (opts) {
-		var _this13 = this;
+		var _this4 = this;
 		return new $promise(function (resolve) {
-			_this13._chainPromisesInner(opts, resolve, []);
+			_this4._chainPromisesInner(opts, resolve, []);
 		});
 	};
 	/**
@@ -2878,7 +2883,7 @@ onix.service("$dom", ["$common", function ($common) {
   * @member $dom
   */
 	this.create = function (config, exported) {
-		var _this14 = this;
+		var _this10 = this;
 		var el = document.createElement(config.el || "div");
 		Object.keys(config).forEach(function (key) {
 			var value = void 0;
@@ -2906,7 +2911,7 @@ onix.service("$dom", ["$common", function ($common) {
 					if (!Array.isArray(value)) {
 						value = [value];
 					}
-					value.forEach(function (child) {
+					value.forEach(function (item) {
 						el.addEventListener(item.event, item.fn);
 					});
 					break;
@@ -2916,7 +2921,7 @@ onix.service("$dom", ["$common", function ($common) {
 						value = [value];
 					}
 					value.forEach(function (child) {
-						el.appendChild(_this14.create(child, exported));
+						el.appendChild(_this10.create(child, exported));
 					});
 					break;
 				case "_exported":
@@ -4560,6 +4565,16 @@ onix.service("$math", function () {
 		}
 	};
 });
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 onix.factory("$myQuery", ["$common", function ($common) {
 	/**
   * DOM manipulation in the style of jquery.
@@ -4572,7 +4587,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
   */
 	var $myQuery = function () {
 		function $myQuery(value, parent) {
-			_classCallCheck2(this, $myQuery);
+			_classCallCheck(this, $myQuery);
 			this._els = this._getElementsFromValue(value, parent);
 			return this;
 		}
@@ -4646,7 +4661,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
    * @method _setGetAll
    */
 		$myQuery.prototype._setGetAll = function _setGetAll(attr, newValue) {
-			var _this15 = this;
+			var _this = this;
 			if (typeof attr !== "undefined") {
 				if (typeof newValue !== "undefined") {
 					this._operation(function (item) {
@@ -4654,9 +4669,9 @@ onix.factory("$myQuery", ["$common", function ($common) {
 					});
 					return this;
 				} else {
-					var _ret4 = function () {
+					var _ret = function () {
 						var values = [];
-						_this15._operation(function (item) {
+						_this._operation(function (item) {
 							values.push(item[attr]);
 						});
 						if (!values.length) {
@@ -4673,7 +4688,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 							};
 						}
 					}();
-					if ((typeof _ret4 === "undefined" ? "undefined" : _typeof2(_ret4)) === "object") return _ret4.v;
+					if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 				}
 			} else {
 				return this;
@@ -4735,7 +4750,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
    * @method attr
    */
 		$myQuery.prototype.attr = function attr(name, newValue) {
-			var _this16 = this;
+			var _this2 = this;
 			if (typeof name !== "undefined") {
 				if (typeof newValue !== "undefined") {
 					this._operation(function (item) {
@@ -4743,9 +4758,9 @@ onix.factory("$myQuery", ["$common", function ($common) {
 					});
 					return this;
 				} else {
-					var _ret5 = function () {
+					var _ret2 = function () {
 						var values = [];
-						_this16._operation(function (item) {
+						_this2._operation(function (item) {
 							values.push(item.getAttribute(name));
 						});
 						if (!values.length) {
@@ -4762,7 +4777,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 							};
 						}
 					}();
-					if ((typeof _ret5 === "undefined" ? "undefined" : _typeof2(_ret5)) === "object") return _ret5.v;
+					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
 				}
 			} else {
 				return this;
@@ -4779,16 +4794,16 @@ onix.factory("$myQuery", ["$common", function ($common) {
    * @method css
    */
 		$myQuery.prototype.css = function css(name, newValue) {
-			var _this17 = this;
+			var _this3 = this;
 			if (typeof name !== "undefined") {
 				if (typeof newValue !== "undefined") {
 					this._operation(function (item) {
 						item.style[$common.cssNameToJS(name)] = newValue;
 					});
 					return this;
-				} else if ((typeof name === "undefined" ? "undefined" : _typeof2(name)) === "object" && !Array.isArray(name)) {
+				} else if ((typeof name === "undefined" ? "undefined" : _typeof(name)) === "object" && !Array.isArray(name)) {
 					Object.keys(name).forEach(function (key) {
-						_this17._operation(function (item) {
+						_this3._operation(function (item) {
 							item.style[$common.cssNameToJS(key)] = name[key];
 						});
 					});

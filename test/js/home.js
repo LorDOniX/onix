@@ -533,6 +533,7 @@ homeApp.factory("HomeSnippet", ["$common", "Snippet", "TestFromModule", function
 	}(Snippet);
 	return HomeSnippet;
 }]);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -545,7 +546,7 @@ homeApp.factory("Page", ["$template", "$common", "$event", function ($template, 
 		function Page() {
 			_classCallCheck(this, Page);
 			// event init
-			var _this = _possibleConstructorReturn(this, _$event.call(this));
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Page).call(this));
 			_this._eventInit();
 			return _this;
 		}
@@ -554,43 +555,54 @@ homeApp.factory("Page", ["$template", "$common", "$event", function ($template, 
    *
    * @param {Object} Page config
    */
-		Page.prototype._constructor = function _constructor(config) {
-			var root = onix.element("body").html($template.compile(config.templ || "", this));
-			// Object for data-bind elements references
-			this._els = {};
-			// each page contanins only one page div
-			$template.bindTemplate(root, this, this._addEls.bind(this));
-			this._show();
-		};
-		/**
-   * Add new els to this._els; this function can be called from $template
-   *
-   * @param {Object} newEls { key, value - node element}
-   */
-		Page.prototype._addEls = function _addEls(newEls) {
-			$common.extend(this._els, newEls || {});
-		};
-		/**
-   * Get page config.
-   *
-   * @return {Object}
-   */
-		Page.prototype._getConfig = function _getConfig() {
-			return this._config;
-		};
-		/**
-   * Get page element.
-   *
-   * @param  {String} name
-   * @return {NodeElement}
-   */
-		Page.prototype._getEl = function _getEl(name) {
-			return this._els[name];
-		};
-		/**
-   * Abstract method.
-   */
-		Page.prototype._show = function _show() {};
+		_createClass(Page, [{
+			key: "_constructor",
+			value: function _constructor(config) {
+				var root = onix.element("body").html($template.compile(config.templ || "", this));
+				// Object for data-bind elements references
+				this._els = {};
+				// each page contanins only one page div
+				$template.bindTemplate(root, this, this._addEls.bind(this));
+				this._show();
+			}
+			/**
+    * Add new els to this._els; this function can be called from $template
+    *
+    * @param {Object} newEls { key, value - node element}
+    */
+		}, {
+			key: "_addEls",
+			value: function _addEls(newEls) {
+				$common.extend(this._els, newEls || {});
+			}
+			/**
+    * Get page config.
+    *
+    * @return {Object}
+    */
+		}, {
+			key: "_getConfig",
+			value: function _getConfig() {
+				return this._config;
+			}
+			/**
+    * Get page element.
+    *
+    * @param  {String} name
+    * @return {NodeElement}
+    */
+		}, {
+			key: "_getEl",
+			value: function _getEl(name) {
+				return this._els[name];
+			}
+			/**
+    * Abstract method.
+    */
+		}, {
+			key: "_show",
+			value: function _show() {}
+		}]);
 		return Page;
 	}($event);
 	;
