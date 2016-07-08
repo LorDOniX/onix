@@ -1,34 +1,75 @@
-onix.factory("$myQuery", function() {
+onix.factory("$myQuery", [
+	"$common",
+function(
+	$common
+) {
 	/**
 	 * DOM manipulation in the style of jquery.
 	 * 
 	 * @class $myQuery
 	 * @chainable
 	 * @param {String|HTMLElement|Array} value
-	 * @param {HTMLElement} [parent]
+	 * @param {$myQuery|HTMLElement} [parent]
 	 * @member $myQuery
 	 */
 	class $myQuery {
 		constructor(value, parent) {
-			parent = parent || document;
-
-			this._els = [];
-
-			if (typeof value === "string") {
-				if (parent instanceof $myQuery) {
-					parent = parent.getEl();
-				}
-
-				this._els = parent.querySelectorAll(value);
-			}
-			else if (Array.isArray(value)) {
-				this._els = value;
-			}
-			else {
-				this._els.push(value);
-			}
+			this._els = this._getElementsFromValue(value, parent);
 
 			return this;
+		}
+
+		/**
+		 * Get elements from value [parent].
+		 * 
+		 * @param {String|HTMLElement|Array} value
+		 * @param {$myQuery|HTMLElement} [parent]
+		 * @return {Array}
+		 * @member $myQuery
+		 * @method _getElementsFromValue
+		 * @private
+		 */
+		_getElementsFromValue(value, parent) {
+			value = Array.isArray(value) ? value : [value];
+
+			let els = [];
+
+			value.forEach(val => {
+				if (typeof val === "string") {
+					if (val.match(/<[a-zA-Z]+>/)) {
+						// create el
+						let el = document.createElement("div");
+						el.innerHTML = val;
+
+						els.push(el);
+					}
+					else {
+						// selector
+						if (parent instanceof $myQuery) {
+							parent = parent.getEl();
+						}
+
+						parent = parent instanceof Element || parent == window || parent == document ? parent : document;
+
+						let selValues = parent.querySelectorAll(val);
+
+						if (selValues) {
+							els = els.concat(Array.prototype.slice.call(selValues));
+						}
+					}
+
+					return;
+				}
+				else if (val instanceof $myQuery) {
+					val = val.getEl();
+				}
+
+				if (val instanceof Element || val == document || val == window) {
+					els.push(val);
+				}
+			});
+
+			return els;
 		}
 
 		/**
@@ -55,36 +96,80 @@ onix.factory("$myQuery", function() {
 		 * Set or get all - cover function.
 		 * 
 		 * @chainable
-		 * @param  {String} newValue
 		 * @param  {String} attr
+		 * @param  {String} [newValue]
 		 * @member $myQuery
 		 * @private
 		 * @method _setGetAll
 		 */
-		_setGetAll(newValue, attr) {
-			if (newValue) {
-				this._operation(item => {
-					item[attr] = newValue;
-				});
+		_setGetAll(attr, newValue) {
+			if (typeof attr !== "undefined") {
+				if (typeof newValue !== "undefined") {
+					this._operation(item => {
+						item[attr] = newValue;
+					});
 
-				return this;
-			}
-			else {
-				let values = [];
-
-				this._operation(item => {
-					values.push(item[attr]);
-				});
-
-				if (!values.length) {
-					return null;
-				}
-				else if (values.length == 1) {
-					return values[0];
+					return this;
 				}
 				else {
-					return values;
+					let values = [];
+
+					this._operation(item => {
+						values.push(item[attr]);
+					});
+
+					if (!values.length) {
+						return null;
+					}
+					else if (values.length == 1) {
+						return values[0];
+					}
+					else {
+						return values;
+					}
 				}
+			}
+			else {
+				return this;
+			}
+		}
+
+		/**
+		 * Bind event.
+		 *
+		 * @param {String} eventName Event name
+		 * @param {Function} cb Callback function
+		 * @param {Object} [scope] cb function scope
+		 * @chainable
+		 * @private
+		 * @method _bindEvent
+		 */
+		_bindEvent(eventName, cb, scope) {
+			this._operation(item => {
+				item.addEventListener(eventName, event => {
+					cb.apply(scope || cb, [event, item]);
+				});
+			});
+
+			return this;
+		}
+
+		/**
+		 * Get original element.
+		 *
+		 * @param  {Number} [ind]
+		 * @return {HTMLElement}
+		 * @member $myQuery
+		 * @method get
+		 */
+		get(ind) {
+			ind = ind || 0;
+
+			if (ind > this._els.length) {
+				return null;
+			}
+			else {
+				return this._els[ind];
 			}
 		}
 
@@ -97,14 +182,7 @@ onix.factory("$myQuery", function() {
 		 * @method getEl
 		 */
 		getEl(ind) {
-			ind = ind || 0;
-
-			if (ind > this._els.length) {
-				return null;
-			}
-			else {
-				return this._els[ind];
-			}
+			return this.get(ind);
 		}
 
 		/**
@@ -118,29 +196,73 @@ onix.factory("$myQuery", function() {
 		 * @method attr
 		 */
 		attr(name, newValue) {
-			if (newValue) {
-				this._operation(item => {
-					item.setAttribute(name, newValue);
-				});
+			if (typeof name !== "undefined") {
+				if (typeof newValue !== "undefined") {
+					this._operation(item => {
+						item.setAttribute(name, newValue);
+					});
 
-				return this;
-			}
-			else {
-				let values = [];
-
-				this._operation(item => {
-					values.push(item.getAttribute(name));
-				});
-
-				if (!values.length) {
-					return null;
-				}
-				else if (values.length == 1) {
-					return values[0];
+					return this;
 				}
 				else {
-					return values;
+					let values = [];
+
+					this._operation(item => {
+						values.push(item.getAttribute(name));
+					});
+
+					if (!values.length) {
+						return null;
+					}
+					else if (values.length == 1) {
+						return values[0];
+					}
+					else {
+						return values;
+					}
 				}
+			}
+			else {
+				return this;
+			}
+		}
+
+		/**
+		 * Get or set css value.
+		 *
+		 * @chainable
+		 * @param  {String|Object} name
+		 * @param  {String} [newValue]
+		 * @return {String}
+		 * @member $myQuery
+		 * @method css
+		 */
+		css(name, newValue) {
+			if (typeof name !== "undefined") {
+				if (typeof newValue !== "undefined") {
+					this._operation(item => {
+						item.style[$common.cssNameToJS(name)] = newValue;
+					});
+
+					return this;
+				}
+				else if (typeof name === "object" && !Array.isArray(name)) {
+					Object.keys(name).forEach(key => {
+						this._operation(item => {
+							item.style[$common.cssNameToJS(key)] = name[key];
+						});
+					});
+
+					return this;
+				}
+				else {
+					let el = this.getEl();
+
+					return el ? el.style[$common.cssNameToJS(name)] : null;
+				}
+			}
+			else {
+				return this;
 			}
 		}
 
@@ -153,7 +275,7 @@ onix.factory("$myQuery", function() {
 		 * @method src
 		 */
 		src(newValue) {
-			return this._setGetAll(newValue, "src");
+			return this._setGetAll("src", newValue);
 		}
 
 		/**
@@ -164,11 +286,7 @@ onix.factory("$myQuery", function() {
 		 * @method hide
 		 */
 		hide() {
-			this._operation(item => {
-				item.style.display = "none";
-			});
-
-			return this;
+			return this.css("display", "none");
 		}
 
 		/**
@@ -180,11 +298,7 @@ onix.factory("$myQuery", function() {
 		 * @method show
 		 */
 		show(displayStyle) {
-			this._operation(item => {
-				item.style.display = displayStyle || "";
-			});
-
-			return this;
+			return this.css("display", displayStyle || "");
 		}
 
 		/**
@@ -197,7 +311,7 @@ onix.factory("$myQuery", function() {
 		 * @method val
 		 */
 		val(newValue) {
-			return this._setGetAll(newValue, "value");
+			return this._setGetAll("value", newValue);
 		}
 
 		/**
@@ -209,23 +323,7 @@ onix.factory("$myQuery", function() {
 		 * @method html
 		 */
 		html(newValue) {
-			return this._setGetAll(newValue, "innerHTML");
-		}
-
-		/**
-		 * Append another element to this one.
-		 *
-		 * @chainable
-		 * @param  {HTMLElement} child
-		 * @member $myQuery
-		 * @method  append
-		 */
-		append(child) {
-			this._operation(item => {
-				item.appendChild(child);
-			});
-
-			return this;
+			return this._setGetAll("innerHTML", newValue);
 		}
 
 		/**
@@ -320,13 +418,7 @@ onix.factory("$myQuery", function() {
 		 * @method click
 		 */
 		click(cb, scope) {
-			this._operation(item => {
-				item.addEventListener("click", event => {
-					cb.apply(scope || cb, [event, item]);
-				});
-			});
-
-			return this;
+			return this._bindEvent("click", cb, scope);
 		}
 
 		/**
@@ -339,10 +431,125 @@ onix.factory("$myQuery", function() {
 		 * @method change
 		 */
 		change(cb, scope) {
-			this._operation(item => {
-				item.addEventListener("change", event => {
-					cb.apply(scope || cb, [event, item]);
-				});
+			return this._bindEvent("change", cb, scope);
+		}
+
+		/**
+		 * Mouse enter event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method mouseenter
+		 */
+		mouseenter(cb, scope) {
+			return this._bindEvent("mouseenter", cb, scope);
+		}
+
+		/**
+		 * Mouse leave event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method mouseleave
+		 */
+		mouseleave(cb, scope) {
+			return this._bindEvent("mouseleave", cb, scope);
+		}
+
+		/**
+		 * Mouse move event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method mouseleave
+		 */
+		mousemove(cb, scope) {
+			return this._bindEvent("mousemove", cb, scope);
+		}
+
+		/**
+		 * Key down event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method keydown
+		 */
+		keydown(cb, scope) {
+			return this._bindEvent("keydown", cb, scope);
+		}
+
+		/**
+		 * Key up event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method keyup
+		 */
+		keyup(cb, scope) {
+			return this._bindEvent("keyup", cb, scope);
+		}
+
+		/**
+		 * Key press event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method keypress
+		 */
+		keypress(cb, scope) {
+			return this._bindEvent("keypress", cb, scope);
+		}
+
+		/**
+		 * Blur event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method blur
+		 */
+		blur(cb, scope) {
+			return this._bindEvent("blur", cb, scope);
+		}
+
+		/**
+		 * Focus event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method focus
+		 */
+		focus(cb, scope) {
+			return this._bindEvent("focus", cb, scope);
+		}
+
+		/**
+		 * Each.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method each
+		 */
+		each(cb, scope) {
+			this._operation((item, ind) => {
+				cb.apply(scope || cb, [item, ind]);
 			});
 
 			return this;
@@ -358,11 +565,7 @@ onix.factory("$myQuery", function() {
 		 * @method forEach
 		 */
 		forEach(cb, scope) {
-			this._operation((item, ind) => {
-				cb.apply(scope || cb, [item, ind]);
-			});
-
-			return this;
+			return this.each(cb, scope);
 		}
 
 		/**
@@ -381,17 +584,61 @@ onix.factory("$myQuery", function() {
 		}
 
 		/**
+		 * Append another element to this one.
+		 *
+		 * @chainable
+		 * @param {HTMLElement|$myQuery|String} child
+		 * @member $myQuery
+		 * @method  append
+		 */
+		append(child) {
+			child = this._getElementsFromValue(child);
+
+			if (child.length) {
+				this._operation(item => {
+					item.appendChild(child[0]);
+				});
+			}
+
+			return this;
+		}
+
+		/**
 		 * Prepend element.
 		 *
 		 * @chainable
-		 * @param  {HTMLElement} child
+		 * @param {HTMLElement|$myQuery|string} child
 		 * @member $myQuery
 		 * @method prepend
 		 */
 		prepend(child) {
-			this._operation(item => {
-				item.parentNode.insertBefore(child, item);
-			});
+			child = this._getElementsFromValue(child);
+
+			if (child.length) {
+				this._operation(item => {
+					item.parentNode.insertBefore(child[0], item);
+				});
+			}
+
+			return this;
+		}
+
+		/**
+		 * Insert current element before element.
+		 *
+		 * @chainable
+		 * @param {HTMLElement|$myQuery|string} beforeEl
+		 * @member $myQuery
+		 * @method prepend
+		 */
+		insertBefore(beforeEl) {
+			beforeEl = this._getElementsFromValue(beforeEl);
+
+			let el = this.getEl();
+
+			if (el && beforeEl.length) {
+				beforeEl[0].parentNode.insertBefore(el, beforeEl[0]);
+			}
 
 			return this;
 		}
@@ -424,13 +671,67 @@ onix.factory("$myQuery", function() {
 		len() {
 			return this._els.length;
 		}
+
+		/**
+		 * Get parent node.
+		 * 
+		 * @return {$myQuery} new instance with parent node
+		 * @member $myQuery
+		 * @method parent
+		 */
+		parent() {
+			let el = this.getEl();
+
+			return el ? new this(el) : null;
+		}
+
+		/**
+		 * Get children.
+		 * 
+		 * @return {Array} Children array
+		 * @member $myQuery
+		 * @method children
+		 */
+		children() {
+			let el = this.getEl();
+
+			return el ? el.children : [];
+		}
+
+		/**
+		 * Get scroll top offset.
+		 * 
+		 * @return {Number} Scroll top in [px]
+		 * @member $myQuery
+		 * @method scrollTop
+		 */
+		scrollTop() {
+			let el = this.getEl();
+			let docOffset = document.body.scrollTop;
+
+			return el ? el.scrollTop + docOffset : docOffset + 0;
+		}
+
+		/**
+		 * Get scroll left offset.
+		 * 
+		 * @return {Number} Scroll left in [px]
+		 * @member $myQuery
+		 * @method scrollLeft
+		 */
+		scrollLeft() {
+			let el = this.getEl();
+			let docOffset = document.body.scrollLeft;
+
+			return el ? el.scrollLeft + docOffset : docOffset + 0;
+		}
 	};
 
 	/**
 	 * Quick acces to myQuery and DOM manipulation.
 	 *
 	 * @param  {String|HTMLElement|Array} value
-	 * @param {HTMLElement} [parent]
+	 * @param {HTMLElement|$myQuery} [parent] Parent node
 	 * @return {$myQuery}
 	 * @member onix
 	 * @property {Function}
@@ -452,7 +753,7 @@ onix.factory("$myQuery", function() {
 			return new $myQuery(value, parent);
 		}
 	};
-});
+}]);
 
 /**
  * Run for cache $myQuery object.

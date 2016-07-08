@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='global-property-'>/**
 </span> * OnixJS framework
- * 2.7.1/1. 7. 2016
+ * 2.7.3/8. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -2197,14 +2197,14 @@ onix = function () {
 <span id='onix-static-method-info'>	/**
 </span>  * Framework info.
   *
-  * version: 2.7.2
-  * date: 7. 7. 2016
+  * version: 2.7.3
+  * date: 8. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log(&#39;OnixJS framework\n&#39;+
-&#39;2.7.1/1. 7. 2016\n&#39;+
+&#39;2.7.3/8. 7. 2016\n&#39;+
 &#39;source: https://gitlab.com/LorDOniX/onix\n&#39;+
 &#39;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&#39;+
 &#39;@license MIT\n&#39;+
@@ -2286,11 +2286,6 @@ onix.factory(&quot;$filter&quot;, [&quot;$di&quot;, function ($di) {
 		});
 	};
 }]);
-var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
-	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-} : function (obj) {
-	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-};
 <span id='$common'>/**
 </span> * Commom functions used in whole application.
  *
@@ -2306,10 +2301,10 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
   * @private
   */
 	this._objCopy = function (dest, source) {
-		var _this = this;
+		var _this10 = this;
 		Object.keys(source).forEach(function (prop) {
 			if (source.hasOwnProperty(prop)) {
-				dest[prop] = _this.cloneValue(source[prop]);
+				dest[prop] = _this10.cloneValue(source[prop]);
 			}
 		});
 	};
@@ -2326,13 +2321,13 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
   * @member $common
   */
 	this._chainPromisesInner = function (opts, resolve, outArray) {
-		var _this2 = this;
+		var _this11 = this;
 		var firstItem = opts.shift();
 		if (firstItem) {
 			// string or function itself
 			var fn = void 0;
 			var error = false;
-			switch (_typeof(firstItem.method)) {
+			switch (_typeof2(firstItem.method)) {
 				case &quot;string&quot;:
 					if (!firstItem.scope || !(firstItem.method in firstItem.scope)) {
 						error = true;
@@ -2352,10 +2347,10 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
 			if (!error) {
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function (data) {
 					outArray.push(data);
-					_this2._chainPromisesInner(opts, resolve, outArray);
+					_this11._chainPromisesInner(opts, resolve, outArray);
 				}, function (err) {
 					outArray.push(err);
-					_this2._chainPromisesInner(opts, resolve, outArray);
+					_this11._chainPromisesInner(opts, resolve, outArray);
 				});
 			} else {
 				resolve(outArray);
@@ -2418,24 +2413,24 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
   * @member $common
   */
 	this.cloneValue = function (value, lvl) {
-		var _this3 = this;
+		var _this12 = this;
 		lvl = lvl || 1;
 		// recursive call threshold
 		if (lvl &gt; 100) return null;
-		switch (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(value)) {
+		switch (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(value)) {
 			case &quot;object&quot;:
 				if (Array.isArray(value)) {
-					var _ret = function () {
+					var _ret2 = function () {
 						// array
 						var newArray = [];
 						value.forEach(function (item) {
-							newArray.push(_this3.cloneValue(item, lvl + 1));
+							newArray.push(_this12.cloneValue(item, lvl + 1));
 						});
 						return {
 							v: newArray
 						};
 					}();
-					if ((typeof _ret === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret)) === &quot;object&quot;) return _ret.v;
+					if ((typeof _ret2 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret2)) === &quot;object&quot;) return _ret2.v;
 				} else if (value instanceof Date) {
 					// date
 					return new Date(value.getTime());
@@ -2443,19 +2438,19 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
 					// element
 					return value;
 				} else if (value) {
-					var _ret2 = function () {
+					var _ret3 = function () {
 						// object
 						var newObj = {};
 						Object.keys(value).forEach(function (prop) {
 							if (value.hasOwnProperty(prop)) {
-								newObj[prop] = _this3.cloneValue(value[prop], lvl + 1);
+								newObj[prop] = _this12.cloneValue(value[prop], lvl + 1);
 							}
 						});
 						return {
 							v: newObj
 						};
 					}();
-					if ((typeof _ret2 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret2)) === &quot;object&quot;) return _ret2.v;
+					if ((typeof _ret3 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret3)) === &quot;object&quot;) return _ret3.v;
 				} else {
 					// null
 					return null;
@@ -2484,7 +2479,7 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
 		inherits.forEach(function (inhItem) {
 			// iterate prototype items
 			for (var p in inhItem.prototype) {
-				source[p] = _typeof(inhItem.prototype[p]) != &quot;object&quot; ? inhItem.prototype[p] : JSON.parse(JSON.stringify(inhItem.prototype[p]));
+				source[p] = _typeof2(inhItem.prototype[p]) != &quot;object&quot; ? inhItem.prototype[p] : JSON.parse(JSON.stringify(inhItem.prototype[p]));
 			}
 		});
 	};
@@ -2605,7 +2600,7 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
   * @member $common
   */
 	this.isObject = function (item) {
-		return (typeof item === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(item)) === &quot;object&quot; &amp;&amp; !Array.isArray(item) &amp;&amp; item !== null;
+		return (typeof item === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(item)) === &quot;object&quot; &amp;&amp; !Array.isArray(item) &amp;&amp; item !== null;
 	};
 <span id='$common-method-col'>	/**
 </span>  * Cover function for console.log, which allows to replace {0..n} occurences inside string.
@@ -2659,9 +2654,9 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
   * @member $common
   */
 	this.chainPromises = function (opts) {
-		var _this4 = this;
+		var _this13 = this;
 		return new $promise(function (resolve) {
-			_this4._chainPromisesInner(opts, resolve, []);
+			_this13._chainPromisesInner(opts, resolve, []);
 		});
 	};
 <span id='$common-method-cancelEvents'>	/**
@@ -2675,6 +2670,21 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
 			e.stopPropagation();
 			e.preventDefault();
 		}
+	};
+<span id='$common-method-cssNameToJS'>	/**
+</span>  * Converts css name to javascript style interpretation.
+  * 
+  * @param {String} value
+  * @return {String} &quot;z-index&quot; -&gt; zIndex
+  * @member $common
+  */
+	this.cssNameToJS = function (value) {
+		var parts = value.split(&quot;-&quot;);
+		var output = &quot;&quot;;
+		parts.forEach(function (part, ind) {
+			output += !ind ? part : part[0].toUpperCase() + part.substr(1);
+		});
+		return output;
 	};
 }]);
 <span id='$cookie'>/**
@@ -2869,35 +2879,51 @@ onix.service(&quot;$date&quot;, function () {
  * 
  * @class $dom
  */
-onix.service(&quot;$dom&quot;, function () {
+onix.service(&quot;$dom&quot;, [&quot;$common&quot;, function ($common) {
 <span id='$dom-method-create'>	/**
 </span>  * Create $dom from the configuration.
   *
   * @param  {Object} config
-  * @param  {String} config.el Element name
-  * @param  {Object} config.attrs Atributes
-  * @param  {Array|Object} config.child Child nodes
-  * @param  {Array} config.events Bind events
-  * @param  {String|Array} config.class Add CSS class/es
+  * @param  {String} config.el Element name, default creates &quot;div&quot;
+  * @param  {Object} [config.attrs] Atributes
+  * @param  {Object} [config.css] Object with css styles
+  * @param  {Array|Object} [config.events] Bind events {event, fn}
+  * @param  {Array|Object} [config.child] Child nodes
+  * @param  {String|Array} [config.class] Add CSS class/es
   * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
-  * @return {Object}
+  * @return {Element}
   * @member $dom
   */
 	this.create = function (config, exported) {
-		var _this = this;
-		var el = document.createElement(config.el);
+		var _this14 = this;
+		var el = document.createElement(config.el || &quot;div&quot;);
 		Object.keys(config).forEach(function (key) {
 			var value = void 0;
 			switch (key) {
 				case &quot;el&quot;:
 					break;
 				case &quot;attrs&quot;:
-					Object.keys(config.attrs).forEach(function (attr) {
-						el.setAttribute(attr, config.attrs[attr]);
-					});
+					value = config.attrs;
+					if (value &amp;&amp; (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(value)) === &quot;object&quot; &amp;&amp; !Array.isArray(value)) {
+						Object.keys(value).forEach(function (attr) {
+							el.setAttribute(attr, value[attr]);
+						});
+					}
+					break;
+				case &quot;css&quot;:
+					value = config.css;
+					if (value &amp;&amp; (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(value)) === &quot;object&quot; &amp;&amp; !Array.isArray(value)) {
+						Object.keys(value).forEach(function (name) {
+							el.style[$common.cssNameToJS(name)] = value[name];
+						});
+					}
 					break;
 				case &quot;events&quot;:
-					config.events.forEach(function (item) {
+					value = config.events;
+					if (!Array.isArray(value)) {
+						value = [value];
+					}
+					value.forEach(function (child) {
 						el.addEventListener(item.event, item.fn);
 					});
 					break;
@@ -2907,7 +2933,7 @@ onix.service(&quot;$dom&quot;, function () {
 						value = [value];
 					}
 					value.forEach(function (child) {
-						el.appendChild(_this.create(child, exported));
+						el.appendChild(_this14.create(child, exported));
 					});
 					break;
 				case &quot;_exported&quot;:
@@ -2934,7 +2960,7 @@ onix.service(&quot;$dom&quot;, function () {
   *
   * @param  {String|Array} els Els = &quot;&quot; -&gt; element; [x, y] -&gt; { x: el, y: el }; [{sel: &quot;div&quot;, name: &quot;xyz&quot;}] -&gt; { &quot;xyz&quot;: div el }
   * @param  {Object} [parent]
-  * @return {Object}
+  * @return {Object|Element}
   * @member $dom
   */
 	this.get = function (els, parent) {
@@ -2957,7 +2983,7 @@ onix.service(&quot;$dom&quot;, function () {
 		}
 		return output;
 	};
-});
+}]);
 function _classCallCheck(instance, Constructor) {
 	if (!(instance instanceof Constructor)) {
 		throw new TypeError(&quot;Cannot call a class as a function&quot;);
@@ -4551,43 +4577,63 @@ onix.service(&quot;$math&quot;, function () {
 		}
 	};
 });
-var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
-	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-} : function (obj) {
-	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-};
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError(&quot;Cannot call a class as a function&quot;);
-	}
-}
-onix.factory(&quot;$myQuery&quot;, function () {
+onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 <span id='$myQuery'>	/**
 </span>  * DOM manipulation in the style of jquery.
   * 
   * @class $myQuery
   * @chainable
   * @param {String|HTMLElement|Array} value
-  * @param {HTMLElement} [parent]
+  * @param {$myQuery|HTMLElement} [parent]
   * @member $myQuery
   */
 	var $myQuery = function () {
 		function $myQuery(value, parent) {
-			_classCallCheck(this, $myQuery);
-			parent = parent || document;
-			this._els = [];
-			if (typeof value === &quot;string&quot;) {
-				if (parent instanceof $myQuery) {
-					parent = parent.getEl();
-				}
-				this._els = parent.querySelectorAll(value);
-			} else if (Array.isArray(value)) {
-				this._els = value;
-			} else {
-				this._els.push(value);
-			}
+			_classCallCheck2(this, $myQuery);
+			this._els = this._getElementsFromValue(value, parent);
 			return this;
 		}
+<span id='$myQuery-method-_getElementsFromValue'>		/**
+</span>   * Get elements from value [parent].
+   * 
+   * @param {String|HTMLElement|Array} value
+   * @param {$myQuery|HTMLElement} [parent]
+   * @return {Array}
+   * @member $myQuery
+   * @method _getElementsFromValue
+   * @private
+   */
+		$myQuery.prototype._getElementsFromValue = function _getElementsFromValue(value, parent) {
+			value = Array.isArray(value) ? value : [value];
+			var els = [];
+			value.forEach(function (val) {
+				if (typeof val === &quot;string&quot;) {
+					if (val.match(/&lt;[a-zA-Z]+&gt;/)) {
+						// create el
+						var el = document.createElement(&quot;div&quot;);
+						el.innerHTML = val;
+						els.push(el);
+					} else {
+						// selector
+						if (parent instanceof $myQuery) {
+							parent = parent.getEl();
+						}
+						parent = parent instanceof Element || parent == window || parent == document ? parent : document;
+						var selValues = parent.querySelectorAll(val);
+						if (selValues) {
+							els = els.concat(Array.prototype.slice.call(selValues));
+						}
+					}
+					return;
+				} else if (val instanceof $myQuery) {
+					val = val.getEl();
+				}
+				if (val instanceof Element || val == document || val == window) {
+					els.push(val);
+				}
+			});
+			return els;
+		};
 <span id='$myQuery-method-_operation'>		/**
 </span>   * Operation on elements.
    * 
@@ -4610,40 +4656,78 @@ onix.factory(&quot;$myQuery&quot;, function () {
 </span>   * Set or get all - cover function.
    * 
    * @chainable
-   * @param  {String} newValue
    * @param  {String} attr
+   * @param  {String} [newValue]
    * @member $myQuery
    * @private
    * @method _setGetAll
    */
-		$myQuery.prototype._setGetAll = function _setGetAll(newValue, attr) {
-			var _this = this;
-			if (newValue) {
-				this._operation(function (item) {
-					item[attr] = newValue;
-				});
-				return this;
-			} else {
-				var _ret = function () {
-					var values = [];
-					_this._operation(function (item) {
-						values.push(item[attr]);
+		$myQuery.prototype._setGetAll = function _setGetAll(attr, newValue) {
+			var _this15 = this;
+			if (typeof attr !== &quot;undefined&quot;) {
+				if (typeof newValue !== &quot;undefined&quot;) {
+					this._operation(function (item) {
+						item[attr] = newValue;
 					});
-					if (!values.length) {
-						return {
-							v: null
-						};
-					} else if (values.length == 1) {
-						return {
-							v: values[0]
-						};
-					} else {
-						return {
-							v: values
-						};
-					}
-				}();
-				if ((typeof _ret === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret)) === &quot;object&quot;) return _ret.v;
+					return this;
+				} else {
+					var _ret4 = function () {
+						var values = [];
+						_this15._operation(function (item) {
+							values.push(item[attr]);
+						});
+						if (!values.length) {
+							return {
+								v: null
+							};
+						} else if (values.length == 1) {
+							return {
+								v: values[0]
+							};
+						} else {
+							return {
+								v: values
+							};
+						}
+					}();
+					if ((typeof _ret4 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret4)) === &quot;object&quot;) return _ret4.v;
+				}
+			} else {
+				return this;
+			}
+		};
+<span id='$myQuery-method-_bindEvent'>		/**
+</span>   * Bind event.
+   *
+   * @param {String} eventName Event name
+   * @param {Function} cb Callback function
+   * @param {Object} [scope] cb function scope
+   * @chainable
+   * @private
+   * @method _bindEvent
+   */
+		$myQuery.prototype._bindEvent = function _bindEvent(eventName, cb, scope) {
+			this._operation(function (item) {
+				item.addEventListener(eventName, function (event) {
+					cb.apply(scope || cb, [event, item]);
+				});
+			});
+			return this;
+		};
+<span id='$myQuery-method-get'>		/**
+</span>   * Get original element.
+   *
+   * @param  {Number} [ind]
+   * @return {HTMLElement}
+   * @member $myQuery
+   * @method get
+   */
+		$myQuery.prototype.get = function get(ind) {
+			ind = ind || 0;
+			if (ind &gt; this._els.length) {
+				return null;
+			} else {
+				return this._els[ind];
 			}
 		};
 <span id='$myQuery-method-getEl'>		/**
@@ -4655,12 +4739,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method getEl
    */
 		$myQuery.prototype.getEl = function getEl(ind) {
-			ind = ind || 0;
-			if (ind &gt; this._els.length) {
-				return null;
-			} else {
-				return this._els[ind];
-			}
+			return this.get(ind);
 		};
 <span id='$myQuery-method-attr'>		/**
 </span>   * Get or set attribute.
@@ -4673,33 +4752,70 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method attr
    */
 		$myQuery.prototype.attr = function attr(name, newValue) {
-			var _this2 = this;
-			if (newValue) {
-				this._operation(function (item) {
-					item.setAttribute(name, newValue);
-				});
-				return this;
-			} else {
-				var _ret2 = function () {
-					var values = [];
-					_this2._operation(function (item) {
-						values.push(item.getAttribute(name));
+			var _this16 = this;
+			if (typeof name !== &quot;undefined&quot;) {
+				if (typeof newValue !== &quot;undefined&quot;) {
+					this._operation(function (item) {
+						item.setAttribute(name, newValue);
 					});
-					if (!values.length) {
-						return {
-							v: null
-						};
-					} else if (values.length == 1) {
-						return {
-							v: values[0]
-						};
-					} else {
-						return {
-							v: values
-						};
-					}
-				}();
-				if ((typeof _ret2 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret2)) === &quot;object&quot;) return _ret2.v;
+					return this;
+				} else {
+					var _ret5 = function () {
+						var values = [];
+						_this16._operation(function (item) {
+							values.push(item.getAttribute(name));
+						});
+						if (!values.length) {
+							return {
+								v: null
+							};
+						} else if (values.length == 1) {
+							return {
+								v: values[0]
+							};
+						} else {
+							return {
+								v: values
+							};
+						}
+					}();
+					if ((typeof _ret5 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret5)) === &quot;object&quot;) return _ret5.v;
+				}
+			} else {
+				return this;
+			}
+		};
+<span id='$myQuery-method-css'>		/**
+</span>   * Get or set css value.
+   *
+   * @chainable
+   * @param  {String|Object} name
+   * @param  {String} [newValue]
+   * @return {String}
+   * @member $myQuery
+   * @method css
+   */
+		$myQuery.prototype.css = function css(name, newValue) {
+			var _this17 = this;
+			if (typeof name !== &quot;undefined&quot;) {
+				if (typeof newValue !== &quot;undefined&quot;) {
+					this._operation(function (item) {
+						item.style[$common.cssNameToJS(name)] = newValue;
+					});
+					return this;
+				} else if ((typeof name === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(name)) === &quot;object&quot; &amp;&amp; !Array.isArray(name)) {
+					Object.keys(name).forEach(function (key) {
+						_this17._operation(function (item) {
+							item.style[$common.cssNameToJS(key)] = name[key];
+						});
+					});
+					return this;
+				} else {
+					var el = this.getEl();
+					return el ? el.style[$common.cssNameToJS(name)] : null;
+				}
+			} else {
+				return this;
 			}
 		};
 <span id='$myQuery-method-src'>		/**
@@ -4711,7 +4827,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method src
    */
 		$myQuery.prototype.src = function src(newValue) {
-			return this._setGetAll(newValue, &quot;src&quot;);
+			return this._setGetAll(&quot;src&quot;, newValue);
 		};
 <span id='$myQuery-method-hide'>		/**
 </span>   * Hide element.
@@ -4721,10 +4837,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method hide
    */
 		$myQuery.prototype.hide = function hide() {
-			this._operation(function (item) {
-				item.style.display = &quot;none&quot;;
-			});
-			return this;
+			return this.css(&quot;display&quot;, &quot;none&quot;);
 		};
 <span id='$myQuery-method-show'>		/**
 </span>   * Show element.
@@ -4735,10 +4848,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method show
    */
 		$myQuery.prototype.show = function show(displayStyle) {
-			this._operation(function (item) {
-				item.style.display = displayStyle || &quot;&quot;;
-			});
-			return this;
+			return this.css(&quot;display&quot;, displayStyle || &quot;&quot;);
 		};
 <span id='$myQuery-method-val'>		/**
 </span>   * Get or set value.
@@ -4750,7 +4860,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method val
    */
 		$myQuery.prototype.val = function val(newValue) {
-			return this._setGetAll(newValue, &quot;value&quot;);
+			return this._setGetAll(&quot;value&quot;, newValue);
 		};
 <span id='$myQuery-method-html'>		/**
 </span>   * Get or set HTML.
@@ -4761,21 +4871,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method html
    */
 		$myQuery.prototype.html = function html(newValue) {
-			return this._setGetAll(newValue, &quot;innerHTML&quot;);
-		};
-<span id='$myQuery-method-append'>		/**
-</span>   * Append another element to this one.
-   *
-   * @chainable
-   * @param  {HTMLElement} child
-   * @member $myQuery
-   * @method  append
-   */
-		$myQuery.prototype.append = function append(child) {
-			this._operation(function (item) {
-				item.appendChild(child);
-			});
-			return this;
+			return this._setGetAll(&quot;innerHTML&quot;, newValue);
 		};
 <span id='$myQuery-method-addClass'>		/**
 </span>   * Add CSS class.
@@ -4857,12 +4953,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method click
    */
 		$myQuery.prototype.click = function click(cb, scope) {
-			this._operation(function (item) {
-				item.addEventListener(&quot;click&quot;, function (event) {
-					cb.apply(scope || cb, [event, item]);
-				});
-			});
-			return this;
+			return this._bindEvent(&quot;click&quot;, cb, scope);
 		};
 <span id='$myQuery-method-change'>		/**
 </span>   * Change event.
@@ -4874,10 +4965,116 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method change
    */
 		$myQuery.prototype.change = function change(cb, scope) {
-			this._operation(function (item) {
-				item.addEventListener(&quot;change&quot;, function (event) {
-					cb.apply(scope || cb, [event, item]);
-				});
+			return this._bindEvent(&quot;change&quot;, cb, scope);
+		};
+<span id='$myQuery-method-mouseenter'>		/**
+</span>   * Mouse enter event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method mouseenter
+   */
+		$myQuery.prototype.mouseenter = function mouseenter(cb, scope) {
+			return this._bindEvent(&quot;mouseenter&quot;, cb, scope);
+		};
+<span id='$myQuery-method-mouseleave'>		/**
+</span>   * Mouse leave event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method mouseleave
+   */
+		$myQuery.prototype.mouseleave = function mouseleave(cb, scope) {
+			return this._bindEvent(&quot;mouseleave&quot;, cb, scope);
+		};
+<span id='$myQuery-method-mouseleave'>		/**
+</span>   * Mouse move event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method mouseleave
+   */
+		$myQuery.prototype.mousemove = function mousemove(cb, scope) {
+			return this._bindEvent(&quot;mousemove&quot;, cb, scope);
+		};
+<span id='$myQuery-method-keydown'>		/**
+</span>   * Key down event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method keydown
+   */
+		$myQuery.prototype.keydown = function keydown(cb, scope) {
+			return this._bindEvent(&quot;keydown&quot;, cb, scope);
+		};
+<span id='$myQuery-method-keyup'>		/**
+</span>   * Key up event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method keyup
+   */
+		$myQuery.prototype.keyup = function keyup(cb, scope) {
+			return this._bindEvent(&quot;keyup&quot;, cb, scope);
+		};
+<span id='$myQuery-method-keypress'>		/**
+</span>   * Key press event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method keypress
+   */
+		$myQuery.prototype.keypress = function keypress(cb, scope) {
+			return this._bindEvent(&quot;keypress&quot;, cb, scope);
+		};
+<span id='$myQuery-method-blur'>		/**
+</span>   * Blur event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method blur
+   */
+		$myQuery.prototype.blur = function blur(cb, scope) {
+			return this._bindEvent(&quot;blur&quot;, cb, scope);
+		};
+<span id='$myQuery-method-focus'>		/**
+</span>   * Focus event.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method focus
+   */
+		$myQuery.prototype.focus = function focus(cb, scope) {
+			return this._bindEvent(&quot;focus&quot;, cb, scope);
+		};
+<span id='$myQuery-method-each'>		/**
+</span>   * Each.
+   *
+   * @chainable
+   * @param  {Function} cb
+   * @param  {Function} [scope]
+   * @member $myQuery
+   * @method each
+   */
+		$myQuery.prototype.each = function each(cb, scope) {
+			this._operation(function (item, ind) {
+				cb.apply(scope || cb, [item, ind]);
 			});
 			return this;
 		};
@@ -4891,10 +5088,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
    * @method forEach
    */
 		$myQuery.prototype.forEach = function forEach(cb, scope) {
-			this._operation(function (item, ind) {
-				cb.apply(scope || cb, [item, ind]);
-			});
-			return this;
+			return this.each(cb, scope);
 		};
 <span id='$myQuery-method-remove'>		/**
 </span>   * Remove element.
@@ -4909,18 +5103,54 @@ onix.factory(&quot;$myQuery&quot;, function () {
 			});
 			return this;
 		};
+<span id='$myQuery-method-append'>		/**
+</span>   * Append another element to this one.
+   *
+   * @chainable
+   * @param {HTMLElement|$myQuery|String} child
+   * @member $myQuery
+   * @method  append
+   */
+		$myQuery.prototype.append = function append(child) {
+			child = this._getElementsFromValue(child);
+			if (child.length) {
+				this._operation(function (item) {
+					item.appendChild(child[0]);
+				});
+			}
+			return this;
+		};
 <span id='$myQuery-method-prepend'>		/**
 </span>   * Prepend element.
    *
    * @chainable
-   * @param  {HTMLElement} child
+   * @param {HTMLElement|$myQuery|string} child
    * @member $myQuery
    * @method prepend
    */
 		$myQuery.prototype.prepend = function prepend(child) {
-			this._operation(function (item) {
-				item.parentNode.insertBefore(child, item);
-			});
+			child = this._getElementsFromValue(child);
+			if (child.length) {
+				this._operation(function (item) {
+					item.parentNode.insertBefore(child[0], item);
+				});
+			}
+			return this;
+		};
+<span id='$myQuery-method-prepend'>		/**
+</span>   * Insert current element before element.
+   *
+   * @chainable
+   * @param {HTMLElement|$myQuery|string} beforeEl
+   * @member $myQuery
+   * @method prepend
+   */
+		$myQuery.prototype.insertBefore = function insertBefore(beforeEl) {
+			beforeEl = this._getElementsFromValue(beforeEl);
+			var el = this.getEl();
+			if (el &amp;&amp; beforeEl.length) {
+				beforeEl[0].parentNode.insertBefore(el, beforeEl[0]);
+			}
 			return this;
 		};
 <span id='$myQuery-method-empty'>		/**
@@ -4949,6 +5179,52 @@ onix.factory(&quot;$myQuery&quot;, function () {
 		$myQuery.prototype.len = function len() {
 			return this._els.length;
 		};
+<span id='$myQuery-method-parent'>		/**
+</span>   * Get parent node.
+   * 
+   * @return {$myQuery} new instance with parent node
+   * @member $myQuery
+   * @method parent
+   */
+		$myQuery.prototype.parent = function parent() {
+			var el = this.getEl();
+			return el ? new this(el) : null;
+		};
+<span id='$myQuery-method-children'>		/**
+</span>   * Get children.
+   * 
+   * @return {Array} Children array
+   * @member $myQuery
+   * @method children
+   */
+		$myQuery.prototype.children = function children() {
+			var el = this.getEl();
+			return el ? el.children : [];
+		};
+<span id='$myQuery-method-scrollTop'>		/**
+</span>   * Get scroll top offset.
+   * 
+   * @return {Number} Scroll top in [px]
+   * @member $myQuery
+   * @method scrollTop
+   */
+		$myQuery.prototype.scrollTop = function scrollTop() {
+			var el = this.getEl();
+			var docOffset = document.body.scrollTop;
+			return el ? el.scrollTop + docOffset : docOffset + 0;
+		};
+<span id='$myQuery-method-scrollLeft'>		/**
+</span>   * Get scroll left offset.
+   * 
+   * @return {Number} Scroll left in [px]
+   * @member $myQuery
+   * @method scrollLeft
+   */
+		$myQuery.prototype.scrollLeft = function scrollLeft() {
+			var el = this.getEl();
+			var docOffset = document.body.scrollLeft;
+			return el ? el.scrollLeft + docOffset : docOffset + 0;
+		};
 		return $myQuery;
 	}();
 	;
@@ -4956,7 +5232,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
 </span>  * Quick acces to myQuery and DOM manipulation.
   *
   * @param  {String|HTMLElement|Array} value
-  * @param {HTMLElement} [parent]
+  * @param {HTMLElement|$myQuery} [parent] Parent node
   * @return {$myQuery}
   * @member onix
   * @property {Function}
@@ -4977,7 +5253,7 @@ onix.factory(&quot;$myQuery&quot;, function () {
 			return new $myQuery(value, parent);
 		}
 	};
-});
+}]);
 <span id='$myQuery-property-'>/**
 </span> * Run for cache $myQuery object.
  */

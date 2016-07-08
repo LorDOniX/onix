@@ -14,6 +14,7 @@ homeApp.factory("HomePage", [
 	"$select",
 	"$template",
 	"$localStorage",
+	"$dom",
 	"HomeResource",
 	"HomeSnippet",
 	"MainMenu",
@@ -35,6 +36,7 @@ function(
 	$select,
 	$template,
 	$localStorage,
+	$dom,
 	HomeResource,
 	HomeSnippet,
 	MainMenu,
@@ -390,6 +392,43 @@ function(
 			$common.col("Get localStorage {0} = {1}", LS_KEY, $localStorage.get(LS_KEY))
 		}
 
+		myQueryTest() {
+			let el = $dom.create({
+				el: "div",
+				innerHTML: "data",
+				css: {
+					color: "red",
+					"background-color": "white",
+					border: "1px solid black"
+				}
+			});
+
+			let ref = onix.element(".myquery-cont").empty().append(el).append("<div>data2</div>");
+
+			$common.col("Style is {0}", ref.css("display", "none").css("display"));
+
+			ref.css("display", "");
+
+			let colors = ["green", "red"];
+			let bgColors = ["#f5f5f5", "#ccc"];
+
+			onix.element(".myquery-cont > div").each((el, ind) => {
+				onix.element(el).css("color", colors[ind]).css("z-index", 12).css({
+					"background-color": bgColors[ind]
+				}).click(e => {
+					console.log("click on div");
+				})
+			});
+
+			onix.element(document).keydown(e => {
+				console.log("document keydown");
+			});
+
+			onix.element(document).click(e => {
+				console.log("document click");
+			});
+		}
+
 		allTests() {
 			console.log("Running all tests...");
 
@@ -404,6 +443,7 @@ function(
 			this.mathAndDate();
 			this.promiseFlattening();
 			this.locStor();
+			this.myQueryTest();
 		}
 	}
 

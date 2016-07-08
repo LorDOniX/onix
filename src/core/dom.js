@@ -3,22 +3,27 @@
  * 
  * @class $dom
  */
-onix.service("$dom", function() {
+onix.service("$dom", [
+	"$common",
+function(
+	$common
+) {
 	/**
 	 * Create $dom from the configuration.
 	 *
 	 * @param  {Object} config
-	 * @param  {String} config.el Element name
-	 * @param  {Object} config.attrs Atributes
-	 * @param  {Array|Object} config.child Child nodes
-	 * @param  {Array} config.events Bind events
-	 * @param  {String|Array} config.class Add CSS class/es
+	 * @param  {String} config.el Element name, default creates "div"
+	 * @param  {Object} [config.attrs] Atributes
+	 * @param  {Object} [config.css] Object with css styles
+	 * @param  {Array|Object} [config.events] Bind events {event, fn}
+	 * @param  {Array|Object} [config.child] Child nodes
+	 * @param  {String|Array} [config.class] Add CSS class/es
 	 * @param  {Object} [exported] to this object will be exported all marked elements (_exported attr.)
-	 * @return {Object}
+	 * @return {Element}
 	 * @member $dom
 	 */
 	this.create = function(config, exported) {
-		let el = document.createElement(config.el);
+		let el = document.createElement(config.el || "div");
 
 		Object.keys(config).forEach(key => {
 			let value;
@@ -28,13 +33,33 @@ onix.service("$dom", function() {
 					break;
 
 				case "attrs":
-					Object.keys(config.attrs).forEach(attr => {
-						el.setAttribute(attr, config.attrs[attr]);
-					});
+					value = config.attrs;
+
+					if (value && typeof value === "object" && !Array.isArray(value)) {
+						Object.keys(value).forEach(attr => {
+							el.setAttribute(attr, value[attr]);
+						});
+					}
+					break;
+
+				case "css":
+					value = config.css;
+
+					if (value && typeof value === "object" && !Array.isArray(value)) {
+						Object.keys(value).forEach(name => {
+							el.style[$common.cssNameToJS(name)] = value[name];
+						});
+					}
 					break;
 
 				case "events":
-					config.events.forEach(item => {
+					value = config.events;
+
+					if (!Array.isArray(value)) {
+						value = [value];
+					}
+					
+					value.forEach(child => {
 						el.addEventListener(item.event, item.fn);
 					});
 					break;
@@ -81,7 +106,7 @@ onix.service("$dom", function() {
 	 *
 	 * @param  {String|Array} els Els = "" -> element; [x, y] -> { x: el, y: el }; [{sel: "div", name: "xyz"}] -> { "xyz": div el }
 	 * @param  {Object} [parent]
-	 * @return {Object}
+	 * @return {Object|Element}
 	 * @member $dom
 	 */
 	this.get = function(els, parent) {
@@ -113,4 +138,4 @@ onix.service("$dom", function() {
 
 		return output;
 	};
-});
+}]);

@@ -439,4 +439,22 @@ function(
 			e.preventDefault();
 		}
 	};
+
+	/**
+	 * Converts css name to javascript style interpretation.
+	 * 
+	 * @param {String} value
+	 * @return {String} "z-index" -> zIndex
+	 * @member $common
+	 */
+	this.cssNameToJS = function(value) {
+		let parts = value.split("-");
+		let output = "";
+
+		parts.forEach((part, ind) => {
+			output += !ind ? part : part[0].toUpperCase() + part.substr(1);
+		});
+
+		return output;
+	};
 }]);

@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.1/1. 7. 2016
+ * 2.7.3/8. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * minimal version: contains [src/libs/polyfills.js, src/libs/es5-sham.js, src/onix/onix.js, src/onix/filter.js]
@@ -1465,14 +1465,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.7.2
-  * date: 7. 7. 2016
+  * version: 2.7.3
+  * date: 8. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.1/1. 7. 2016\n'+
+'2.7.3/8. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+

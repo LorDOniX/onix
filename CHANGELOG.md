@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.7.3 (8. 7. 2016)
+
+* $common - cssNameToJS method (uses $dom, $myQuery)
+* $dom - css attribute
+* $myQuery - add events; methods (parent, insertBefore); refactoring
+* update test home page
+
 ## 2.7.2 (7. 7. 2016)
 
 * bundler - add websocket
