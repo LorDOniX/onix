@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='global-property-'>/**
 </span> * OnixJS framework
- * 2.7.4/8. 7. 2016
+ * 2.7.5/10. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1533,7 +1533,16 @@ if (!Object.isExtensible) {
 	}
 }.call(this));
 var _typeof2 = typeof Symbol === &quot;function&quot; &amp;&amp; typeof Symbol.iterator === &quot;symbol&quot; ? function (obj) { return typeof obj; } : function (obj) { return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj; };
-function _classCallCheck2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(&quot;Cannot call a class as a function&quot;); } }
+var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
+	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
+} : function (obj) {
+	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
+};
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError(&quot;Cannot call a class as a function&quot;);
+	}
+}
 onix = function () {
 	/* ************************************* $module **************************** */
 <span id='$module'>	/**
@@ -1550,7 +1559,7 @@ onix = function () {
    * @param  {Array} dependencies Other modules dependencies
    */
 		function $module(name, dependencies) {
-			_classCallCheck2(this, $module);
+			_classCallCheck(this, $module);
 <span id='$module-property-_objects'>			/**
 </span>    * All objects.
     *
@@ -1923,8 +1932,8 @@ onix = function () {
   */
 	var $modules = function () {
 		function $modules() {
-			var _this7 = this;
-			_classCallCheck2(this, $modules);
+			var _this = this;
+			_classCallCheck(this, $modules);
 <span id='$modules-property-_modules'>			/**
 </span>    * All modules array.
     *
@@ -1953,7 +1962,7 @@ onix = function () {
 			};
 			// bind DOM ready
 			document.addEventListener(&quot;DOMContentLoaded&quot;, function () {
-				_this7._domLoad();
+				_this._domLoad();
 			});
 		}
 <span id='$modules-method-_domLoad'>		/**
@@ -1964,15 +1973,15 @@ onix = function () {
    * @method _domLoad
    */
 		$modules.prototype._domLoad = function _domLoad() {
-			var _this8 = this;
+			var _this2 = this;
 			var configs = [];
 			var runs = [];
 			this._modules.forEach(function (module) {
 				var error = false;
 				var dependencies = module.getDependencies();
 				dependencies.every(function (dep) {
-					if (!(dep in _this8._modulesObj)) {
-						console.error(&quot;Module &#39;&quot; + _this8._name + &quot;&#39; dependency &#39;&quot; + dep + &quot;&#39; not found!&quot;);
+					if (!(dep in _this2._modulesObj)) {
+						console.error(&quot;Module &#39;&quot; + _this2._name + &quot;&#39; dependency &#39;&quot; + dep + &quot;&#39; not found!&quot;);
 						error = true;
 						return false;
 					} else {
@@ -1986,11 +1995,11 @@ onix = function () {
 			});
 			// run all configs
 			configs.forEach(function (config) {
-				_this8.run(config, true);
+				_this2.run(config, true);
 			});
 			// run all runs
 			runs.forEach(function (run) {
-				_this8.run(run);
+				_this2.run(run);
 			});
 		};
 <span id='$modules-method-_getObject'>		/**
@@ -2056,7 +2065,7 @@ onix = function () {
    * @method run
    */
 		$modules.prototype.run = function run(obj, isConfig, parent) {
-			var _this9 = this;
+			var _this3 = this;
 			parent = parent || [];
 			if (parent.indexOf(obj.name) != -1) {
 				console.error(&quot;Circular dependency error! Object name: &quot; + obj.name + &quot;, parents: &quot; + parent.join(&quot;|&quot;));
@@ -2078,14 +2087,14 @@ onix = function () {
 			if (obj.inject &amp;&amp; obj.inject.length) {
 				obj.inject.forEach(function (objName) {
 					if (typeof objName === &quot;string&quot;) {
-						var injObj = _this9._getObject(objName);
+						var injObj = _this3._getObject(objName);
 						if (!injObj) {
 							console.error(&quot;Object name: &quot; + objName + &quot; not found!&quot;);
 							inject.push(null);
 						} else {
-							inject.push(_this9.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+							inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 						}
-					} else if ((typeof objName === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(objName)) === &quot;object&quot;) {
+					} else if ((typeof objName === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(objName)) === &quot;object&quot;) {
 						inject.push(objName);
 					}
 				});
@@ -2197,14 +2206,14 @@ onix = function () {
 <span id='onix-static-method-info'>	/**
 </span>  * Framework info.
   *
-  * version: 2.7.4
-  * date: 8. 7. 2016
+  * version: 2.7.5
+  * date: 10. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log(&#39;OnixJS framework\n&#39;+
-&#39;2.7.4/8. 7. 2016\n&#39;+
+&#39;2.7.5/10. 7. 2016\n&#39;+
 &#39;source: https://gitlab.com/LorDOniX/onix\n&#39;+
 &#39;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&#39;+
 &#39;@license MIT\n&#39;+
@@ -2879,6 +2888,11 @@ onix.service(&quot;$date&quot;, function () {
 		return new Date(date.getTime() + addTime);
 	};
 });
+var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
+	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
+} : function (obj) {
+	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
+};
 <span id='$dom'>/**
 </span> * Class for creating DOM elements and getting their references.
  * 
@@ -2900,7 +2914,7 @@ onix.service(&quot;$dom&quot;, [&quot;$common&quot;, function ($common) {
   * @member $dom
   */
 	this.create = function (config, exported) {
-		var _this10 = this;
+		var _this = this;
 		var el = document.createElement(config.el || &quot;div&quot;);
 		Object.keys(config).forEach(function (key) {
 			var value = void 0;
@@ -2909,7 +2923,7 @@ onix.service(&quot;$dom&quot;, [&quot;$common&quot;, function ($common) {
 					break;
 				case &quot;attrs&quot;:
 					value = config.attrs;
-					if (value &amp;&amp; (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(value)) === &quot;object&quot; &amp;&amp; !Array.isArray(value)) {
+					if (value &amp;&amp; (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(value)) === &quot;object&quot; &amp;&amp; !Array.isArray(value)) {
 						Object.keys(value).forEach(function (attr) {
 							el.setAttribute(attr, value[attr]);
 						});
@@ -2917,7 +2931,7 @@ onix.service(&quot;$dom&quot;, [&quot;$common&quot;, function ($common) {
 					break;
 				case &quot;css&quot;:
 					value = config.css;
-					if (value &amp;&amp; (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(value)) === &quot;object&quot; &amp;&amp; !Array.isArray(value)) {
+					if (value &amp;&amp; (typeof value === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(value)) === &quot;object&quot; &amp;&amp; !Array.isArray(value)) {
 						Object.keys(value).forEach(function (name) {
 							el.style[$common.cssNameToJS(name)] = value[name];
 						});
@@ -2938,7 +2952,7 @@ onix.service(&quot;$dom&quot;, [&quot;$common&quot;, function ($common) {
 						value = [value];
 					}
 					value.forEach(function (child) {
-						el.appendChild(_this10.create(child, exported));
+						el.appendChild(_this.create(child, exported));
 					});
 					break;
 				case &quot;_exported&quot;:
@@ -5129,8 +5143,9 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 		$myQuery.prototype.append = function append(child) {
 			child = this._getElementsFromValue(child);
 			if (child.length) {
-				this._operation(function (item) {
-					item.appendChild(child[0]);
+				this._operation(function (item, ind) {
+					var appChild = ind ? child[0].cloneNode(true) : child[0];
+					item.appendChild(appChild);
 				});
 			}
 			return this;
@@ -5146,8 +5161,9 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 		$myQuery.prototype.prepend = function prepend(child) {
 			child = this._getElementsFromValue(child);
 			if (child.length) {
-				this._operation(function (item) {
-					item.parentNode.insertBefore(child[0], item);
+				this._operation(function (item, ind) {
+					var prepChild = ind ? child[0].cloneNode(true) : child[0];
+					item.insertBefore(prepChild, item.firstChild);
 				});
 			}
 			return this;

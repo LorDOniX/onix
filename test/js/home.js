@@ -471,11 +471,11 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 					border: "1px solid black"
 				}
 			});
-			var ref = onix.element(".myquery-cont").empty().append(el).append("<div>data2</div>");
+			var ref = onix.element(".myquery-cont").empty().append(el).append("<div>data2</div>").prepend("<div>data prepend</div>");
 			$common.col("Style is {0}", ref.css("display", "none").css("display"));
 			ref.css("display", "");
-			var colors = ["green", "red"];
-			var bgColors = ["#f5f5f5", "#ccc"];
+			var colors = ["green", "red", "blue"];
+			var bgColors = ["#f5f5f5", "#ccc", "#666"];
 			onix.element(".myquery-cont > div").each(function (el, ind) {
 				onix.element(el).css("color", colors[ind]).css("z-index", 12).css({
 					"background-color": bgColors[ind]

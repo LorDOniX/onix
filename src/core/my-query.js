@@ -595,8 +595,10 @@ function(
 			child = this._getElementsFromValue(child);
 
 			if (child.length) {
-				this._operation(item => {
-					item.appendChild(child[0]);
+				this._operation((item, ind) => {
+					let appChild = ind ? child[0].cloneNode(true) : child[0];
+
+					item.appendChild(appChild);
 				});
 			}
 
@@ -615,8 +617,10 @@ function(
 			child = this._getElementsFromValue(child);
 
 			if (child.length) {
-				this._operation(item => {
-					item.parentNode.insertBefore(child[0], item);
+				this._operation((item, ind) => {
+					let prepChild = ind ? child[0].cloneNode(true) : child[0];
+
+					item.insertBefore(prepChild, item.firstChild);
 				});
 			}
 

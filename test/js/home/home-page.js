@@ -403,14 +403,14 @@ function(
 				}
 			});
 
-			let ref = onix.element(".myquery-cont").empty().append(el).append("<div>data2</div>");
+			let ref = onix.element(".myquery-cont").empty().append(el).append("<div>data2</div>").prepend("<div>data prepend</div>");
 
 			$common.col("Style is {0}", ref.css("display", "none").css("display"));
 
 			ref.css("display", "");
 
-			let colors = ["green", "red"];
-			let bgColors = ["#f5f5f5", "#ccc"];
+			let colors = ["green", "red", "blue"];
+			let bgColors = ["#f5f5f5", "#ccc", "#666"];
 
 			onix.element(".myquery-cont > div").each((el, ind) => {
 				onix.element(el).css("color", colors[ind]).css("z-index", 12).css({

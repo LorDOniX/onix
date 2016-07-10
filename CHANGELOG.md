@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.7.5 (10. 7. 2016)
+
+* $myQuery - prepend() bugfix
+
 ## 2.7.4 (8. 7. 2016)
 
 * $dom - bugfix
