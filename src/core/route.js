@@ -122,10 +122,10 @@ function(
 		let path = $location.get();
 		let find = false;
 		let config = null;
-		let data = {};
 
 		this._routes.every(item => {
-			if (path.match(new RegExp(item.url))) {
+			// exact match or regular expression
+			if (path == item.url || path.match(new RegExp(item.url))) {
 				config = item.config;
 				find = true;
 				

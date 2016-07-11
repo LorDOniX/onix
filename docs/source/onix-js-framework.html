@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='global-property-'>/**
 </span> * OnixJS framework
- * 2.7.5/10. 7. 2016
+ * 2.7.6/11. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1533,16 +1533,7 @@ if (!Object.isExtensible) {
 	}
 }.call(this));
 var _typeof2 = typeof Symbol === &quot;function&quot; &amp;&amp; typeof Symbol.iterator === &quot;symbol&quot; ? function (obj) { return typeof obj; } : function (obj) { return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj; };
-var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
-	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-} : function (obj) {
-	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-};
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError(&quot;Cannot call a class as a function&quot;);
-	}
-}
+function _classCallCheck2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(&quot;Cannot call a class as a function&quot;); } }
 onix = function () {
 	/* ************************************* $module **************************** */
 <span id='$module'>	/**
@@ -1559,7 +1550,7 @@ onix = function () {
    * @param  {Array} dependencies Other modules dependencies
    */
 		function $module(name, dependencies) {
-			_classCallCheck(this, $module);
+			_classCallCheck2(this, $module);
 <span id='$module-property-_objects'>			/**
 </span>    * All objects.
     *
@@ -1932,8 +1923,8 @@ onix = function () {
   */
 	var $modules = function () {
 		function $modules() {
-			var _this = this;
-			_classCallCheck(this, $modules);
+			var _this7 = this;
+			_classCallCheck2(this, $modules);
 <span id='$modules-property-_modules'>			/**
 </span>    * All modules array.
     *
@@ -1962,7 +1953,7 @@ onix = function () {
 			};
 			// bind DOM ready
 			document.addEventListener(&quot;DOMContentLoaded&quot;, function () {
-				_this._domLoad();
+				_this7._domLoad();
 			});
 		}
 <span id='$modules-method-_domLoad'>		/**
@@ -1973,15 +1964,15 @@ onix = function () {
    * @method _domLoad
    */
 		$modules.prototype._domLoad = function _domLoad() {
-			var _this2 = this;
+			var _this8 = this;
 			var configs = [];
 			var runs = [];
 			this._modules.forEach(function (module) {
 				var error = false;
 				var dependencies = module.getDependencies();
 				dependencies.every(function (dep) {
-					if (!(dep in _this2._modulesObj)) {
-						console.error(&quot;Module &#39;&quot; + _this2._name + &quot;&#39; dependency &#39;&quot; + dep + &quot;&#39; not found!&quot;);
+					if (!(dep in _this8._modulesObj)) {
+						console.error(&quot;Module &#39;&quot; + _this8._name + &quot;&#39; dependency &#39;&quot; + dep + &quot;&#39; not found!&quot;);
 						error = true;
 						return false;
 					} else {
@@ -1995,11 +1986,11 @@ onix = function () {
 			});
 			// run all configs
 			configs.forEach(function (config) {
-				_this2.run(config, true);
+				_this8.run(config, true);
 			});
 			// run all runs
 			runs.forEach(function (run) {
-				_this2.run(run);
+				_this8.run(run);
 			});
 		};
 <span id='$modules-method-_getObject'>		/**
@@ -2065,7 +2056,7 @@ onix = function () {
    * @method run
    */
 		$modules.prototype.run = function run(obj, isConfig, parent) {
-			var _this3 = this;
+			var _this9 = this;
 			parent = parent || [];
 			if (parent.indexOf(obj.name) != -1) {
 				console.error(&quot;Circular dependency error! Object name: &quot; + obj.name + &quot;, parents: &quot; + parent.join(&quot;|&quot;));
@@ -2087,14 +2078,14 @@ onix = function () {
 			if (obj.inject &amp;&amp; obj.inject.length) {
 				obj.inject.forEach(function (objName) {
 					if (typeof objName === &quot;string&quot;) {
-						var injObj = _this3._getObject(objName);
+						var injObj = _this9._getObject(objName);
 						if (!injObj) {
 							console.error(&quot;Object name: &quot; + objName + &quot; not found!&quot;);
 							inject.push(null);
 						} else {
-							inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+							inject.push(_this9.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 						}
-					} else if ((typeof objName === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(objName)) === &quot;object&quot;) {
+					} else if ((typeof objName === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(objName)) === &quot;object&quot;) {
 						inject.push(objName);
 					}
 				});
@@ -2206,14 +2197,14 @@ onix = function () {
 <span id='onix-static-method-info'>	/**
 </span>  * Framework info.
   *
-  * version: 2.7.5
-  * date: 10. 7. 2016
+  * version: 2.7.6
+  * date: 11. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log(&#39;OnixJS framework\n&#39;+
-&#39;2.7.5/10. 7. 2016\n&#39;+
+&#39;2.7.6/11. 7. 2016\n&#39;+
 &#39;source: https://gitlab.com/LorDOniX/onix\n&#39;+
 &#39;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&#39;+
 &#39;@license MIT\n&#39;+
@@ -4254,11 +4245,6 @@ onix.factory(&quot;$localStorage&quot;, [&quot;$features&quot;, function ($featu
 		}
 	};
 }]);
-var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
-	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-} : function (obj) {
-	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-};
 <span id='$location'>/**
 </span> * Support class for location operations.
  * 
@@ -4298,7 +4284,7 @@ onix.service(&quot;$location&quot;, function () {
 			obj.forEach(function (item) {
 				url.push(encodeURIComponent(item.name) + &quot;=&quot; + encodeURIComponent(item.value));
 			});
-		} else if ((typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(obj)) === &quot;object&quot;) {
+		} else if ((typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj)) === &quot;object&quot;) {
 			Object.keys(obj).forEach(function (key) {
 				url.push(encodeURIComponent(key) + &quot;=&quot; + encodeURIComponent(obj[key]));
 			});
@@ -4320,7 +4306,7 @@ onix.service(&quot;$location&quot;, function () {
 				window.location.search = newURL;
 			}
 		} else {
-			var _ret = function () {
+			var _ret3 = function () {
 				// read
 				var data = location.search;
 				var output = {};
@@ -4336,17 +4322,17 @@ onix.service(&quot;$location&quot;, function () {
 					v: output
 				};
 			}();
-			if ((typeof _ret === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret)) === &quot;object&quot;) return _ret.v;
+			if ((typeof _ret3 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret3)) === &quot;object&quot;) return _ret3.v;
 		}
 	};
 <span id='$location-method-get'>	/**
-</span>  * Get current location.
+</span>  * Get current location - path + search (without hash).
   *
   * @return {String}
   * @member $location
   */
 	this.get = function () {
-		return window.location.pathname;
+		return window.location.pathname + window.location.search;
 	};
 });
 <span id='$math'>/**
@@ -5644,13 +5630,13 @@ onix.service(&quot;$route&quot;, [&quot;$location&quot;, &quot;$template&quot;, 
   * @member $route
   */
 	this.go = function () {
-		var _this = this;
+		var _this10 = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
-		var data = {};
 		this._routes.every(function (item) {
-			if (path.match(new RegExp(item.url))) {
+			// exact match or regular expression
+			if (path == item.url || path.match(new RegExp(item.url))) {
 				config = item.config;
 				find = true;
 				return false;
@@ -5686,7 +5672,7 @@ onix.service(&quot;$route&quot;, [&quot;$location&quot;, &quot;$template&quot;, 
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this._runController(contr, routeParams);
+						_this10._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {

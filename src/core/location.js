@@ -89,12 +89,12 @@ onix.service("$location", function() {
 	};
 
 	/**
-	 * Get current location.
+	 * Get current location - path + search (without hash).
 	 *
 	 * @return {String}
 	 * @member $location
 	 */
 	this.get = function() {
-		return window.location.pathname;
+		return window.location.pathname + window.location.search;
 	};
 });

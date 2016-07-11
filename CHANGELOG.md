@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.7.6 (11. 7. 2016)
+
+* $location - method get returns also search part of the url
+* $route - method go update
+
 ## 2.7.5 (10. 7. 2016)
 
 * $myQuery - prepend() bugfix

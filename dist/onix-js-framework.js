@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.5/10. 7. 2016
+ * 2.7.6/11. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1516,16 +1516,7 @@ if (!Object.isExtensible) {
 	}
 }.call(this));
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
+function _classCallCheck2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
 	/* ************************************* $module **************************** */
 	/**
@@ -1542,7 +1533,7 @@ onix = function () {
    * @param  {Array} dependencies Other modules dependencies
    */
 		function $module(name, dependencies) {
-			_classCallCheck(this, $module);
+			_classCallCheck2(this, $module);
 			/**
     * All objects.
     *
@@ -1915,8 +1906,8 @@ onix = function () {
   */
 	var $modules = function () {
 		function $modules() {
-			var _this = this;
-			_classCallCheck(this, $modules);
+			var _this7 = this;
+			_classCallCheck2(this, $modules);
 			/**
     * All modules array.
     *
@@ -1945,7 +1936,7 @@ onix = function () {
 			};
 			// bind DOM ready
 			document.addEventListener("DOMContentLoaded", function () {
-				_this._domLoad();
+				_this7._domLoad();
 			});
 		}
 		/**
@@ -1956,15 +1947,15 @@ onix = function () {
    * @method _domLoad
    */
 		$modules.prototype._domLoad = function _domLoad() {
-			var _this2 = this;
+			var _this8 = this;
 			var configs = [];
 			var runs = [];
 			this._modules.forEach(function (module) {
 				var error = false;
 				var dependencies = module.getDependencies();
 				dependencies.every(function (dep) {
-					if (!(dep in _this2._modulesObj)) {
-						console.error("Module '" + _this2._name + "' dependency '" + dep + "' not found!");
+					if (!(dep in _this8._modulesObj)) {
+						console.error("Module '" + _this8._name + "' dependency '" + dep + "' not found!");
 						error = true;
 						return false;
 					} else {
@@ -1978,11 +1969,11 @@ onix = function () {
 			});
 			// run all configs
 			configs.forEach(function (config) {
-				_this2.run(config, true);
+				_this8.run(config, true);
 			});
 			// run all runs
 			runs.forEach(function (run) {
-				_this2.run(run);
+				_this8.run(run);
 			});
 		};
 		/**
@@ -2048,7 +2039,7 @@ onix = function () {
    * @method run
    */
 		$modules.prototype.run = function run(obj, isConfig, parent) {
-			var _this3 = this;
+			var _this9 = this;
 			parent = parent || [];
 			if (parent.indexOf(obj.name) != -1) {
 				console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
@@ -2070,14 +2061,14 @@ onix = function () {
 			if (obj.inject && obj.inject.length) {
 				obj.inject.forEach(function (objName) {
 					if (typeof objName === "string") {
-						var injObj = _this3._getObject(objName);
+						var injObj = _this9._getObject(objName);
 						if (!injObj) {
 							console.error("Object name: " + objName + " not found!");
 							inject.push(null);
 						} else {
-							inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+							inject.push(_this9.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 						}
-					} else if ((typeof objName === "undefined" ? "undefined" : _typeof(objName)) === "object") {
+					} else if ((typeof objName === "undefined" ? "undefined" : _typeof2(objName)) === "object") {
 						inject.push(objName);
 					}
 				});
@@ -2189,14 +2180,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.7.5
-  * date: 10. 7. 2016
+  * version: 2.7.6
+  * date: 11. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.5/10. 7. 2016\n'+
+'2.7.6/11. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -4237,11 +4228,6 @@ onix.factory("$localStorage", ["$features", function ($features) {
 		}
 	};
 }]);
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
 /**
  * Support class for location operations.
  * 
@@ -4281,7 +4267,7 @@ onix.service("$location", function () {
 			obj.forEach(function (item) {
 				url.push(encodeURIComponent(item.name) + "=" + encodeURIComponent(item.value));
 			});
-		} else if ((typeof obj === "undefined" ? "undefined" : _typeof(obj)) === "object") {
+		} else if ((typeof obj === "undefined" ? "undefined" : _typeof2(obj)) === "object") {
 			Object.keys(obj).forEach(function (key) {
 				url.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
 			});
@@ -4303,7 +4289,7 @@ onix.service("$location", function () {
 				window.location.search = newURL;
 			}
 		} else {
-			var _ret = function () {
+			var _ret3 = function () {
 				// read
 				var data = location.search;
 				var output = {};
@@ -4319,17 +4305,17 @@ onix.service("$location", function () {
 					v: output
 				};
 			}();
-			if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+			if ((typeof _ret3 === "undefined" ? "undefined" : _typeof2(_ret3)) === "object") return _ret3.v;
 		}
 	};
 	/**
-  * Get current location.
+  * Get current location - path + search (without hash).
   *
   * @return {String}
   * @member $location
   */
 	this.get = function () {
-		return window.location.pathname;
+		return window.location.pathname + window.location.search;
 	};
 });
 /**
@@ -5627,13 +5613,13 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
   * @member $route
   */
 	this.go = function () {
-		var _this = this;
+		var _this10 = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
-		var data = {};
 		this._routes.every(function (item) {
-			if (path.match(new RegExp(item.url))) {
+			// exact match or regular expression
+			if (path == item.url || path.match(new RegExp(item.url))) {
 				config = item.config;
 				find = true;
 				return false;
@@ -5669,7 +5655,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this._runController(contr, routeParams);
+						_this10._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {
