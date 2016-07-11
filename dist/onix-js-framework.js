@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.6/11. 7. 2016
+ * 2.7.7/11. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -2180,14 +2180,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.7.6
+  * version: 2.7.7
   * date: 11. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.6/11. 7. 2016\n'+
+'2.7.7/11. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -4565,16 +4565,6 @@ onix.service("$math", function () {
 		}
 	};
 });
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$myQuery", ["$common", function ($common) {
 	/**
   * DOM manipulation in the style of jquery.
@@ -4587,7 +4577,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
   */
 	var $myQuery = function () {
 		function $myQuery(value, parent) {
-			_classCallCheck(this, $myQuery);
+			_classCallCheck2(this, $myQuery);
 			this._els = this._getElementsFromValue(value, parent);
 			return this;
 		}
@@ -4606,11 +4596,15 @@ onix.factory("$myQuery", ["$common", function ($common) {
 			var els = [];
 			value.forEach(function (val) {
 				if (typeof val === "string") {
-					if (val.match(/<[a-zA-Z]+>/)) {
-						// create el
-						var el = document.createElement("div");
-						el.innerHTML = val;
-						els.push(el);
+					if (val.match(/[<]\s*[a-zA-Z0-9]+[^>]*[>]/)) {
+						var df = document.createDocumentFragment();
+						var divEl = document.createElement("div");
+						divEl.insertAdjacentHTML("afterbegin", val);
+						// copy child from div -> fragment
+						while (divEl.firstChild) {
+							df.appendChild(divEl.firstChild);
+						}
+						els.push(df);
 					} else {
 						// selector
 						if (parent instanceof $myQuery) {
@@ -4661,7 +4655,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
    * @method _setGetAll
    */
 		$myQuery.prototype._setGetAll = function _setGetAll(attr, newValue) {
-			var _this = this;
+			var _this10 = this;
 			if (typeof attr !== "undefined") {
 				if (typeof newValue !== "undefined") {
 					this._operation(function (item) {
@@ -4669,9 +4663,9 @@ onix.factory("$myQuery", ["$common", function ($common) {
 					});
 					return this;
 				} else {
-					var _ret = function () {
+					var _ret4 = function () {
 						var values = [];
-						_this._operation(function (item) {
+						_this10._operation(function (item) {
 							values.push(item[attr]);
 						});
 						if (!values.length) {
@@ -4688,7 +4682,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 							};
 						}
 					}();
-					if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+					if ((typeof _ret4 === "undefined" ? "undefined" : _typeof2(_ret4)) === "object") return _ret4.v;
 				}
 			} else {
 				return this;
@@ -4750,7 +4744,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
    * @method attr
    */
 		$myQuery.prototype.attr = function attr(name, newValue) {
-			var _this2 = this;
+			var _this11 = this;
 			if (typeof name !== "undefined") {
 				if (typeof newValue !== "undefined") {
 					this._operation(function (item) {
@@ -4758,9 +4752,9 @@ onix.factory("$myQuery", ["$common", function ($common) {
 					});
 					return this;
 				} else {
-					var _ret2 = function () {
+					var _ret5 = function () {
 						var values = [];
-						_this2._operation(function (item) {
+						_this11._operation(function (item) {
 							values.push(item.getAttribute(name));
 						});
 						if (!values.length) {
@@ -4777,7 +4771,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 							};
 						}
 					}();
-					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+					if ((typeof _ret5 === "undefined" ? "undefined" : _typeof2(_ret5)) === "object") return _ret5.v;
 				}
 			} else {
 				return this;
@@ -4794,16 +4788,16 @@ onix.factory("$myQuery", ["$common", function ($common) {
    * @method css
    */
 		$myQuery.prototype.css = function css(name, newValue) {
-			var _this3 = this;
+			var _this12 = this;
 			if (typeof name !== "undefined") {
 				if (typeof newValue !== "undefined") {
 					this._operation(function (item) {
 						item.style[$common.cssNameToJS(name)] = newValue;
 					});
 					return this;
-				} else if ((typeof name === "undefined" ? "undefined" : _typeof(name)) === "object" && !Array.isArray(name)) {
+				} else if ((typeof name === "undefined" ? "undefined" : _typeof2(name)) === "object" && !Array.isArray(name)) {
 					Object.keys(name).forEach(function (key) {
-						_this3._operation(function (item) {
+						_this12._operation(function (item) {
 							item.style[$common.cssNameToJS(key)] = name[key];
 						});
 					});
@@ -5613,7 +5607,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
   * @member $route
   */
 	this.go = function () {
-		var _this10 = this;
+		var _this13 = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
@@ -5655,7 +5649,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this10._runController(contr, routeParams);
+						_this13._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {

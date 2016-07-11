@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.7.7 (11. 7. 2016)
+
+* $myQuery - fix creating DOM elements from string; bugfix element regex;
+
 ## 2.7.6 (11. 7. 2016)
 
 * $location - method get returns also search part of the url

@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='global-property-'>/**
 </span> * OnixJS framework
- * 2.7.6/11. 7. 2016
+ * 2.7.7/11. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -2197,14 +2197,14 @@ onix = function () {
 <span id='onix-static-method-info'>	/**
 </span>  * Framework info.
   *
-  * version: 2.7.6
+  * version: 2.7.7
   * date: 11. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log(&#39;OnixJS framework\n&#39;+
-&#39;2.7.6/11. 7. 2016\n&#39;+
+&#39;2.7.7/11. 7. 2016\n&#39;+
 &#39;source: https://gitlab.com/LorDOniX/onix\n&#39;+
 &#39;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&#39;+
 &#39;@license MIT\n&#39;+
@@ -4582,16 +4582,6 @@ onix.service(&quot;$math&quot;, function () {
 		}
 	};
 });
-var _typeof = typeof Symbol === &quot;function&quot; &amp;&amp; _typeof2(Symbol.iterator) === &quot;symbol&quot; ? function (obj) {
-	return typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-} : function (obj) {
-	return obj &amp;&amp; typeof Symbol === &quot;function&quot; &amp;&amp; obj.constructor === Symbol ? &quot;symbol&quot; : typeof obj === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(obj);
-};
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError(&quot;Cannot call a class as a function&quot;);
-	}
-}
 onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 <span id='$myQuery'>	/**
 </span>  * DOM manipulation in the style of jquery.
@@ -4604,7 +4594,7 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
   */
 	var $myQuery = function () {
 		function $myQuery(value, parent) {
-			_classCallCheck(this, $myQuery);
+			_classCallCheck2(this, $myQuery);
 			this._els = this._getElementsFromValue(value, parent);
 			return this;
 		}
@@ -4623,11 +4613,15 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 			var els = [];
 			value.forEach(function (val) {
 				if (typeof val === &quot;string&quot;) {
-					if (val.match(/&lt;[a-zA-Z]+&gt;/)) {
-						// create el
-						var el = document.createElement(&quot;div&quot;);
-						el.innerHTML = val;
-						els.push(el);
+					if (val.match(/[&lt;]\s*[a-zA-Z0-9]+[^&gt;]*[&gt;]/)) {
+						var df = document.createDocumentFragment();
+						var divEl = document.createElement(&quot;div&quot;);
+						divEl.insertAdjacentHTML(&quot;afterbegin&quot;, val);
+						// copy child from div -&gt; fragment
+						while (divEl.firstChild) {
+							df.appendChild(divEl.firstChild);
+						}
+						els.push(df);
 					} else {
 						// selector
 						if (parent instanceof $myQuery) {
@@ -4678,7 +4672,7 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
    * @method _setGetAll
    */
 		$myQuery.prototype._setGetAll = function _setGetAll(attr, newValue) {
-			var _this = this;
+			var _this10 = this;
 			if (typeof attr !== &quot;undefined&quot;) {
 				if (typeof newValue !== &quot;undefined&quot;) {
 					this._operation(function (item) {
@@ -4686,9 +4680,9 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 					});
 					return this;
 				} else {
-					var _ret = function () {
+					var _ret4 = function () {
 						var values = [];
-						_this._operation(function (item) {
+						_this10._operation(function (item) {
 							values.push(item[attr]);
 						});
 						if (!values.length) {
@@ -4705,7 +4699,7 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 							};
 						}
 					}();
-					if ((typeof _ret === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret)) === &quot;object&quot;) return _ret.v;
+					if ((typeof _ret4 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret4)) === &quot;object&quot;) return _ret4.v;
 				}
 			} else {
 				return this;
@@ -4767,7 +4761,7 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
    * @method attr
    */
 		$myQuery.prototype.attr = function attr(name, newValue) {
-			var _this2 = this;
+			var _this11 = this;
 			if (typeof name !== &quot;undefined&quot;) {
 				if (typeof newValue !== &quot;undefined&quot;) {
 					this._operation(function (item) {
@@ -4775,9 +4769,9 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 					});
 					return this;
 				} else {
-					var _ret2 = function () {
+					var _ret5 = function () {
 						var values = [];
-						_this2._operation(function (item) {
+						_this11._operation(function (item) {
 							values.push(item.getAttribute(name));
 						});
 						if (!values.length) {
@@ -4794,7 +4788,7 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
 							};
 						}
 					}();
-					if ((typeof _ret2 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(_ret2)) === &quot;object&quot;) return _ret2.v;
+					if ((typeof _ret5 === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(_ret5)) === &quot;object&quot;) return _ret5.v;
 				}
 			} else {
 				return this;
@@ -4811,16 +4805,16 @@ onix.factory(&quot;$myQuery&quot;, [&quot;$common&quot;, function ($common) {
    * @method css
    */
 		$myQuery.prototype.css = function css(name, newValue) {
-			var _this3 = this;
+			var _this12 = this;
 			if (typeof name !== &quot;undefined&quot;) {
 				if (typeof newValue !== &quot;undefined&quot;) {
 					this._operation(function (item) {
 						item.style[$common.cssNameToJS(name)] = newValue;
 					});
 					return this;
-				} else if ((typeof name === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(name)) === &quot;object&quot; &amp;&amp; !Array.isArray(name)) {
+				} else if ((typeof name === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof2(name)) === &quot;object&quot; &amp;&amp; !Array.isArray(name)) {
 					Object.keys(name).forEach(function (key) {
-						_this3._operation(function (item) {
+						_this12._operation(function (item) {
 							item.style[$common.cssNameToJS(key)] = name[key];
 						});
 					});
@@ -5630,7 +5624,7 @@ onix.service(&quot;$route&quot;, [&quot;$location&quot;, &quot;$template&quot;, 
   * @member $route
   */
 	this.go = function () {
-		var _this10 = this;
+		var _this13 = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
@@ -5672,7 +5666,7 @@ onix.service(&quot;$route&quot;, [&quot;$location&quot;, &quot;$template&quot;, 
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this10._runController(contr, routeParams);
+						_this13._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {

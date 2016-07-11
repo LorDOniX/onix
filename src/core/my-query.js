@@ -36,12 +36,18 @@ function(
 
 			value.forEach(val => {
 				if (typeof val === "string") {
-					if (val.match(/<[a-zA-Z]+>/)) {
-						// create el
-						let el = document.createElement("div");
-						el.innerHTML = val;
+					if (val.match(/[<]\s*[a-zA-Z0-9]+[^>]*[>]/)) {
+						let df = document.createDocumentFragment();
+						let divEl = document.createElement("div");
 
-						els.push(el);
+						divEl.insertAdjacentHTML("afterbegin", val);
+
+						// copy child from div -> fragment
+						while (divEl.firstChild) {
+							df.appendChild(divEl.firstChild);
+						}
+
+						els.push(df);
 					}
 					else {
 						// selector
