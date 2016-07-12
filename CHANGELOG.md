@@ -1,5 +1,9 @@
 # Change Log
 
+## unreleased
+
+* bundler - has his own directory
+
 ## 2.7.7 (11. 7. 2016)
 
 * $myQuery - fix creating DOM elements from string; bugfix element regex;

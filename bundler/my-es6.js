@@ -17,7 +17,7 @@ class MyES6 {
 		this._distCache = {};
 		this._usedPaths = [];
 		this._force = false;
-		this._cache = Common.fileExists(config.cache) ? require("./" + config.cache) : {};
+		this._cache = Common.getJSON(config.cache);
 		this._onixjsData = null;
 		this._reloadSet = false;
 		this._timeStop = new TimeStop();

@@ -16,7 +16,7 @@
 		"onixPH": "\"{ONIX_INFO}\""
 	},
 	"reload": {
-		"file": "reload-server.js",
+		"file": "bundler/reload-server.js",
 		"server": "localhost",
 		"port": 8200,
 		"serverPH": "{SERVER}",

@@ -68,6 +68,27 @@ class Common {
 	}
 
 	/**
+	 * Get json from file.
+	 * 
+	 * @param  {String} file
+	 * @return {Object}
+	 */
+	static getJSON(file) {
+		let obj = {};
+
+		try {
+			let data = fs.readFileSync(file);
+
+			obj = JSON.parse(data.toString());
+		}
+		catch (err) {
+			console.log(err);
+		}
+
+		return obj;
+	}
+
+	/**
 	 * Remove file.
 	 * @param  {String} name
 	 * @return {Promise}
