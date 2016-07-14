@@ -163,11 +163,11 @@ function(
 
 					return newArray;
 				}
-				else if (value instanceof Date) {
+				else if (value && value instanceof Date) {
 					// date
 					return new Date(value.getTime());
 				}
-				else if (value instanceof Element) {
+				else if (this.isElement(value)) {
 					// element
 					return value;
 				}
@@ -345,7 +345,7 @@ function(
 	 * @member $common
 	 */
 	this.isElement = function(val) {
-		return (val instanceof HTMLElement);
+		return (val && val instanceof Element);
 	};
 
 	/**
@@ -367,25 +367,12 @@ function(
 	 * @member $common
 	 */
 	this.col = function() {
-		let args = Array.prototype.slice.call(arguments);
-		let output = "";
-		let params = {};
+		let args = arguments;
 
-		args.forEach((arg, ind) => {
-			if (ind == 0) {
-				output = arg;
-			}
-			else {
-				params["[{]" + (ind - 1) + "[}]"] = arg;
-			}
-		});
+		if (args.length) {
+			let str = args[0];
 
-		Object.keys(params).forEach(param => {
-			output = output.replace(new RegExp(param, "g"), params[param]);
-		});
-
-		if (output) {
-			console.log(output);
+			console.log(str.format.apply(str, Array.prototype.slice.call(args, 1)));
 		}
 	};
 

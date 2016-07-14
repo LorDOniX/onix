@@ -105,40 +105,40 @@ function(
 
 			$dom.create({
 				el: "div",
-				"class": cropClass,
+				class: cropClass,
 				child: [{
 					el: "div",
-					"class": "crop-top",
+					class: "crop-top",
 					child: [{
 						el: "span",
-						"class": "point-nw"
+						class: "point-nw"
 					}, {
 						el: "span",
-						"class": "point-ne"
+						class: "point-ne"
 					}],
 					_exported: "cropTop"
 				}, {
 					el: "div",
-					"class": "crop-bottom",
+					class: "crop-bottom",
 					child: [{
 						el: "span",
-						"class": "point-sw"
+						class: "point-sw"
 					}, {
 						el: "span",
-						"class": "point-se"
+						class: "point-se"
 					}],
 					_exported: "cropBottom"
 				}, {
 					el: "div",
-					"class": "crop-left",
+					class: "crop-left",
 					_exported: "cropLeft"
 				}, {
 					el: "div",
-					"class": "crop-right",
+					class: "crop-right",
 					_exported: "cropRight"
 				}, {
 					el: "div",
-					"class": "crop-middle",
+					class: "crop-middle",
 					_exported: "cropMiddle"
 				}],
 				_exported: "container"

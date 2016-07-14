@@ -28,18 +28,16 @@ function(
 
 		let cont = $dom.create({
 			el: "span",
-			"class": ["preview-item", "preview-loading"],
+			class: ["preview-item", "preview-loading"],
 			child: [{
 				el: "span",
-				"class": "canvas-cover",
-				child: [
-					$loader.getSpinner(true)
-				],
+				class: "canvas-cover",
+				child: $loader.getSpinner(true),
 				style: "height: " + (maxSize || 100) + "px",
 				_exported: "canvasCover"
 			}, {
 				el: "span",
-				"class": "title",
+				class: "title",
 				innerHTML: file.name.replace(/\..*/g, "")
 			}]
 		}, exported);
@@ -69,10 +67,10 @@ function(
 			// ceiling line
 			el.appendChild($dom.create({
 				el: "div",
-				child: [{
+				child: {
 					el: "span",
 					_exported: "img_06"
-				}]
+				}
 			}, exported));
 		}
 
@@ -137,6 +135,7 @@ function(
 	 * @param  {Number} [opts.maxSize = 0] Max image size in px; the size is used for image scale
 	 * @param  {Number} [opts.count = 0] How many images are processed simultinously
 	 * @param  {Boolean} [opts.createHolder = false] Create placeholder, see _createPreviewHolders function
+	 * @return  {Boolean} Images will be shown?
 	 * @member $previewImages
 	 */
 	this.show = function(el, files, optsArg) {
@@ -192,6 +191,11 @@ function(
 
 			// run jobs array
 			$job.multipleJobs(jobsArray, opts.count);
+
+			return true;
+		}
+		else {
+			return false;
 		}
 	};
 }]);

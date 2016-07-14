@@ -24,7 +24,7 @@ function(
 		_create() {
 			this._el = $dom.create({
 				el: "div",
-				"class": "loader"
+				class: "loader"
 			});
 
 			// insert into the body on first position
@@ -75,13 +75,13 @@ function(
 			for (let i = 1; i < 6; i++) {
 				children.push({
 					el: "div",
-					"class": "rect" + i
+					class: "rect" + i
 				});
 			}
 
 			let domConf = {
 				el: "div",
-				"class": "spinner",
+				class: "spinner",
 				child: children
 			};
 

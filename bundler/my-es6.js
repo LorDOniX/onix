@@ -14,6 +14,18 @@ class MyES6 {
 		this._config = config || {};
 		this._header = header || {};
 		this._reload = reload || {};
+
+		// es6 config
+		this._es6config = {
+			compact: false,
+			presets: this._config.presets.map(preset => {
+				return require.resolve(preset)
+			}),
+			plugins: this._config.plugins.map(plugin => {
+				return require.resolve(plugin)
+			})
+		};
+
 		this._distCache = {};
 		this._usedPaths = [];
 		this._force = false;
@@ -429,15 +441,8 @@ class MyES6 {
 	 * @return {String}
 	 */
 	_transpile(path, data) {
-		let es6config = {
-			compact: false,
-			presets: this._config.presets.map((preset) => {
-				return require.resolve(preset)
-			})
-		};
-
 		try {
-			let transform = babelCore.transform(data, es6config);
+			let transform = babelCore.transform(data, this._es6config);
 
 			return transform.code;
 		}

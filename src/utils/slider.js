@@ -90,7 +90,7 @@ function(
 
 			return $dom.create({
 				el: "div",
-				"class": "slider",
+				class: "slider",
 				child: [{
 					el: "input",
 					type: "text",
@@ -98,15 +98,15 @@ function(
 					_exported: "input"
 				}, {
 					el: "span",
-					"class": "line-holder",
+					class: "line-holder",
 					_exported: "lineHolder",
 					child: [{
 						el: "span",
-						"class": "lh-tube",
+						class: "lh-tube",
 						_exported: "tube"
 					}, {
 						el: "span",
-						"class": "lh-caret",
+						class: "lh-caret",
 						_exported: "caret"
 					}]
 				}]

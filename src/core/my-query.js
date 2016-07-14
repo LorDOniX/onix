@@ -51,11 +51,11 @@ function(
 					}
 					else {
 						// selector
-						if (parent instanceof $myQuery) {
+						if (parent && parent instanceof $myQuery) {
 							parent = parent.getEl();
 						}
 
-						parent = parent instanceof Element || parent == window || parent == document ? parent : document;
+						parent = (parent && parent instanceof Element) || parent == window || parent == document ? parent : document;
 
 						let selValues = parent.querySelectorAll(val);
 
@@ -66,11 +66,11 @@ function(
 
 					return;
 				}
-				else if (val instanceof $myQuery) {
+				else if (val && val instanceof $myQuery) {
 					val = val.getEl();
 				}
 
-				if (val instanceof Element || val == document || val == window) {
+				if ($common.isElement(val) || val == document || val == window) {
 					els.push(val);
 				}
 			});

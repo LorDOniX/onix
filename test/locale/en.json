@@ -1,5 +1,6 @@
 {
 	"home_page": {
-		"title": "Onix framework - testing website"
+		"title": "Onix framework - testing website",
+		"testData": "Trans data"
 	}
 }

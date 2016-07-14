@@ -39,4 +39,12 @@ onix.service("$features", function() {
 	 * @type {Boolean}
 	 */
 	this.LOCAL_STORAGE = locStor;
+
+	/**
+	 * Media queries are available.
+	 *
+	 * @member $features
+	 * @type {Boolean}
+	 */
+	this.MEDIA_QUERY = "matchMedia" in window && "matches" in window.matchMedia("(min-width: 500px)");
 });

@@ -263,11 +263,18 @@ function(
 			var uploadPreview = this._getEl("uploadPreview");
 			var filesInput = this._getEl("uploadInput");
 
-			$previewImages.show(uploadPreview, filesInput.files, {
+			var showState = $previewImages.show(uploadPreview, filesInput.files, {
 				maxSize: 180,
 				count: 2,
 				createHolder: true
 			});
+
+			if (!showState) {
+				uploadPreview.innerHTML = "SELECT IMAGES FOR THEIRS PREVIEWS";
+			}
+
+			// clear value
+			filesInput.value = null;
 		}
 
 		mathAndDate() {
@@ -429,9 +436,15 @@ function(
 			});
 		}
 
+		others() {
+			$common.col("$common.col with string only");
+			$common.col("i18n trans {0}, missing {1}", _("home_page.testData"), _("home_page.notExists"));
+		}
+
 		allTests() {
 			console.log("Running all tests...");
 
+			this.others();
 			this.buttonClick();
 			this.filterTest();
 			this.snippetTest();

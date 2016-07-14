@@ -34,7 +34,7 @@ function(
 				canvas: null
 			};
 
-			reader.onload = (e) => {
+			reader.onload = e => {
 				let binaryData = reader.result;
 				let binaryDataArray = new Uint8Array(binaryData);
 				let exif = null;

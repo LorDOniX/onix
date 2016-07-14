@@ -74,3 +74,39 @@
 	border: 1px solid black;
 	cursor: pointer;
 }
+
+/**
+ * No media queries fix
+ */
+.no-media-query {
+	.navbar-header {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	.navbar-collapse {
+		width: auto;
+		display: inline-block;
+		vertical-align: top;
+		border-top: 0;
+		box-shadow: none;
+		
+		&.collapse {
+			height: auto!important;
+			padding-bottom: 0;
+			overflow: visible!important;
+			margin-right: 0;
+			margin-left: 0;
+			margin-top: 5px;
+		}
+	}
+
+	.navbar-nav {
+		float: left;
+		margin: 0;
+		
+		& > li {
+			float: left;
+		}
+	}
+}

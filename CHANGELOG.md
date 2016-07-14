@@ -1,8 +1,14 @@
 # Change Log
 
-## unreleased
+## 2.7.8 (14. 7. 2016)
 
 * bundler - has his own directory
+* polyfills update for ES6
+* string.format - $common.col use it
+* $i18n - missing key is on the output, before it was empty string
+* ES6 presets + plugins
+* $previewImages - method show returns boolean
+* $features - media queries support
 
 ## 2.7.7 (11. 7. 2016)
 

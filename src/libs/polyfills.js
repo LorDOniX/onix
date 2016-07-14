@@ -1,45 +1,4 @@
-(function() {
-	Event = Event || window.Event;
-
-	Event.prototype.stopPropagation = Event.prototype.stopPropagation || function() {
-		this.cancelBubble = true;
-	};
-
-	Event.prototype.preventDefault = Event.prototype.preventDefault || function () {
-		this.returnValue = false;
-	};
-})();
-
-if (!("btoa" in window)) {
-	window.btoa = function(val) {
-		return val;
-	}
-}
-
-if (!String.prototype.trim) {
-	String.prototype.trim = function () {
-		return this.replace(/^\s+|\s+$/g, '');
-	};
-}
-
-if(!Array.isArray) {
-	/**
-	 * Array.isArray dle ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
-	 */
-	Array.isArray = function (vArg) {
-		return Object.prototype.toString.call(vArg) === "[object Array]";
-	};
-}
-
-/**
- * Shim for "fixing" IE's lack of support (IE < 9) for applying slice
- * on host objects like NamedNodeMap, NodeList, and HTMLCollection
- * (technically, since host objects have been implementation-dependent,
- * at least before ES6, IE hasn't needed to work this way).
- * Also works on strings, fixes IE < 9 to allow an explicit undefined
- * for the 2nd argument (as in Firefox), and prevents errors when
- * called on other DOM objects.
- */
+// ie shim for slice on host objects like NamedNodeMap, NodeList, and HTMLCollection
 (function () {
   'use strict';
   var _slice = Array.prototype.slice;
@@ -96,205 +55,347 @@ if(!Array.isArray) {
   }
 }());
 
-if (!Array.prototype.forEach) { 
-	Array.prototype.forEach = function(cb, _this) {
-	    var len = this.length;
-	    for (var i=0;i<len;i++) { 
-			if (i in this) { cb.call(_this, this[i], i, this); }
+(function() {
+	// event
+	Event = Event || window.Event;
+
+	Event.prototype.stopPropagation = Event.prototype.stopPropagation || function() {
+		this.cancelBubble = true;
+	};
+
+	Event.prototype.preventDefault = Event.prototype.preventDefault || function () {
+		this.returnValue = false;
+	};
+
+	// btoa
+	if (!("btoa" in window)) {
+		window.btoa = function(val) {
+			return val;
 		}
 	}
-}
 
-if (!Array.prototype.every) { 
-	Array.prototype.every = function(cb, _this) {
-	    var len = this.length;
-	    for (var i=0;i<len;i++) {
-			if (i in this && !cb.call(_this, this[i], i, this)) { return false; }
-	    }
-	    return true;
+	// array
+	if(!Array.isArray) {
+		// Array.isArray by ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+		Array.isArray = function (vArg) {
+			return Object.prototype.toString.call(vArg) === "[object Array]";
+		};
 	}
-}
 
-if (!Array.prototype.indexOf) { 
-	Array.prototype.indexOf = function(item, from) {
-	    var len = this.length;
-	    var i = from || 0;
-	    if (i < 0) { i += len; }
-	    for (;i<len;i++) {
-			if (i in this && this[i] === item) { return i; }
-	    }
-	    return -1;
-	}
-}
-
-if (!("console" in window)) {
-	var emptyFn = function() {};
-
-	window.console = {};
-
-	["log", "warn", "error", "clear", "info"].forEach(function(name) {
-		window.console[name] = emptyFn;
-	});
-}
-
-if (!Function.prototype.bind) {
-	/**
-	 * ES5 Function.prototype.bind
-	 * Vrací funkci zbindovanou do zadaného kontextu.
-	 * Zbylé volitelné parametry jsou předány volání vnitřní funkce.
-	 * @param {object} thisObj Nový kontext
-	 * @returns {function}
-	 */
-	Function.prototype.bind = function(thisObj) {
-		var fn = this;
-		var args = Array.prototype.slice.call(arguments, 1);
-		return function() {
-			return fn.apply(thisObj, args.concat(Array.prototype.slice.call(arguments)));
-		}
-	}
-};
-
-if (!("addEventListener" in document)) {
-	var w = Window.prototype;
-	var h = HTMLDocument.prototype;
-	var e = Element.prototype;
-
-	document["addEventListener"] = w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
-		if (!this.__eventListeners) {
-			this.__eventListeners = {};
-		}
-
-		if (eventName == "DOMContentLoaded") {
-			this.attachEvent("onreadystatechange", function() {
-				if (document.readyState === "complete") {
-					listener();
-				}
-			});
-		}
-		else {
-			if (!this.__eventListeners[eventName]) {
-				this.__eventListeners[eventName] = [];
+	if (!Array.prototype.forEach) { 
+		Array.prototype.forEach = function(cb, _this) {
+		    var len = this.length;
+		    for (var i=0;i<len;i++) { 
+				if (i in this) { cb.call(_this, this[i], i, this); }
 			}
+		}
+	}
 
-			var fn = function() {
-				return listener.apply(this, arguments);
-			}.bind(this);
+	if (!Array.prototype.every) { 
+		Array.prototype.every = function(cb, _this) {
+		    var len = this.length;
+		    for (var i=0;i<len;i++) {
+				if (i in this && !cb.call(_this, this[i], i, this)) { return false; }
+		    }
+		    return true;
+		}
+	}
 
-			this.__eventListeners[eventName].push({
-				fn: fn,
-				listener: listener
-			});
+	if (!Array.prototype.indexOf) { 
+		Array.prototype.indexOf = function(item, from) {
+		    var len = this.length;
+		    var i = from || 0;
+		    if (i < 0) { i += len; }
+		    for (;i<len;i++) {
+				if (i in this && this[i] === item) { return i; }
+		    }
+		    return -1;
+		}
+	}
 
-			this.attachEvent("on" + eventName, fn);
+	// objects
+	// Object.keys by ES5 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+	if (!Object.keys) {
+	    Object.keys = (function () {
+	        'use strict';
+
+	        var hasOwnProperty = Object.prototype.hasOwnProperty,
+	            hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+	            dontEnums = [
+	                'toString',
+	                'toLocaleString',
+	                'valueOf',
+	                'hasOwnProperty',
+	                'isPrototypeOf',
+	                'propertyIsEnumerable',
+	                'constructor'
+	            ],
+	            dontEnumsLength = dontEnums.length;
+
+	        return function (obj) {
+	            if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+	                throw new TypeError('Object.keys called on non-object');
+	            }
+
+	            var result = [], prop, i;
+
+	            for (prop in obj) {
+	                if (hasOwnProperty.call(obj, prop)) {
+	                    result.push(prop);
+	                }
+	            }
+
+	            if (hasDontEnumBug) {
+	                for (i = 0; i < dontEnumsLength; i++) {
+	                    if (hasOwnProperty.call(obj, dontEnums[i])) {
+	                        result.push(dontEnums[i]);
+	                    }
+	                }
+	            }
+	            return result;
+	        };
+	    }());
+	}
+	
+	// Object.defineProperty
+	try {
+		Object.defineProperty({}, "a", {value:3});
+	} catch (e) {
+		var nativeDefineProperty = Object.defineProperty;
+		Object.defineProperty = function(obj, prop, descriptor) {
+			try {
+				return nativeDefineProperty.apply(Object, arguments);
+			} catch (e) {
+				obj[prop] = descriptor.value;
+				return obj;
+			}
+		}
+
+		Object.defineProperties = function(obj, props) {
+		    for (var p in props) {
+		        Object.defineProperty(obj, p, props[p]);
+		    }
+			return obj;
+		}
+	}
+
+	// object.create
+	if (!Object.create) {
+		Object.create = function(proto, props) {
+		    var tmp = function() {};
+		    tmp.prototype = proto;
+		    var result = new tmp();
+		    Object.defineProperties(result, props);
+		    return result;
+		}
+	}
+
+	// Object.getPrototypeOf
+	var testObject = {};
+
+	if (!(Object.setPrototypeOf || testObject.__proto__)) {
+		var nativeGetPrototypeOf = Object.getPrototypeOf;
+
+		Object.getPrototypeOf = function(object) {
+			if (object.__proto__) {
+				return object.__proto__;
+			} else {
+				return nativeGetPrototypeOf.call(Object, object);
+			}
+		}
+	}
+
+	// date timestamp by ES5 - http://dailyjs.com/2010/01/07/ecmascript5-date/
+	if (!Date.now) {
+		Date.now = function() { return +(new Date); }
+	}
+
+	// functions
+	if (!Function.prototype.bind) {
+		Function.prototype.bind = function(thisObj) {
+			var fn = this;
+			var args = Array.prototype.slice.call(arguments, 1);
+			return function() {
+				return fn.apply(thisObj, args.concat(Array.prototype.slice.call(arguments)));
+			}
 		}
 	};
 
-	document["removeEventListener"] = w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
-		var all = this.__eventListeners || {};
-		var items = all[eventName] || [];
-		var fn = null;
-		var pos = -1;
+	// strings
+	if (!String.prototype.trim) {
+		String.prototype.trim = function () {
+			return this.replace(/^\s+|\s+$/g, '');
+		};
+	}
 
-		for (var i = 0; i < items.length; i++) {
-			var item = items[i];
+	if (!String.prototype.replaceAll) {
+		String.prototype.replaceAll = function(target, replacement) {
+			return this.split(target).join(replacement);
+		};
+	}
 
-			if (item.listener == listener) {
-				fn = item.fn;
-				pos = i;
-				break;
+	// "hi {0}".format("Roman") => "hi Roman" {0..n}, args...
+	if (!String.prototype.format) {
+		String.prototype.format = function() {
+			var args = Array.prototype.slice.call(arguments);
+			var output = this.toString();
+
+			args.forEach(function(arg, ind) {
+				output = output.replace(new RegExp("{\\s*" + ind + "\\s*}", "g"), arg);
+			});
+
+			return output;
+		};
+	}
+
+	// console
+	if (!("console" in window)) {
+		var emptyFn = function() {};
+
+		window.console = {};
+
+		["log", "warn", "error", "clear", "info"].forEach(function(name) {
+			window.console[name] = emptyFn;
+		});
+	}
+
+	// old ie
+	if (!("addEventListener" in document)) {
+		var w = Window.prototype;
+		var h = HTMLDocument.prototype;
+		var e = Element.prototype;
+
+		document["addEventListener"] = w["addEventListener"] = h["addEventListener"] = e["addEventListener"] = function(eventName, listener) {
+			if (!this.__eventListeners) {
+				this.__eventListeners = {};
 			}
-		}
 
-		if (fn) {
-			items.splice(pos, 1);
-
-			if (!items.length) {
-				delete all[eventName];
+			if (eventName == "DOMContentLoaded") {
+				this.attachEvent("onreadystatechange", function() {
+					if (document.readyState === "complete") {
+						listener();
+					}
+				});
 			}
-			
-			return this.detachEvent("on" + eventName, fn);
-		}
-		else return null;
-	};
-}
-
-if (!("classList" in document.documentElement) && window.Element) {
-	(function () {
-		var prototype = Array.prototype,
-		indexOf = prototype.indexOf,
-		slice = prototype.slice,
-		push = prototype.push,
-		splice = prototype.splice,
-		join = prototype.join;
-
-		function DOMTokenList(elm) {
-			this._element = elm;
-			if (elm.className == this._classCache) { return; }
-			this._classCache = elm.className;
-			if (!this._classCache) { return; }
-
-			var classes = this._classCache.replace(/^\s+|\s+$/g,'').split(/\s+/);
-			for (var i = 0; i < classes.length; i++) {
-				push.call(this, classes[i]);
-			}
-		}
-		window.DOMTokenList = DOMTokenList;
-
-		function setToClassName(el, classes) {
-			el.className = classes.join(" ");
-		}
-
-		DOMTokenList.prototype = {
-			add: function(token) {
-				if (this.contains(token)) { return; }
-				push.call(this, token);
-				setToClassName(this._element, slice.call(this, 0));
-			},
-			contains: function(token) {
-				return (indexOf.call(this, token) != -1);
-			},
-			item: function(index) {
-				return this[index] || null;
-			},
-			remove: function(token) {
-				var i = indexOf.call(this, token);
-				if (i == -1) { return; }
-				splice.call(this, i, 1);
-				setToClassName(this._element, slice.call(this, 0));
-			},
-			toString: function() {
-				return join.call(this, " ");
-			},
-			toggle: function(token) {
-				if (indexOf.call(this, token) == -1) {
-					this.add(token);
-					return true;
-				} else {
-					this.remove(token);
-					return false;
+			else {
+				if (!this.__eventListeners[eventName]) {
+					this.__eventListeners[eventName] = [];
 				}
+
+				var fn = function() {
+					return listener.apply(this, arguments);
+				}.bind(this);
+
+				this.__eventListeners[eventName].push({
+					fn: fn,
+					listener: listener
+				});
+
+				this.attachEvent("on" + eventName, fn);
 			}
 		};
 
-		function defineElementGetter (obj, prop, getter) {
-			if (Object.defineProperty) {
-				Object.defineProperty(obj, prop, {
-					get: getter
-				});
-			} else {
-				obj.__defineGetter__(prop, getter);
+		document["removeEventListener"] = w["removeEventListener"] = h["removeEventListener"] = e["removeEventListener"] = function(eventName, listener) {
+			var all = this.__eventListeners || {};
+			var items = all[eventName] || [];
+			var fn = null;
+			var pos = -1;
+
+			for (var i = 0; i < items.length; i++) {
+				var item = items[i];
+
+				if (item.listener == listener) {
+					fn = item.fn;
+					pos = i;
+					break;
+				}
 			}
-		}
 
-		defineElementGetter(Element.prototype, "classList", function() {
-			return new DOMTokenList(this);
-		});
-	})();
-}
+			if (fn) {
+				items.splice(pos, 1);
 
-if (!Date.now) {
-	/**
-	 * aktuální timestamp dle ES5 - http://dailyjs.com/2010/01/07/ecmascript5-date/
-	 */
-	Date.now = function() { return +(new Date); }
-}
+				if (!items.length) {
+					delete all[eventName];
+				}
+				
+				return this.detachEvent("on" + eventName, fn);
+			}
+			else return null;
+		};
+	}
+
+	// dom classList
+	if (!("classList" in document.documentElement) && window.Element) {
+		(function () {
+			var prototype = Array.prototype,
+			indexOf = prototype.indexOf,
+			slice = prototype.slice,
+			push = prototype.push,
+			splice = prototype.splice,
+			join = prototype.join;
+
+			function DOMTokenList(elm) {
+				this._element = elm;
+				if (elm.className == this._classCache) { return; }
+				this._classCache = elm.className;
+				if (!this._classCache) { return; }
+
+				var classes = this._classCache.replace(/^\s+|\s+$/g,'').split(/\s+/);
+				for (var i = 0; i < classes.length; i++) {
+					push.call(this, classes[i]);
+				}
+			}
+			window.DOMTokenList = DOMTokenList;
+
+			function setToClassName(el, classes) {
+				el.className = classes.join(" ");
+			}
+
+			DOMTokenList.prototype = {
+				add: function(token) {
+					if (this.contains(token)) { return; }
+					push.call(this, token);
+					setToClassName(this._element, slice.call(this, 0));
+				},
+				contains: function(token) {
+					return (indexOf.call(this, token) != -1);
+				},
+				item: function(index) {
+					return this[index] || null;
+				},
+				remove: function(token) {
+					var i = indexOf.call(this, token);
+					if (i == -1) { return; }
+					splice.call(this, i, 1);
+					setToClassName(this._element, slice.call(this, 0));
+				},
+				toString: function() {
+					return join.call(this, " ");
+				},
+				toggle: function(token) {
+					if (indexOf.call(this, token) == -1) {
+						this.add(token);
+						return true;
+					} else {
+						this.remove(token);
+						return false;
+					}
+				}
+			};
+
+			function defineElementGetter (obj, prop, getter) {
+				if (Object.defineProperty) {
+					Object.defineProperty(obj, prop, {
+						get: getter
+					});
+				} else {
+					obj.__defineGetter__(prop, getter);
+				}
+			}
+
+			defineElementGetter(Element.prototype, "classList", function() {
+				return new DOMTokenList(this);
+			});
+		})();
+	}
+})();

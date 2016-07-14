@@ -81,7 +81,7 @@ function(
 					break;
 
 				case "class":
-					value = config["class"];
+					value = config.class;
 
 					if (typeof value === "string") {
 						el.classList.add(value);

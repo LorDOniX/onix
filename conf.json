@@ -1,8 +1,13 @@
 {
 	"ES6": {
 		"cache": "cache.json",
-		"presets": ["babel-preset-es2015-loose"],
-		"newBrowsersPresets": ["babel-preset-es2015"]
+		"presets": [
+			"babel-preset-es2015"
+		],
+		"plugins": [
+			"babel-plugin-transform-es3-member-expression-literals",
+			"babel-plugin-transform-es3-property-literals"
+		]
 	},
 	"header": {
 		"file": "HEADER",
@@ -32,8 +37,7 @@
 		"outputMin": "dist/onix-js-minimal-framework.min.js",
 		"data": [{
 			"files": [
-				"src/libs/polyfills.js",
-				"src/libs/es5-sham.js"
+				"src/libs/polyfills.js"
 			]
 		}, {
 			"ES6": true,
@@ -54,7 +58,6 @@
 		"data": [{
 			"files": [
 				"src/libs/polyfills.js",
-				"src/libs/es5-sham.js",
 				"src/libs/exif.js"
 			]
 		}, {

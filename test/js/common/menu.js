@@ -1,6 +1,10 @@
 menuModule = onix.module("menu");
 
-menuModule.service("MainMenu", function() {
+menuModule.service("MainMenu", [
+	"$features",
+function(
+	$features
+) {
 	this.PAGES = {
 		HOME: {
 			name: "Home page",
@@ -125,5 +129,12 @@ menuModule.service("MainMenu", function() {
 		});
 
 		document.body.insertBefore(menuEl, document.body.firstChild);
+
+		// old browsers menu fix
+		var hasMediaQuery = $features ? $features.MEDIA_QUERY : "matchMedia" in window && "matches" in window.matchMedia("(min-width: 500px)");
+		
+		if (!hasMediaQuery) {
+			document.body.classList.add("no-media-query");
+		}
 	};
-});
+}]);

@@ -114,10 +114,8 @@ onix.provider("$i18n", function() {
 	 * @private
 	 */
 	let _getText = function(key, replace) {
-		key = key || "";
-
 		let lObj = _langs[_currentLang];
-		let translate = "";
+		let translate = key || "";
 
 		if (lObj) {
 			let parts = key.split(".");

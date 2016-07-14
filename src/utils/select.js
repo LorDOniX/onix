@@ -88,7 +88,7 @@ function(
 					if (caretEl) {
 						let captionTextEl = $dom.create({
 							el: "span",
-							"class": "add-caption"
+							class: "add-caption"
 						});
 
 						captionEl.insertBefore(captionTextEl, caretEl);
