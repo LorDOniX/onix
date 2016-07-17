@@ -59,11 +59,9 @@ onix.provider("$template", function() {
 				 * @private
 				 */
 				this._RE = {
-					VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
-					NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
-					STRINGS: /["'][^"']+["']/g,
-					JSONS: /[{][^}]+[}]/g,
-					ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+					VARIABLE: /^[$_a-zA-Z][$_a-zA-Z0-9]+$/,
+					NUMBERS: /^[-]?[0-9]+[.]?([0-9e]+)?$/,
+					STRINGS: /^["'][^"']+[\"']$/
 				};
 
 				/**
@@ -95,7 +93,14 @@ onix.provider("$template", function() {
 			_parseFnName(value) {
 				value = value || "";
 
-				return value.match(/[a-zA-Z0-9_]+/)[0];
+				let match = value.match(/^\s*([a-zA-Z0-9_$]+)/);
+
+				if (match) {
+					return match[1];
+				}
+				else {
+					return "";
+				}
 			}
 
 			/**
@@ -111,54 +116,80 @@ onix.provider("$template", function() {
 			 * @method _parseArgs
 			 */
 			_parseArgs(value, config) {
-				let argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
+				value = value || "";
+				config = config || {};
 
+				let bracketsData = onix.match(value, "(", ")");
+				let argsValue = bracketsData.length ? bracketsData[0] : "";
+				let parts = onix.split(argsValue);
 				let args = [];
-				let matches = argsValue.match(this._RE.ALL);
-				
-				if (matches) {
-					let all = [];
+				let all = [];
 
-					matches.forEach(item => {
-						let value;
+				parts.forEach(item => {
+					let origItem = item;
+					let value = null;
 
-						if (item.match(this._RE.STRINGS)) {
-							value = item.substr(1, item.length - 2)
-						}
-						else if (item.match(this._RE.NUMBERS)) {
-							value = parseFloat(item);
-						}
-						else if (item.match(this._RE.JSONS)) {
-							value = JSON.parse(item);
-						}
-						else if (item.match(this._RE.VARIABLE)) {
-							let variable = item.match(this._RE.VARIABLE)[0];
+					item = item.trim();
 
-							if (variable == "$event") {
+					if (item.match(this._RE.VARIABLE)) {
+						//console.log("variable");
+						switch (item) {
+							case "$event":
 								value = config.event;
-							}
-							else if (variable == "$element") {
+								break;
+
+							case "$element":
 								value = config.el;
-							}
-							else {
-								// todo - maybe eval with scope
+								break;
+
+							case "undefined":
+								value = undefined;
+								break;
+
+							case "null":
+							default:
 								value = null;
+						}
+					}
+					else if (item.match(this._RE.STRINGS)) {
+						value = item.substr(1, item.length - 2)
+					}
+					else if (item.match(this._RE.NUMBERS)) {
+						value = parseFloat(item);
+					}
+					else {
+						// array 
+						let array = onix.match(item, "[", "]");
+						// expr
+						let expr = onix.match(item, "{", "}");
+
+						if (array.length) {
+							try {
+								value = JSON.parse("[" + array[0] + "]");
+							}
+							catch (err) {
+								console.error(err);
 							}
 						}
-
-						all.push({
-							value: value,
-							pos: argsValue.indexOf(item)
-						});
-					});
-
-					if (all.length) {
-						all.sort((a, b) => {
-							return a.pos - b.pos
-						}).forEach(item => {
-							args.push(item.value);
-						});
+						else if (expr.length) {
+							value = () => {
+								return new Function(expr[0]);
+							};
+						}
 					}
+
+					all.push({
+						value: value,
+						pos: argsValue.indexOf(origItem)
+					});
+				});
+
+				if (all.length) {
+					all.sort((a, b) => {
+						return a.pos - b.pos
+					}).forEach(item => {
+						args.push(item.value);
+					});
 				}
 
 				return args;
@@ -259,73 +290,71 @@ onix.provider("$template", function() {
 			 * @method compile
 			 */
 			compile(key, data) {
+				if (!key || !data) return "";
+
 				let tmpl = this.get(key);
+				let all = onix.match(tmpl, _conf.left, _conf.right);
 
-				if (data) {
-					let all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
+				all.forEach(item => {
+					let itemSave = _conf.left + item + _conf.right;
 
-					all.forEach(item => {
-						let itemSave = item;
+					// filter
+					if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
+						let filterValue;
 
-						item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
+						// filters
+						item.split(this._CONST.FILTER_DELIMETER).forEach((filterItem, ind) => {
+							filterItem = filterItem.trim();
 
-						if (item.indexOf(this._CONST.FILTER_DELIMETER) != -1) {
-							let filterValue;
+							if (!ind) {
+								// value
+								if (filterItem in data) {
+									filterValue = data[filterItem];
+								}
+							}
+							else {
+								// preprocessing by filter
+								let args = [filterValue];
+								let filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
+								let filterName = "";
 
-							// filters
-							item.split(this._CONST.FILTER_DELIMETER).forEach((filterItem, ind) => {
-								filterItem = filterItem.trim();
-
-								if (!ind) {
-									// value
-									if (filterItem in data) {
-										filterValue = data[filterItem];
-									}
+								if (filterParts.length == 1) {
+									filterName = filterParts[0].trim();
 								}
 								else {
-									// preprocessing by filter
-									let args = [filterValue];
-									let filterParts = filterItem.split(this._CONST.FILTER_PARAM_DELIMETER);
-									let filterName = "";
+									filterParts.forEach((filterPartItem, filterPartInd) => {
+										filterPartItem = filterPartItem.trim();
 
-									if (filterParts.length == 1) {
-										filterName = filterParts[0].trim();
-									}
-									else {
-										filterParts.forEach((filterPartItem, filterPartInd) => {
-											filterPartItem = filterPartItem.trim();
-
-											if (!filterPartInd) {
-												filterName = filterPartItem;
-											}
-											else {
-												args.push(filterPartItem);
-											}
-										});
-									}
-
-									let filter = $filter(filterName);
-
-									filterValue = filter.apply(filter, args);
+										if (!filterPartInd) {
+											filterName = filterPartItem;
+										}
+										else {
+											args.push(filterPartItem);
+										}
+									});
 								}
-							});
 
-							tmpl = tmpl.replace(itemSave, filterValue || "");
-						}
-						else {
-							// standard
-							let replaceValue = "";
+								let filter = $filter(filterName);
 
-							item = item.trim();
-
-							if (item in data) {
-								replaceValue = data[item];
+								filterValue = filter.apply(filter, args);
 							}
+						});
 
-							tmpl = tmpl.replace(itemSave, replaceValue);
+						tmpl = tmpl.replace(itemSave, filterValue || "");
+					}
+					else {
+						// standard
+						let replaceValue = "";
+
+						item = item.trim();
+
+						if (item in data) {
+							replaceValue = data[item];
 						}
-					});
-				}
+
+						tmpl = tmpl.replace(itemSave, replaceValue);
+					}
+				});
 
 				return tmpl;
 			}

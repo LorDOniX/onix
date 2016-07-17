@@ -1,6 +1,8 @@
 {
 	"home_page": {
 		"title": "Onix framework - testing website",
-		"testData": "Trans data"
+		"testData": "Trans data",
+		"plural": "There was {COUNT, plural, one{car} few{cars} other{cars}} {hi} aa",
+		"more": "{NUM, plural, one{další} few{další} other{dalších}}"
 	}
 }

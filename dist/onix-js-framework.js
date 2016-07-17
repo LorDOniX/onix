@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.8/14. 7. 2016
+ * 2.7.9/17. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1067,25 +1067,8 @@
 	}
 }.call(this));
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
+var _createClass2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+function _classCallCheck2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
 	/* ************************************* $module **************************** */
 	/**
@@ -1102,7 +1085,7 @@ onix = function () {
    * @param  {Array} dependencies Other modules dependencies
    */
 		function $module(name, dependencies) {
-			_classCallCheck(this, $module);
+			_classCallCheck2(this, $module);
 			/**
     * All objects.
     *
@@ -1154,7 +1137,7 @@ onix = function () {
    * @static
    * @method parseParam
    */
-		_createClass($module, [{
+		_createClass2($module, [{
 			key: "getDependencies",
 			/**
     * Get dependencies.
@@ -1510,8 +1493,8 @@ onix = function () {
   */
 	var $modules = function () {
 		function $modules() {
-			var _this = this;
-			_classCallCheck(this, $modules);
+			var _this6 = this;
+			_classCallCheck2(this, $modules);
 			/**
     * All modules array.
     *
@@ -1540,7 +1523,7 @@ onix = function () {
 			};
 			// bind DOM ready
 			document.addEventListener("DOMContentLoaded", function () {
-				_this._domLoad();
+				_this6._domLoad();
 			});
 		}
 		/**
@@ -1550,18 +1533,18 @@ onix = function () {
    * @private
    * @method _domLoad
    */
-		_createClass($modules, [{
+		_createClass2($modules, [{
 			key: "_domLoad",
 			value: function _domLoad() {
-				var _this2 = this;
+				var _this7 = this;
 				var configs = [];
 				var runs = [];
 				this._modules.forEach(function (module) {
 					var error = false;
 					var dependencies = module.getDependencies();
 					dependencies.every(function (dep) {
-						if (!(dep in _this2._modulesObj)) {
-							console.error("Module '" + _this2._name + "' dependency '" + dep + "' not found!");
+						if (!(dep in _this7._modulesObj)) {
+							console.error("Module '" + _this7._name + "' dependency '" + dep + "' not found!");
 							error = true;
 							return false;
 						} else {
@@ -1575,11 +1558,11 @@ onix = function () {
 				});
 				// run all configs
 				configs.forEach(function (config) {
-					_this2.run(config, true);
+					_this7.run(config, true);
 				});
 				// run all runs
 				runs.forEach(function (run) {
-					_this2.run(run);
+					_this7.run(run);
 				});
 			}
 			/**
@@ -1651,7 +1634,7 @@ onix = function () {
 		}, {
 			key: "run",
 			value: function run(obj, isConfig, parent) {
-				var _this3 = this;
+				var _this8 = this;
 				parent = parent || [];
 				if (parent.indexOf(obj.name) != -1) {
 					console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
@@ -1673,14 +1656,14 @@ onix = function () {
 				if (obj.inject && obj.inject.length) {
 					obj.inject.forEach(function (objName) {
 						if (typeof objName === "string") {
-							var injObj = _this3._getObject(objName);
+							var injObj = _this8._getObject(objName);
 							if (!injObj) {
 								console.error("Object name: " + objName + " not found!");
 								inject.push(null);
 							} else {
-								inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+								inject.push(_this8.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 							}
-						} else if ((typeof objName === "undefined" ? "undefined" : _typeof(objName)) === "object") {
+						} else if ((typeof objName === "undefined" ? "undefined" : _typeof2(objName)) === "object") {
 							inject.push(objName);
 						}
 					});
@@ -1793,16 +1776,118 @@ onix = function () {
   */
 	onix.noop = $modulesInst.noop;
 	/**
+  * Return all occurences between left and right delimeter inside string value.
+  * 
+  * @param  {String} txt Input string
+  * @param  {String} leftDelimeter  one or more characters
+  * @param  {String} rightDelimeter one or more characters
+  * @method match
+  * @static
+  * @return {Array}
+  */
+	onix.match = function (txt, leftDelimeter, rightDelimeter) {
+		var matches = [];
+		var open = 0;
+		var ldl = leftDelimeter.length;
+		var rdl = rightDelimeter.length;
+		var match = "";
+		for (var i = 0; i < txt.length; i++) {
+			var item = txt[i];
+			var lpos = i - ldl + 1;
+			var rpos = i - rdl + 1;
+			// one sign - only check; more - check current + prev items to match leftDelimeter
+			if (ldl == 1 && item == leftDelimeter || ldl > 1 && (lpos >= 0 ? txt.substr(lpos, ldl) : "") == leftDelimeter) {
+				open++;
+				if (open == 1) {
+					continue;
+				}
+			}
+			// same as left + remove
+			if (rdl == 1 && item == rightDelimeter || rdl > 1 && (rpos >= 0 ? txt.substr(rpos, rdl) : "") == rightDelimeter) {
+				open--;
+				if (rdl > 1) {
+					// remove rightDelimeter rest parts
+					match = match.substr(0, match.length - rdl + 1);
+				}
+			}
+			if (open > 0) {
+				match += item;
+			}
+			if (!open && match.length) {
+				matches.push(match);
+				match = "";
+			}
+		}
+		return matches;
+	};
+	/**
+  * Split string with delimeter. Similar to string.split(), but keeps opening strings/brackets in the memory.
+  * "5, {x:5, c: 6}, 'Roman, Peter'".split(",") => ["5", " {x:5", " c: 6}", " 'Roman", " Peter'"]
+  * onix.split("5, {x:5, c: 6}, 'Roman, Peter'", ",") => ["5", "{x:5, c: 6}", "'Roman, Peter"]
+  * 
+  * @param  {String} txt Input string
+  * @param  {String} delimeter one character splitter
+  * @method match
+  * @static
+  * @return {Array}
+  */
+	onix.split = function (txt, delimeter) {
+		txt = txt || "";
+		delimeter = delimeter || ",";
+		var open = 0;
+		var matches = [];
+		var match = "";
+		var strStart = false;
+		var len = txt.length;
+		for (var i = 0; i < len; i++) {
+			var item = txt[i];
+			switch (item) {
+				case "'":
+				case '"':
+					if (strStart) {
+						strStart = false;
+						open--;
+					} else {
+						strStart = true;
+						open++;
+					}
+					break;
+				case "{":
+				case "[":
+					open++;
+					break;
+				case "}":
+				case "]":
+					open--;
+					break;
+			}
+			// delimeter
+			if (item == delimeter && !open) {
+				if (match.length) {
+					matches.push(match);
+				}
+				match = "";
+			} else {
+				match += item;
+			}
+			// end
+			if (i == len - 1 && match.length) {
+				matches.push(match);
+			}
+		}
+		return matches;
+	};
+	/**
   * Framework info.
   *
-  * version: 2.7.8
-  * date: 14. 7. 2016
+  * version: 2.7.9
+  * date: 17. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.8/14. 7. 2016\n'+
+'2.7.9/17. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2563,6 +2648,8 @@ onix.service("$dom", ["$common", function ($common) {
 	this.get = function (els, parent) {
 		parent = parent || document;
 		var output = void 0;
+		// remove .# and white space from the beginning of the string
+		var rexp = /^[.# ]+/g;
 		if (typeof els === "string" && els) {
 			output = parent.querySelector(els);
 		} else if (Array.isArray(els)) {
@@ -2570,10 +2657,10 @@ onix.service("$dom", ["$common", function ($common) {
 			els.forEach(function (item) {
 				var name = void 0;
 				if (typeof item === "string") {
-					name = item.replace(/^[.# ]+/g, "");
+					name = item.replace(rexp, "");
 					output[name] = parent.querySelector(item);
 				} else {
-					name = item.sel.replace(/^[.# ]+/g, "");
+					name = item.sel.replace(rexp, "");
 					output[item.name || name] = parent.querySelector(item.sel);
 				}
 			});
@@ -3078,20 +3165,6 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
 		});
 	};
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.provider("$i18n", function () {
 	/**
   * All langs data.
@@ -3129,29 +3202,25 @@ onix.provider("$i18n", function () {
 	var _transReplace = function _transReplace(translate, replace) {
 		translate = translate || "";
 		replace = replace || {};
-		var replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
-		if (replaceParts) {
+		var leftDelimeter = "{";
+		var rightDelimeter = "}";
+		// message format delimeters
+		var replaceParts = onix.match(translate, leftDelimeter, rightDelimeter);
+		if (replaceParts.length) {
 			(function () {
 				var finalReplace = {};
 				replaceParts.forEach(function (part) {
-					var key = part;
-					if (key.length > 2) {
-						key = key.substr(1, key.length - 2);
-					}
-					// multi
-					var parts = key.split(",");
-					var name = parts[0].trim();
+					var parts = part.split(",");
+					if (!parts.length) return;
+					// first is variable name
+					var name = parts.shift().trim();
 					var multiPartsObj = {};
-					if (parts.length == 2) {
-						var multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
-						if (multiParts) {
-							multiParts.forEach(function (mpart) {
-								var mpartSplits = mpart.split("{");
-								var mpartValue = mpartSplits[1];
-								mpartValue = mpartValue.substr(0, mpartValue.length - 1);
-								multiPartsObj[mpartSplits[0].trim()] = mpartValue;
-							});
-						}
+					var multiParts = parts.join(" ").match(/[a-zA-Z0-9_]+{[^}]*}/g);
+					if (multiParts) {
+						multiParts.forEach(function (mpart) {
+							var mpartSplits = mpart.match(/([a-zA-Z0-9_]+){([^}]*)/);
+							multiPartsObj[mpartSplits[1].trim()] = mpartSplits[2].trim();
+						});
 					}
 					var replaceValue = name in replace ? replace[name] : "";
 					if (typeof replaceValue === "number" && Object.keys(multiPartsObj).length) {
@@ -3170,10 +3239,10 @@ onix.provider("$i18n", function () {
 						}
 						replaceValue = multiKey in multiPartsObj ? multiPartsObj[multiKey] : "";
 					}
-					finalReplace[part] = replaceValue;
+					finalReplace[leftDelimeter + part + rightDelimeter] = replaceValue;
 				});
 				Object.keys(finalReplace).forEach(function (key) {
-					translate = translate.replace(new RegExp(key, "g"), finalReplace[key]);
+					translate = translate.replaceAll(key, finalReplace[key]);
 				});
 			})();
 		}
@@ -3300,9 +3369,9 @@ onix.provider("$i18n", function () {
    */
 		var $i18n = function () {
 			function $i18n() {
-				_classCallCheck(this, $i18n);
+				_classCallCheck2(this, $i18n);
 			}
-			_createClass($i18n, [{
+			_createClass2($i18n, [{
 				key: "_",
 				/**
      * Get text function. Translate for the current language and the key.
@@ -5489,25 +5558,6 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 onix.factory("$routeParams", function () {
 	return {};
 });
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.provider("$template", function () {
 	/**
   * Configuration for template delimeters.
@@ -5548,7 +5598,7 @@ onix.provider("$template", function () {
    */
 		var $template = function () {
 			function $template() {
-				_classCallCheck(this, $template);
+				_classCallCheck2(this, $template);
 				/**
      * Template cache.
      *
@@ -5565,11 +5615,9 @@ onix.provider("$template", function () {
      * @private
      */
 				this._RE = {
-					VARIABLE: /[$_a-zA-Z][$_a-zA-Z0-9]+/g,
-					NUMBERS: /[-]?[0-9]+[.]?([0-9e]+)?/g,
-					STRINGS: /["'][^"']+["']/g,
-					JSONS: /[{][^}]+[}]/g,
-					ALL: /[-]?[0-9]+[.]?([0-9e]+)?|["'][^"']+["']|[{][^}]+[}]|[$_a-zA-Z][$_a-zA-Z0-9]+/g
+					VARIABLE: /^[$_a-zA-Z][$_a-zA-Z0-9]+$/,
+					NUMBERS: /^[-]?[0-9]+[.]?([0-9e]+)?$/,
+					STRINGS: /^["'][^"']+[\"']$/
 				};
 				/**
      * Constants.
@@ -5595,11 +5643,16 @@ onix.provider("$template", function () {
     * @private
     * @method _parseFnName
     */
-			_createClass($template, [{
+			_createClass2($template, [{
 				key: "_parseFnName",
 				value: function _parseFnName(value) {
 					value = value || "";
-					return value.match(/[a-zA-Z0-9_]+/)[0];
+					var match = value.match(/^\s*([a-zA-Z0-9_$]+)/);
+					if (match) {
+						return match[1];
+					} else {
+						return "";
+					}
 				}
 				/**
      * Parse arguments from the string -> makes array from them.
@@ -5616,45 +5669,68 @@ onix.provider("$template", function () {
 			}, {
 				key: "_parseArgs",
 				value: function _parseArgs(value, config) {
-					var _this = this;
-					var argsValue = value ? value.replace(/^[^(]+./, "").replace(/\).*$/, "") : "";
+					var _this9 = this;
+					value = value || "";
+					config = config || {};
+					var bracketsData = onix.match(value, "(", ")");
+					var argsValue = bracketsData.length ? bracketsData[0] : "";
+					var parts = onix.split(argsValue);
 					var args = [];
-					var matches = argsValue.match(this._RE.ALL);
-					if (matches) {
-						(function () {
-							var all = [];
-							matches.forEach(function (item) {
-								var value = void 0;
-								if (item.match(_this._RE.STRINGS)) {
-									value = item.substr(1, item.length - 2);
-								} else if (item.match(_this._RE.NUMBERS)) {
-									value = parseFloat(item);
-								} else if (item.match(_this._RE.JSONS)) {
-									value = JSON.parse(item);
-								} else if (item.match(_this._RE.VARIABLE)) {
-									var variable = item.match(_this._RE.VARIABLE)[0];
-									if (variable == "$event") {
-										value = config.event;
-									} else if (variable == "$element") {
-										value = config.el;
-									} else {
-										// todo - maybe eval with scope
-										value = null;
-									}
-								}
-								all.push({
-									value: value,
-									pos: argsValue.indexOf(item)
-								});
-							});
-							if (all.length) {
-								all.sort(function (a, b) {
-									return a.pos - b.pos;
-								}).forEach(function (item) {
-									args.push(item.value);
-								});
+					var all = [];
+					parts.forEach(function (item) {
+						var origItem = item;
+						var value = null;
+						item = item.trim();
+						if (item.match(_this9._RE.VARIABLE)) {
+							//console.log("variable");
+							switch (item) {
+								case "$event":
+									value = config.event;
+									break;
+								case "$element":
+									value = config.el;
+									break;
+								case "undefined":
+									value = undefined;
+									break;
+								case "null":
+								default:
+									value = null;
 							}
-						})();
+						} else if (item.match(_this9._RE.STRINGS)) {
+							value = item.substr(1, item.length - 2);
+						} else if (item.match(_this9._RE.NUMBERS)) {
+							value = parseFloat(item);
+						} else {
+							(function () {
+								// array 
+								var array = onix.match(item, "[", "]");
+								// expr
+								var expr = onix.match(item, "{", "}");
+								if (array.length) {
+									try {
+										value = JSON.parse("[" + array[0] + "]");
+									} catch (err) {
+										console.error(err);
+									}
+								} else if (expr.length) {
+									value = function value() {
+										return new Function(expr[0]);
+									};
+								}
+							})();
+						}
+						all.push({
+							value: value,
+							pos: argsValue.indexOf(origItem)
+						});
+					});
+					if (all.length) {
+						all.sort(function (a, b) {
+							return a.pos - b.pos;
+						}).forEach(function (item) {
+							args.push(item.value);
+						});
 					}
 					return args;
 				}
@@ -5671,13 +5747,13 @@ onix.provider("$template", function () {
 			}, {
 				key: "_bindEvent",
 				value: function _bindEvent(el, attr, scope) {
-					var _this2 = this;
+					var _this10 = this;
 					if (!el || !attr || !scope) return;
 					var eventName = attr.name.replace(_conf.elPrefix, "");
 					var fnName = this._parseFnName(attr.value);
 					if (eventName && fnName in scope) {
 						el.addEventListener(eventName, function (event) {
-							var args = _this2._parseArgs(attr.value, {
+							var args = _this10._parseArgs(attr.value, {
 								el: el,
 								event: event
 							});
@@ -5702,7 +5778,7 @@ onix.provider("$template", function () {
 						Object.keys(el.attributes).forEach(function (attr) {
 							var item = el.attributes[attr];
 							// ie8 fix
-							if (!item || (typeof item === "undefined" ? "undefined" : _typeof(item)) !== "object" || !item.name) return;
+							if (!item || (typeof item === "undefined" ? "undefined" : _typeof2(item)) !== "object" || !item.name) return;
 							if (item.name.indexOf(_conf.elPrefix) != -1) {
 								output.push({
 									name: item.name,
@@ -5724,9 +5800,9 @@ onix.provider("$template", function () {
 			}, {
 				key: "_init",
 				value: function _init() {
-					var _this3 = this;
+					var _this11 = this;
 					onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function (item) {
-						_this3.add(item.id || "", item.innerHTML);
+						_this11.add(item.id || "", item.innerHTML);
 					});
 				}
 			}, {
@@ -5754,60 +5830,59 @@ onix.provider("$template", function () {
 			}, {
 				key: "compile",
 				value: function compile(key, data) {
-					var _this4 = this;
+					var _this12 = this;
+					if (!key || !data) return "";
 					var tmpl = this.get(key);
-					if (data) {
-						var all = tmpl.match(new RegExp(_conf.left + "(.*?)" + _conf.right, "g")) || [];
-						all.forEach(function (item) {
-							var itemSave = item;
-							item = item.replace(new RegExp("^" + _conf.left), "").replace(new RegExp(_conf.right + "$"), "");
-							if (item.indexOf(_this4._CONST.FILTER_DELIMETER) != -1) {
-								(function () {
-									var filterValue = void 0;
-									// filters
-									item.split(_this4._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
-										filterItem = filterItem.trim();
-										if (!ind) {
-											// value
-											if (filterItem in data) {
-												filterValue = data[filterItem];
-											}
-										} else {
-											(function () {
-												// preprocessing by filter
-												var args = [filterValue];
-												var filterParts = filterItem.split(_this4._CONST.FILTER_PARAM_DELIMETER);
-												var filterName = "";
-												if (filterParts.length == 1) {
-													filterName = filterParts[0].trim();
-												} else {
-													filterParts.forEach(function (filterPartItem, filterPartInd) {
-														filterPartItem = filterPartItem.trim();
-														if (!filterPartInd) {
-															filterName = filterPartItem;
-														} else {
-															args.push(filterPartItem);
-														}
-													});
-												}
-												var filter = $filter(filterName);
-												filterValue = filter.apply(filter, args);
-											})();
+					var all = onix.match(tmpl, _conf.left, _conf.right);
+					all.forEach(function (item) {
+						var itemSave = _conf.left + item + _conf.right;
+						// filter
+						if (item.indexOf(_this12._CONST.FILTER_DELIMETER) != -1) {
+							(function () {
+								var filterValue = void 0;
+								// filters
+								item.split(_this12._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
+									filterItem = filterItem.trim();
+									if (!ind) {
+										// value
+										if (filterItem in data) {
+											filterValue = data[filterItem];
 										}
-									});
-									tmpl = tmpl.replace(itemSave, filterValue || "");
-								})();
-							} else {
-								// standard
-								var replaceValue = "";
-								item = item.trim();
-								if (item in data) {
-									replaceValue = data[item];
-								}
-								tmpl = tmpl.replace(itemSave, replaceValue);
+									} else {
+										(function () {
+											// preprocessing by filter
+											var args = [filterValue];
+											var filterParts = filterItem.split(_this12._CONST.FILTER_PARAM_DELIMETER);
+											var filterName = "";
+											if (filterParts.length == 1) {
+												filterName = filterParts[0].trim();
+											} else {
+												filterParts.forEach(function (filterPartItem, filterPartInd) {
+													filterPartItem = filterPartItem.trim();
+													if (!filterPartInd) {
+														filterName = filterPartItem;
+													} else {
+														args.push(filterPartItem);
+													}
+												});
+											}
+											var filter = $filter(filterName);
+											filterValue = filter.apply(filter, args);
+										})();
+									}
+								});
+								tmpl = tmpl.replace(itemSave, filterValue || "");
+							})();
+						} else {
+							// standard
+							var replaceValue = "";
+							item = item.trim();
+							if (item in data) {
+								replaceValue = data[item];
 							}
-						});
-					}
+							tmpl = tmpl.replace(itemSave, replaceValue);
+						}
+					});
 					return tmpl;
 				}
 				/**
@@ -5837,18 +5912,18 @@ onix.provider("$template", function () {
 			}, {
 				key: "bindTemplate",
 				value: function bindTemplate(root, scope, addElsCb) {
-					var _this5 = this;
+					var _this13 = this;
 					var allElements = onix.element("*", root);
 					if (allElements.len()) {
 						(function () {
 							var newEls = {};
 							allElements.forEach(function (item) {
-								var attrs = _this5._getAttributes(item);
+								var attrs = _this13._getAttributes(item);
 								attrs.forEach(function (attr) {
 									if (attr.name == _conf.elDataBind) {
 										newEls[attr.value] = item;
 									} else {
-										_this5._bindEvent(item, attr, scope);
+										_this13._bindEvent(item, attr, scope);
 									}
 								});
 							});
@@ -5870,12 +5945,12 @@ onix.provider("$template", function () {
 			}, {
 				key: "load",
 				value: function load(key, path) {
-					var _this6 = this;
+					var _this14 = this;
 					return new $promise(function (resolve, reject) {
 						$http.createRequest({
 							url: path
 						}).then(function (okData) {
-							_this6.add(key, okData.data);
+							_this14.add(key, okData.data);
 							resolve();
 						}, function (errorData) {
 							reject(errorData);

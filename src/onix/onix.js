@@ -775,10 +775,133 @@ onix = (function() {
 	onix.noop = $modulesInst.noop;
 
 	/**
+	 * Return all occurences between left and right delimeter inside string value.
+	 * 
+	 * @param  {String} txt Input string
+	 * @param  {String} leftDelimeter  one or more characters
+	 * @param  {String} rightDelimeter one or more characters
+	 * @method match
+	 * @static
+	 * @return {Array}
+	 */
+	onix.match = function(txt, leftDelimeter, rightDelimeter) {
+		let matches = [];
+		let open = 0;
+		let ldl = leftDelimeter.length;
+		let rdl = rightDelimeter.length;
+		let match = "";
+
+		for (let i = 0; i < txt.length; i++) {
+			let item = txt[i];
+			let lpos = i - ldl + 1;
+			let rpos = i - rdl + 1;
+
+			// one sign - only check; more - check current + prev items to match leftDelimeter
+			if ((ldl == 1 && item == leftDelimeter) || (ldl > 1 && (lpos >= 0 ? txt.substr(lpos, ldl) : "") == leftDelimeter)) {
+				open++;
+
+				if (open == 1) {
+					continue;
+				}
+			}
+
+			// same as left + remove
+			if ((rdl == 1 && item == rightDelimeter) || (rdl > 1 && (rpos >= 0 ? txt.substr(rpos, rdl) : "") == rightDelimeter)) {
+				open--;
+
+				if (rdl > 1) {
+					// remove rightDelimeter rest parts
+					match = match.substr(0, match.length - rdl + 1);
+				}
+			}
+
+			if (open > 0) {
+				match += item;
+			}
+
+			if (!open && match.length) {
+				matches.push(match);
+				match = "";
+			}
+		}
+
+		return matches;
+	};
+
+	/**
+	 * Split string with delimeter. Similar to string.split(), but keeps opening strings/brackets in the memory.
+	 * "5, {x:5, c: 6}, 'Roman, Peter'".split(",") => ["5", " {x:5", " c: 6}", " 'Roman", " Peter'"]
+	 * onix.split("5, {x:5, c: 6}, 'Roman, Peter'", ",") => ["5", "{x:5, c: 6}", "'Roman, Peter"]
+	 * 
+	 * @param  {String} txt Input string
+	 * @param  {String} delimeter one character splitter
+	 * @method match
+	 * @static
+	 * @return {Array}
+	 */
+	onix.split = function(txt, delimeter) {
+		txt = txt || "";
+		delimeter = delimeter || ",";
+
+		let open = 0;
+		let matches = [];
+		let match = "";
+		let strStart = false;
+		let len = txt.length;
+
+		for (let i = 0; i < len; i++) {
+			let item = txt[i];
+
+			switch (item) {
+				case "'":
+				case '"':
+					if (strStart) {
+						strStart = false;
+						open--;
+					}
+					else {
+						strStart = true;
+						open++;
+					}
+					break;
+
+				case "{":
+				case "[":
+					open++;
+					break;
+
+				case "}":
+				case "]":
+					open--;
+					break;
+			}
+
+			// delimeter
+			if (item == delimeter && !open) {
+				if (match.length) {
+					matches.push(match);
+				}
+
+				match = "";
+			}
+			else {
+				match += item;
+			}
+
+			// end
+			if (i == len - 1 && match.length) {
+				matches.push(match);
+			}
+		}
+
+		return matches;
+	};
+
+	/**
 	 * Framework info.
 	 *
-	 * version: 2.7.8
-	 * date: 14. 7. 2016
+	 * version: 2.7.9
+	 * date: 17. 7. 2016
 	 * @member onix
 	 * @static
 	 */

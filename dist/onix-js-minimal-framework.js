@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.8/14. 7. 2016
+ * 2.7.9/17. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * minimal version: contains [src/libs/polyfills.js, src/onix/onix.js, src/onix/filter.js]
@@ -351,26 +351,9 @@
 		})();
 	}
 })();
-var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
 	/* ************************************* $module **************************** */
 	/**
@@ -1078,16 +1061,118 @@ onix = function () {
   */
 	onix.noop = $modulesInst.noop;
 	/**
+  * Return all occurences between left and right delimeter inside string value.
+  * 
+  * @param  {String} txt Input string
+  * @param  {String} leftDelimeter  one or more characters
+  * @param  {String} rightDelimeter one or more characters
+  * @method match
+  * @static
+  * @return {Array}
+  */
+	onix.match = function (txt, leftDelimeter, rightDelimeter) {
+		var matches = [];
+		var open = 0;
+		var ldl = leftDelimeter.length;
+		var rdl = rightDelimeter.length;
+		var match = "";
+		for (var i = 0; i < txt.length; i++) {
+			var item = txt[i];
+			var lpos = i - ldl + 1;
+			var rpos = i - rdl + 1;
+			// one sign - only check; more - check current + prev items to match leftDelimeter
+			if (ldl == 1 && item == leftDelimeter || ldl > 1 && (lpos >= 0 ? txt.substr(lpos, ldl) : "") == leftDelimeter) {
+				open++;
+				if (open == 1) {
+					continue;
+				}
+			}
+			// same as left + remove
+			if (rdl == 1 && item == rightDelimeter || rdl > 1 && (rpos >= 0 ? txt.substr(rpos, rdl) : "") == rightDelimeter) {
+				open--;
+				if (rdl > 1) {
+					// remove rightDelimeter rest parts
+					match = match.substr(0, match.length - rdl + 1);
+				}
+			}
+			if (open > 0) {
+				match += item;
+			}
+			if (!open && match.length) {
+				matches.push(match);
+				match = "";
+			}
+		}
+		return matches;
+	};
+	/**
+  * Split string with delimeter. Similar to string.split(), but keeps opening strings/brackets in the memory.
+  * "5, {x:5, c: 6}, 'Roman, Peter'".split(",") => ["5", " {x:5", " c: 6}", " 'Roman", " Peter'"]
+  * onix.split("5, {x:5, c: 6}, 'Roman, Peter'", ",") => ["5", "{x:5, c: 6}", "'Roman, Peter"]
+  * 
+  * @param  {String} txt Input string
+  * @param  {String} delimeter one character splitter
+  * @method match
+  * @static
+  * @return {Array}
+  */
+	onix.split = function (txt, delimeter) {
+		txt = txt || "";
+		delimeter = delimeter || ",";
+		var open = 0;
+		var matches = [];
+		var match = "";
+		var strStart = false;
+		var len = txt.length;
+		for (var i = 0; i < len; i++) {
+			var item = txt[i];
+			switch (item) {
+				case "'":
+				case '"':
+					if (strStart) {
+						strStart = false;
+						open--;
+					} else {
+						strStart = true;
+						open++;
+					}
+					break;
+				case "{":
+				case "[":
+					open++;
+					break;
+				case "}":
+				case "]":
+					open--;
+					break;
+			}
+			// delimeter
+			if (item == delimeter && !open) {
+				if (match.length) {
+					matches.push(match);
+				}
+				match = "";
+			} else {
+				match += item;
+			}
+			// end
+			if (i == len - 1 && match.length) {
+				matches.push(match);
+			}
+		}
+		return matches;
+	};
+	/**
   * Framework info.
   *
-  * version: 2.7.8
-  * date: 14. 7. 2016
+  * version: 2.7.9
+  * date: 17. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.8/14. 7. 2016\n'+
+'2.7.9/17. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+

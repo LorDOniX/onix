@@ -101,7 +101,8 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 		});
 		document.body.insertBefore(menuEl, document.body.firstChild);
 		// old browsers menu fix
-		if (!$features.MEDIA_QUERY) {
+		var hasMediaQuery = $features ? $features.MEDIA_QUERY : "matchMedia" in window && "matches" in window.matchMedia("(min-width: 500px)");
+		if (!hasMediaQuery) {
 			document.body.classList.add("no-media-query");
 		}
 	};
@@ -281,7 +282,12 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 		}, {
 			key: "buttonClick",
 			value: function buttonClick(el, event) {
-				console.log(el, event);
+				var args = arguments;
+				console.log(args);
+				if (args.length == 8) {
+					var fn = args[7];
+					$common.col("fnTest {0}", fn());
+				}
 				// loader
 				$loader.start();
 				// test for once events
@@ -543,6 +549,11 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 			value: function others() {
 				$common.col("$common.col with string only");
 				$common.col("i18n trans {0}, missing {1}", _("home_page.testData"), _("home_page.notExists"));
+				//$common.col("i18n plural: 0 => {0}, 1 => {1}, 10 => {2}", _("home_page.plural", { COUNT: 0 }), _("home_page.plural", { COUNT: 1 }), _("home_page.plural", { COUNT: 10 }));
+				$common.col("i18n plural: 0 => {0}", _("home_page.plural", { COUNT: 0 }));
+				var s2 = "There was {   COUNT , plural, one{car} few{cars} other{ cars  }    } {hi} aa    {   daads }   ";
+				console.log(s2);
+				console.log(_(s2));
 			}
 		}, {
 			key: "allTests",

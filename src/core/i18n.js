@@ -39,35 +39,31 @@ onix.provider("$i18n", function() {
 		translate = translate || "";
 		replace = replace || {};
 
-		let replaceParts = translate.match(/{[^}]+,.*}|{[^}]*}/g);
+		let leftDelimeter = "{";
+		let rightDelimeter = "}";
 
-		if (replaceParts) {
+		// message format delimeters
+		let replaceParts = onix.match(translate, leftDelimeter, rightDelimeter);
+
+		if (replaceParts.length) {
 			let finalReplace = {};
 
 			replaceParts.forEach(part => {
-				let key = part;
+				let parts = part.split(",");
 
-				if (key.length > 2) {
-					key = key.substr(1, key.length - 2);
-				}
+				if (!parts.length) return;
 
-				// multi
-				let parts = key.split(",");
-				let name = parts[0].trim();
+				// first is variable name
+				let name = parts.shift().trim();
 				let multiPartsObj = {};
+				let multiParts = parts.join(" ").match(/[a-zA-Z0-9_]+{[^}]*}/g);
 
-				if (parts.length == 2) {
-					let multiParts = parts[1].match(/[a-zA-Z0-9_]+{[^}]*}/g);
+				if (multiParts) {
+					multiParts.forEach(mpart => {
+						let mpartSplits = mpart.match(/([a-zA-Z0-9_]+){([^}]*)/);
 
-					if (multiParts) {
-						multiParts.forEach(mpart => {
-							let mpartSplits = mpart.split("{");
-							let mpartValue = mpartSplits[1];
-							mpartValue = mpartValue.substr(0, mpartValue.length - 1);
-
-							multiPartsObj[mpartSplits[0].trim()] = mpartValue;
-						});
-					}
+						multiPartsObj[mpartSplits[1].trim()] = mpartSplits[2].trim();
+					});
 				}
 
 				let replaceValue = name in replace ? replace[name] : "";
@@ -93,11 +89,11 @@ onix.provider("$i18n", function() {
 					replaceValue = multiKey in multiPartsObj ? multiPartsObj[multiKey] : "";
 				}
 
-				finalReplace[part] = replaceValue;
+				finalReplace[leftDelimeter + part + rightDelimeter] = replaceValue;
 			});
 
 			Object.keys(finalReplace).forEach(key => {
-				translate = translate.replace(new RegExp(key, "g"), finalReplace[key]);
+				translate = translate.replaceAll(key, finalReplace[key]);
 			});
 		}
 

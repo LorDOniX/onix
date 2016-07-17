@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.7.9 (17. 7. 2016)
+
+* onix.match - similar to string.match() with own delimeters
+* onix.split - similar to string.split() with own delimeter
+* $i18n - regular expressions refactoring; uses onix.match|onix.split
+* $template - regular expressions refactoring; uses onix.match|onix.split
+
 ## 2.7.8 (14. 7. 2016)
 
 * bundler - has his own directory

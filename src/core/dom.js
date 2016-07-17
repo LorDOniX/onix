@@ -113,6 +113,8 @@ function(
 		parent = parent || document;
 		
 		let output;
+		// remove .# and white space from the beginning of the string
+		let rexp = /^[.# ]+/g;
 
 		if (typeof els === "string" && els) {
 			output = parent.querySelector(els);
@@ -124,12 +126,12 @@ function(
 				let name;
 
 				if (typeof item === "string") {
-					name = item.replace(/^[.# ]+/g, "");
+					name = item.replace(rexp, "");
 
 					output[name] = parent.querySelector(item);
 				}
 				else {
-					name = item.sel.replace(/^[.# ]+/g, "");
+					name = item.sel.replace(rexp, "");
 
 					output[item.name || name] = parent.querySelector(item.sel);
 				}
