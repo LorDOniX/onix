@@ -33,10 +33,11 @@ function(
 	 * @param  {Array} opts.args Additional arguments for function
 	 * @param  {Function} resolve Resolve callback for $promise
 	 * @param  {Array} outArray Array for output from all executed promises
+	 * @param  {Number} rejected Number of rejected promises
 	 * @private
 	 * @member $common
 	 */
-	this._chainPromisesInner = function(opts, resolve, outArray) {
+	this._chainPromisesInner = function(opts, resolve, outArray, rejected) {
 		let firstItem = opts.shift();
 
 		if (firstItem) {
@@ -68,19 +69,84 @@ function(
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then((data) => {
 					outArray.push(data);
 
-					this._chainPromisesInner(opts, resolve, outArray);
+					this._chainPromisesInner(opts, resolve, outArray, rejected);
 				}, (err) => {
 					outArray.push(err);
 
-					this._chainPromisesInner(opts, resolve, outArray);
+					this._chainPromisesInner(opts, resolve, outArray, rejected + 1);
 				});
 			}
 			else {
-				resolve(outArray);
+				resolve({
+					output: outArray,
+					rejected: rejected
+				});
 			}
 		}
 		else {
-			resolve(outArray);
+			resolve({
+				output: outArray,
+				rejected: rejected
+			});
+		}
+	};
+
+	/**
+	 * Clone value without references.
+	 * 
+	 * @param  {Object} value Input value
+	 * @param  {Number} [lvl] Recursive threshold
+	 * @return {Object} cloned value
+	 * @member $common
+	 */
+	this._cloneValue = function(value, lvl) {
+		lvl = lvl || 0;
+
+		// recursive call threshold
+		if (lvl > 100) return null;
+
+		switch (typeof value) {
+			case "object":
+				if (Array.isArray(value)) {
+					// array
+					let newArray = [];
+
+					value.forEach(item => {
+						newArray.push(this._cloneValue(item, lvl + 1));
+					});
+
+					return newArray;
+				}
+				else if (value && value instanceof Date) {
+					// date
+					return new Date(value.getTime());
+				}
+				else if (this.isElement(value)) {
+					// element
+					return value;
+				}
+				else if (value) {
+					// object
+					let newObj = {};
+
+					Object.keys(value).forEach(prop => {
+						if (value.hasOwnProperty(prop)) {
+							newObj[prop] = this._cloneValue(value[prop], lvl + 1);
+						}
+					});
+
+					return newObj;
+				}
+				else {
+					// null
+					return null;
+				}
+
+			case "undefined":
+			case "function":
+			case "number":
+			case "string":
+				return value;
 		}
 	};
 
@@ -141,59 +207,11 @@ function(
 	 * Clone value without references.
 	 * 
 	 * @param  {Object} value Input value
-	 * @param  {Number} [lvl] Recursive threshold
 	 * @return {Object} cloned value
 	 * @member $common
 	 */
-	this.cloneValue = function(value, lvl) {
-		lvl = lvl || 1;
-
-		// recursive call threshold
-		if (lvl > 100) return null;
-
-		switch (typeof value) {
-			case "object":
-				if (Array.isArray(value)) {
-					// array
-					let newArray = [];
-
-					value.forEach(item => {
-						newArray.push(this.cloneValue(item, lvl + 1));
-					});
-
-					return newArray;
-				}
-				else if (value && value instanceof Date) {
-					// date
-					return new Date(value.getTime());
-				}
-				else if (this.isElement(value)) {
-					// element
-					return value;
-				}
-				else if (value) {
-					// object
-					let newObj = {};
-
-					Object.keys(value).forEach(prop => {
-						if (value.hasOwnProperty(prop)) {
-							newObj[prop] = this.cloneValue(value[prop], lvl + 1);
-						}
-					});
-
-					return newObj;
-				}
-				else {
-					// null
-					return null;
-				}
-
-			case "undefined":
-			case "function":
-			case "number":
-			case "string":
-				return value;
-		}
+	this.cloneValue = function(value) {
+		return this._cloneValue(value, 0);
 	};
 
 	/**
@@ -405,12 +423,12 @@ function(
 	 * @param  {String|Function} opts.method Function or method name inside scope
 	 * @param  {Object} opts.scope Scope for method function
 	 * @param  {Array} opts.args Additional arguments for function
-	 * @return {$promise}
+	 * @return {$promise} Resolve with object { outArray: [promise outputs], rejected: 0..n count of rejected promise }
 	 * @member $common
 	 */
 	this.chainPromises = function(opts) {
 		return new $promise(resolve => {
-			this._chainPromisesInner(opts, resolve, []);
+			this._chainPromisesInner(opts, resolve, [], 0);
 		});
 	};
 

@@ -2,6 +2,8 @@
 
 var chokidar = require('chokidar');
 
+var Common = require("./common");
+
 class Watcher {
 	constructor() {
 		this._timeoutID = null;
@@ -36,7 +38,7 @@ class Watcher {
 	start() {
 		if (!this._paths.length) return;
 
-		console.log("Watcher is starting...");
+		Common.col("Watcher is starting...");
 
 		this._handler = chokidar.watch(this._paths).on('change', (path, stats) => {
 			this._buffer.push(path);

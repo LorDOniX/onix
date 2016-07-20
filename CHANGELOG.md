@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.8.0 (20. 7. 2016)
+
+* bundler update - fixes, ES6 error output; uglify IE8 fix;
+* common - chainPromises resolved now with object (+rejected key)
+* $common - chainPromises resolved now with object (+rejected key); cloneValue remove recursive arg (_cloneValue);
+* $myQuery - add mouseWheel event; bind and unbind method for add/remove event listener
+* test site with docs menu item
+
 ## 2.7.9 (17. 7. 2016)
 
 * onix.match - similar to string.match() with own delimeters

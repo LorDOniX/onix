@@ -20,6 +20,10 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 		TEST: {
 			name: "Test",
 			url: "/test"
+		},
+		DOCS: {
+			name: "Documentation",
+			url: "/docs"
 		}
 	};
 	this._createFromObj = function (config) {
@@ -57,7 +61,7 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 	this.create = function (activePage) {
 		var pagesLi = [];
 		// pages order
-		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER, this.PAGES.TEST].forEach(function (page, ind) {
+		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER, this.PAGES.TEST, this.PAGES.DOCS].forEach(function (page, ind) {
 			var pageObj = {
 				el: "li",
 				child: [{
@@ -537,12 +541,17 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 						console.log("click on div");
 					});
 				});
-				onix.element(document).keydown(function (e) {
+				var doc = onix.element(document).keydown(function (event, el, mqRef) {
 					console.log("document keydown");
+					console.log(arguments);
+					console.log(this);
+					mqRef.unbind("keydown");
 				});
-				onix.element(document).click(function (e) {
+				var clickFn = function clickFn(e, el, mqRef) {
 					console.log("document click");
-				});
+				};
+				doc.bind("click", clickFn);
+				doc.unbind("click", clickFn);
 			}
 		}, {
 			key: "others",

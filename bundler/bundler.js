@@ -27,19 +27,19 @@ class Bundler {
 
 		Common.col("Bundler help");
 		Common.col("------------");
-		Common.col("./bundler.js watch - watch and compile js & less files");
-		Common.col("./bundler.js dev - compile for dev");
-		Common.col("./bundler.js dist - compile for dist");
-		Common.col("./bundler.js doc - documentation");
-		Common.col("./bundler.js clear - clear ES6 cache");
-		Common.col("./bundler.js - default is watch option");
-		Common.col("./bundler.js --force - always rewrite output files (disable cache)");
+		Common.col("watch - watch and compile js & less files");
+		Common.col("dev   - compile for dev");
+		Common.col("dist  - compile for dist");
+		Common.col("doc   - documentation");
+		Common.col("clear - clear ES6 cache");
+		Common.col("- default is watch option");
+		Common.col("--force - always rewrite output files (disable cache)");
 
-		let firstArg = this._args.length ? this._args[0] : "";
-
-		if (this._args.length == 2 && this._args[1] == "--force") {
+		if (this._args.indexOf("--force") != -1) {
 			this._myES6.alwaysRewrite();
 		}
+
+		let firstArg = this._args.length ? this._args[0] : "";
 
 		// pre files operations
 		switch (firstArg) {
@@ -74,7 +74,9 @@ class Bundler {
 	 * @return {String} one optinal parameter
 	 */
 	_getArgs() {
-		return Array.prototype.slice.call(process.argv, 2);
+		return Array.prototype.slice.call(process.argv, 2).map(arg => {
+			return arg.trim();
+		});
 	}
 
 	_getBundles(run) {
@@ -159,25 +161,31 @@ class Bundler {
 					if (bundle.watchPath == path) {
 						Common.col("-");
 						Common.col("File change {0}:", file);
-						Common.chainPromises([this._runBundle(bundle, "dev")]).then(ok => {
-							let sendObj = {
-								id: bundle.id,
-								operation: "",
-								data: {}
-							};
-							
-							switch (bundle.type) {
-								case "js":
-									sendObj.operation = "refresh-page";
-									break;
 
-								case "less":
-									sendObj.operation = "refresh-css";
-									sendObj.data.file = pathObj.basename(bundle.output);
-									break;
+						Common.chainPromises([this._runBundle(bundle, "dev")]).then(cpData => {
+							if (cpData.rejected) {
+								Common.col("Bundle was rejected, nothings to be done!");
 							}
+							else {
+								let sendObj = {
+									id: bundle.id,
+									operation: "",
+									data: {}
+								};
+								
+								switch (bundle.type) {
+									case "js":
+										sendObj.operation = "refresh-page";
+										break;
 
-							this._websocket.send(sendObj);
+									case "less":
+										sendObj.operation = "refresh-css";
+										sendObj.data.file = pathObj.basename(bundle.output);
+										break;
+								}
+
+								this._websocket.send(sendObj);
+							}
 						});
 
 						return false;
@@ -269,7 +277,7 @@ class Bundler {
 
 		return {
 			method: () => {
-				return new Promise(resolve => {
+				return new Promise((resolve, reject) => {
 					switch (bundle.type) {
 						case "js":
 							this._myES6.makeJS(bundle, run).then(ok => {
@@ -280,7 +288,7 @@ class Bundler {
 							}, err => {
 								Common.col(err);
 
-								resolve();
+								reject();
 							});
 							break;
 
@@ -293,7 +301,7 @@ class Bundler {
 							}, err => {
 								Common.col(err);
 
-								resolve();
+								reject();
 							});
 							break;
 					}

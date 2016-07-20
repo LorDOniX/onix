@@ -15,6 +15,7 @@ function(
 	class $myQuery {
 		constructor(value, parent) {
 			this._els = this._getElementsFromValue(value, parent);
+			this._eventsCache = {};
 
 			return this;
 		}
@@ -152,9 +153,22 @@ function(
 		 */
 		_bindEvent(eventName, cb, scope) {
 			this._operation(item => {
-				item.addEventListener(eventName, event => {
-					cb.apply(scope || cb, [event, item]);
-				});
+				// create new item in events cache
+				if (!this._eventsCache[eventName]) {
+					this._eventsCache[eventName] = [];
+				}
+
+				let eventObj = {
+					item: item,
+					cb: cb,
+					bindFn: event => {
+						cb.apply(scope || item, [event, item, this]);
+					}
+				};
+
+				this._eventsCache[eventName].push(eventObj);
+
+				item.addEventListener(eventName, eventObj.bindFn);
 			});
 
 			return this;
@@ -480,6 +494,19 @@ function(
 		}
 
 		/**
+		 * Mouse move event.
+		 *
+		 * @chainable
+		 * @param  {Function} cb
+		 * @param  {Function} [scope]
+		 * @member $myQuery
+		 * @method mouseleave
+		 */
+		mousemove(cb, scope) {
+			return this._bindEvent("DOMMouseScroll", cb, scope)._bindEvent("mousewheel", cb, scope);
+		}
+
+		/**
 		 * Key down event.
 		 *
 		 * @chainable
@@ -734,6 +761,53 @@ function(
 			let docOffset = document.body.scrollLeft;
 
 			return el ? el.scrollLeft + docOffset : docOffset + 0;
+		}
+
+		/**
+		 * Bind event to the element.
+		 * 
+		 * @param {String} eventType click, mousedown etc.
+		 * @param {Function} handler Event callback function
+		 * @param {Object} [scope] Handler scope
+		 * @chainable
+		 * @member $myQuery
+		 * @method bind
+		 */
+		bind(eventType, handler, scope) {
+			if (eventType && typeof handler === "function") {
+				this._bindEvent(eventType, handler, scope);
+			}
+
+			return this;
+		}
+
+		/**
+		 * Unbind events.
+		 * 
+		 * @param {String} eventType click, mousedown etc.
+		 * @param {Function} [handler] Event callback function
+		 * @chainable
+		 * @member $myQuery
+		 * @method unbind
+		 */
+		unbind(eventType, handler) {
+			if (eventType) {
+				let all = this._eventsCache[eventType] || [];
+				let len = all.length - 1;
+
+				for (let i = len; i >= 0; i--) {
+					let eventItem = all[i];
+
+					if (!handler || (typeof handler === "function" && eventItem.cb == handler)) {
+						eventItem.item.removeEventListener(eventType, eventItem.bindFn);
+
+						// remove
+						all.splice(i, 1);
+					}
+				}
+			}
+
+			return this;
 		}
 	};
 

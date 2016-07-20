@@ -14,14 +14,7 @@ app.use("/templ", express.static(path.join(__dirname, MAIN_PATH + '/templ')));
 app.use("/locale", express.static(path.join(__dirname, MAIN_PATH + '/locale')));
 app.use("/img", express.static(path.join(__dirname, MAIN_PATH + '/img')));
 app.use("/dist", express.static(path.join(__dirname, 'dist')));
-
-// test api
-app.get("/api/home/", function(req, res) {
-	res.json({
-		name: "test API item",
-		value: 42
-	});
-});
+app.use("/docs", express.static(path.join(__dirname, 'docs')));
 
 // test
 app.get('/test', function(req, res) {
@@ -41,6 +34,11 @@ app.get('/anonymizer', function(req, res) {
 // minimal
 app.get('/minimal', function(req, res) {
 	res.sendfile(MAIN_PATH + '/minimal.html');
+});
+
+// docs
+app.get('/docs', function(req, res) {
+	res.sendfile('docs/index.html');
 });
 
 // default

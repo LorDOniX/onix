@@ -25,6 +25,10 @@ function(
 		TEST: {
 			name: "Test",
 			url: "/test"
+		},
+		DOCS: {
+			name: "Documentation",
+			url: "/docs"
 		}
 	};
 
@@ -80,7 +84,8 @@ function(
 			this.PAGES.MINIMAL,
 			this.PAGES.ANONYMIZER,
 			this.PAGES.CROPPER,
-			this.PAGES.TEST
+			this.PAGES.TEST,
+			this.PAGES.DOCS
 		]
 		.forEach(function(page, ind) {
 			var pageObj = {

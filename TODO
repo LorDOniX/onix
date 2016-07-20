@@ -1,5 +1,6 @@
 TODO:
 - uglify EOF windows ERROR
+- uglify - some version add default screw-ie8 > "class" -> uglify -> class
 
 JSDUCK:
 - https://github.com/senchalabs/jsduck/wiki

@@ -435,13 +435,20 @@ function(
 				})
 			});
 
-			onix.element(document).keydown(e => {
+			let doc = onix.element(document).keydown(function(event, el, mqRef) {
 				console.log("document keydown");
+				console.log(arguments);
+				console.log(this);
+
+				mqRef.unbind("keydown");
 			});
 
-			onix.element(document).click(e => {
+			let clickFn = (e, el, mqRef) => {
 				console.log("document click");
-			});
+			};
+
+			doc.bind("click", clickFn);
+			doc.unbind("click", clickFn);
 		}
 
 		others() {

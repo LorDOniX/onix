@@ -1,6 +1,7 @@
 "use strict";
 
 var webSocketServer = require('ws').Server;
+
 var Common = require("./common");
 
 class Websocket {

@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.7.9/17. 7. 2016
+ * 2.8.0/20. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1066,9 +1066,11 @@
 		});
 	}
 }.call(this));
-var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-var _createClass2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-function _classCallCheck2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
 	/* ************************************* $module **************************** */
 	/**
@@ -1085,7 +1087,7 @@ onix = function () {
    * @param  {Array} dependencies Other modules dependencies
    */
 		function $module(name, dependencies) {
-			_classCallCheck2(this, $module);
+			_classCallCheck(this, $module);
 			/**
     * All objects.
     *
@@ -1137,7 +1139,7 @@ onix = function () {
    * @static
    * @method parseParam
    */
-		_createClass2($module, [{
+		_createClass($module, [{
 			key: "getDependencies",
 			/**
     * Get dependencies.
@@ -1493,8 +1495,8 @@ onix = function () {
   */
 	var $modules = function () {
 		function $modules() {
-			var _this6 = this;
-			_classCallCheck2(this, $modules);
+			var _this = this;
+			_classCallCheck(this, $modules);
 			/**
     * All modules array.
     *
@@ -1523,7 +1525,7 @@ onix = function () {
 			};
 			// bind DOM ready
 			document.addEventListener("DOMContentLoaded", function () {
-				_this6._domLoad();
+				_this._domLoad();
 			});
 		}
 		/**
@@ -1533,18 +1535,18 @@ onix = function () {
    * @private
    * @method _domLoad
    */
-		_createClass2($modules, [{
+		_createClass($modules, [{
 			key: "_domLoad",
 			value: function _domLoad() {
-				var _this7 = this;
+				var _this2 = this;
 				var configs = [];
 				var runs = [];
 				this._modules.forEach(function (module) {
 					var error = false;
 					var dependencies = module.getDependencies();
 					dependencies.every(function (dep) {
-						if (!(dep in _this7._modulesObj)) {
-							console.error("Module '" + _this7._name + "' dependency '" + dep + "' not found!");
+						if (!(dep in _this2._modulesObj)) {
+							console.error("Module '" + _this2._name + "' dependency '" + dep + "' not found!");
 							error = true;
 							return false;
 						} else {
@@ -1558,11 +1560,11 @@ onix = function () {
 				});
 				// run all configs
 				configs.forEach(function (config) {
-					_this7.run(config, true);
+					_this2.run(config, true);
 				});
 				// run all runs
 				runs.forEach(function (run) {
-					_this7.run(run);
+					_this2.run(run);
 				});
 			}
 			/**
@@ -1634,7 +1636,7 @@ onix = function () {
 		}, {
 			key: "run",
 			value: function run(obj, isConfig, parent) {
-				var _this8 = this;
+				var _this3 = this;
 				parent = parent || [];
 				if (parent.indexOf(obj.name) != -1) {
 					console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
@@ -1656,14 +1658,14 @@ onix = function () {
 				if (obj.inject && obj.inject.length) {
 					obj.inject.forEach(function (objName) {
 						if (typeof objName === "string") {
-							var injObj = _this8._getObject(objName);
+							var injObj = _this3._getObject(objName);
 							if (!injObj) {
 								console.error("Object name: " + objName + " not found!");
 								inject.push(null);
 							} else {
-								inject.push(_this8.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+								inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 							}
-						} else if ((typeof objName === "undefined" ? "undefined" : _typeof2(objName)) === "object") {
+						} else if ((typeof objName === "undefined" ? "undefined" : _typeof(objName)) === "object") {
 							inject.push(objName);
 						}
 					});
@@ -1880,14 +1882,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.7.9
-  * date: 17. 7. 2016
+  * version: 2.8.0
+  * date: 20. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.7.9/17. 7. 2016\n'+
+'2.8.0/20. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -1969,11 +1971,6 @@ onix.factory("$filter", ["$di", function ($di) {
 		});
 	};
 }]);
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
 /**
  * Commom functions used in whole application.
  *
@@ -1989,10 +1986,10 @@ onix.service("$common", ["$promise", function ($promise) {
   * @private
   */
 	this._objCopy = function (dest, source) {
-		var _this = this;
+		var _this4 = this;
 		Object.keys(source).forEach(function (prop) {
 			if (source.hasOwnProperty(prop)) {
-				dest[prop] = _this.cloneValue(source[prop]);
+				dest[prop] = _this4.cloneValue(source[prop]);
 			}
 		});
 	};
@@ -2005,11 +2002,12 @@ onix.service("$common", ["$promise", function ($promise) {
   * @param  {Array} opts.args Additional arguments for function
   * @param  {Function} resolve Resolve callback for $promise
   * @param  {Array} outArray Array for output from all executed promises
+  * @param  {Number} rejected Number of rejected promises
   * @private
   * @member $common
   */
-	this._chainPromisesInner = function (opts, resolve, outArray) {
-		var _this2 = this;
+	this._chainPromisesInner = function (opts, resolve, outArray, rejected) {
+		var _this5 = this;
 		var firstItem = opts.shift();
 		if (firstItem) {
 			// string or function itself
@@ -2035,16 +2033,80 @@ onix.service("$common", ["$promise", function ($promise) {
 			if (!error) {
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then(function (data) {
 					outArray.push(data);
-					_this2._chainPromisesInner(opts, resolve, outArray);
+					_this5._chainPromisesInner(opts, resolve, outArray, rejected);
 				}, function (err) {
 					outArray.push(err);
-					_this2._chainPromisesInner(opts, resolve, outArray);
+					_this5._chainPromisesInner(opts, resolve, outArray, rejected + 1);
 				});
 			} else {
-				resolve(outArray);
+				resolve({
+					output: outArray,
+					rejected: rejected
+				});
 			}
 		} else {
-			resolve(outArray);
+			resolve({
+				output: outArray,
+				rejected: rejected
+			});
+		}
+	};
+	/**
+  * Clone value without references.
+  * 
+  * @param  {Object} value Input value
+  * @param  {Number} [lvl] Recursive threshold
+  * @return {Object} cloned value
+  * @member $common
+  */
+	this._cloneValue = function (value, lvl) {
+		var _this6 = this;
+		lvl = lvl || 0;
+		// recursive call threshold
+		if (lvl > 100) return null;
+		switch (typeof value === "undefined" ? "undefined" : _typeof(value)) {
+			case "object":
+				if (Array.isArray(value)) {
+					var _ret = function () {
+						// array
+						var newArray = [];
+						value.forEach(function (item) {
+							newArray.push(_this6._cloneValue(item, lvl + 1));
+						});
+						return {
+							v: newArray
+						};
+					}();
+					if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+				} else if (value && value instanceof Date) {
+					// date
+					return new Date(value.getTime());
+				} else if (this.isElement(value)) {
+					// element
+					return value;
+				} else if (value) {
+					var _ret2 = function () {
+						// object
+						var newObj = {};
+						Object.keys(value).forEach(function (prop) {
+							if (value.hasOwnProperty(prop)) {
+								newObj[prop] = _this6._cloneValue(value[prop], lvl + 1);
+							}
+						});
+						return {
+							v: newObj
+						};
+					}();
+					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+				} else {
+					// null
+					return null;
+				}
+			case "undefined":
+			case "function":
+			case "number":
+			case "string":
+				return value;
 		}
 	};
 	/**
@@ -2096,59 +2158,11 @@ onix.service("$common", ["$promise", function ($promise) {
   * Clone value without references.
   * 
   * @param  {Object} value Input value
-  * @param  {Number} [lvl] Recursive threshold
   * @return {Object} cloned value
   * @member $common
   */
-	this.cloneValue = function (value, lvl) {
-		var _this3 = this;
-		lvl = lvl || 1;
-		// recursive call threshold
-		if (lvl > 100) return null;
-		switch (typeof value === "undefined" ? "undefined" : _typeof(value)) {
-			case "object":
-				if (Array.isArray(value)) {
-					var _ret = function () {
-						// array
-						var newArray = [];
-						value.forEach(function (item) {
-							newArray.push(_this3.cloneValue(item, lvl + 1));
-						});
-						return {
-							v: newArray
-						};
-					}();
-					if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
-				} else if (value && value instanceof Date) {
-					// date
-					return new Date(value.getTime());
-				} else if (this.isElement(value)) {
-					// element
-					return value;
-				} else if (value) {
-					var _ret2 = function () {
-						// object
-						var newObj = {};
-						Object.keys(value).forEach(function (prop) {
-							if (value.hasOwnProperty(prop)) {
-								newObj[prop] = _this3.cloneValue(value[prop], lvl + 1);
-							}
-						});
-						return {
-							v: newObj
-						};
-					}();
-					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
-				} else {
-					// null
-					return null;
-				}
-			case "undefined":
-			case "function":
-			case "number":
-			case "string":
-				return value;
-		}
+	this.cloneValue = function (value) {
+		return this._cloneValue(value, 0);
 	};
 	/**
   * Inherit function with another function/s.
@@ -2327,13 +2341,13 @@ onix.service("$common", ["$promise", function ($promise) {
   * @param  {String|Function} opts.method Function or method name inside scope
   * @param  {Object} opts.scope Scope for method function
   * @param  {Array} opts.args Additional arguments for function
-  * @return {$promise}
+  * @return {$promise} Resolve with object { outArray: [promise outputs], rejected: 0..n count of rejected promise }
   * @member $common
   */
 	this.chainPromises = function (opts) {
-		var _this4 = this;
+		var _this7 = this;
 		return new $promise(function (resolve) {
-			_this4._chainPromisesInner(opts, resolve, []);
+			_this7._chainPromisesInner(opts, resolve, [], 0);
 		});
 	};
 	/**
@@ -2551,11 +2565,6 @@ onix.service("$date", function () {
 		return new Date(date.getTime() + addTime);
 	};
 });
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
 /**
  * Class for creating DOM elements and getting their references.
  * 
@@ -2577,7 +2586,7 @@ onix.service("$dom", ["$common", function ($common) {
   * @member $dom
   */
 	this.create = function (config, exported) {
-		var _this = this;
+		var _this8 = this;
 		var el = document.createElement(config.el || "div");
 		Object.keys(config).forEach(function (key) {
 			var value = void 0;
@@ -2615,7 +2624,7 @@ onix.service("$dom", ["$common", function ($common) {
 						value = [value];
 					}
 					value.forEach(function (child) {
-						el.appendChild(_this.create(child, exported));
+						el.appendChild(_this8.create(child, exported));
 					});
 					break;
 				case "_exported":
@@ -2668,20 +2677,6 @@ onix.service("$dom", ["$common", function ($common) {
 		return output;
 	};
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$event", function () {
 	/**
   * This class is used for extending existing objects and brings signal functionality.
@@ -2802,30 +2797,6 @@ onix.factory("$event", function () {
 	;
 	return $event;
 });
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
-function _possibleConstructorReturn(self, call) {
-	if (!self) {
-		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
-}
-function _inherits(subClass, superClass) {
-	if (typeof superClass !== "function" && superClass !== null) {
-		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
-	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
 onix.factory("$resize", ["$event", function ($event) {
 	// ------------------------ private ----------------------------------------
 	/**
@@ -2838,22 +2809,22 @@ onix.factory("$resize", ["$event", function ($event) {
 		function $resize() {
 			_classCallCheck(this, $resize);
 			// event init
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
-			_this._eventInit();
+			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
+			_this9._eventInit();
 			/**
     * Is active?
     *
     * @member $resize
     * @private
     */
-			_this._active = false;
+			_this9._active = false;
 			/**
     * Resize object.
     *
     * @member $resize
     * @private
     */
-			_this._resizeObj = {
+			_this9._resizeObj = {
 				id: null,
 				timeout: 333
 			};
@@ -2863,11 +2834,11 @@ onix.factory("$resize", ["$event", function ($event) {
     * @member $resize
     * @private
     */
-			_this._binds = {
-				resize: _this._resize.bind(_this),
-				resizeInner: _this._resizeInner.bind(_this)
+			_this9._binds = {
+				resize: _this9._resize.bind(_this9),
+				resizeInner: _this9._resizeInner.bind(_this9)
 			};
-			return _this;
+			return _this9;
 		}
 		/**
    * Window resize event.
@@ -2930,11 +2901,6 @@ onix.factory("$resize", ["$event", function ($event) {
 	;
 	return new $resize();
 }]);
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
 /**
  * Filter - lowercase functionality.
  *
@@ -3095,17 +3061,17 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
   * @member $http
   */
 	this.createRequest = function (config) {
-		var _this = this;
+		var _this10 = this;
 		return new $promise(function (resolve, reject) {
 			config = config || {};
 			var request = new XMLHttpRequest();
-			var method = config.method || _this.METHOD.GET;
+			var method = config.method || _this10.METHOD.GET;
 			var url = config.url || "";
 			if (!url) {
 				reject();
 				return;
 			}
-			url = _this._updateURL(url, config.getData);
+			url = _this10._updateURL(url, config.getData);
 			request.onerror = function (err) {
 				reject(err);
 			};
@@ -3146,15 +3112,15 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
 							request.setRequestHeader(headerName, headers[headerName]);
 						});
 					}
-					if (method == _this.METHOD.GET) {
+					if (method == _this10.METHOD.GET) {
 						request.setRequestHeader('Accept', 'application/json');
 					}
-					var type = config.postType || _this.POST_TYPES.JSON;
-					if (config.postData && type == _this.POST_TYPES.JSON) {
+					var type = config.postType || _this10.POST_TYPES.JSON;
+					if (config.postData && type == _this10.POST_TYPES.JSON) {
 						request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 						request.send(JSON.stringify(config.postData));
-					} else if (config.postData && type == _this.POST_TYPES.FORM_DATA) {
-						request.send(_this._preparePostData(config.postData));
+					} else if (config.postData && type == _this10.POST_TYPES.FORM_DATA) {
+						request.send(_this10._preparePostData(config.postData));
 					} else {
 						request.send();
 					}
@@ -3369,9 +3335,9 @@ onix.provider("$i18n", function () {
    */
 		var $i18n = function () {
 			function $i18n() {
-				_classCallCheck2(this, $i18n);
+				_classCallCheck(this, $i18n);
 			}
-			_createClass2($i18n, [{
+			_createClass($i18n, [{
 				key: "_",
 				/**
      * Get text function. Translate for the current language and the key.
@@ -3485,7 +3451,7 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
   * @member $image
   */
 	this.readFromFile = function (file, maxSize) {
-		var _this = this;
+		var _this11 = this;
 		return new $promise(function (resolve, reject) {
 			if (!$features.FILE_READER) {
 				reject();
@@ -3503,12 +3469,12 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 				var exif = null;
 				// exif only for jpeg
 				if (file.type == "image/jpeg" || file.type == "image/pjpeg") {
-					exif = _this.getEXIF(binaryData);
+					exif = _this11.getEXIF(binaryData);
 				}
 				var img = new Image();
 				img.onload = function () {
-					var imd = _this.getImageDim(img, maxSize);
-					var canvas = _this.getCanvas(img, {
+					var imd = _this11.getImageDim(img, maxSize);
+					var canvas = _this11.getCanvas(img, {
 						width: imd.width,
 						height: imd.height,
 						orientation: exif ? exif.Orientation : 0,
@@ -3519,7 +3485,7 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 					output.canvas = canvas;
 					resolve(output);
 				};
-				img.src = _this.fileToBase64(file.type, binaryDataArray);
+				img.src = _this11.fileToBase64(file.type, binaryDataArray);
 			};
 			reader.readAsArrayBuffer(file);
 		});
@@ -3744,20 +3710,6 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 		}
 	};
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$job", ["$promise", function ($promise) {
 	/**
   * Factory for manage multiple tasks.
@@ -3806,17 +3758,17 @@ onix.factory("$job", ["$promise", function ($promise) {
 		}, {
 			key: "start",
 			value: function start() {
-				var _this = this;
+				var _this12 = this;
 				return new $promise(function (resolve, reject) {
-					if (_this._isRunning || !_this._tasks.length) {
+					if (_this12._isRunning || !_this12._tasks.length) {
 						reject();
 						return;
 					}
 					// job is running
-					_this._isRunning = true;
+					_this12._isRunning = true;
 					// because of pop
-					_this._tasks.reverse();
-					_this._doJob(resolve);
+					_this12._tasks.reverse();
+					_this12._doJob(resolve);
 				});
 			}
 			/**
@@ -3854,7 +3806,7 @@ onix.factory("$job", ["$promise", function ($promise) {
     * @method _doJob
     */
 			value: function _doJob(resolve) {
-				var _this2 = this,
+				var _this13 = this,
 				    _arguments = arguments;
 				var rest = this._tasks.length;
 				if (rest == 0) {
@@ -3863,11 +3815,11 @@ onix.factory("$job", ["$promise", function ($promise) {
 				} else {
 					var job = this._tasks.pop();
 					job.task.apply(job.scope || job.task, job.args.concat(function () {
-						if (_this2._taskDone.cb) {
+						if (_this13._taskDone.cb) {
 							var doneFnArgs = Array.prototype.slice.call(_arguments, 0);
-							_this2._taskDone.cb.apply(_this2._taskDone.scope || _this2._taskDone.cb, doneFnArgs);
+							_this13._taskDone.cb.apply(_this13._taskDone.scope || _this13._taskDone.cb, doneFnArgs);
 						}
-						_this2._doJob(resolve);
+						_this13._doJob(resolve);
 					}));
 				}
 			}
@@ -3980,11 +3932,6 @@ onix.factory("$localStorage", ["$features", function ($features) {
 		}
 	};
 }]);
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
 /**
  * Support class for location operations.
  * 
@@ -4046,7 +3993,7 @@ onix.service("$location", function () {
 				window.location.search = newURL;
 			}
 		} else {
-			var _ret = function () {
+			var _ret6 = function () {
 				// read
 				var data = location.search;
 				var output = {};
@@ -4062,7 +4009,7 @@ onix.service("$location", function () {
 					v: output
 				};
 			}();
-			if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+			if ((typeof _ret6 === "undefined" ? "undefined" : _typeof(_ret6)) === "object") return _ret6.v;
 		}
 	};
 	/**
@@ -4322,25 +4269,6 @@ onix.service("$math", function () {
 		}
 	};
 });
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$myQuery", ["$common", function ($common) {
 	/**
   * DOM manipulation in the style of jquery.
@@ -4355,6 +4283,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		function $myQuery(value, parent) {
 			_classCallCheck(this, $myQuery);
 			this._els = this._getElementsFromValue(value, parent);
+			this._eventsCache = {};
 			return this;
 		}
 		/**
@@ -4437,7 +4366,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "_setGetAll",
 			value: function _setGetAll(attr, newValue) {
-				var _this = this;
+				var _this14 = this;
 				if (typeof attr !== "undefined") {
 					if (typeof newValue !== "undefined") {
 						this._operation(function (item) {
@@ -4445,9 +4374,9 @@ onix.factory("$myQuery", ["$common", function ($common) {
 						});
 						return this;
 					} else {
-						var _ret = function () {
+						var _ret7 = function () {
 							var values = [];
-							_this._operation(function (item) {
+							_this14._operation(function (item) {
 								values.push(item[attr]);
 							});
 							if (!values.length) {
@@ -4464,7 +4393,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 								};
 							}
 						}();
-						if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+						if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
 					}
 				} else {
 					return this;
@@ -4483,10 +4412,21 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "_bindEvent",
 			value: function _bindEvent(eventName, cb, scope) {
+				var _this15 = this;
 				this._operation(function (item) {
-					item.addEventListener(eventName, function (event) {
-						cb.apply(scope || cb, [event, item]);
-					});
+					// create new item in events cache
+					if (!_this15._eventsCache[eventName]) {
+						_this15._eventsCache[eventName] = [];
+					}
+					var eventObj = {
+						item: item,
+						cb: cb,
+						bindFn: function bindFn(event) {
+							cb.apply(scope || item, [event, item, _this15]);
+						}
+					};
+					_this15._eventsCache[eventName].push(eventObj);
+					item.addEventListener(eventName, eventObj.bindFn);
 				});
 				return this;
 			}
@@ -4534,7 +4474,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "attr",
 			value: function attr(name, newValue) {
-				var _this2 = this;
+				var _this16 = this;
 				if (typeof name !== "undefined") {
 					if (typeof newValue !== "undefined") {
 						this._operation(function (item) {
@@ -4542,9 +4482,9 @@ onix.factory("$myQuery", ["$common", function ($common) {
 						});
 						return this;
 					} else {
-						var _ret2 = function () {
+						var _ret8 = function () {
 							var values = [];
-							_this2._operation(function (item) {
+							_this16._operation(function (item) {
 								values.push(item.getAttribute(name));
 							});
 							if (!values.length) {
@@ -4561,7 +4501,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 								};
 							}
 						}();
-						if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+						if ((typeof _ret8 === "undefined" ? "undefined" : _typeof(_ret8)) === "object") return _ret8.v;
 					}
 				} else {
 					return this;
@@ -4580,7 +4520,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "css",
 			value: function css(name, newValue) {
-				var _this3 = this;
+				var _this17 = this;
 				if (typeof name !== "undefined") {
 					if (typeof newValue !== "undefined") {
 						this._operation(function (item) {
@@ -4589,7 +4529,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 						return this;
 					} else if ((typeof name === "undefined" ? "undefined" : _typeof(name)) === "object" && !Array.isArray(name)) {
 						Object.keys(name).forEach(function (key) {
-							_this3._operation(function (item) {
+							_this17._operation(function (item) {
 								item.style[$common.cssNameToJS(key)] = name[key];
 							});
 						});
@@ -4816,6 +4756,20 @@ onix.factory("$myQuery", ["$common", function ($common) {
 			key: "mousemove",
 			value: function mousemove(cb, scope) {
 				return this._bindEvent("mousemove", cb, scope);
+			}
+			/**
+    * Mouse move event.
+    *
+    * @chainable
+    * @param  {Function} cb
+    * @param  {Function} [scope]
+    * @member $myQuery
+    * @method mouseleave
+    */
+		}, {
+			key: "mousemove",
+			value: function mousemove(cb, scope) {
+				return this._bindEvent("DOMMouseScroll", cb, scope)._bindEvent("mousewheel", cb, scope);
 			}
 			/**
     * Key down event.
@@ -5075,6 +5029,50 @@ onix.factory("$myQuery", ["$common", function ($common) {
 				var docOffset = document.body.scrollLeft;
 				return el ? el.scrollLeft + docOffset : docOffset + 0;
 			}
+			/**
+    * Bind event to the element.
+    * 
+    * @param {String} eventType click, mousedown etc.
+    * @param {Function} handler Event callback function
+    * @param {Object} [scope] Handler scope
+    * @chainable
+    * @member $myQuery
+    * @method bind
+    */
+		}, {
+			key: "bind",
+			value: function bind(eventType, handler, scope) {
+				if (eventType && typeof handler === "function") {
+					this._bindEvent(eventType, handler, scope);
+				}
+				return this;
+			}
+			/**
+    * Unbind events.
+    * 
+    * @param {String} eventType click, mousedown etc.
+    * @param {Function} [handler] Event callback function
+    * @chainable
+    * @member $myQuery
+    * @method unbind
+    */
+		}, {
+			key: "unbind",
+			value: function unbind(eventType, handler) {
+				if (eventType) {
+					var all = this._eventsCache[eventType] || [];
+					var len = all.length - 1;
+					for (var i = len; i >= 0; i--) {
+						var eventItem = all[i];
+						if (!handler || typeof handler === "function" && eventItem.cb == handler) {
+							eventItem.item.removeEventListener(eventType, eventItem.bindFn);
+							// remove
+							all.splice(i, 1);
+						}
+					}
+				}
+				return this;
+			}
 		}]);
 		return $myQuery;
 	}();
@@ -5111,20 +5109,6 @@ onix.factory("$myQuery", ["$common", function ($common) {
 onix.run(["$myQuery", function () {
 	// empty
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$promise", function () {
 	/**
   * ES6 promise implementation.
@@ -5202,7 +5186,7 @@ onix.factory("$promise", function () {
 		}, {
 			key: "_resolveFuncs",
 			value: function _resolveFuncs() {
-				var _this = this;
+				var _this18 = this;
 				var len = this._thens.length;
 				var isCatch = this._state == this._STATES.REJECTED;
 				for (var i = 0; i < len; i++) {
@@ -5214,9 +5198,9 @@ onix.factory("$promise", function () {
 						// promise flattening
 						if (output) {
 							if (i != len - 1) {
-								var _ret = function () {
+								var _ret9 = function () {
 									var resolveCb = null;
-									var rest = _this._thens.slice(i + 1);
+									var rest = _this18._thens.slice(i + 1);
 									var prom = void 0;
 									if (output instanceof $promise) {
 										prom = output;
@@ -5233,7 +5217,7 @@ onix.factory("$promise", function () {
 									}
 									return "break";
 								}();
-								if (_ret === "break") break;
+								if (_ret9 === "break") break;
 							}
 						}
 					} catch (err) {
@@ -5496,7 +5480,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
   * @member $route
   */
 	this.go = function () {
-		var _this = this;
+		var _this19 = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
@@ -5538,7 +5522,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this._runController(contr, routeParams);
+						_this19._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {
@@ -5598,7 +5582,7 @@ onix.provider("$template", function () {
    */
 		var $template = function () {
 			function $template() {
-				_classCallCheck2(this, $template);
+				_classCallCheck(this, $template);
 				/**
      * Template cache.
      *
@@ -5643,7 +5627,7 @@ onix.provider("$template", function () {
     * @private
     * @method _parseFnName
     */
-			_createClass2($template, [{
+			_createClass($template, [{
 				key: "_parseFnName",
 				value: function _parseFnName(value) {
 					value = value || "";
@@ -5669,7 +5653,7 @@ onix.provider("$template", function () {
 			}, {
 				key: "_parseArgs",
 				value: function _parseArgs(value, config) {
-					var _this9 = this;
+					var _this20 = this;
 					value = value || "";
 					config = config || {};
 					var bracketsData = onix.match(value, "(", ")");
@@ -5681,7 +5665,7 @@ onix.provider("$template", function () {
 						var origItem = item;
 						var value = null;
 						item = item.trim();
-						if (item.match(_this9._RE.VARIABLE)) {
+						if (item.match(_this20._RE.VARIABLE)) {
 							//console.log("variable");
 							switch (item) {
 								case "$event":
@@ -5697,9 +5681,9 @@ onix.provider("$template", function () {
 								default:
 									value = null;
 							}
-						} else if (item.match(_this9._RE.STRINGS)) {
+						} else if (item.match(_this20._RE.STRINGS)) {
 							value = item.substr(1, item.length - 2);
-						} else if (item.match(_this9._RE.NUMBERS)) {
+						} else if (item.match(_this20._RE.NUMBERS)) {
 							value = parseFloat(item);
 						} else {
 							(function () {
@@ -5747,13 +5731,13 @@ onix.provider("$template", function () {
 			}, {
 				key: "_bindEvent",
 				value: function _bindEvent(el, attr, scope) {
-					var _this10 = this;
+					var _this21 = this;
 					if (!el || !attr || !scope) return;
 					var eventName = attr.name.replace(_conf.elPrefix, "");
 					var fnName = this._parseFnName(attr.value);
 					if (eventName && fnName in scope) {
 						el.addEventListener(eventName, function (event) {
-							var args = _this10._parseArgs(attr.value, {
+							var args = _this21._parseArgs(attr.value, {
 								el: el,
 								event: event
 							});
@@ -5778,7 +5762,7 @@ onix.provider("$template", function () {
 						Object.keys(el.attributes).forEach(function (attr) {
 							var item = el.attributes[attr];
 							// ie8 fix
-							if (!item || (typeof item === "undefined" ? "undefined" : _typeof2(item)) !== "object" || !item.name) return;
+							if (!item || (typeof item === "undefined" ? "undefined" : _typeof(item)) !== "object" || !item.name) return;
 							if (item.name.indexOf(_conf.elPrefix) != -1) {
 								output.push({
 									name: item.name,
@@ -5800,9 +5784,9 @@ onix.provider("$template", function () {
 			}, {
 				key: "_init",
 				value: function _init() {
-					var _this11 = this;
+					var _this22 = this;
 					onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function (item) {
-						_this11.add(item.id || "", item.innerHTML);
+						_this22.add(item.id || "", item.innerHTML);
 					});
 				}
 			}, {
@@ -5830,18 +5814,18 @@ onix.provider("$template", function () {
 			}, {
 				key: "compile",
 				value: function compile(key, data) {
-					var _this12 = this;
+					var _this23 = this;
 					if (!key || !data) return "";
 					var tmpl = this.get(key);
 					var all = onix.match(tmpl, _conf.left, _conf.right);
 					all.forEach(function (item) {
 						var itemSave = _conf.left + item + _conf.right;
 						// filter
-						if (item.indexOf(_this12._CONST.FILTER_DELIMETER) != -1) {
+						if (item.indexOf(_this23._CONST.FILTER_DELIMETER) != -1) {
 							(function () {
 								var filterValue = void 0;
 								// filters
-								item.split(_this12._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
+								item.split(_this23._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
 									filterItem = filterItem.trim();
 									if (!ind) {
 										// value
@@ -5852,7 +5836,7 @@ onix.provider("$template", function () {
 										(function () {
 											// preprocessing by filter
 											var args = [filterValue];
-											var filterParts = filterItem.split(_this12._CONST.FILTER_PARAM_DELIMETER);
+											var filterParts = filterItem.split(_this23._CONST.FILTER_PARAM_DELIMETER);
 											var filterName = "";
 											if (filterParts.length == 1) {
 												filterName = filterParts[0].trim();
@@ -5912,18 +5896,18 @@ onix.provider("$template", function () {
 			}, {
 				key: "bindTemplate",
 				value: function bindTemplate(root, scope, addElsCb) {
-					var _this13 = this;
+					var _this24 = this;
 					var allElements = onix.element("*", root);
 					if (allElements.len()) {
 						(function () {
 							var newEls = {};
 							allElements.forEach(function (item) {
-								var attrs = _this13._getAttributes(item);
+								var attrs = _this24._getAttributes(item);
 								attrs.forEach(function (attr) {
 									if (attr.name == _conf.elDataBind) {
 										newEls[attr.value] = item;
 									} else {
-										_this13._bindEvent(item, attr, scope);
+										_this24._bindEvent(item, attr, scope);
 									}
 								});
 							});
@@ -5945,12 +5929,12 @@ onix.provider("$template", function () {
 			}, {
 				key: "load",
 				value: function load(key, path) {
-					var _this14 = this;
+					var _this25 = this;
 					return new $promise(function (resolve, reject) {
 						$http.createRequest({
 							url: path
 						}).then(function (okData) {
-							_this14.add(key, okData.data);
+							_this25.add(key, okData.data);
 							resolve();
 						}, function (errorData) {
 							reject(errorData);
@@ -6007,30 +5991,6 @@ onix.service("$features", function () {
   */
 	this.MEDIA_QUERY = "matchMedia" in window && "matches" in window.matchMedia("(min-width: 500px)");
 });
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
-function _possibleConstructorReturn(self, call) {
-	if (!self) {
-		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
-}
-function _inherits(subClass, superClass) {
-	if (typeof superClass !== "function" && superClass !== null) {
-		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
-	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
 onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common", "$features", function ($math, $event, $loader, $promise, $common, $features) {
 	/**
   * Anonymizer - canvas for image preview with posibility for add geometries.
@@ -6052,22 +6012,22 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
   * @param {HTMLElement} [optsArg.entityPreview = null] Create entity preview? Parent for append.
   * @class $anonymizer
   */
-	var $anonymizer = function (_$event) {
-		_inherits($anonymizer, _$event);
+	var $anonymizer = function (_$event2) {
+		_inherits($anonymizer, _$event2);
 		function $anonymizer(parent, optsArg) {
 			_classCallCheck(this, $anonymizer);
 			// event init
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
-			_this._eventInit();
+			var _this26 = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
+			_this26._eventInit();
 			// is canvas available?
 			if (!$features.CANVAS) {
 				console.error("Canvas is not available!");
-				return _possibleConstructorReturn(_this);
+				return _possibleConstructorReturn(_this26);
 			}
 			// parent reference
-			_this._parent = parent;
-			_this._parent.classList.add("anonymizer");
-			_this._opts = {
+			_this26._parent = parent;
+			_this26._parent.classList.add("anonymizer");
+			_this26._opts = {
 				canWidth: parent.offsetWidth || 0,
 				canHeight: parent.offsetHeight || 0,
 				zoom: 100,
@@ -6083,59 +6043,59 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 				entityPreview: null
 			};
 			for (var key in optsArg) {
-				_this._opts[key] = optsArg[key];
+				_this26._opts[key] = optsArg[key];
 			}
 			// canvas width & height
-			_this._canWidth = _this._opts.canWidth;
-			_this._canHeight = _this._opts.canHeight;
+			_this26._canWidth = _this26._opts.canWidth;
+			_this26._canHeight = _this26._opts.canHeight;
 			// zoom
-			_this._zoom = _this._opts.zoom;
+			_this26._zoom = _this26._opts.zoom;
 			// zoom step
-			_this._zoomStep = _this._opts.zoomStep;
+			_this26._zoomStep = _this26._opts.zoomStep;
 			// step for zoom move
-			_this._zoomMoveStep = 0;
+			_this26._zoomMoveStep = 0;
 			// act. image width
-			_this._curWidth = 0;
+			_this26._curWidth = 0;
 			// act. image height
-			_this._curHeight = 0;
+			_this26._curHeight = 0;
 			// create main canvas
-			_this._canvas = document.createElement("canvas");
-			_this._canvas.width = _this._canWidth;
-			_this._canvas.height = _this._canHeight;
+			_this26._canvas = document.createElement("canvas");
+			_this26._canvas.width = _this26._canWidth;
+			_this26._canvas.height = _this26._canHeight;
 			// ctx of main canvas
-			_this._ctx = _this._canvas.getContext("2d");
+			_this26._ctx = _this26._canvas.getContext("2d");
 			// loaded image
-			_this._img = null;
+			_this26._img = null;
 			// original image width
-			_this._imgWidth = 0;
+			_this26._imgWidth = 0;
 			// original image height
-			_this._imgHeight = 0;
+			_this26._imgHeight = 0;
 			// canvas & ctx for create line
-			_this._lineCanvas = null;
-			_this._lineCanvasCtx = null;
+			_this26._lineCanvas = null;
+			_this26._lineCanvasCtx = null;
 			// canvas & ctx for preview of a entity
-			_this._entityCanvas = null;
-			_this._entityCanvasCtx = null;
+			_this26._entityCanvas = null;
+			_this26._entityCanvasCtx = null;
 			// entites to draw
-			_this._entites = [];
+			_this26._entites = [];
 			// image draw offset axe x
-			_this._x = 0;
+			_this26._x = 0;
 			// image draw offset axe y
-			_this._y = 0;
+			_this26._y = 0;
 			// threshold for click
-			_this._THRESHOLD = {
+			_this26._THRESHOLD = {
 				MIN: -1,
 				MAX: 1
 			};
 			// helper for mouse event
-			_this._mouse = {
+			_this26._mouse = {
 				startXSave: 0,
 				startYSave: 0,
 				startX: 0,
 				startY: 0,
 				bcr: null
 			};
-			_this._flags = {
+			_this26._flags = {
 				wasRightClick: false,
 				wasMove: false,
 				wasPreview: false,
@@ -6143,34 +6103,34 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 				wasImgMove: false
 			};
 			// binds
-			_this._binds = {
-				mouseWheel: _this._mouseWheel.bind(_this),
-				mouseDown: _this._mouseDown.bind(_this),
-				mouseMove: _this._mouseMove.bind(_this),
-				mouseUp: _this._mouseUp.bind(_this),
-				mouseMoveLine: _this._mouseMoveLine.bind(_this),
-				mouseUpLine: _this._mouseUpLine.bind(_this),
-				contextMenu: _this._cancelEvents.bind(_this)
+			_this26._binds = {
+				mouseWheel: _this26._mouseWheel.bind(_this26),
+				mouseDown: _this26._mouseDown.bind(_this26),
+				mouseMove: _this26._mouseMove.bind(_this26),
+				mouseUp: _this26._mouseUp.bind(_this26),
+				mouseMoveLine: _this26._mouseMoveLine.bind(_this26),
+				mouseUpLine: _this26._mouseUpLine.bind(_this26),
+				contextMenu: _this26._cancelEvents.bind(_this26)
 			};
 			// firefox
-			_this._canvas.addEventListener("DOMMouseScroll", _this._binds.mouseWheel);
+			_this26._canvas.addEventListener("DOMMouseScroll", _this26._binds.mouseWheel);
 			// others
-			_this._canvas.addEventListener("mousewheel", _this._binds.mouseWheel);
-			_this._canvas.addEventListener("mousedown", _this._binds.mouseDown);
-			_this._canvas.addEventListener("contextmenu", _this._binds.contextMenu);
+			_this26._canvas.addEventListener("mousewheel", _this26._binds.mouseWheel);
+			_this26._canvas.addEventListener("mousedown", _this26._binds.mouseDown);
+			_this26._canvas.addEventListener("contextmenu", _this26._binds.contextMenu);
 			// spinner - progress for image load
-			_this._spinner = $loader.getSpinner();
-			parent.appendChild(_this._spinner);
-			parent.appendChild(_this._canvas);
+			_this26._spinner = $loader.getSpinner();
+			parent.appendChild(_this26._spinner);
+			parent.appendChild(_this26._canvas);
 			// preview canvas
-			if (_this._opts.entityPreview) {
-				_this._entityCanvas = document.createElement("canvas");
-				_this._entityCanvas.width = 300;
-				_this._entityCanvas.height = 150;
-				_this._entityCanvasCtx = _this._entityCanvas.getContext("2d");
-				_this._opts.entityPreview.appendChild(_this._entityCanvas);
+			if (_this26._opts.entityPreview) {
+				_this26._entityCanvas = document.createElement("canvas");
+				_this26._entityCanvas.width = 300;
+				_this26._entityCanvas.height = 150;
+				_this26._entityCanvasCtx = _this26._entityCanvas.getContext("2d");
+				_this26._opts.entityPreview.appendChild(_this26._entityCanvas);
 			}
-			return _this;
+			return _this26;
 		}
 		/**
    * Scene redraw - clear, picture, entites.
@@ -6182,33 +6142,33 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		_createClass($anonymizer, [{
 			key: "_redraw",
 			value: function _redraw() {
-				var _this2 = this;
+				var _this27 = this;
 				// pictue
 				this._ctx.clearRect(0, 0, this._canWidth, this._canHeight);
 				this._ctx.drawImage(this._img, this._x, this._y, this._img.width, this._img.height, 0, 0, this._curWidth, this._curHeight);
 				// entites
 				if (this._entites.length) {
 					(function () {
-						var zc = _this2._zoom / 100;
-						var xc = _this2._x * zc;
-						var yc = _this2._y * zc;
-						_this2._entites.forEach(function (entity) {
+						var zc = _this27._zoom / 100;
+						var xc = _this27._x * zc;
+						var yc = _this27._y * zc;
+						_this27._entites.forEach(function (entity) {
 							var x = void 0;
 							var y = void 0;
 							switch (entity.id) {
 								case $anonymizer.ENTITES.CIRCLE.id:
 									var radius = Math.round(entity.value * zc);
-									x = Math.round(_this2._curWidth * entity.xRatio - xc);
-									y = Math.round(_this2._curHeight * entity.yRatio - yc);
-									_this2._drawCircle(_this2._ctx, x, y, radius);
+									x = Math.round(_this27._curWidth * entity.xRatio - xc);
+									y = Math.round(_this27._curHeight * entity.yRatio - yc);
+									_this27._drawCircle(_this27._ctx, x, y, radius);
 									break;
 								case $anonymizer.ENTITES.LINE.id:
 									var lineWidth = Math.round(entity.value * zc);
-									x = Math.round(_this2._curWidth * entity.xRatio - xc);
-									y = Math.round(_this2._curHeight * entity.yRatio - yc);
-									var x2 = Math.round(_this2._curWidth * entity.x2Ratio - xc);
-									var y2 = Math.round(_this2._curHeight * entity.y2Ratio - yc);
-									_this2._drawLine(_this2._ctx, x, y, x2, y2, lineWidth);
+									x = Math.round(_this27._curWidth * entity.xRatio - xc);
+									y = Math.round(_this27._curHeight * entity.yRatio - yc);
+									var x2 = Math.round(_this27._curWidth * entity.x2Ratio - xc);
+									var y2 = Math.round(_this27._curHeight * entity.y2Ratio - yc);
+									_this27._drawLine(_this27._ctx, x, y, x2, y2, lineWidth);
 									break;
 							}
 						});
@@ -6903,30 +6863,30 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		}, {
 			key: "loadImage",
 			value: function loadImage(url) {
-				var _this3 = this;
+				var _this28 = this;
 				return new $promise(function (resolve, reject) {
-					_this3._setWhiteCanvas();
-					_this3._spinner.classList.remove("hide");
+					_this28._setWhiteCanvas();
+					_this28._spinner.classList.remove("hide");
 					var img = new Image();
 					img.addEventListener("load", function () {
-						_this3._spinner.classList.add("hide");
-						_this3._img = img;
-						_this3._imgWidth = img.width;
-						_this3._imgHeight = img.height;
-						_this3._zoom = _this3._opts.zoom;
-						_this3.trigger("zoom", _this3._zoom);
-						_this3._postZoom();
-						_this3._setCenter();
-						_this3._alignImgToCanvas();
-						_this3._drawEntityPreview();
-						_this3._redraw();
+						_this28._spinner.classList.add("hide");
+						_this28._img = img;
+						_this28._imgWidth = img.width;
+						_this28._imgHeight = img.height;
+						_this28._zoom = _this28._opts.zoom;
+						_this28.trigger("zoom", _this28._zoom);
+						_this28._postZoom();
+						_this28._setCenter();
+						_this28._alignImgToCanvas();
+						_this28._drawEntityPreview();
+						_this28._redraw();
 						resolve();
 					});
 					img.addEventListener("error", function () {
-						_this3._spinner.classList.add("hide");
-						_this3._img = null;
-						_this3._imgWidth = 0;
-						_this3._imgHeight = 0;
+						_this28._spinner.classList.add("hide");
+						_this28._img = null;
+						_this28._imgWidth = 0;
+						_this28._imgHeight = 0;
 						reject();
 					});
 					img.src = url || "";
@@ -6987,14 +6947,14 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		}, {
 			key: "switchEntity",
 			value: function switchEntity() {
-				var _this4 = this;
+				var _this29 = this;
 				var variants = Object.keys($anonymizer.ENTITES);
 				var priority = this._opts.curEntity.priority;
 				var selVariant = null;
 				var lowestVariant = null;
 				variants.forEach(function (variant) {
 					var varObj = $anonymizer.ENTITES[variant];
-					if (!selVariant && varObj.priority > _this4._opts.curEntity.priority) {
+					if (!selVariant && varObj.priority > _this29._opts.curEntity.priority) {
 						selVariant = varObj;
 					}
 					if (!lowestVariant || varObj.priority < lowestVariant.priority) {
@@ -7099,7 +7059,7 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		}, {
 			key: "exportEntites",
 			value: function exportEntites() {
-				var _this5 = this;
+				var _this30 = this;
 				var output = {
 					actions: [],
 					image: {
@@ -7112,18 +7072,18 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 						case $anonymizer.ENTITES.CIRCLE.id:
 							output.actions.push({
 								type: entity.id.toLowerCase(),
-								x: $math.setRange(Math.round(_this5._imgWidth * entity.xRatio), 0, _this5._imgWidth),
-								y: $math.setRange(Math.round(_this5._imgHeight * entity.yRatio), 0, _this5._imgHeight),
+								x: $math.setRange(Math.round(_this30._imgWidth * entity.xRatio), 0, _this30._imgWidth),
+								y: $math.setRange(Math.round(_this30._imgHeight * entity.yRatio), 0, _this30._imgHeight),
 								r: entity.value
 							});
 							break;
 						case $anonymizer.ENTITES.LINE.id:
 							output.actions.push({
 								type: entity.id.toLowerCase(),
-								x1: $math.setRange(Math.round(_this5._imgWidth * entity.xRatio), 0, _this5._imgWidth),
-								y1: $math.setRange(Math.round(_this5._imgHeight * entity.yRatio), 0, _this5._imgHeight),
-								x2: $math.setRange(Math.round(_this5._imgWidth * entity.x2Ratio), 0, _this5._imgWidth),
-								y2: $math.setRange(Math.round(_this5._imgHeight * entity.y2Ratio), 0, _this5._imgHeight),
+								x1: $math.setRange(Math.round(_this30._imgWidth * entity.xRatio), 0, _this30._imgWidth),
+								y1: $math.setRange(Math.round(_this30._imgHeight * entity.yRatio), 0, _this30._imgHeight),
+								x2: $math.setRange(Math.round(_this30._imgWidth * entity.x2Ratio), 0, _this30._imgWidth),
+								y2: $math.setRange(Math.round(_this30._imgHeight * entity.y2Ratio), 0, _this30._imgHeight),
 								width: entity.value
 							});
 							break;
@@ -7189,20 +7149,6 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 	};
 	return $anonymizer;
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$loader", ["$dom", function ($dom) {
 	/**
   * Progress loader in the application.
@@ -7252,14 +7198,14 @@ onix.factory("$loader", ["$dom", function ($dom) {
 		}, {
 			key: "end",
 			value: function end() {
-				var _this = this;
+				var _this31 = this;
 				this._el.classList.remove("start");
 				this._el.classList.add("end");
 				setTimeout(function () {
-					_this._el.classList.remove("end");
-					_this._el.classList.add("hide");
+					_this31._el.classList.remove("end");
+					_this31._el.classList.add("hide");
 					setTimeout(function () {
-						_this._el.classList.remove("hide");
+						_this31._el.classList.remove("hide");
 					}, 350);
 				}, 150);
 			}
@@ -7294,20 +7240,6 @@ onix.factory("$loader", ["$dom", function ($dom) {
 	;
 	return new $loader();
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 	/**
   * $notify uses bootstrap alerts and provides additional functionality.
@@ -7355,9 +7287,9 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 		}, {
 			key: "reset",
 			value: function reset() {
-				var _this = this;
+				var _this32 = this;
 				Object.keys(this._options).forEach(function (key) {
-					_this._el.classList.remove(_this._options[key]);
+					_this32._el.classList.remove(_this32._options[key]);
 				});
 				return this;
 			}
@@ -7429,12 +7361,12 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 		}, {
 			key: "hide",
 			value: function hide(timeout) {
-				var _this2 = this;
+				var _this33 = this;
 				return new $promise(function (resolve) {
 					setTimeout(function () {
-						_this2.reset();
+						_this33.reset();
 						resolve();
-					}, timeout || _this2._HIDE_TIMEOUT);
+					}, timeout || _this33._HIDE_TIMEOUT);
 				});
 			}
 		}]);
@@ -7452,11 +7384,6 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 		return new $notify(el);
 	};
 }]);
-var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-} : function (obj) {
-	return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-};
 /**
  * Class for creating img previews from File[] variable.
  * 
@@ -7573,7 +7500,7 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
   * @member $previewImages
   */
 	this.show = function (el, files, optsArg) {
-		var _this = this;
+		var _this34 = this;
 		// clear previous
 		el.innerHTML = "";
 		// add class
@@ -7592,10 +7519,10 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 		var pictureFiles = $image.getPictureFiles(files);
 		var count = pictureFiles.length;
 		if (count) {
-			var _ret = function () {
+			var _ret17 = function () {
 				// create placeholder?
 				if (opts.createHolder) {
-					_this._createPreviewHolders(el, count);
+					_this34._createPreviewHolders(el, count);
 				}
 				var jobsArray = [];
 				// sort by name, make previewID - only for 7 pictures
@@ -7603,8 +7530,8 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 					if (a.name < b.name) return -1;else if (a.name > b.name) return 1;else return 0;
 				}).forEach(function (pf, ind) {
 					jobsArray.push({
-						task: _this._jobTask,
-						scope: _this,
+						task: _this34._jobTask,
+						scope: _this34,
 						args: [{
 							file: pf,
 							previewID: "img_0" + ind
@@ -7617,36 +7544,12 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 					v: true
 				};
 			}();
-			if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+			if ((typeof _ret17 === "undefined" ? "undefined" : _typeof(_ret17)) === "object") return _ret17.v;
 		} else {
 			return false;
 		}
 	};
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
-function _possibleConstructorReturn(self, call) {
-	if (!self) {
-		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
-}
-function _inherits(subClass, superClass) {
-	if (typeof superClass !== "function" && superClass !== null) {
-		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
-	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
 onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event, $dom) {
 	/**
   * $select uses bootstrap dropdown and provides additional functionality.
@@ -7656,20 +7559,20 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
   * @param {Object} [opts]
   * @param {Boolean} [opts.addCaption = false] Add caption to select
   */
-	var $select = function (_$event) {
-		_inherits($select, _$event);
+	var $select = function (_$event3) {
+		_inherits($select, _$event3);
 		function $select(el, opts) {
 			_classCallCheck(this, $select);
 			// event init
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($select).call(this));
-			_this._eventInit();
-			_this._opts = {
+			var _this35 = _possibleConstructorReturn(this, Object.getPrototypeOf($select).call(this));
+			_this35._eventInit();
+			_this35._opts = {
 				addCaption: false
 			};
 			for (var key in opts) {
-				_this._opts[key] = opts[key];
+				_this35._opts[key] = opts[key];
 			}
-			_this._CONST = {
+			_this35._CONST = {
 				CAPTION_SEL: ".dropdown-toggle",
 				OPTIONS_SEL: ".dropdown-menu a",
 				CARET_SEL: ".caret",
@@ -7677,18 +7580,18 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 				OPEN_CLASS: "open",
 				ACTIVE_CLASS: "active"
 			};
-			_this._el = el;
-			_this._optinsRef = [];
-			_this._captionEl = null;
-			_this.captionTextEl = null;
-			_this._binds = {
-				captionClick: _this._captionClick.bind(_this),
-				choiceClick: _this._choiceClick.bind(_this),
-				removeAllOpened: _this._removeAllOpened.bind(_this),
-				click: _this._click.bind(_this)
+			_this35._el = el;
+			_this35._optinsRef = [];
+			_this35._captionEl = null;
+			_this35.captionTextEl = null;
+			_this35._binds = {
+				captionClick: _this35._captionClick.bind(_this35),
+				choiceClick: _this35._choiceClick.bind(_this35),
+				removeAllOpened: _this35._removeAllOpened.bind(_this35),
+				click: _this35._click.bind(_this35)
 			};
-			_this._bind();
-			return _this;
+			_this35._bind();
+			return _this35;
 		}
 		/**
    * Bind clicks on the select.
@@ -7742,10 +7645,10 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		}, {
 			key: "_removeAllOpened",
 			value: function _removeAllOpened() {
-				var _this2 = this;
+				var _this36 = this;
 				// remove all
 				onix.element(this._CONST.OPEN_DROPDOWN_SEL).forEach(function (item) {
-					item.classList.remove(_this2._CONST.OPEN_CLASS);
+					item.classList.remove(_this36._CONST.OPEN_CLASS);
 				});
 			}
 			/**
@@ -7794,14 +7697,14 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		}, {
 			key: "_bindChoices",
 			value: function _bindChoices() {
-				var _this3 = this;
+				var _this37 = this;
 				onix.element(this._CONST.OPTIONS_SEL, this._el).forEach(function (option) {
-					option.addEventListener("click", _this3._binds.choiceClick);
+					option.addEventListener("click", _this37._binds.choiceClick);
 					// event ref
-					_this3._optinsRef.push({
+					_this37._optinsRef.push({
 						el: option,
 						event: "click",
-						fn: _this3._binds.choiceClick
+						fn: _this37._binds.choiceClick
 					});
 				});
 			}
@@ -7898,12 +7801,12 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		}, {
 			key: "setAddCaption",
 			value: function setAddCaption() {
-				var _this4 = this;
+				var _this38 = this;
 				if (!this._opts.addCaption) return;
 				this._optinsRef.every(function (item) {
 					var parent = item.el.parentNode;
-					if (parent.classList.contains(_this4._CONST.ACTIVE_CLASS)) {
-						_this4._captionTextEl.innerHTML = item.el.innerHTML;
+					if (parent.classList.contains(_this38._CONST.ACTIVE_CLASS)) {
+						_this38._captionTextEl.innerHTML = item.el.innerHTML;
 						return false;
 					} else {
 						return true;
@@ -7916,30 +7819,6 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 	;
 	return $select;
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
-function _possibleConstructorReturn(self, call) {
-	if (!self) {
-		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-	}return call && ((typeof call === "undefined" ? "undefined" : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
-}
-function _inherits(subClass, superClass) {
-	if (typeof superClass !== "function" && superClass !== null) {
-		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof2(superClass)));
-	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
 onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $event, $common, $math) {
 	/**
   * Slider - slider with input for selecting numbers from the range.
@@ -7952,54 +7831,54 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
   * @param {Number} [optsArg.timeout=333] Timeout for signal fire (keydown, move)
   * @class $slider
   */
-	var $slider = function (_$event) {
-		_inherits($slider, _$event);
+	var $slider = function (_$event4) {
+		_inherits($slider, _$event4);
 		function $slider(parent, optsArg) {
 			_classCallCheck(this, $slider);
 			// event init
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($slider).call(this));
-			_this._eventInit();
-			_this._parent = parent;
-			_this._root = _this._create();
-			_this._opts = {
+			var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf($slider).call(this));
+			_this39._eventInit();
+			_this39._parent = parent;
+			_this39._root = _this39._create();
+			_this39._opts = {
 				min: 0,
 				max: 100,
 				wheelStep: 1,
 				timeout: 333
 			};
 			for (var key in optsArg) {
-				_this._opts[key] = optsArg[key];
+				_this39._opts[key] = optsArg[key];
 			}
 			// selected value
-			_this._value = null;
+			_this39._value = null;
 			// signal change - helper
-			_this._signalObj = {
+			_this39._signalObj = {
 				id: null,
 				lastValue: null
 			};
-			parent.appendChild(_this._root);
-			_this._binds = {
-				keyUp: _this._keyUp.bind(_this),
-				click: _this._click.bind(_this),
-				mouseDownCaret: _this._mouseDownCaret.bind(_this),
-				mouseMove: _this._mouseMove.bind(_this),
-				mouseWheel: _this._mouseWheel.bind(_this),
-				mouseUp: _this._mouseUp.bind(_this),
-				sendSignalInner: _this._sendSignalInner.bind(_this)
+			parent.appendChild(_this39._root);
+			_this39._binds = {
+				keyUp: _this39._keyUp.bind(_this39),
+				click: _this39._click.bind(_this39),
+				mouseDownCaret: _this39._mouseDownCaret.bind(_this39),
+				mouseMove: _this39._mouseMove.bind(_this39),
+				mouseWheel: _this39._mouseWheel.bind(_this39),
+				mouseUp: _this39._mouseUp.bind(_this39),
+				sendSignalInner: _this39._sendSignalInner.bind(_this39)
 			};
-			_this._mouse = {
+			_this39._mouse = {
 				bcr: null
 			};
-			_this._els.input.addEventListener("keyup", _this._binds.keyUp);
-			_this._els.tube.addEventListener("click", _this._binds.click);
-			_this._els.caret.addEventListener("mousedown", _this._binds.mouseDownCaret);
+			_this39._els.input.addEventListener("keyup", _this39._binds.keyUp);
+			_this39._els.tube.addEventListener("click", _this39._binds.click);
+			_this39._els.caret.addEventListener("mousedown", _this39._binds.mouseDownCaret);
 			// firefox
-			_this._els.lineHolder.addEventListener("DOMMouseScroll", _this._binds.mouseWheel);
+			_this39._els.lineHolder.addEventListener("DOMMouseScroll", _this39._binds.mouseWheel);
 			// others
-			_this._els.lineHolder.addEventListener("mousewheel", _this._binds.mouseWheel);
+			_this39._els.lineHolder.addEventListener("mousewheel", _this39._binds.mouseWheel);
 			// def. max value
-			_this.setValue(_this._opts.max);
-			return _this;
+			_this39.setValue(_this39._opts.max);
+			return _this39;
 		}
 		/**
    * Create slider and his children.
@@ -8335,20 +8214,6 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
 	;
 	return $slider;
 }]);
-var _createClass = function () {
-	function defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}return function (Constructor, protoProps, staticProps) {
-		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	};
-}();
-function _classCallCheck(instance, Constructor) {
-	if (!(instance instanceof Constructor)) {
-		throw new TypeError("Cannot call a class as a function");
-	}
-}
 onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $common) {
 	/**
   *
@@ -8590,15 +8455,15 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 		}, {
 			key: "_mouseMove",
 			value: function _mouseMove(e) {
-				var _this = this;
+				var _this40 = this;
 				$common.cancelEvents(e);
 				var diffX = e.clientX - this._mouse.startX;
 				var diffY = e.clientY - this._mouse.startY;
 				if (this._type == "crop-middle") {
 					// move
 					Object.keys(this._points).forEach(function (key) {
-						_this._points[key].x += diffX;
-						_this._points[key].y += diffY;
+						_this40._points[key].x += diffX;
+						_this40._points[key].y += diffY;
 					});
 					this._alignPoints();
 					this._redraw();
@@ -8610,7 +8475,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 					}
 					if (this._resizeTest(diffX, diffY, group)) {
 						group.forEach(function (i) {
-							var point = _this._points[i.type];
+							var point = _this40._points[i.type];
 							// add diffx, diffy to all group members
 							point.x += i.x ? diffX : 0;
 							point.y += i.y ? diffY : 0;
@@ -8675,7 +8540,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 		}, {
 			key: "_resizeTest",
 			value: function _resizeTest(diffX, diffY, group) {
-				var _this2 = this;
+				var _this41 = this;
 				if (!this._options.aspectRatio) {
 					return false;
 				}
@@ -8700,8 +8565,8 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 				group.forEach(function (i) {
 					var point = points[i.type];
 					// add diffx, diffy to all group members
-					point.x = _this2._points[i.type].x + (i.x ? diffX : 0);
-					point.y = _this2._points[i.type].y + (i.y ? diffY : 0);
+					point.x = _this41._points[i.type].x + (i.x ? diffX : 0);
+					point.y = _this41._points[i.type].y + (i.y ? diffY : 0);
 				});
 				// min. and max. value
 				var size = this._getSize(points);

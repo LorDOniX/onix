@@ -10,7 +10,7 @@
 
 	var refreshCSS = function(file) {
 		var ts = new Date().getTime().toString(16);
-		var links = document.head.querySelectorAll("link[type='text/css']");
+		var links = document.head.querySelectorAll("link");
 
 		if (links) {
 			for (var i = 0; i < links.length; i++) {

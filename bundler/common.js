@@ -179,7 +179,7 @@ class Common {
 	 */
 	static chainPromises(opts) {
 		return new Promise((resolve) => {
-			this.chainPromisesInner(opts, resolve, []);
+			this.chainPromisesInner(opts, resolve, [], 0);
 		});
 	}
 
@@ -188,8 +188,9 @@ class Common {
 	 * @param  {Array} opts { method: {string|function}, args: [], scope: {object} }
 	 * @param  {Promise} [resolve]
 	 * @param  {Array} outArray
+	 * @param  {Number} rejected
 	 */
-	static chainPromisesInner(opts, resolve, outArray) {
+	static chainPromisesInner(opts, resolve, outArray, rejected) {
 		let firstItem = opts.shift();
 
 		if (firstItem) {
@@ -218,21 +219,30 @@ class Common {
 			}
 
 			if (!error) {
-				fn.apply(firstItem.scope || fn, firstItem.args || []).then((data) => {
+				fn.apply(firstItem.scope || fn, firstItem.args || []).then(data => {
 					outArray.push(data);
-					this.chainPromisesInner(opts, resolve, outArray);
-				}, (err) => {
+
+					this.chainPromisesInner(opts, resolve, outArray, rejected);
+				}, err => {
 					outArray.push(err);
-					this.chainPromisesInner(opts, resolve, outArray);
+
+					this.chainPromisesInner(opts, resolve, outArray, rejected + 1);
 				});
 			}
 			else {
 				this.col("No callable {0} function found!", firstItem.method);
-				resolve(outArray);
+
+				resolve({
+					output: outArray,
+					rejected: rejected
+				});
 			}
 		}
 		else {
-			resolve(outArray);
+			resolve({
+				output: outArray,
+				rejected: rejected
+			});
 		}
 	}
 };
