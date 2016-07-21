@@ -1,8 +1,9 @@
 # Change Log
 
-## unreleased
+## 2.8.1 (21. 7. 2016)
 
 * common - chainPromisesInner is private
+* $common - formatSize bugfix (1000 vs 1024)
 * bundler little optimazing and refactoring
 
 ## 2.8.0 (20. 7. 2016)

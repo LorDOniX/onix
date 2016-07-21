@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.8.0/20. 7. 2016
+ * 2.8.1/21. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1882,14 +1882,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.8.0
-  * date: 20. 7. 2016
+  * version: 2.8.1
+  * date: 21. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.8.0/20. 7. 2016\n'+
+'2.8.1/21. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2328,10 +2328,10 @@ onix.service("$common", ["$promise", function ($promise) {
 		if (typeof size !== "number") {
 			return "null";
 		}
-		var lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1000)) : 0;
+		var lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1024)) : 0;
 		var sizes = ["", "K", "M", "G", "T"];
 		lv = Math.min(sizes.length, lv);
-		var value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
+		var value = lv > 0 ? (size / Math.pow(1024, lv)).toFixed(2) : size;
 		return value + " " + sizes[lv] + "B";
 	};
 	/**

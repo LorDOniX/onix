@@ -351,8 +351,10 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 						});
 					}
 				}]).then(function (output) {
-					console.log("All done");
-					console.log(output);
+					console.log("All done, rejected {0}".format(output.rejected));
+					output.output.forEach(function (i) {
+						console.log(i);
+					});
 				});
 			}
 		}, {

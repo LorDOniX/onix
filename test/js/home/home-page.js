@@ -218,8 +218,11 @@ function(
 					});
 				}
 			}]).then(function(output) {
-				console.log("All done");
-				console.log(output);
+				console.log("All done, rejected {0}".format(output.rejected));
+
+				output.output.forEach(i => {
+					console.log(i);
+				});
 			});
 		}
 

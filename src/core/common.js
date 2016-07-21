@@ -406,12 +406,12 @@ function(
 			return "null";
 		}
 
-		let lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1000)) : 0;
+		let lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1024)) : 0;
 		let sizes = ["", "K", "M", "G", "T"];
 
 		lv = Math.min(sizes.length, lv);
 		
-		let value = lv > 0 ? (size / Math.pow(1000, lv)).toFixed(2) : size;
+		let value = lv > 0 ? (size / Math.pow(1024, lv)).toFixed(2) : size;
 
 		return value + " " + sizes[lv] + "B";
 	};
