@@ -3,6 +3,7 @@
 ## unreleased
 
 * common - chainPromisesInner is private
+* bundler little optimazing and refactoring
 
 ## 2.8.0 (20. 7. 2016)
 

@@ -8,7 +8,7 @@ var TimeStop = require("./time-stop");
 class MyLess {
 	makeLess(bundle, run) {
 		return new Promise((resolve, reject) => {
-			Common.readFile(bundle.source).then((data) => {
+			Common.readFile(bundle.source).then(data => {
 				// readed less files, prepare config
 				let lessOpts = {
 					filename: bundle.source,
@@ -25,18 +25,18 @@ class MyLess {
 					}
 					else {
 						// write output
-						Common.writeFile(bundle.output, output.css).then(() => {
+						Common.writeFile(bundle.output, output.css).then(ok => {
 							Common.col("Write CSS {0} {1}", bundle.output, Common.formatSize(output.css.length));
 
 							resolve();
-						}, () => {
+						}, err => {
 							Common.col("Write {0} write file error!", e.filename);
 
 							reject();
 						});
 					}
 				});
-			}, (err) => {
+			}, err => {
 				Common.col(err.message);
 
 				reject();

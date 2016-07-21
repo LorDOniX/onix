@@ -92,39 +92,6 @@ class Bundler {
 		return all;
 	}
 
-	_dev(runAfter) {
-		Common.col("-");
-
-		let all = this._getBundles("dev");
-
-		// save cache after all bundles
-		all.push({
-			method: () => {
-				return this._myES6.saveCache();
-			}
-		});
-
-		Common.chainPromises(all).then(e => {
-			Common.col("Dev is done");
-
-			this._myES6.getOnixInfo();
-
-			switch (runAfter) {
-				case "watch":
-					this._setWatcher();
-
-					// run server?
-					if (this._runServerReq) {
-						this._websocket.start();
-					}
-					else {
-						this._websocket.disable();
-					}
-					break;
-			}
-		});
-	}
-
 	_setWatcher() {
 		if (!this._watchBundles.length) return;
 
@@ -203,6 +170,39 @@ class Bundler {
 		});
 	}
 
+	_dev(runAfter) {
+		Common.col("-");
+
+		let all = this._getBundles("dev");
+
+		// save cache after all bundles
+		all.push({
+			method: () => {
+				return this._myES6.saveCache();
+			}
+		});
+
+		Common.chainPromises(all).then(e => {
+			Common.col("Dev is done");
+
+			this._myES6.getOnixInfo();
+
+			switch (runAfter) {
+				case "watch":
+					this._setWatcher();
+
+					// run server?
+					if (this._runServerReq) {
+						this._websocket.start();
+					}
+					else {
+						this._websocket.disable();
+					}
+					break;
+			}
+		});
+	}
+
 	_dist() {
 		Common.col("-");
 
@@ -244,7 +244,7 @@ class Bundler {
 						Common.col("JSDuck is done - please see jsduck.log for output information.");
 
 						if (stdout) {
-							console.log(stdout);
+							Common.col(stdout);
 
 							resolve();
 						}

@@ -5,9 +5,9 @@ var chokidar = require('chokidar');
 var Common = require("./common");
 
 class Watcher {
-	constructor() {
+	constructor(delay) {
 		this._timeoutID = null;
-		this._timeDelay = 500;
+		this._timeDelay = delay || 500;
 		this._handler = null;
 		this._buffer = [];
 	}

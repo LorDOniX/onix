@@ -38,17 +38,16 @@ class Common {
 	 * @return {String}
 	 */
 	static formatSize(size) {
-		size = size || 0;
-
-		let sizeKB = size / 1024;
-		let sizeMB = size / (1024 * 1024);
-
-		if (sizeKB < 1024) {
-			return sizeKB.toFixed(2) + " KB";
+		if (typeof size !== "number") {
+			return "null";
 		}
-		else {
-			return sizeMB.toFixed(2) + " MB";
-		}
+
+		let lv = size > 0 ? Math.floor(Math.log(size) / Math.log(1024)) : 0;
+		let sizes = ["", "K", "M", "G", "T"];
+		lv = Math.min(sizes.length, lv);
+		let value = lv > 0 ? (size / Math.pow(1024, lv)).toFixed(2) : size;
+
+		return value + " " + sizes[lv] + "B";
 	}
 
 	/**
@@ -102,9 +101,9 @@ class Common {
 
 			fs.stat(name, (err, stats) => {
 				if (stats) {
-					fs.unlink(name, (err) => {
-						if (err) {
-							reject(err);
+					fs.unlink(name, (err2) => {
+						if (err2) {
+							reject(err2);
 						} 
 						else {
 							resolve();
@@ -129,7 +128,7 @@ class Common {
 		return new Promise((resolve, reject) => {
 			name = name || "";
 
-			fs.writeFile(name, data, 'utf8', (err) => {
+			fs.writeFile(name, data, 'utf8', err => {
 				if (err) {
 					reject(err);
 				} 
@@ -153,18 +152,18 @@ class Common {
 		let all = [];
 
 		return new Promise((resolve, reject) => {
-			files.forEach((file) => {
+			files.forEach(file => {
 				let readPromise = this.readFile(file);
 
 				all.push(readPromise);
 
-				readPromise.then((data) => {
+				readPromise.then(data => {
 					readedFiles.push({
 						path: file,
 						data: data || ""
 					});
-				}, (err) => {
-					console.log(err.message);
+				}, err => {
+					Common.col(err.message);
 				});
 			});
 
@@ -174,10 +173,6 @@ class Common {
 		});
 	}
 
-	static fileExists(name) {
-		return fs.existsSync(name);
-	}
-
 	/**
 	 * Chaining multiple methods with promises.
 	 * 
@@ -185,7 +180,7 @@ class Common {
 	 * @return {Promise}
 	 */
 	static chainPromises(opts) {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			this._chainPromisesInner(opts, resolve, [], 0);
 		});
 	}

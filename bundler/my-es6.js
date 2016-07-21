@@ -97,7 +97,6 @@ class MyES6 {
 		return new Promise((resolve, reject) => {
 			let bundleData = bundle.data || [];
 			let allFiles = [];
-			let allFilesCount = 0;
 			let es6Files = [];
 
 			this._timeStop.start("ES6");
@@ -123,6 +122,8 @@ class MyES6 {
 				// append to the files
 				allFiles.push(this._header.file);
 			}
+
+			let allFilesCount = 0;
 
 			Common.readFiles(allFiles).then(all => {
 				let cached = 0;
@@ -205,7 +206,7 @@ class MyES6 {
 						});
 					}
 				}
-			}, (err) => {
+			}, err => {
 				reject(err);
 			});
 		});
@@ -284,10 +285,9 @@ class MyES6 {
 		let onixjsData = this._getCacheItem(this._header.onix).data;
 		let version = "";
 		let date = "";
-
 		let lines = onixjsData.split(EOL);
 
-		lines.forEach((line) => {
+		lines.forEach(line => {
 			line = line.trim();
 
 			let ind = line.indexOf(this._header.version);
@@ -362,14 +362,13 @@ class MyES6 {
 			output.push(allData);
 		});
 
-		if (run == "dist") {
-			Common.col("ES6 transpilation takes {0}", this._timeStop.end("ES6Parts"));
-		}
-
 		// dev & reload
 		if (run == "dev" && bundle.reload && this._reload) {
 			// append reload server to the end
 			output.push(this._getCacheItem(this._reload.file).data);
+		}
+		else if (run == "dist") {
+			Common.col("ES6 transpilation takes {0}", this._timeStop.end("ES6Parts"));
 		}
 
 		let outputData = output.join(EOL);
@@ -413,7 +412,7 @@ class MyES6 {
 		catch (err) {
 			Common.col("UglifyJS error {0}", err.message);
 
-			if ("line" in err && "col" in err) {
+			if (err.line && err.col) {
 				Common.col("Line {0} col {1}", err.line, err.col);
 			}
 

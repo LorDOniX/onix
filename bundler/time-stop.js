@@ -7,12 +7,15 @@ class TimeStop {
 
 	start(label) {
 		let ct = Date.now();
+
 		label = label || ct;
+
 		this._cache[label] = ct;
 	}
 
 	end(label) {
 		label = label || "";
+
 		let ct = Date.now();
 		let cacheItem = this._cache[label];
 
@@ -26,7 +29,9 @@ class TimeStop {
 				return (diff / 1000).toFixed(2) + " s";
 			}
 		}
-		else return "0 ms";
+		else {
+			return "0 ms";
+		}
 	}
 };
 
