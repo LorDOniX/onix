@@ -5,6 +5,7 @@ var fs = require("fs");
 class Common {
 	/**
 	 * Own console log
+	 * 
 	 * 1. argument string, other replace objects by key {0..n}
 	 */
 	static col() {
@@ -32,6 +33,7 @@ class Common {
 
 	/**
 	 * Size to KB/MB.
+	 * 
 	 * @param  {Number} size
 	 * @return {String}
 	 */
@@ -51,6 +53,7 @@ class Common {
 
 	/**
 	 * Read file.
+	 * 
 	 * @param  {String} name
 	 * @return {Promise}
 	 */
@@ -89,6 +92,7 @@ class Common {
 
 	/**
 	 * Remove file.
+	 * 
 	 * @param  {String} name
 	 * @return {Promise}
 	 */
@@ -116,6 +120,7 @@ class Common {
 
 	/**
 	 * Write file.
+	 * 
 	 * @param  {String} name
 	 * @param  {String} data
 	 * @return {Promise}
@@ -137,6 +142,7 @@ class Common {
 
 	/**
 	 * Read files
+	 * 
 	 * @param  {Array} files List of all files
 	 * @return {Promise}
 	 */
@@ -174,23 +180,26 @@ class Common {
 
 	/**
 	 * Chaining multiple methods with promises.
+	 * 
 	 * @param  {Array} opts
 	 * @return {Promise}
 	 */
 	static chainPromises(opts) {
 		return new Promise((resolve) => {
-			this.chainPromisesInner(opts, resolve, [], 0);
+			this._chainPromisesInner(opts, resolve, [], 0);
 		});
 	}
 
 	/**
 	 * Inner method for chaining promises.
+	 * 
 	 * @param  {Array} opts { method: {string|function}, args: [], scope: {object} }
 	 * @param  {Promise} [resolve]
 	 * @param  {Array} outArray
 	 * @param  {Number} rejected
+	 * @private
 	 */
-	static chainPromisesInner(opts, resolve, outArray, rejected) {
+	static _chainPromisesInner(opts, resolve, outArray, rejected) {
 		let firstItem = opts.shift();
 
 		if (firstItem) {
@@ -222,11 +231,11 @@ class Common {
 				fn.apply(firstItem.scope || fn, firstItem.args || []).then(data => {
 					outArray.push(data);
 
-					this.chainPromisesInner(opts, resolve, outArray, rejected);
+					this._chainPromisesInner(opts, resolve, outArray, rejected);
 				}, err => {
 					outArray.push(err);
 
-					this.chainPromisesInner(opts, resolve, outArray, rejected + 1);
+					this._chainPromisesInner(opts, resolve, outArray, rejected + 1);
 				});
 			}
 			else {

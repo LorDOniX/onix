@@ -1,5 +1,9 @@
 # Change Log
 
+## unreleased
+
+* common - chainPromisesInner is private
+
 ## 2.8.0 (20. 7. 2016)
 
 * bundler update - fixes, ES6 error output; uglify IE8 fix;
