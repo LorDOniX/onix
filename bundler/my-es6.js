@@ -41,6 +41,12 @@ class MyES6 {
 		this._force = true;
 	}
 
+	disableCache() {
+		Common.col("Disable cache file");
+
+		this._cache = {};
+	}
+
 	saveCache() {
 		return new Promise((resolve, reject) => {
 			if (!Object.keys(this._cache).length) {
@@ -59,10 +65,12 @@ class MyES6 {
 
 				Common.writeFile(this._config.cache, data).then(() => {
 					Common.col("Cache file {0} {1} was written!", this._config.cache, Common.formatSize(data.length));
+					Common.col("-");
 
 					resolve();
 				}, () => {
 					Common.col("Cache file {0} write file error!", this._config.cache);
+					Common.col("-");
 
 					reject();
 				});
@@ -73,10 +81,12 @@ class MyES6 {
 	clearCache() {
 		return new Promise((resolve, reject) => {
 			Common.removeFile(this._config.cache).then(() => {
+				Common.col("-");
 				Common.col("Cache file {0} was removed!", this._config.cache);
 
 				resolve();
 			}, (err) => {
+				Common.col("-");
 				Common.col("Cache file {0} remove file error: {1}!", this._config.cache, err.message);
 
 				reject();
@@ -98,8 +108,6 @@ class MyES6 {
 			let bundleData = bundle.data || [];
 			let allFiles = [];
 			let es6Files = [];
-
-			this._timeStop.start("ES6");
 
 			Common.col("Make JS bundle {0}", bundle.id);
 
@@ -123,11 +131,12 @@ class MyES6 {
 				allFiles.push(this._header.file);
 			}
 
-			let allFilesCount = 0;
-
 			Common.readFiles(allFiles).then(all => {
 				let cached = 0;
+				let es6cached = 0;
 				let errors = 0;
+				let allFilesCount = 0;
+				let es6time = 0;
 
 				all.forEach((file) => {
 					if (bundle.header && file.path == this._header.file) {
@@ -142,15 +151,17 @@ class MyES6 {
 					}
 					else {
 						let transpile = run == "dev" && es6Files.indexOf(file.path) != -1;
+
+						if (transpile) {
+							this._timeStop.start("ES6");
+						}
+
 						let sfcObj = this._setFileCache(file.path, file.data, transpile);
 
-						if (sfcObj.error) {
-							errors++;
-						}
-						if (sfcObj.cached) {
-							cached++;
-						}
-
+						errors += sfcObj.error ? 1 : 0;
+						cached += sfcObj.cached ? 1 : 0;
+						es6cached += sfcObj.cached && transpile ? 1 : 0;
+						es6time += !sfcObj.cached && transpile ? this._timeStop.end("ES6", true) : 0;
 						allFilesCount++;
 					}
 				});
@@ -162,8 +173,8 @@ class MyES6 {
 				}
 				else {
 					if (run == "dev") {
-						Common.col("ES6 transpilation: {0} files takes {1}, {2} cached, all files count {3}",
-									es6Files.length, this._timeStop.end("ES6"), cached, allFilesCount);
+						Common.col("ES6 transpilation takes {0} for {1}/{2} [cached/files]",
+									this._timeStop.formatTime(es6time), es6cached, es6Files.length);
 					}
 					else if (run == "dist") {
 						// dist -> always rewrite

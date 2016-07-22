@@ -13,24 +13,31 @@ class TimeStop {
 		this._cache[label] = ct;
 	}
 
-	end(label) {
+	// [getNumber] {Boolean}
+	end(label, getNumber) {
 		label = label || "";
 
 		let ct = Date.now();
 		let cacheItem = this._cache[label];
+		let time = 0;
 
 		if (cacheItem) {
-			let diff = ct - cacheItem;
+			time = ct - cacheItem;
+		}
 
-			if (diff < 1000) {
-				return diff + " ms";
-			}
-			else {
-				return (diff / 1000).toFixed(2) + " s";
-			}
+		return (getNumber ? time : this.formatTime(time));
+	}
+
+	formatTime(time) {
+		time = time || 0;
+
+		if (time < 1000) {
+			return time + " ms";
 		}
 		else {
-			return "0 ms";
+			let num = time / 1000;
+
+			return num.toFixed(2) + " s";
 		}
 	}
 };

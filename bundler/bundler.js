@@ -27,16 +27,23 @@ class Bundler {
 
 		Common.col("Bundler help");
 		Common.col("------------");
+		Common.col("first argument:");
 		Common.col("watch - watch and compile js & less files");
 		Common.col("dev   - compile for dev");
 		Common.col("dist  - compile for dist");
 		Common.col("doc   - documentation");
-		Common.col("clear - clear ES6 cache");
-		Common.col("- default is watch option");
-		Common.col("--force - always rewrite output files (disable cache)");
+		Common.col("clear - remove ES6 cache file");
+		Common.col("default is watch option");
+		Common.col("variable argument at any position");
+		Common.col("--force - always rewrite output files");
+		Common.col("--clear - disable cache file");
 
 		if (this._args.indexOf("--force") != -1) {
 			this._myES6.alwaysRewrite();
+		}
+
+		if (this._args.indexOf("--clear") != -1) {
+			this._myES6.disableCache();
 		}
 
 		let firstArg = this._args.length ? this._args[0] : "";

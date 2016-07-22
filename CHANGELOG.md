@@ -1,5 +1,9 @@
 # Change Log
 
+## unrealesed
+
+* bundler update - refactoring
+
 ## 2.8.1 (21. 7. 2016)
 
 * common - chainPromisesInner is private
