@@ -30,7 +30,7 @@ class MyES6 {
 		this._usedPaths = [];
 		this._force = false;
 		this._cache = Common.getJSON(config.cache);
-		this._onixjsData = null;
+		this._headerData = null;
 		this._reloadSet = false;
 		this._timeStop = new TimeStop();
 	}
@@ -94,13 +94,13 @@ class MyES6 {
 		});
 	}
 
-	getOnixInfo() {
-		if (!this._onixjsData) return;
+	getMetaInfo() {
+		if (!this._headerData) return;
 
-		let version = this._onixjsData.version;
-		let date = this._onixjsData.date;
+		let version = this._headerData.version;
+		let date = this._headerData.date;
 
-		Common.col("Onix version {0} date {1}", version, date);
+		Common.col("Version {0} date {1}", version, date);
 	}
 
 	makeJS(bundle, run) {
@@ -142,7 +142,7 @@ class MyES6 {
 					if (bundle.header && file.path == this._header.file) {
 						this._setFileCache(file.path, file.data);
 
-						this._setOnixjsData();
+						this._setHeaderData();
 					}
 					else if (bundle.reload && file.path == this._reload.file) {
 						this._setFileCache(file.path, file.data);
@@ -224,11 +224,11 @@ class MyES6 {
 	}
 
 	_getHeader(addComment, bundle) {
-		if (!this._header || !this._onixjsData) return "";
+		if (!this._header || !this._headerData) return "";
 
 		let headerData = this._getCacheItem(this._header.file).data;
-		let version = this._onixjsData.version;
-		let date = this._onixjsData.date;
+		let version = this._headerData.version;
+		let date = this._headerData.date;
 		let output = [];
 		let joiner = addComment ? "\n" : "";
 		let minPh = "";
@@ -289,14 +289,13 @@ class MyES6 {
 		this._reloadSet = true;
 	}
 
-	_setOnixjsData() {
-		if (!this._header || this._onixjsData) return;
+	_setHeaderData() {
+		if (!this._header || this._headerData) return;
 
-		// onix js
-		let onixjsData = this._getCacheItem(this._header.onix).data;
+		let headerData = this._getCacheItem(this._header.source).data;
 		let version = "";
 		let date = "";
-		let lines = onixjsData.split(EOL);
+		let lines = headerData.split(EOL);
 
 		lines.forEach(line => {
 			line = line.trim();
@@ -312,8 +311,7 @@ class MyES6 {
 			}
 		});
 
-		this._onixjsData = {
-			data: onixjsData,
+		this._headerData = {
 			version: version,
 			date: date
 		};
@@ -423,7 +421,7 @@ class MyES6 {
 		catch (err) {
 			Common.col("UglifyJS error {0}", err.message);
 
-			if (err.line && err.col) {
+			if ("line" in err && "col" in err) {
 				Common.col("Line {0} col {1}", err.line, err.col);
 			}
 

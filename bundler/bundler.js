@@ -192,7 +192,7 @@ class Bundler {
 		Common.chainPromises(all).then(e => {
 			Common.col("Dev is done");
 
-			this._myES6.getOnixInfo();
+			this._myES6.getMetaInfo();
 
 			switch (runAfter) {
 				case "watch":
@@ -219,7 +219,7 @@ class Bundler {
 		Common.chainPromises(all).then(e => {
 			Common.col("Dist is done");
 
-			this._myES6.getOnixInfo();
+			this._myES6.getMetaInfo();
 		});
 	}
 

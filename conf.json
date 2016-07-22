@@ -11,7 +11,7 @@
 	},
 	"header": {
 		"file": "HEADER",
-		"onix": "src/onix/onix.js",
+		"source": "src/onix/onix.js",
 		"version": "version: ",
 		"date": "date: ",
 		"minimal": " * minimal version: contains [{MINIMAL}]",
