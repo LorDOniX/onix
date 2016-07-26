@@ -46,9 +46,7 @@ function(
 
 	class HomePage extends Page {
 		constructor(config) {
-			super();
-
-			this._constructor(config);
+			super(config);
 		}
 
 		// ------------------------ private ---------------------------------------

@@ -24,9 +24,6 @@ function(
 		constructor(parent, optsArg) {
 			super();
 			
-			// event init
-			this._eventInit();
-			
 			this._parent = parent;
 			this._root = this._create();
 

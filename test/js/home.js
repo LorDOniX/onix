@@ -190,9 +190,7 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 		_inherits(HomePage, _Page);
 		function HomePage(config) {
 			_classCallCheck(this, HomePage);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomePage).call(this));
-			_this._constructor(config);
-			return _this;
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(HomePage).call(this, config));
 		}
 		// ------------------------ private ---------------------------------------
 		_createClass(HomePage, [{
@@ -598,8 +596,7 @@ homeApp.factory("HomeSnippet", ["$common", "Snippet", "TestFromModule", function
 		_inherits(HomeSnippet, _Snippet);
 		function HomeSnippet(config, parent) {
 			_classCallCheck(this, HomeSnippet);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeSnippet).call(this));
-			_this._constructor(config, parent);
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeSnippet).call(this, config, parent));
 			TestFromModule.test();
 			return _this;
 		}
@@ -623,34 +620,28 @@ homeApp.factory("Page", ["$template", "$common", "$event", function ($template, 
   */
 	var Page = function (_$event) {
 		_inherits(Page, _$event);
-		function Page() {
-			_classCallCheck(this, Page);
-			// event init
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Page).call(this));
-			_this._eventInit();
-			return _this;
-		}
 		/**
    * Constructor for page.
    *
    * @param {Object} Page config
    */
+		function Page(config) {
+			_classCallCheck(this, Page);
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Page).call(this));
+			var root = onix.element("body").html($template.compile(config.templ || "", _this));
+			// Object for data-bind elements references
+			_this._els = {};
+			// each page contanins only one page div
+			$template.bindTemplate(root, _this, _this._addEls.bind(_this));
+			_this._show();
+			return _this;
+		}
+		/**
+   * Add new els to this._els; this function can be called from $template
+   *
+   * @param {Object} newEls { key, value - node element}
+   */
 		_createClass(Page, [{
-			key: "_constructor",
-			value: function _constructor(config) {
-				var root = onix.element("body").html($template.compile(config.templ || "", this));
-				// Object for data-bind elements references
-				this._els = {};
-				// each page contanins only one page div
-				$template.bindTemplate(root, this, this._addEls.bind(this));
-				this._show();
-			}
-			/**
-    * Add new els to this._els; this function can be called from $template
-    *
-    * @param {Object} newEls { key, value - node element}
-    */
-		}, {
 			key: "_addEls",
 			value: function _addEls(newEls) {
 				$common.extend(this._els, newEls || {});
@@ -698,36 +689,30 @@ homeApp.factory("Snippet", ["$template", "$common", "$event", function ($templat
   */
 	var Snippet = function (_$event) {
 		_inherits(Snippet, _$event);
-		function Snippet(config) {
-			_classCallCheck(this, Snippet);
-			// event init
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Snippet).call(this));
-			_this._eventInit();
-			return _this;
-		}
 		/**
    * Constructor for snippet.
    *
    * @param {Object} config Config for snippet
    * @param {Object} parent Parent object
    */
+		function Snippet(config, parent) {
+			_classCallCheck(this, Snippet);
+			// Object for data-bind elements references
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Snippet).call(this));
+			_this._els = {};
+			_this._config = config || {};
+			_this._parent = parent;
+			_this._root = _this._create(config);
+			$template.bindTemplate(_this._root, _this, _this._addEls.bind(_this));
+			_this._show();
+			return _this;
+		}
+		/**
+   * Add new els to this._els; this function can be called from $template
+   *
+   * @param {Object} newEls { key, value - node element}
+   */
 		_createClass(Snippet, [{
-			key: "_constructor",
-			value: function _constructor(config, parent) {
-				// Object for data-bind elements references
-				this._els = {};
-				this._config = config || {};
-				this._parent = parent;
-				this._root = this._create(config);
-				$template.bindTemplate(this._root, this, this._addEls.bind(this));
-				this._show();
-			}
-			/**
-    * Add new els to this._els; this function can be called from $template
-    *
-    * @param {Object} newEls { key, value - node element}
-    */
-		}, {
 			key: "_addEls",
 			value: function _addEls(newEls) {
 				$common.extend(this._els, newEls || {});

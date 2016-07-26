@@ -16,6 +16,14 @@ app.use("/img", express.static(path.join(__dirname, MAIN_PATH + '/img')));
 app.use("/dist", express.static(path.join(__dirname, 'dist')));
 app.use("/docs", express.static(path.join(__dirname, 'docs')));
 
+// test api
+app.get("/api/home/", function(req, res) {
+	res.json({
+		name: "test API item",
+		value: 42
+	});
+});
+
 // test
 app.get('/test', function(req, res) {
 	res.sendfile(MAIN_PATH + '/test.html');

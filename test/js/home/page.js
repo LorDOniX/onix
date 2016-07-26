@@ -11,19 +11,14 @@ function(
 	 * Page
 	 */
 	class Page extends $event {
-		constructor() {
-			super();
-
-			// event init
-			this._eventInit();
-		}
-
 		/**
 		 * Constructor for page.
 		 *
 		 * @param {Object} Page config
 		 */
-		_constructor(config) {
+		constructor(config) {
+			super();
+
 			var root = onix.element("body").html($template.compile(config.templ || "", this));
 
 			// Object for data-bind elements references

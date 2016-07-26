@@ -19,9 +19,6 @@ function(
 		constructor(el, opts) {
 			super();
 			
-			// event init
-			this._eventInit();
-			
 			this._opts = {
 				addCaption: false
 			};

@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.8.1/21. 7. 2016
+ * 2.8.2/26. 7. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1882,14 +1882,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.8.1
-  * date: 21. 7. 2016
+  * version: 2.8.2
+  * date: 26. 7. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.8.1/21. 7. 2016\n'+
+'2.8.2/26. 7. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2686,36 +2686,25 @@ onix.factory("$event", function () {
 	var $event = function () {
 		function $event() {
 			_classCallCheck(this, $event);
-		}
-		_createClass($event, [{
-			key: "_eventInit",
 			/**
-    * Init event functionality.
+    * All events. { name: name, event: function, scope, [once] }
     * 
+    * @type {Array}
     * @member $event
     * @private
-    * @method _eventInit
     */
-			value: function _eventInit() {
-				/**
-     * All events. { name: name, event: function, scope, [once] }
-     * 
-     * @type {Array}
-     * @member $event
-     * @private
-     */
-				this._allEvents = [];
-			}
-			/**
-    * Add new event to the stack.
-    * 
-    * @param  {String} name 
-    * @param  {Function} fn
-    * @param  {Object|Function} [scope]
-    * @member $event
-    * @method on
-    */
-		}, {
+			this._allEvents = [];
+		}
+		/**
+   * Add new event to the stack.
+   * 
+   * @param  {String} name 
+   * @param  {Function} fn
+   * @param  {Object|Function} [scope]
+   * @member $event
+   * @method on
+   */
+		_createClass($event, [{
 			key: "on",
 			value: function on(name, fn, scope) {
 				if (!name || !fn) return;
@@ -2808,15 +2797,13 @@ onix.factory("$resize", ["$event", function ($event) {
 		_inherits($resize, _$event);
 		function $resize() {
 			_classCallCheck(this, $resize);
-			// event init
-			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
-			_this9._eventInit();
 			/**
     * Is active?
     *
     * @member $resize
     * @private
     */
+			var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
 			_this9._active = false;
 			/**
     * Resize object.
@@ -6016,10 +6003,8 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		_inherits($anonymizer, _$event2);
 		function $anonymizer(parent, optsArg) {
 			_classCallCheck(this, $anonymizer);
-			// event init
-			var _this26 = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
-			_this26._eventInit();
 			// is canvas available?
+			var _this26 = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
 			if (!$features.CANVAS) {
 				console.error("Canvas is not available!");
 				return _possibleConstructorReturn(_this26);
@@ -7563,9 +7548,7 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		_inherits($select, _$event3);
 		function $select(el, opts) {
 			_classCallCheck(this, $select);
-			// event init
 			var _this35 = _possibleConstructorReturn(this, Object.getPrototypeOf($select).call(this));
-			_this35._eventInit();
 			_this35._opts = {
 				addCaption: false
 			};
@@ -7835,9 +7818,7 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
 		_inherits($slider, _$event4);
 		function $slider(parent, optsArg) {
 			_classCallCheck(this, $slider);
-			// event init
 			var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf($slider).call(this));
-			_this39._eventInit();
 			_this39._parent = parent;
 			_this39._root = _this39._create();
 			_this39._opts = {

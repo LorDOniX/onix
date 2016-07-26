@@ -11,20 +11,15 @@ function(
 	 * Snippet
 	 */
 	class Snippet extends $event {
-		constructor(config) {
-			super();
-
-			// event init
-			this._eventInit();
-		}
-
 		/**
 		 * Constructor for snippet.
 		 *
 		 * @param {Object} config Config for snippet
 		 * @param {Object} parent Parent object
 		 */
-		_constructor(config, parent) {
+		constructor(config, parent) {
+			super();
+
 			// Object for data-bind elements references
 			this._els = {};
 

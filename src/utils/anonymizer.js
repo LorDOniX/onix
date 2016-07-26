@@ -36,9 +36,6 @@ function(
 	class $anonymizer extends $event {
 		constructor(parent, optsArg) {
 			super();
-			
-			// event init
-			this._eventInit();
 
 			// is canvas available?
 			if (!$features.CANVAS) {

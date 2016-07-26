@@ -13,9 +13,6 @@ function(
 	class $resize extends $event {
 		constructor() {
 			super();
-			
-			// event init
-			this._eventInit();
 
 			/**
 			 * Is active?

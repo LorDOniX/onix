@@ -5,14 +5,7 @@ onix.factory("$event", function() {
  	 * @class $event
  	 */
 	class $event {
-		/**
-		 * Init event functionality.
-		 * 
-		 * @member $event
-		 * @private
-		 * @method _eventInit
-		 */
-		_eventInit() {
+		constructor() {
 			/**
 			 * All events. { name: name, event: function, scope, [once] }
 			 * 

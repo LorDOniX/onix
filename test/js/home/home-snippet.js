@@ -9,9 +9,7 @@ function(
 ) {
 	class HomeSnippet extends Snippet {
 		constructor(config, parent) {
-			super();
-
-			this._constructor(config, parent);
+			super(config, parent);
 
 			TestFromModule.test();
 		}

@@ -1,8 +1,10 @@
 # Change Log
 
-## unrealesed
+## 2.8.2 (26. 7. 2016)
 
 * bundler update - refactoring
+* $event - _eventInit moved to constructor; update all occurances (framework + test website)
+* test site - _constructor method move to constructor()
 
 ## 2.8.1 (21. 7. 2016)
 
