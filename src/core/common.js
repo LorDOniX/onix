@@ -462,4 +462,54 @@ function(
 
 		return output;
 	};
+
+	/**
+	 * Get value from object using JSON path.
+	 * 
+	 * @param  {Object} obj
+	 * @param  {String} path "key.subkey.keyxy", "key.subkey.key[5].keyYZ"
+	 * @param  {Object} [defValue] Default value if path does not exist
+	 * @return {Object} value from path|default value|null
+	 * @member $common
+	 */
+	this.valueFromObject = function(obj, path, defValue) {
+		if (arguments.length < 2) {
+			return null;
+		}
+
+		let curObj = obj;
+		let parts = path.split(".");
+
+		parts.every(part => {
+			part = part.trim();
+			
+			let arrayMatch = part.match(/\[\s*(\d+)\s*\]/);
+			let isOk = false;
+
+			if (arrayMatch) {
+				let arrayObj = curObj[part.replace(arrayMatch[0], "")];
+				let ind = parseFloat(arrayMatch[1]);
+
+				if (Array.isArray(arrayObj) && ind >= 0 && ind < arrayObj.length) {
+					curObj = arrayObj[ind];
+					isOk = true;
+				}
+			}
+			else if (this.isObject(curObj)) {
+				curObj = curObj[part];
+				isOk = true;
+			}
+
+			if (!isOk || typeof curObj === "undefined") {
+				curObj = defValue || null;
+
+				return false;
+			}
+			else {
+				return true;
+			}
+		});
+
+		return curObj;
+	};
 }]);

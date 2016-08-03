@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.8.4 (3. 8. 2016)
+
+* $myQuery - multiple mousemove bugfix (one is mousewheel)
+* $common - new method valueFromObject - get value from object using path
+
 ## 2.8.3 (3. 8. 2016)
 
 * $http - application/json index of

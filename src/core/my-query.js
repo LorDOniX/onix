@@ -502,7 +502,7 @@ function(
 		 * @member $myQuery
 		 * @method mouseleave
 		 */
-		mousemove(cb, scope) {
+		mousewheel(cb, scope) {
 			return this._bindEvent("DOMMouseScroll", cb, scope)._bindEvent("mousewheel", cb, scope);
 		}
 

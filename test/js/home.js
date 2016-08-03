@@ -563,6 +563,10 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 				var s2 = "There was {   COUNT , plural, one{car} few{cars} other{ cars  }    } {hi} aa    {   daads }   ";
 				console.log(s2);
 				console.log(_(s2));
+				$common.col('valueFromObject({a:{data: 5}}, "a.data") -> {0}', $common.valueFromObject({ a: { data: 5 } }, "a.data"));
+				$common.col('valueFromObject({a:{data: 5}}, "a.x") -> {0}', $common.valueFromObject({ a: { data: 5 } }, "a.x"));
+				$common.col('valueFromObject({a:{data: 5}}, "a.data.x2.y2", 100) -> {0}', $common.valueFromObject({ a: { data: 5 } }, "a.data.x2.y2", 100));
+				$common.col('valueFromObject({a: [{data: 5}, {data: 6}]}, "a[1].data") -> {0}', $common.valueFromObject({ a: [{ data: 5 }, { data: 6 }] }, "a[1].data"));
 			}
 		}, {
 			key: "allTests",
