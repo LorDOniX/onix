@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.8.3 (3. 8. 2016)
+
+* $http - application/json index of
+
 ## 2.8.2 (26. 7. 2016)
 
 * bundler update - refactoring

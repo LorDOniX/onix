@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.8.2/26. 7. 2016
+ * 2.8.3/3. 8. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1882,14 +1882,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.8.2
-  * date: 26. 7. 2016
+  * version: 2.8.3
+  * date: 3. 8. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.8.2/26. 7. 2016\n'+
+'2.8.3/3. 8. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -3068,7 +3068,7 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
 					var responseData = request.responseText || "";
 					var responseType = request.getResponseHeader("Content-Type");
 					var promiseData = null;
-					if (responseType == "application/json") {
+					if (responseType.indexOf("application/json") != -1) {
 						promiseData = responseData.length ? JSON.parse(responseData) : {};
 					} else {
 						promiseData = responseData;

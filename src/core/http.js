@@ -125,7 +125,7 @@ function(
 					let responseType = request.getResponseHeader("Content-Type");
 					let promiseData = null;
 
-					if (responseType == "application/json") {
+					if (responseType.indexOf("application/json") != -1) {
 						promiseData = responseData.length ? JSON.parse(responseData) : {};
 					}
 					else {

@@ -900,8 +900,8 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.8.2
-	 * date: 26. 7. 2016
+	 * version: 2.8.3
+	 * date: 3. 8. 2016
 	 * @member onix
 	 * @static
 	 */
