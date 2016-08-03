@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='global-property-'>/**
 </span> * OnixJS framework
- * 2.8.4/3. 8. 2016
+ * 2.8.5/3. 8. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1899,14 +1899,14 @@ onix = function () {
 <span id='onix-static-method-info'>	/**
 </span>  * Framework info.
   *
-  * version: 2.8.4
+  * version: 2.8.5
   * date: 3. 8. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log(&#39;OnixJS framework\n&#39;+
-&#39;2.8.4/3. 8. 2016\n&#39;+
+&#39;2.8.5/3. 8. 2016\n&#39;+
 &#39;source: https://gitlab.com/LorDOniX/onix\n&#39;+
 &#39;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&#39;+
 &#39;@license MIT\n&#39;+
@@ -3123,7 +3123,7 @@ onix.service(&quot;$http&quot;, [&quot;$promise&quot;, &quot;$common&quot;, &quo
 			request.onreadystatechange = function () {
 				if (request.readyState == 4) {
 					var responseData = request.responseText || &quot;&quot;;
-					var responseType = request.getResponseHeader(&quot;Content-Type&quot;);
+					var responseType = request.getResponseHeader(&quot;Content-Type&quot;) || &quot;&quot;;
 					var promiseData = null;
 					if (responseType.indexOf(&quot;application/json&quot;) != -1) {
 						promiseData = responseData.length ? JSON.parse(responseData) : {};

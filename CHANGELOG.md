@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.8.5 (3. 8. 2016)
+
+* $http - bugfix for default value getResponseHeader()
+
 ## 2.8.4 (3. 8. 2016)
 
 * $myQuery - multiple mousemove bugfix (one is mousewheel)

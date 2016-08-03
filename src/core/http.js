@@ -122,7 +122,7 @@ function(
 			request.onreadystatechange = () => {
 				if (request.readyState == 4) {
 					let responseData = request.responseText || "";
-					let responseType = request.getResponseHeader("Content-Type");
+					let responseType = request.getResponseHeader("Content-Type") || "";
 					let promiseData = null;
 
 					if (responseType.indexOf("application/json") != -1) {
