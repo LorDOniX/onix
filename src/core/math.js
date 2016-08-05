@@ -263,4 +263,22 @@ onix.service("$math", function() {
 			return value;
 		}
 	};
+
+	/**
+	 * Get middle angle between start and end angle.
+	 * Negative angle is computed like 360 + negative angle.
+	 * 
+	 * @param {Number} startAngle
+	 * @param {Number} endAngle
+	 * @return {Number}
+	 * @member $math
+	 */
+	this.getMiddleAngle = function(startAngle, endAngle) {
+		startAngle = startAngle || 0;
+		endAngle = endAngle || 0;
+
+		let value = ((startAngle + endAngle) / 2) % 180;
+
+		return (value < 0 ? 360 + value : value);
+	};
 });

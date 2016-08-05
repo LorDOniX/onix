@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.8.5/3. 8. 2016
+ * 2.8.6/5. 8. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * minimal version: contains [src/libs/polyfills.js, src/onix/onix.js, src/onix/filter.js]
@@ -797,6 +797,14 @@ onix = function () {
     */
 			this._modulesObj = {};
 			/**
+    * All objects cache - quick access.
+    *
+    * @private
+    * @member $modules
+    * @type {Object}
+    */
+			this._objectsCache = {};
+			/**
     * Modules constants.
     *
     * @private
@@ -862,39 +870,54 @@ onix = function () {
 		}, {
 			key: "_getObject",
 			value: function _getObject(name) {
+				var _this3 = this;
 				var output = null;
-				var searchModuleName = "";
-				var searchObjectName = "";
-				if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
-					var parts = name.split(this._CONST.MODULE_SEPARATOR);
-					if (parts.length == 2) {
-						searchModuleName = parts[0];
-						searchObjectName = parts[1];
-					} else {
-						console.error("Get object " + name + " error! Wrong module separator use.");
-						return null;
-					}
+				// get from cache
+				if (name in this._objectsCache) {
+					output = this._objectsCache[name];
 				} else {
-					searchObjectName = name;
-				}
-				this._modules.every(function (module) {
-					var moduleObjects = module.getObjects();
-					if (searchModuleName) {
-						if (module.getName() != searchModuleName) return true;
-						if (searchObjectName in moduleObjects) {
-							output = moduleObjects[searchObjectName];
-							return false;
+					var _ret = function () {
+						var searchModuleName = "";
+						var searchObjectName = "";
+						if (name.indexOf(_this3._CONST.MODULE_SEPARATOR) != -1) {
+							var parts = name.split(_this3._CONST.MODULE_SEPARATOR);
+							if (parts.length == 2) {
+								searchModuleName = parts[0];
+								searchObjectName = parts[1];
+							} else {
+								console.error("Get object " + name + " error! Wrong module separator use.");
+								return {
+									v: null
+								};
+							}
 						} else {
-							console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
-							return false;
+							searchObjectName = name;
 						}
-					} else {
-						if (searchObjectName in moduleObjects) {
-							output = moduleObjects[searchObjectName];
-							return false;
-						} else return true;
-					}
-				});
+						_this3._modules.every(function (module) {
+							var moduleObjects = module.getObjects();
+							if (searchModuleName) {
+								if (module.getName() != searchModuleName) return true;
+								if (searchObjectName in moduleObjects) {
+									output = moduleObjects[searchObjectName];
+									return false;
+								} else {
+									console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
+									return false;
+								}
+							} else {
+								if (searchObjectName in moduleObjects) {
+									output = moduleObjects[searchObjectName];
+									return false;
+								} else {
+									return true;
+								}
+							}
+						});
+						// save to cache
+						_this3._objectsCache[name] = output;
+					}();
+					if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+				}
 				return output;
 			}
 		}, {
@@ -919,7 +942,7 @@ onix = function () {
 		}, {
 			key: "run",
 			value: function run(obj, isConfig, parent) {
-				var _this3 = this;
+				var _this4 = this;
 				parent = parent || [];
 				if (parent.indexOf(obj.name) != -1) {
 					console.error("Circular dependency error! Object name: " + obj.name + ", parents: " + parent.join("|"));
@@ -941,12 +964,12 @@ onix = function () {
 				if (obj.inject && obj.inject.length) {
 					obj.inject.forEach(function (objName) {
 						if (typeof objName === "string") {
-							var injObj = _this3._getObject(objName);
+							var injObj = _this4._getObject(objName);
 							if (!injObj) {
 								console.error("Object name: " + objName + " not found!");
 								inject.push(null);
 							} else {
-								inject.push(_this3.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
+								inject.push(_this4.run(injObj, isConfig, obj.name ? parent.concat(obj.name) : parent));
 							}
 						} else if ((typeof objName === "undefined" ? "undefined" : _typeof(objName)) === "object") {
 							inject.push(objName);
@@ -1165,14 +1188,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.8.5
-  * date: 3. 8. 2016
+  * version: 2.8.6
+  * date: 5. 8. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.8.5/3. 8. 2016\n'+
+'2.8.6/5. 8. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+

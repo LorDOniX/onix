@@ -458,6 +458,15 @@ onix = (function() {
 			this._modulesObj = {};
 
 			/**
+			 * All objects cache - quick access.
+			 *
+			 * @private
+			 * @member $modules
+			 * @type {Object}
+			 */
+			this._objectsCache = {};
+
+			/**
 			 * Modules constants.
 			 *
 			 * @private
@@ -530,52 +539,63 @@ onix = (function() {
 		_getObject(name) {
 			let output = null;
 
-			let searchModuleName = "";
-			let searchObjectName = "";
-
-			if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
-				let parts = name.split(this._CONST.MODULE_SEPARATOR);
-
-				if (parts.length == 2) {
-					searchModuleName = parts[0];
-					searchObjectName = parts[1];
-				}
-				else {
-					console.error("Get object " + name + " error! Wrong module separator use.");
-
-					return null;
-				}
+			// get from cache
+			if (name in this._objectsCache) {
+				output = this._objectsCache[name];
 			}
 			else {
-				searchObjectName = name;
-			}
+				let searchModuleName = "";
+				let searchObjectName = "";
 
-			this._modules.every(module => {
-				let moduleObjects = module.getObjects();
+				if (name.indexOf(this._CONST.MODULE_SEPARATOR) != -1) {
+					let parts = name.split(this._CONST.MODULE_SEPARATOR);
 
-				if (searchModuleName) {
-					if (module.getName() != searchModuleName) return true;
-
-					if (searchObjectName in moduleObjects) {
-						output = moduleObjects[searchObjectName];
-
-						return false;
+					if (parts.length == 2) {
+						searchModuleName = parts[0];
+						searchObjectName = parts[1];
 					}
 					else {
-						console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
+						console.error("Get object " + name + " error! Wrong module separator use.");
 
-						return false;
+						return null;
 					}
 				}
 				else {
-					if (searchObjectName in moduleObjects) {
-						output = moduleObjects[searchObjectName];
-
-						return false;
-					}
-					else return true;
+					searchObjectName = name;
 				}
-			});
+
+				this._modules.every(module => {
+					let moduleObjects = module.getObjects();
+
+					if (searchModuleName) {
+						if (module.getName() != searchModuleName) return true;
+
+						if (searchObjectName in moduleObjects) {
+							output = moduleObjects[searchObjectName];
+
+							return false;
+						}
+						else {
+							console.error("Get object " + searchObjectName + " error! Cannot find object in the module " + searchModuleName + ".");
+
+							return false;
+						}
+					}
+					else {
+						if (searchObjectName in moduleObjects) {
+							output = moduleObjects[searchObjectName];
+
+							return false;
+						}
+						else {
+							return true;
+						}
+					}
+				});
+
+				// save to cache
+				this._objectsCache[name] = output;
+			}
 
 			return output;
 		};
@@ -900,8 +920,8 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 2.8.5
-	 * date: 3. 8. 2016
+	 * version: 2.8.6
+	 * date: 5. 8. 2016
 	 * @member onix
 	 * @static
 	 */

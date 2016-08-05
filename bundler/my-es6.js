@@ -141,8 +141,6 @@ class MyES6 {
 				all.forEach((file) => {
 					if (bundle.header && file.path == this._header.file) {
 						this._setFileCache(file.path, file.data);
-
-						this._setHeaderData();
 					}
 					else if (bundle.reload && file.path == this._reload.file) {
 						this._setFileCache(file.path, file.data);
@@ -157,6 +155,9 @@ class MyES6 {
 						}
 
 						let sfcObj = this._setFileCache(file.path, file.data, transpile);
+
+						// after cache - can i set header data?
+						this._setHeaderData(file.path);
 
 						errors += sfcObj.error ? 1 : 0;
 						cached += sfcObj.cached ? 1 : 0;
@@ -289,8 +290,8 @@ class MyES6 {
 		this._reloadSet = true;
 	}
 
-	_setHeaderData() {
-		if (!this._header || this._headerData) return;
+	_setHeaderData(path) {
+		if (this._headerData || !this._header || path != this._header.source) return;
 
 		let headerData = this._getCacheItem(this._header.source).data;
 		let version = "";

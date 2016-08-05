@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.8.6 (5. 8. 2016)
+
+* $modules - caching objects
+* $math - new method getMiddleAngle
+* bundler - dist & version info fix
+
 ## 2.8.5 (3. 8. 2016)
 
 * $http - bugfix for default value getResponseHeader()
