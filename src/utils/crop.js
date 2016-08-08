@@ -600,6 +600,11 @@ function(
 				sw.x = nw.x;
 				sw.y = se.y;
 
+				let size = this._getSize();
+
+				this._dim.width = size.width;
+				this._dim.height = size.height;
+
 				this._redraw();
 
 				this._backupData = null;

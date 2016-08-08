@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.8.7 (. . 2016)
+
+* $crop - restore method sets new width and height
+
 ## 2.8.6 (5. 8. 2016)
 
 * $modules - caching objects
