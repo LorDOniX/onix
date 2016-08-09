@@ -1,8 +1,9 @@
 # Change Log
 
-## 2.8.7 (. . 2016)
+## 2.8.7 (9. 8. 2016)
 
-* $crop - restore method sets new width and height
+* $crop - restore method sets new width and height (bugfix)
+* $common - cloneValue bugfix (boolean)
 
 ## 2.8.6 (5. 8. 2016)
 

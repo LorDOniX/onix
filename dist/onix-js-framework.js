@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.8.6/5. 8. 2016
+ * 2.8.7/9. 8. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1905,14 +1905,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.8.6
-  * date: 5. 8. 2016
+  * version: 2.8.7
+  * date: 9. 8. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.8.6/5. 8. 2016\n'+
+'2.8.7/9. 8. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2126,6 +2126,7 @@ onix.service("$common", ["$promise", function ($promise) {
 					return null;
 				}
 			case "undefined":
+			case "boolean":
 			case "function":
 			case "number":
 			case "string":
@@ -8813,6 +8814,9 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 					ne.y = nw.y;
 					sw.x = nw.x;
 					sw.y = se.y;
+					var size = this._getSize();
+					this._dim.width = size.width;
+					this._dim.height = size.height;
 					this._redraw();
 					this._backupData = null;
 				}

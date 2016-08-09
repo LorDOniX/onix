@@ -143,6 +143,7 @@ function(
 				}
 
 			case "undefined":
+			case "boolean":
 			case "function":
 			case "number":
 			case "string":

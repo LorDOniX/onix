@@ -466,6 +466,15 @@ function(
 			$common.col('valueFromObject({a:{data: 5}}, "a.x") -> {0}', $common.valueFromObject({a:{data: 5}}, "a.x"));
 			$common.col('valueFromObject({a:{data: 5}}, "a.data.x2.y2", 100) -> {0}', $common.valueFromObject({a:{data: 5}}, "a.data.x2.y2", 100));
 			$common.col('valueFromObject({a: [{data: 5}, {data: 6}]}, "a[1].data") -> {0}', $common.valueFromObject({a: [{data: 5}, {data: 6}]}, "a[1].data"));
+
+			console.log($common.cloneValue("string"));
+			console.log($common.cloneValue([]));
+			console.log($common.cloneValue({ a: 5, r: [1, "assda", false]}));
+			console.log($common.cloneValue(new Date()));
+			console.log($common.cloneValue(10.85));
+			console.log($common.cloneValue(null));
+			console.log($common.cloneValue(false));
+			console.log($common.cloneValue(document.createElement("div")));
 		}
 
 		allTests() {
