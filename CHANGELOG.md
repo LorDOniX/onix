@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.8.8 (11. 8. 2016)
+
+* $job - bugfix taskDoneObj - ES6 transpilation
+
 ## 2.8.7 (9. 8. 2016)
 
 * $crop - restore method sets new width and height (bugfix)

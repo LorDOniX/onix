@@ -107,7 +107,7 @@ function(
 			else {
 				let job = this._tasks.pop();
 
-				job.task.apply(job.scope || job.task, job.args.concat(() => {
+				job.task.apply(job.scope || job.task, job.args.concat(function() {
 					if (this._taskDone.cb) {
 						let doneFnArgs = Array.prototype.slice.call(arguments, 0);
 
@@ -115,7 +115,7 @@ function(
 					}
 
 					this._doJob(resolve);
-				}));
+				}.bind(this)));
 			}
 		}
 	};
