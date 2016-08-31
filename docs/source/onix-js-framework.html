@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='global-property-'>/**
 </span> * OnixJS framework
- * 2.8.8/11. 8. 2016
+ * 2.9.0/31. 8. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1922,14 +1922,14 @@ onix = function () {
 <span id='onix-static-method-info'>	/**
 </span>  * Framework info.
   *
-  * version: 2.8.8
-  * date: 11. 8. 2016
+  * version: 2.9.0
+  * date: 31. 8. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log(&#39;OnixJS framework\n&#39;+
-&#39;2.8.8/11. 8. 2016\n&#39;+
+&#39;2.9.0/31. 8. 2016\n&#39;+
 &#39;source: https://gitlab.com/LorDOniX/onix\n&#39;+
 &#39;documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n&#39;+
 &#39;@license MIT\n&#39;+
@@ -2458,6 +2458,30 @@ onix.service(&quot;$common&quot;, [&quot;$promise&quot;, function ($promise) {
 		});
 		return curObj;
 	};
+<span id='$common-method-timeDuration'>	/**
+</span>  * Format time duration in secods.
+  * Output in format: hours:minutes:seconds.
+  * 
+  * @param  {Number} seconds Number of seconds
+  * @return {String}
+  */
+	this.timeDuration = function (seconds) {
+		seconds = seconds || 0;
+		var output = &quot;&quot;;
+		var days = Math.floor(seconds / (3600 * 24));
+		seconds -= days * 3600 * 24;
+		if (days) {
+			output += days + &quot;d &quot;;
+		}
+		var hours = Math.floor(seconds / 3600);
+		seconds -= hours * 3600;
+		output += (hours &lt; 10 ? &quot;0&quot; + hours : hours) + &quot;:&quot;;
+		var minutes = Math.floor(seconds / 60);
+		output += (minutes &lt; 10 ? &quot;0&quot; + minutes : minutes) + &quot;:&quot;;
+		seconds -= minutes * 60;
+		output += seconds &lt; 10 ? &quot;0&quot; + seconds : seconds;
+		return output;
+	};
 }]);
 <span id='$cookie'>/**
 </span> * Functionality over browser cookies.
@@ -2644,6 +2668,44 @@ onix.service(&quot;$date&quot;, function () {
 		days = days || 0;
 		var addTime = 1000 * 60 * 60 * 24 * days;
 		return new Date(date.getTime() + addTime);
+	};
+<span id='$date-method-format'>	/**
+</span>  * Date - string format.
+  * yyyy - full year; m - month; d - day; s - secods; M - minutes; h - hours;
+  * double: dd, ss, MM, hh - left pad with zero.
+  * 
+  * @param  {Date} date Input date
+  * @param  {String} format Format string
+  * @return {String}
+  */
+	this.format = function (date, format) {
+		format = format || &quot;d. m. yyyy hh:MM:ss&quot;;
+		var day = date.getDate();
+		var month = date.getMonth() + 1;
+		var year = date.getFullYear();
+		var seconds = date.getSeconds();
+		var minutes = date.getMinutes();
+		var hours = date.getHours();
+		var dateObj = {
+			&quot;yyyy&quot;: year,
+			&quot;m&quot;: month,
+			&quot;mm&quot;: month &lt; 10 ? &quot;0&quot; + month : month,
+			&quot;d&quot;: day,
+			&quot;dd&quot;: day &lt; 10 ? &quot;0&quot; + day : day,
+			&quot;s&quot;: seconds,
+			&quot;ss&quot;: seconds &lt; 10 ? &quot;0&quot; + seconds : seconds,
+			&quot;M&quot;: minutes,
+			&quot;MM&quot;: minutes &lt; 10 ? &quot;0&quot; + minutes : minutes,
+			&quot;h&quot;: hours,
+			&quot;hh&quot;: hours &lt; 10 ? &quot;0&quot; + hours : hours
+		};
+		var keys = Object.keys(dateObj).sort(function (a, b) {
+			return b.length - a.length;
+		});
+		keys.forEach(function (key) {
+			format = format.replace(new RegExp(key, &quot;g&quot;), dateObj[key]);
+		});
+		return format;
 	};
 });
 <span id='$dom'>/**
@@ -5634,11 +5696,11 @@ onix.provider(&quot;$template&quot;, function () {
 	var _conf = {
 		left: &quot;{{&quot;,
 		right: &quot;}}&quot;,
-		elPrefix: &quot;data-&quot;,
+		elEventPrefix: &quot;data-event-&quot;,
 		elDataBind: &quot;data-bind&quot;
 	};
 <span id='$templateProvider-method-setConfig'>	/**
-</span>  * Set template config; you can use &quot;left&quot; {{ and &quot;right&quot; }} template delimeters, elPrefix = &quot;data-&quot; and elDataBind = &quot;data-bind&quot;
+</span>  * Set template config; you can use &quot;left&quot; {{ and &quot;right&quot; }} template delimeters, elEventPrefix = &quot;data-event-&quot; and elDataBind = &quot;data-bind&quot;
   * 
   * @param {Object} confParam Object with new config
   * @member $templateProvider
@@ -5814,10 +5876,9 @@ onix.provider(&quot;$template&quot;, function () {
 				value: function _bindEvent(el, attr, scope) {
 					var _this22 = this;
 					if (!el || !attr || !scope) return;
-					var eventName = attr.name.replace(_conf.elPrefix, &quot;&quot;);
 					var fnName = this._parseFnName(attr.value);
-					if (eventName &amp;&amp; fnName in scope) {
-						el.addEventListener(eventName, function (event) {
+					if (attr.name &amp;&amp; fnName in scope) {
+						el.addEventListener(attr.name, function (event) {
 							var args = _this22._parseArgs(attr.value, {
 								el: el,
 								event: event
@@ -5844,9 +5905,12 @@ onix.provider(&quot;$template&quot;, function () {
 							var item = el.attributes[attr];
 							// ie8 fix
 							if (!item || (typeof item === &quot;undefined&quot; ? &quot;undefined&quot; : _typeof(item)) !== &quot;object&quot; || !item.name) return;
-							if (item.name.indexOf(_conf.elPrefix) != -1) {
+							var isBind = item.name == _conf.elDataBind;
+							var isPrefix = item.name.indexOf(_conf.elEventPrefix) != -1;
+							if (isBind || isPrefix) {
 								output.push({
-									name: item.name,
+									isBind: isBind,
+									name: isPrefix ? item.name.replace(_conf.elEventPrefix, &quot;&quot;) : item.name,
 									value: item.value
 								});
 							}
@@ -5985,7 +6049,7 @@ onix.provider(&quot;$template&quot;, function () {
 							allElements.forEach(function (item) {
 								var attrs = _this25._getAttributes(item);
 								attrs.forEach(function (attr) {
-									if (attr.name == _conf.elDataBind) {
+									if (attr.isBind) {
 										newEls[attr.value] = item;
 									} else {
 										_this25._bindEvent(item, attr, scope);

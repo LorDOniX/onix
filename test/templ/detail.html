@@ -15,29 +15,29 @@
 					<h3>Image preview</h3>
 					<div>
 						<label for="uploadInput">Files to upload:</label>
-						<input type="file" name="pano" id="uploadInput" data-bind="uploadInput" data-change="uploadChange" multiple="">
+						<input type="file" name="pano" id="uploadInput" data-bind="uploadInput" data-event-change="uploadChange" multiple="">
 					</div>
 					<div data-bind="uploadPreview" class="upload-previews">SELECT IMAGES FOR THEIRS PREVIEWS</div>
 				</div>
 				<div class="col-md-12">
 					<h3>Individual tests</h3>
-					<button type="button" class="btn btn-success" data-click="others()">Others test</button>
-					<button type="button" class="btn btn-success" data-click="buttonClick($element, $event, 'Roman, Makudera',  5, null, undefined, [5, 8], { var x = 10; return x * x; })">Button click test</button>
-					<button type="button" class="btn btn-success" data-click="filterTest()">$filter("xyz") test</button>
-					<button type="button" class="btn btn-success" data-click="snippetTest()">snippet test</button>
-					<button type="button" class="btn btn-success" data-click="moduleTest()">module test</button>
-					<button type="button" class="btn btn-success" data-click="apiTest()">API test</button>
-					<button type="button" class="btn btn-success" data-click="chp()">Chaining promises test</button>
-					<button type="button" class="btn btn-success" data-click="routeParams()">Route params test</button>
-					<button type="button" class="btn btn-success" data-click="promiseTest()">Promise test</button>
-					<button type="button" class="btn btn-success" data-click="mathAndDate()">Math and date</button>
-					<button type="button" class="btn btn-success" data-click="promiseFlattening()">Promise flattening</button>
-					<button type="button" class="btn btn-success" data-click="locStor()">Locale storage</button>
-					<button type="button" class="btn btn-success" data-click="myQueryTest()">$myQuery test</button>
+					<button type="button" class="btn btn-success" data-event-click="others()">Others test</button>
+					<button type="button" class="btn btn-success" data-event-click="buttonClick($element, $event, 'Roman, Makudera',  5, null, undefined, [5, 8], { var x = 10; return x * x; })">Button click test</button>
+					<button type="button" class="btn btn-success" data-event-click="filterTest()">$filter("xyz") test</button>
+					<button type="button" class="btn btn-success" data-event-click="snippetTest()">snippet test</button>
+					<button type="button" class="btn btn-success" data-event-click="moduleTest()">module test</button>
+					<button type="button" class="btn btn-success" data-event-click="apiTest()">API test</button>
+					<button type="button" class="btn btn-success" data-event-click="chp()">Chaining promises test</button>
+					<button type="button" class="btn btn-success" data-event-click="routeParams()">Route params test</button>
+					<button type="button" class="btn btn-success" data-event-click="promiseTest()">Promise test</button>
+					<button type="button" class="btn btn-success" data-event-click="mathAndDate()">Math and date</button>
+					<button type="button" class="btn btn-success" data-event-click="promiseFlattening()">Promise flattening</button>
+					<button type="button" class="btn btn-success" data-event-click="locStor()">Locale storage</button>
+					<button type="button" class="btn btn-success" data-event-click="myQueryTest()">$myQuery test</button>
 				</div>
 				<div class="col-md-12">
 					<h3>All tests</h3>
-					<button type="button" class="btn btn-success" data-click="allTests()">Run all tests</button>
+					<button type="button" class="btn btn-success" data-event-click="allTests()">Run all tests</button>
 				</div>
 				<div class="col-md-12">
 					<h3>$select test</h3>

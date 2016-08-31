@@ -513,4 +513,35 @@ function(
 
 		return curObj;
 	};
+
+	/**
+	 * Format time duration in secods.
+	 * Output in format: hours:minutes:seconds.
+	 * 
+	 * @param  {Number} seconds Number of seconds
+	 * @return {String}
+	 */
+	this.timeDuration = function(seconds) {
+		seconds = seconds || 0;
+
+		let output = "";
+		let days = Math.floor(seconds / (3600 * 24));
+		seconds -= days * 3600 * 24;
+
+		if (days) {
+			output += days + "d ";
+		}
+
+		let hours = Math.floor(seconds / 3600);
+		seconds -= hours * 3600;
+		output += (hours < 10 ? "0" + hours : hours) + ":";
+
+		let minutes = Math.floor(seconds / 60);
+		output += (minutes < 10 ? "0" + minutes : minutes) + ":";
+		seconds -= minutes * 60;
+
+		output += (seconds < 10 ? "0" + seconds : seconds);
+		
+		return output;
+	};
 }]);

@@ -9,12 +9,12 @@ onix.provider("$template", function() {
 	let _conf = {
 		left: "{{",
 		right: "}}",
-		elPrefix: "data-",
+		elEventPrefix: "data-event-",
 		elDataBind: "data-bind"
 	};
 
 	/**
-	 * Set template config; you can use "left" {{ and "right" }} template delimeters, elPrefix = "data-" and elDataBind = "data-bind"
+	 * Set template config; you can use "left" {{ and "right" }} template delimeters, elEventPrefix = "data-event-" and elDataBind = "data-bind"
 	 * 
 	 * @param {Object} confParam Object with new config
 	 * @member $templateProvider
@@ -208,11 +208,10 @@ onix.provider("$template", function() {
 			_bindEvent(el, attr, scope) {
 				if (!el || !attr || !scope) return;
 
-				let eventName = attr.name.replace(_conf.elPrefix, "");
 				let fnName = this._parseFnName(attr.value);
 
-				if (eventName && fnName in scope) {
-					el.addEventListener(eventName, event => {
+				if (attr.name && fnName in scope) {
+					el.addEventListener(attr.name, event => {
 						let args = this._parseArgs(attr.value, {
 							el: el,
 							event: event
@@ -242,9 +241,13 @@ onix.provider("$template", function() {
 						// ie8 fix
 						if (!item || typeof item !== "object" || !item.name) return;
 
-						if (item.name.indexOf(_conf.elPrefix) != -1) {
+						let isBind = item.name == _conf.elDataBind;
+						let isPrefix = item.name.indexOf(_conf.elEventPrefix) != -1;
+
+						if (isBind || isPrefix) {
 							output.push({
-								name: item.name,
+								isBind: isBind,
+								name: isPrefix ? item.name.replace(_conf.elEventPrefix, "") : item.name,
 								value: item.value
 							});
 						}
@@ -392,7 +395,7 @@ onix.provider("$template", function() {
 						let attrs = this._getAttributes(item);
 
 						attrs.forEach(attr => {
-							if (attr.name == _conf.elDataBind) {
+							if (attr.isBind) {
 								newEls[attr.value] = item;
 							}
 							else {

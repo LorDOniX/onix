@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.9.0 (31. 8. 2016)
+
+* $template - data- for events is replaced by data-event-; elPrefix -> elEventPrefix rename;
+* $date - format method (date string format)
+* $common - timeDuration method (time duration string)
+
 ## 2.8.8 (11. 8. 2016)
 
 * $job - bugfix taskDoneObj - ES6 transpilation

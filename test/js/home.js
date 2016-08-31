@@ -575,6 +575,8 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 				console.log($common.cloneValue(null));
 				console.log($common.cloneValue(false));
 				console.log($common.cloneValue(document.createElement("div")));
+				console.log("Date format day.month.year hours:minutes -> {0}".format($date.format(new Date(), "dd.mm.yyyy hh:MM")));
+				console.log("Time duration 54321 seconds -> {0}".format($common.timeDuration(54321)));
 			}
 		}, {
 			key: "allTests",

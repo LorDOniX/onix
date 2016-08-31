@@ -87,4 +87,49 @@ onix.service("$date", function() {
 
 		return new Date(date.getTime() + addTime);
 	};
+
+	/**
+	 * Date - string format.
+	 * yyyy - full year; m - month; d - day; s - secods; M - minutes; h - hours;
+	 * double: dd, ss, MM, hh - left pad with zero.
+	 * 
+	 * @param  {Date} date Input date
+	 * @param  {String} format Format string
+	 * @return {String}
+	 */
+	this.format = function(date, format) {
+		format = format || "d. m. yyyy hh:MM:ss";
+
+		let day = date.getDate();
+		let month = date.getMonth() + 1;
+		let year = date.getFullYear();
+
+		let seconds = date.getSeconds();
+		let minutes = date.getMinutes();
+		let hours = date.getHours();
+
+		let dateObj = {
+			"yyyy": year,
+			"m": month,
+			"mm": month < 10 ? "0" + month : month,
+			"d": day,
+			"dd": day < 10 ? "0" + day : day,
+			"s": seconds,
+			"ss": seconds < 10 ? "0" + seconds : seconds,
+			"M": minutes,
+			"MM": minutes < 10 ? "0" + minutes : minutes,
+			"h": hours,
+			"hh": hours < 10 ? "0" + hours : hours,
+		};
+
+		let keys = Object.keys(dateObj).sort((a, b) => {
+			return b.length - a.length;
+		});
+
+		keys.forEach(key => {
+			format = format.replace(new RegExp(key, "g"), dateObj[key]);
+		});
+
+		return format;
+	};
 });
