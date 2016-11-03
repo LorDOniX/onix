@@ -22,6 +22,10 @@ function(
 			name: "Crop",
 			url: "/crop"
 		},
+		UTILS: {
+			name: "Utils",
+			url: "/utils"
+		},
 		TEST: {
 			name: "Test",
 			url: "/test"
@@ -84,6 +88,7 @@ function(
 			this.PAGES.MINIMAL,
 			this.PAGES.ANONYMIZER,
 			this.PAGES.CROPPER,
+			this.PAGES.UTILS,
 			this.PAGES.TEST,
 			this.PAGES.DOCS
 		]

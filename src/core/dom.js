@@ -12,7 +12,7 @@ function(
 	 * Create $dom from the configuration.
 	 *
 	 * @param  {Object} config
-	 * @param  {String} config.el Element name, default creates "div"
+	 * @param  {String} config.el Element name, default creates "div", for text node use "text"
 	 * @param  {Object} [config.attrs] Atributes
 	 * @param  {Object} [config.css] Object with css styles
 	 * @param  {Array|Object} [config.events] Bind events {event, fn}
@@ -23,7 +23,15 @@ function(
 	 * @member $dom
 	 */
 	this.create = function(config, exported) {
-		let el = document.createElement(config.el || "div");
+		let elName = config.el || "div";
+		let el;
+
+		if (elName == "text") {
+			el = document.createTextNode("");
+		}
+		else {
+			el = document.createElement(elName);
+		}
 
 		Object.keys(config).forEach(key => {
 			let value;

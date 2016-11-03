@@ -16,22 +16,25 @@
 
 	<script src="/js/common/menu.js"></script>
 	
-	<script src="/js/crop/crop.js"></script>
+	<script src="/js/utils/utils.js"></script>
 </head>
 <body>
-	<div class="main-cont">
-		<h1>Crop</h1>
-
-		<div class="crop-area">
-			<img src="/img-test/test-photo.jpg" alt="" />
-		</div>
-
+	<div id="utils">
+		<h2>Popup and lightbox</h2>
 		<div>
-			<button type="button" data-event-click="setCenter()">Set center</button>
-			<button type="button" data-event-click="fitToArea()">Fit to area</button>
-			<button type="button" data-event-click="backup()">Backup</button>
-			<button type="button" data-event-click="restore()">Restore</button>
-			<button type="button" data-event-click="aabb()">Get AABB</button>
+			<button type="button" class="btn btn-default" data-event-click="popup()">Popup</button>
+			<button type="button" class="btn btn-default" data-event-click="lightbox()">Lightbox</button>
+			
+		</div>
+		<div>
+			<h2>JSON viewer</h2>
+			<div>
+				<input type="text" class="form-control" data-bind="urlInput" />
+			</div>
+			<div class="json-viewer-btn">
+				<button type="button" class="btn btn-default" data-event-click="jsonViewer()">JSON viewer</button>
+			</div>
+			<div data-bind="jsonOutput"></div>
 		</div>
 	</div>
 </body>

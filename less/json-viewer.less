@@ -1,0 +1,68 @@
+.json-viewer {
+	color: #000;
+	padding-left: 20px;
+
+	.hide {
+		display: none;
+	}
+
+	.items-ph {
+		color: #aaa;
+		padding: 0 1em;
+		
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	a.list-link {
+		color: #000;
+		text-decoration: none;
+		position: relative;
+		
+		&:before {
+			color: #aaa;
+			content: "\25BC";
+			position: absolute;
+			display: inline-block;
+			width: 1em;
+			left: -1em;
+		}
+
+		&.collapsed:before {
+			content: "\25B6";
+		}
+
+		&.empty:before {
+			content: "";
+		}
+	}
+
+	ul {
+		list-style-type: none;
+		margin: 0;
+		margin: 0 0 0 1px;
+		border-left: 1px dotted #ccc;
+		padding-left: 2em;
+
+		li {
+			.type-string,
+			.type-date {
+				color: #0B7500;
+			}
+
+			.type-boolean {
+				color: #1A01CC;
+				font-weight: bold;
+			}
+
+			.type-number {
+				color: #1A01CC;
+			}
+
+			.type-null {
+				color: red;
+			}
+		}
+	}
+}

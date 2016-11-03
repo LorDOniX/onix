@@ -17,6 +17,10 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 			name: "Crop",
 			url: "/crop"
 		},
+		UTILS: {
+			name: "Utils",
+			url: "/utils"
+		},
 		TEST: {
 			name: "Test",
 			url: "/test"
@@ -61,7 +65,7 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 	this.create = function (activePage) {
 		var pagesLi = [];
 		// pages order
-		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER, this.PAGES.TEST, this.PAGES.DOCS].forEach(function (page, ind) {
+		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER, this.PAGES.UTILS, this.PAGES.TEST, this.PAGES.DOCS].forEach(function (page, ind) {
 			var pageObj = {
 				el: "li",
 				child: [{

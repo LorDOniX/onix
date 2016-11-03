@@ -93,7 +93,10 @@
 				"src/utils/preview-images.js",
 				"src/utils/select.js",
 				"src/utils/slider.js",
-				"src/utils/crop.js"
+				"src/utils/crop.js",
+				"src/utils/json-viewer.js",
+				"src/utils/lightbox.js",
+				"src/utils/popup.js"
 			]
 		}]
 	}, {

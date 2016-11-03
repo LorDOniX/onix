@@ -12,7 +12,8 @@ app.use("/js", express.static(path.join(__dirname, (MAIN_PATH + '/js'))));
 app.use("/src", express.static(path.join(__dirname, 'src')));
 app.use("/templ", express.static(path.join(__dirname, MAIN_PATH + '/templ')));
 app.use("/locale", express.static(path.join(__dirname, MAIN_PATH + '/locale')));
-app.use("/img", express.static(path.join(__dirname, MAIN_PATH + '/img')));
+app.use("/img-test", express.static(path.join(__dirname, MAIN_PATH + '/img')));
+app.use("/img", express.static(path.join(__dirname, 'img')));
 app.use("/dist", express.static(path.join(__dirname, 'dist')));
 app.use("/docs", express.static(path.join(__dirname, 'docs')));
 
@@ -42,6 +43,11 @@ app.get('/anonymizer', function(req, res) {
 // minimal
 app.get('/minimal', function(req, res) {
 	res.sendfile(MAIN_PATH + '/minimal.html');
+});
+
+// utils
+app.get('/utils', function(req, res) {
+	res.sendfile(MAIN_PATH + '/utils.html');
 });
 
 // docs

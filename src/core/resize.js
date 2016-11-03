@@ -101,6 +101,17 @@ function(
 			
 			this._active = false;
 		}
+
+		/**
+		 * Is resize event captured?
+		 *
+		 * @return {Boolean}
+		 * @member $resize
+		 * @method isActive
+		 */
+		isActive() {
+			return this._active;
+		}
 	};
 
 	return new $resize();

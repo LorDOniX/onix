@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.0.0 (3. 11. 2016)
+
+* add $jsonViewer for visualise JSON objects
+* add $lightbox for visualise images
+* add $popup for popup windows and alert replace
+* $common - add method compareObjects
+* $location - add method decodeSearchValue, parseURL - parsing url to object
+* $dom - create method accepts "text" for creating text node
+* $features - add property MOUSE_WHEEL_EVENT_NAME
+* $resize - add method isActive
+* new test setion for utils
+* img and img-test server rules
+
 ## 2.9.0 (31. 8. 2016)
 
 * $template - data- for events is replaced by data-event-; elPrefix -> elEventPrefix rename;

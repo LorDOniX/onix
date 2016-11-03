@@ -1,0 +1,147 @@
+.lightbox {
+	position: fixed;
+	left: 50%;
+	top: 10px;
+	transform: translateX(-50%);
+	z-index: 101;
+	background: #FFF;
+	
+	.hide {
+		display: none;
+	}
+	
+	.close-holder {
+		padding: 12px;
+		text-align: right;
+		
+		.exit-btn {
+			display: inline-block;
+			border: none;
+			width: 48px;
+			height: 49px;
+			background: url(@lightboxExitImg);
+			cursor: pointer;
+			outline: none;
+		}
+	}
+
+	.img-holder {
+		min-width: 250px;
+		min-height: 250px;
+		position: relative;
+		.transition(width 0.2s ease-in-out, height 0.2s ease-in-out);
+		
+		.prev-btn,
+		.next-btn {
+			border: none;
+			width: 158px;
+			position: absolute;
+			z-index: 2;
+			top: 50%;
+			margin-top: -38px;
+			line-height: 20px;
+			height: 76px;
+			font-size: 16px;
+			font-weight: normal;
+			text-transform: uppercase;
+			color: #FFF;
+			cursor: pointer;
+			padding: 28px 45px;
+			outline: none;
+		}
+		
+		.left-part {
+			position: absolute;
+			z-index: 1;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			right: 50%;
+			width: 50%;
+			height: 100%;
+			
+			.prev-btn {
+				left: 0;
+				padding-right: 20px;
+				text-align: right;
+				background: url(@lightboxPrevImg);
+			}
+		}
+
+		.right-part {
+			position: absolute;
+			z-index: 1;
+			left: 50%;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			width: 50%;
+			height: 100%;
+			
+			.next-btn {
+				right: 0;
+				padding-left: 45px;
+				text-align: left;
+				background: url(@lightboxNextImg);
+			}
+		}
+
+		.spinner {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			margin-left: -25px;
+			margin-top: -20px;
+		}
+
+		img {
+			.transition(opacity 0.5s ease-in-out 0.2s);
+			opacity: 1;
+			-webkit-backface-visibility: hidden;
+			max-width: 100%;
+		}
+
+		img[data-src] {
+			opacity: 0;
+		}
+	}
+
+	.footer {
+		padding-bottom: 55px;
+		
+		p {
+			font-family: 'Open Sans', sans-serif;
+			font-size: 16px;
+			line-height: 20px;
+			padding-top: 10px;
+			text-align: center;
+		}
+		
+		.pos {
+			font-size: 12px;
+		}
+	}
+	
+	&.first-run {
+		.img-holder {
+			width: 600px;
+			height: 480px;
+			.transition(width 1s ease-in-out, height 1s ease-in-out);
+		}
+	}
+}
+
+.lightbox-cover {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background: #000;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+	z-index: 100;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+}

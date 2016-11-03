@@ -97,6 +97,7 @@ function(
 	 * @param  {Object} value Input value
 	 * @param  {Number} [lvl] Recursive threshold
 	 * @return {Object} cloned value
+	 * @private
 	 * @member $common
 	 */
 	this._cloneValue = function(value, lvl) {
@@ -149,6 +150,43 @@ function(
 			case "string":
 				return value;
 		}
+	};
+
+	/**
+	 * Compare two objects - returns array of differences between left -> right object.
+	 * If length is 0 -> there is no difference.
+	 * 
+	 * @param  {Object} leftObj
+	 * @param  {Object} rightObj
+	 * @param  {Array[String]} [path] Object path
+	 * @param  {Array[String]} [output] All differences
+	 * @return {Array}
+	 * @private
+	 * @member $common
+	 */
+	this._compare = function(leftObj, rightObj, path, output) {
+		path = path || [];
+		output = output || [];
+		
+		Object.keys(leftObj).forEach(key => {
+			let itemLeft = leftObj[key];
+			let itemRight = rightObj[key];
+			let curPath = path.concat(key).join(".");
+
+			if (this.isObject(itemLeft)) {
+				if (this.isObject(itemRight)) {
+					this._compare(itemLeft, itemRight, path.concat(key), output);
+				}
+				else {
+					output.push("missing object at path \"{0}\"".format(curPath));
+				}
+			}
+			else if (typeof itemLeft === "string" && typeof itemRight !== "string") {
+				output.push("wrong type at path \"{0}\"".format(curPath));
+			}
+		});
+
+		return output;
 	};
 
 	/**
@@ -520,6 +558,7 @@ function(
 	 * 
 	 * @param  {Number} seconds Number of seconds
 	 * @return {String}
+	 * @member $common
 	 */
 	this.timeDuration = function(seconds) {
 		seconds = seconds || 0;
@@ -543,5 +582,21 @@ function(
 		output += (seconds < 10 ? "0" + seconds : seconds);
 		
 		return output;
+	};
+
+	/**
+	 * Compare two objects - returns array of differences between left -> right object.
+	 * If length is 0 -> there is no difference.
+	 * 
+	 * @param  {Object} leftObj
+	 * @param  {Object} rightObj
+	 * @return {Array}
+	 * @member $common
+	 */
+	this.compareObjects = function(leftObj, rightObj) {
+		leftObj = leftObj || {};
+		rightObj = rightObj || {};
+
+		return this._compare(leftObj, rightObj);
 	};
 }]);

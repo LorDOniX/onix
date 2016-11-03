@@ -49,8 +49,8 @@ function(
 			return;
 		}
 
-		//this._anonymizer.loadImage("/img/praha.jpg");
-		this._anonymizer.loadImage("/img/pano.jpg");
+		//this._anonymizer.loadImage("/img-test/test-photo.jpg");
+		this._anonymizer.loadImage("/img-test/pano.jpg");
 
 		this._anonymizer.on("zoom", function(value) {
 			var zoomEl = this._els.zoom;

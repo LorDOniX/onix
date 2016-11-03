@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 2.9.0/31. 8. 2016
+ * 3.0.0/3. 11. 2016
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * @license MIT
@@ -1905,14 +1905,14 @@ onix = function () {
 	/**
   * Framework info.
   *
-  * version: 2.9.0
-  * date: 31. 8. 2016
+  * version: 3.0.0
+  * date: 3. 11. 2016
   * @member onix
   * @static
   */
 	onix.info = function () {
 		console.log('OnixJS framework\n'+
-'2.9.0/31. 8. 2016\n'+
+'3.0.0/3. 11. 2016\n'+
 'source: https://gitlab.com/LorDOniX/onix\n'+
 'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+
 '@license MIT\n'+
@@ -2080,6 +2080,7 @@ onix.service("$common", ["$promise", function ($promise) {
   * @param  {Object} value Input value
   * @param  {Number} [lvl] Recursive threshold
   * @return {Object} cloned value
+  * @private
   * @member $common
   */
 	this._cloneValue = function (value, lvl) {
@@ -2132,6 +2133,38 @@ onix.service("$common", ["$promise", function ($promise) {
 			case "string":
 				return value;
 		}
+	};
+	/**
+  * Compare two objects - returns array of differences between left -> right object.
+  * If length is 0 -> there is no difference.
+  * 
+  * @param  {Object} leftObj
+  * @param  {Object} rightObj
+  * @param  {Array[String]} [path] Object path
+  * @param  {Array[String]} [output] All differences
+  * @return {Array}
+  * @private
+  * @member $common
+  */
+	this._compare = function (leftObj, rightObj, path, output) {
+		var _this8 = this;
+		path = path || [];
+		output = output || [];
+		Object.keys(leftObj).forEach(function (key) {
+			var itemLeft = leftObj[key];
+			var itemRight = rightObj[key];
+			var curPath = path.concat(key).join(".");
+			if (_this8.isObject(itemLeft)) {
+				if (_this8.isObject(itemRight)) {
+					_this8._compare(itemLeft, itemRight, path.concat(key), output);
+				} else {
+					output.push("missing object at path \"{0}\"".format(curPath));
+				}
+			} else if (typeof itemLeft === "string" && typeof itemRight !== "string") {
+				output.push("wrong type at path \"{0}\"".format(curPath));
+			}
+		});
+		return output;
 	};
 	/**
   * Confirm window, returns promise.
@@ -2369,9 +2402,9 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.chainPromises = function (opts) {
-		var _this8 = this;
+		var _this9 = this;
 		return new $promise(function (resolve) {
-			_this8._chainPromisesInner(opts, resolve, [], 0);
+			_this9._chainPromisesInner(opts, resolve, [], 0);
 		});
 	};
 	/**
@@ -2411,7 +2444,7 @@ onix.service("$common", ["$promise", function ($promise) {
   * @member $common
   */
 	this.valueFromObject = function (obj, path, defValue) {
-		var _this9 = this;
+		var _this10 = this;
 		if (arguments.length < 2) {
 			return null;
 		}
@@ -2428,7 +2461,7 @@ onix.service("$common", ["$promise", function ($promise) {
 					curObj = arrayObj[ind];
 					isOk = true;
 				}
-			} else if (_this9.isObject(curObj)) {
+			} else if (_this10.isObject(curObj)) {
 				curObj = curObj[part];
 				isOk = true;
 			}
@@ -2447,6 +2480,7 @@ onix.service("$common", ["$promise", function ($promise) {
   * 
   * @param  {Number} seconds Number of seconds
   * @return {String}
+  * @member $common
   */
 	this.timeDuration = function (seconds) {
 		seconds = seconds || 0;
@@ -2464,6 +2498,20 @@ onix.service("$common", ["$promise", function ($promise) {
 		seconds -= minutes * 60;
 		output += seconds < 10 ? "0" + seconds : seconds;
 		return output;
+	};
+	/**
+  * Compare two objects - returns array of differences between left -> right object.
+  * If length is 0 -> there is no difference.
+  * 
+  * @param  {Object} leftObj
+  * @param  {Object} rightObj
+  * @return {Array}
+  * @member $common
+  */
+	this.compareObjects = function (leftObj, rightObj) {
+		leftObj = leftObj || {};
+		rightObj = rightObj || {};
+		return this._compare(leftObj, rightObj);
 	};
 }]);
 /**
@@ -2701,7 +2749,7 @@ onix.service("$dom", ["$common", function ($common) {
   * Create $dom from the configuration.
   *
   * @param  {Object} config
-  * @param  {String} config.el Element name, default creates "div"
+  * @param  {String} config.el Element name, default creates "div", for text node use "text"
   * @param  {Object} [config.attrs] Atributes
   * @param  {Object} [config.css] Object with css styles
   * @param  {Array|Object} [config.events] Bind events {event, fn}
@@ -2712,8 +2760,14 @@ onix.service("$dom", ["$common", function ($common) {
   * @member $dom
   */
 	this.create = function (config, exported) {
-		var _this10 = this;
-		var el = document.createElement(config.el || "div");
+		var _this11 = this;
+		var elName = config.el || "div";
+		var el = void 0;
+		if (elName == "text") {
+			el = document.createTextNode("");
+		} else {
+			el = document.createElement(elName);
+		}
 		Object.keys(config).forEach(function (key) {
 			var value = void 0;
 			switch (key) {
@@ -2750,7 +2804,7 @@ onix.service("$dom", ["$common", function ($common) {
 						value = [value];
 					}
 					value.forEach(function (child) {
-						el.appendChild(_this10.create(child, exported));
+						el.appendChild(_this11.create(child, exported));
 					});
 					break;
 				case "_exported":
@@ -2929,15 +2983,15 @@ onix.factory("$resize", ["$event", function ($event) {
     * @member $resize
     * @private
     */
-			var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
-			_this11._active = false;
+			var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
+			_this12._active = false;
 			/**
     * Resize object.
     *
     * @member $resize
     * @private
     */
-			_this11._resizeObj = {
+			_this12._resizeObj = {
 				id: null,
 				timeout: 333
 			};
@@ -2947,11 +3001,11 @@ onix.factory("$resize", ["$event", function ($event) {
     * @member $resize
     * @private
     */
-			_this11._binds = {
-				resize: _this11._resize.bind(_this11),
-				resizeInner: _this11._resizeInner.bind(_this11)
+			_this12._binds = {
+				resize: _this12._resize.bind(_this12),
+				resizeInner: _this12._resizeInner.bind(_this12)
 			};
-			return _this11;
+			return _this12;
 		}
 		/**
    * Window resize event.
@@ -3007,6 +3061,18 @@ onix.factory("$resize", ["$event", function ($event) {
 				if (!this._active) return;
 				window.removeEventListener("resize", this._binds.resize);
 				this._active = false;
+			}
+			/**
+    * Is resize event captured?
+    *
+    * @return {Boolean}
+    * @member $resize
+    * @method isActive
+    */
+		}, {
+			key: "isActive",
+			value: function isActive() {
+				return this._active;
 			}
 		}]);
 		return $resize;
@@ -3174,17 +3240,17 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
   * @member $http
   */
 	this.createRequest = function (config) {
-		var _this12 = this;
+		var _this13 = this;
 		return new $promise(function (resolve, reject) {
 			config = config || {};
 			var request = new XMLHttpRequest();
-			var method = config.method || _this12.METHOD.GET;
+			var method = config.method || _this13.METHOD.GET;
 			var url = config.url || "";
 			if (!url) {
 				reject();
 				return;
 			}
-			url = _this12._updateURL(url, config.getData);
+			url = _this13._updateURL(url, config.getData);
 			request.onerror = function (err) {
 				reject(err);
 			};
@@ -3225,15 +3291,15 @@ onix.service("$http", ["$promise", "$common", "$location", function ($promise, $
 							request.setRequestHeader(headerName, headers[headerName]);
 						});
 					}
-					if (method == _this12.METHOD.GET) {
+					if (method == _this13.METHOD.GET) {
 						request.setRequestHeader('Accept', 'application/json');
 					}
-					var type = config.postType || _this12.POST_TYPES.JSON;
-					if (config.postData && type == _this12.POST_TYPES.JSON) {
+					var type = config.postType || _this13.POST_TYPES.JSON;
+					if (config.postData && type == _this13.POST_TYPES.JSON) {
 						request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 						request.send(JSON.stringify(config.postData));
-					} else if (config.postData && type == _this12.POST_TYPES.FORM_DATA) {
-						request.send(_this12._preparePostData(config.postData));
+					} else if (config.postData && type == _this13.POST_TYPES.FORM_DATA) {
+						request.send(_this13._preparePostData(config.postData));
 					} else {
 						request.send();
 					}
@@ -3564,7 +3630,7 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
   * @member $image
   */
 	this.readFromFile = function (file, maxSize) {
-		var _this13 = this;
+		var _this14 = this;
 		return new $promise(function (resolve, reject) {
 			if (!$features.FILE_READER) {
 				reject();
@@ -3582,12 +3648,12 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 				var exif = null;
 				// exif only for jpeg
 				if (file.type == "image/jpeg" || file.type == "image/pjpeg") {
-					exif = _this13.getEXIF(binaryData);
+					exif = _this14.getEXIF(binaryData);
 				}
 				var img = new Image();
 				img.onload = function () {
-					var imd = _this13.getImageDim(img, maxSize);
-					var canvas = _this13.getCanvas(img, {
+					var imd = _this14.getImageDim(img, maxSize);
+					var canvas = _this14.getCanvas(img, {
 						width: imd.width,
 						height: imd.height,
 						orientation: exif ? exif.Orientation : 0,
@@ -3598,7 +3664,7 @@ onix.service("$image", ["$promise", "$features", function ($promise, $features) 
 					output.canvas = canvas;
 					resolve(output);
 				};
-				img.src = _this13.fileToBase64(file.type, binaryDataArray);
+				img.src = _this14.fileToBase64(file.type, binaryDataArray);
 			};
 			reader.readAsArrayBuffer(file);
 		});
@@ -3871,17 +3937,17 @@ onix.factory("$job", ["$promise", function ($promise) {
 		}, {
 			key: "start",
 			value: function start() {
-				var _this14 = this;
+				var _this15 = this;
 				return new $promise(function (resolve, reject) {
-					if (_this14._isRunning || !_this14._tasks.length) {
+					if (_this15._isRunning || !_this15._tasks.length) {
 						reject();
 						return;
 					}
 					// job is running
-					_this14._isRunning = true;
+					_this15._isRunning = true;
 					// because of pop
-					_this14._tasks.reverse();
-					_this14._doJob(resolve);
+					_this15._tasks.reverse();
+					_this15._doJob(resolve);
 				});
 			}
 			/**
@@ -4056,7 +4122,7 @@ onix.service("$location", function () {
   * @member $location
   */
 	this.refresh = function () {
-		window.location.reload();
+		location.reload();
 	};
 	/**
   * Create a new search url. This method appends ? to the start of the url.
@@ -4101,26 +4167,11 @@ onix.service("$location", function () {
 			// write
 			var newURL = this.createSearchURL(obj);
 			if (newURL) {
-				window.location.search = newURL;
+				location.search = newURL;
 			}
 		} else {
-			var _ret7 = function () {
-				// read
-				var data = location.search;
-				var output = {};
-				if (data) {
-					data = data.replace("?", "");
-					data.split("&").forEach(function (item) {
-						var parts = item.split("=");
-						var name = decodeURIComponent(parts[0]);
-						output[name] = decodeURIComponent(parts[1]);
-					});
-				}
-				return {
-					v: output
-				};
-			}();
-			if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
+			// read
+			return this.parseSearch();
 		}
 	};
 	/**
@@ -4130,7 +4181,141 @@ onix.service("$location", function () {
   * @member $location
   */
 	this.get = function () {
-		return window.location.pathname + window.location.search;
+		return location.pathname + location.search;
+	};
+	/**
+  * Decode value from URL.
+  * 
+  * @param  {String} value Input value
+  * @return {String}
+  * @member $location
+  */
+	this.decodeSearchValue = function (value) {
+		return decodeURIComponent(value.replace(/\+/g, " "));
+	};
+	/**
+  * Parse search part of the URL.
+  * 
+  * @param  {String} [query] Optinal query, default is location.search
+  * @return {Object} Object with keys and values from the search
+  * @member $location
+  */
+	this.parseSearch = function (query) {
+		// read
+		query = query || location.search.substring(1);
+		var match = void 0;
+		var search = /([^&=]+)=?([^&]*)/g;
+		var output = {};
+		while (match = search.exec(query)) {
+			var key = this.decodeSearchValue(match[1]);
+			var value = this.decodeSearchValue(match[2]);
+			if (key in output) {
+				if (!Array.isArray(output[key])) {
+					output[key] = [output[key]];
+				}
+				output[key].push(value);
+			} else {
+				output[key] = value;
+			}
+		}
+		return output;
+	};
+	/**
+  * Parse URL to object.
+  * 
+  * @param {String} url Input URL
+  * @param {Object} [optsArg] optional configuration
+  * @param {Boolean} [optsArg.autoNumber = false] find number in string and convert it
+  * @param {Object} [optsArg.hints = {}] { key name : convert operation }, operations: "json" value -> object, "number" -> value -> number, fn(value) -> value
+  * @return {Object} parse url to object with keys like host, protocol etc.
+  * @member $location
+  */
+	this.parseURL = function (url, optsArg) {
+		var _this16 = this;
+		var opts = {
+			autoNumber: false,
+			hints: {}
+		};
+		var obj = {
+			protocol: "",
+			host: "",
+			port: null,
+			path: "",
+			search: null,
+			hash: ""
+		};
+		for (var key in optsArg) {
+			opts[key] = optsArg[key];
+		}
+		url = (url || "").trim();
+		// protocol
+		var test = url.match(/([a-zA-Z0-9]+):\/\//);
+		if (test) {
+			obj.protocol = test[1];
+			url = url.replace(test[0], "");
+		}
+		// host
+		test = url.match(/^[^?:#\/]+/);
+		if (test) {
+			obj.host = test[0];
+			url = url.replace(obj.host, "");
+		}
+		// port
+		test = url.match(/^:([0-9]+)[\/?#]?/);
+		if (test) {
+			obj.port = parseFloat(test[1]);
+			url = url.replace(":" + test[1], "");
+		}
+		// path
+		test = url.match(/^[^?#]+/);
+		if (test) {
+			obj.path = test[0];
+			url = url.replace(obj.path, "");
+		}
+		// search
+		test = url.match(/\?([^#]+)/);
+		if (test) {
+			(function () {
+				var searchObj = _this16.parseSearch(test[1]);
+				// update
+				Object.keys(searchObj).forEach(function (key) {
+					var value = searchObj[key];
+					if (key in opts.hints) {
+						var hintValue = opts.hints[key];
+						if (typeof hintValue === "string") {
+							switch (opts.hints[key]) {
+								case "json":
+									try {
+										searchObj[key] = JSON.parse(value);
+									} catch (err) {
+										console.error(err);
+									}
+									break;
+								case "number":
+									searchObj[key] = parseFloat(value);
+									break;
+							}
+						} else if (typeof hintValue === "function") {
+							searchObj[key] = hintValue(value);
+						}
+					} else if (opts.autoNumber) {
+						var numTest = value.match(/^[-]?[0-9]+\.?[0-9e]*$/);
+						if (numTest) {
+							var num = parseFloat(numTest[0]);
+							searchObj[key] = isNaN(num) ? value : num;
+						}
+					}
+				});
+				obj.search = searchObj;
+				url = url.replace(test[0], "");
+			})();
+		}
+		// hash
+		test = url.match(/#(.*)$/);
+		if (test) {
+			obj.hash = test[1];
+		}
+		return obj;
 	};
 });
 /**
@@ -4492,7 +4677,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "_setGetAll",
 			value: function _setGetAll(attr, newValue) {
-				var _this15 = this;
+				var _this17 = this;
 				if (typeof attr !== "undefined") {
 					if (typeof newValue !== "undefined") {
 						this._operation(function (item) {
@@ -4502,7 +4687,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 					} else {
 						var _ret8 = function () {
 							var values = [];
-							_this15._operation(function (item) {
+							_this17._operation(function (item) {
 								values.push(item[attr]);
 							});
 							if (!values.length) {
@@ -4538,20 +4723,20 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "_bindEvent",
 			value: function _bindEvent(eventName, cb, scope) {
-				var _this16 = this;
+				var _this18 = this;
 				this._operation(function (item) {
 					// create new item in events cache
-					if (!_this16._eventsCache[eventName]) {
-						_this16._eventsCache[eventName] = [];
+					if (!_this18._eventsCache[eventName]) {
+						_this18._eventsCache[eventName] = [];
 					}
 					var eventObj = {
 						item: item,
 						cb: cb,
 						bindFn: function bindFn(event) {
-							cb.apply(scope || item, [event, item, _this16]);
+							cb.apply(scope || item, [event, item, _this18]);
 						}
 					};
-					_this16._eventsCache[eventName].push(eventObj);
+					_this18._eventsCache[eventName].push(eventObj);
 					item.addEventListener(eventName, eventObj.bindFn);
 				});
 				return this;
@@ -4600,7 +4785,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "attr",
 			value: function attr(name, newValue) {
-				var _this17 = this;
+				var _this19 = this;
 				if (typeof name !== "undefined") {
 					if (typeof newValue !== "undefined") {
 						this._operation(function (item) {
@@ -4610,7 +4795,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 					} else {
 						var _ret9 = function () {
 							var values = [];
-							_this17._operation(function (item) {
+							_this19._operation(function (item) {
 								values.push(item.getAttribute(name));
 							});
 							if (!values.length) {
@@ -4646,7 +4831,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 		}, {
 			key: "css",
 			value: function css(name, newValue) {
-				var _this18 = this;
+				var _this20 = this;
 				if (typeof name !== "undefined") {
 					if (typeof newValue !== "undefined") {
 						this._operation(function (item) {
@@ -4655,7 +4840,7 @@ onix.factory("$myQuery", ["$common", function ($common) {
 						return this;
 					} else if ((typeof name === "undefined" ? "undefined" : _typeof(name)) === "object" && !Array.isArray(name)) {
 						Object.keys(name).forEach(function (key) {
-							_this18._operation(function (item) {
+							_this20._operation(function (item) {
 								item.style[$common.cssNameToJS(key)] = name[key];
 							});
 						});
@@ -5312,7 +5497,7 @@ onix.factory("$promise", function () {
 		}, {
 			key: "_resolveFuncs",
 			value: function _resolveFuncs() {
-				var _this19 = this;
+				var _this21 = this;
 				var len = this._thens.length;
 				var isCatch = this._state == this._STATES.REJECTED;
 				for (var i = 0; i < len; i++) {
@@ -5326,7 +5511,7 @@ onix.factory("$promise", function () {
 							if (i != len - 1) {
 								var _ret10 = function () {
 									var resolveCb = null;
-									var rest = _this19._thens.slice(i + 1);
+									var rest = _this21._thens.slice(i + 1);
 									var prom = void 0;
 									if (output instanceof $promise) {
 										prom = output;
@@ -5606,7 +5791,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
   * @member $route
   */
 	this.go = function () {
-		var _this20 = this;
+		var _this22 = this;
 		var path = $location.get();
 		var find = false;
 		var config = null;
@@ -5648,7 +5833,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 				// run controller function
 				var runController = function runController() {
 					if (contr) {
-						_this20._runController(contr, routeParams);
+						_this22._runController(contr, routeParams);
 					}
 				};
 				if (templateUrl) {
@@ -5779,7 +5964,7 @@ onix.provider("$template", function () {
 			}, {
 				key: "_parseArgs",
 				value: function _parseArgs(value, config) {
-					var _this21 = this;
+					var _this23 = this;
 					value = value || "";
 					config = config || {};
 					var bracketsData = onix.match(value, "(", ")");
@@ -5791,7 +5976,7 @@ onix.provider("$template", function () {
 						var origItem = item;
 						var value = null;
 						item = item.trim();
-						if (item.match(_this21._RE.VARIABLE)) {
+						if (item.match(_this23._RE.VARIABLE)) {
 							//console.log("variable");
 							switch (item) {
 								case "$event":
@@ -5807,9 +5992,9 @@ onix.provider("$template", function () {
 								default:
 									value = null;
 							}
-						} else if (item.match(_this21._RE.STRINGS)) {
+						} else if (item.match(_this23._RE.STRINGS)) {
 							value = item.substr(1, item.length - 2);
-						} else if (item.match(_this21._RE.NUMBERS)) {
+						} else if (item.match(_this23._RE.NUMBERS)) {
 							value = parseFloat(item);
 						} else {
 							(function () {
@@ -5857,12 +6042,12 @@ onix.provider("$template", function () {
 			}, {
 				key: "_bindEvent",
 				value: function _bindEvent(el, attr, scope) {
-					var _this22 = this;
+					var _this24 = this;
 					if (!el || !attr || !scope) return;
 					var fnName = this._parseFnName(attr.value);
 					if (attr.name && fnName in scope) {
 						el.addEventListener(attr.name, function (event) {
-							var args = _this22._parseArgs(attr.value, {
+							var args = _this24._parseArgs(attr.value, {
 								el: el,
 								event: event
 							});
@@ -5912,9 +6097,9 @@ onix.provider("$template", function () {
 			}, {
 				key: "_init",
 				value: function _init() {
-					var _this23 = this;
+					var _this25 = this;
 					onix.element(this._CONST.TEMPLATE_SCRIPT_SELECTOR).forEach(function (item) {
-						_this23.add(item.id || "", item.innerHTML);
+						_this25.add(item.id || "", item.innerHTML);
 					});
 				}
 			}, {
@@ -5942,18 +6127,18 @@ onix.provider("$template", function () {
 			}, {
 				key: "compile",
 				value: function compile(key, data) {
-					var _this24 = this;
+					var _this26 = this;
 					if (!key || !data) return "";
 					var tmpl = this.get(key);
 					var all = onix.match(tmpl, _conf.left, _conf.right);
 					all.forEach(function (item) {
 						var itemSave = _conf.left + item + _conf.right;
 						// filter
-						if (item.indexOf(_this24._CONST.FILTER_DELIMETER) != -1) {
+						if (item.indexOf(_this26._CONST.FILTER_DELIMETER) != -1) {
 							(function () {
 								var filterValue = void 0;
 								// filters
-								item.split(_this24._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
+								item.split(_this26._CONST.FILTER_DELIMETER).forEach(function (filterItem, ind) {
 									filterItem = filterItem.trim();
 									if (!ind) {
 										// value
@@ -5964,7 +6149,7 @@ onix.provider("$template", function () {
 										(function () {
 											// preprocessing by filter
 											var args = [filterValue];
-											var filterParts = filterItem.split(_this24._CONST.FILTER_PARAM_DELIMETER);
+											var filterParts = filterItem.split(_this26._CONST.FILTER_PARAM_DELIMETER);
 											var filterName = "";
 											if (filterParts.length == 1) {
 												filterName = filterParts[0].trim();
@@ -6024,18 +6209,18 @@ onix.provider("$template", function () {
 			}, {
 				key: "bindTemplate",
 				value: function bindTemplate(root, scope, addElsCb) {
-					var _this25 = this;
+					var _this27 = this;
 					var allElements = onix.element("*", root);
 					if (allElements.len()) {
 						(function () {
 							var newEls = {};
 							allElements.forEach(function (item) {
-								var attrs = _this25._getAttributes(item);
+								var attrs = _this27._getAttributes(item);
 								attrs.forEach(function (attr) {
 									if (attr.isBind) {
 										newEls[attr.value] = item;
 									} else {
-										_this25._bindEvent(item, attr, scope);
+										_this27._bindEvent(item, attr, scope);
 									}
 								});
 							});
@@ -6057,12 +6242,12 @@ onix.provider("$template", function () {
 			}, {
 				key: "load",
 				value: function load(key, path) {
-					var _this26 = this;
+					var _this28 = this;
 					return new $promise(function (resolve, reject) {
 						$http.createRequest({
 							url: path
 						}).then(function (okData) {
-							_this26.add(key, okData.data);
+							_this28.add(key, okData.data);
 							resolve();
 						}, function (errorData) {
 							reject(errorData);
@@ -6118,6 +6303,20 @@ onix.service("$features", function () {
   * @type {Boolean}
   */
 	this.MEDIA_QUERY = "matchMedia" in window && "matches" in window.matchMedia("(min-width: 500px)");
+	// mouse wheel event name
+	var mouseWheel = "DOMMouseScroll";
+	if ("onwheel" in window) {
+		mouseWheel = "wheel";
+	} else if ("onmousewheel" in window) {
+		mouseWheel = "mousewheel";
+	}
+	/**
+  * Event name for mouse wheel.
+  *
+  * @member $features
+  * @type {String}
+  */
+	this.MOUSE_WHEEL_EVENT_NAME = mouseWheel;
 });
 onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common", "$features", function ($math, $event, $loader, $promise, $common, $features) {
 	/**
@@ -6145,15 +6344,15 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		function $anonymizer(parent, optsArg) {
 			_classCallCheck(this, $anonymizer);
 			// is canvas available?
-			var _this27 = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
+			var _this29 = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
 			if (!$features.CANVAS) {
 				console.error("Canvas is not available!");
-				return _possibleConstructorReturn(_this27);
+				return _possibleConstructorReturn(_this29);
 			}
 			// parent reference
-			_this27._parent = parent;
-			_this27._parent.classList.add("anonymizer");
-			_this27._opts = {
+			_this29._parent = parent;
+			_this29._parent.classList.add("anonymizer");
+			_this29._opts = {
 				canWidth: parent.offsetWidth || 0,
 				canHeight: parent.offsetHeight || 0,
 				zoom: 100,
@@ -6169,59 +6368,59 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 				entityPreview: null
 			};
 			for (var key in optsArg) {
-				_this27._opts[key] = optsArg[key];
+				_this29._opts[key] = optsArg[key];
 			}
 			// canvas width & height
-			_this27._canWidth = _this27._opts.canWidth;
-			_this27._canHeight = _this27._opts.canHeight;
+			_this29._canWidth = _this29._opts.canWidth;
+			_this29._canHeight = _this29._opts.canHeight;
 			// zoom
-			_this27._zoom = _this27._opts.zoom;
+			_this29._zoom = _this29._opts.zoom;
 			// zoom step
-			_this27._zoomStep = _this27._opts.zoomStep;
+			_this29._zoomStep = _this29._opts.zoomStep;
 			// step for zoom move
-			_this27._zoomMoveStep = 0;
+			_this29._zoomMoveStep = 0;
 			// act. image width
-			_this27._curWidth = 0;
+			_this29._curWidth = 0;
 			// act. image height
-			_this27._curHeight = 0;
+			_this29._curHeight = 0;
 			// create main canvas
-			_this27._canvas = document.createElement("canvas");
-			_this27._canvas.width = _this27._canWidth;
-			_this27._canvas.height = _this27._canHeight;
+			_this29._canvas = document.createElement("canvas");
+			_this29._canvas.width = _this29._canWidth;
+			_this29._canvas.height = _this29._canHeight;
 			// ctx of main canvas
-			_this27._ctx = _this27._canvas.getContext("2d");
+			_this29._ctx = _this29._canvas.getContext("2d");
 			// loaded image
-			_this27._img = null;
+			_this29._img = null;
 			// original image width
-			_this27._imgWidth = 0;
+			_this29._imgWidth = 0;
 			// original image height
-			_this27._imgHeight = 0;
+			_this29._imgHeight = 0;
 			// canvas & ctx for create line
-			_this27._lineCanvas = null;
-			_this27._lineCanvasCtx = null;
+			_this29._lineCanvas = null;
+			_this29._lineCanvasCtx = null;
 			// canvas & ctx for preview of a entity
-			_this27._entityCanvas = null;
-			_this27._entityCanvasCtx = null;
+			_this29._entityCanvas = null;
+			_this29._entityCanvasCtx = null;
 			// entites to draw
-			_this27._entites = [];
+			_this29._entites = [];
 			// image draw offset axe x
-			_this27._x = 0;
+			_this29._x = 0;
 			// image draw offset axe y
-			_this27._y = 0;
+			_this29._y = 0;
 			// threshold for click
-			_this27._THRESHOLD = {
+			_this29._THRESHOLD = {
 				MIN: -1,
 				MAX: 1
 			};
 			// helper for mouse event
-			_this27._mouse = {
+			_this29._mouse = {
 				startXSave: 0,
 				startYSave: 0,
 				startX: 0,
 				startY: 0,
 				bcr: null
 			};
-			_this27._flags = {
+			_this29._flags = {
 				wasRightClick: false,
 				wasMove: false,
 				wasPreview: false,
@@ -6229,34 +6428,34 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 				wasImgMove: false
 			};
 			// binds
-			_this27._binds = {
-				mouseWheel: _this27._mouseWheel.bind(_this27),
-				mouseDown: _this27._mouseDown.bind(_this27),
-				mouseMove: _this27._mouseMove.bind(_this27),
-				mouseUp: _this27._mouseUp.bind(_this27),
-				mouseMoveLine: _this27._mouseMoveLine.bind(_this27),
-				mouseUpLine: _this27._mouseUpLine.bind(_this27),
-				contextMenu: _this27._cancelEvents.bind(_this27)
+			_this29._binds = {
+				mouseWheel: _this29._mouseWheel.bind(_this29),
+				mouseDown: _this29._mouseDown.bind(_this29),
+				mouseMove: _this29._mouseMove.bind(_this29),
+				mouseUp: _this29._mouseUp.bind(_this29),
+				mouseMoveLine: _this29._mouseMoveLine.bind(_this29),
+				mouseUpLine: _this29._mouseUpLine.bind(_this29),
+				contextMenu: _this29._cancelEvents.bind(_this29)
 			};
 			// firefox
-			_this27._canvas.addEventListener("DOMMouseScroll", _this27._binds.mouseWheel);
+			_this29._canvas.addEventListener("DOMMouseScroll", _this29._binds.mouseWheel);
 			// others
-			_this27._canvas.addEventListener("mousewheel", _this27._binds.mouseWheel);
-			_this27._canvas.addEventListener("mousedown", _this27._binds.mouseDown);
-			_this27._canvas.addEventListener("contextmenu", _this27._binds.contextMenu);
+			_this29._canvas.addEventListener("mousewheel", _this29._binds.mouseWheel);
+			_this29._canvas.addEventListener("mousedown", _this29._binds.mouseDown);
+			_this29._canvas.addEventListener("contextmenu", _this29._binds.contextMenu);
 			// spinner - progress for image load
-			_this27._spinner = $loader.getSpinner();
-			parent.appendChild(_this27._spinner);
-			parent.appendChild(_this27._canvas);
+			_this29._spinner = $loader.getSpinner();
+			parent.appendChild(_this29._spinner);
+			parent.appendChild(_this29._canvas);
 			// preview canvas
-			if (_this27._opts.entityPreview) {
-				_this27._entityCanvas = document.createElement("canvas");
-				_this27._entityCanvas.width = 300;
-				_this27._entityCanvas.height = 150;
-				_this27._entityCanvasCtx = _this27._entityCanvas.getContext("2d");
-				_this27._opts.entityPreview.appendChild(_this27._entityCanvas);
+			if (_this29._opts.entityPreview) {
+				_this29._entityCanvas = document.createElement("canvas");
+				_this29._entityCanvas.width = 300;
+				_this29._entityCanvas.height = 150;
+				_this29._entityCanvasCtx = _this29._entityCanvas.getContext("2d");
+				_this29._opts.entityPreview.appendChild(_this29._entityCanvas);
 			}
-			return _this27;
+			return _this29;
 		}
 		/**
    * Scene redraw - clear, picture, entites.
@@ -6268,33 +6467,33 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		_createClass($anonymizer, [{
 			key: "_redraw",
 			value: function _redraw() {
-				var _this28 = this;
+				var _this30 = this;
 				// pictue
 				this._ctx.clearRect(0, 0, this._canWidth, this._canHeight);
 				this._ctx.drawImage(this._img, this._x, this._y, this._img.width, this._img.height, 0, 0, this._curWidth, this._curHeight);
 				// entites
 				if (this._entites.length) {
 					(function () {
-						var zc = _this28._zoom / 100;
-						var xc = _this28._x * zc;
-						var yc = _this28._y * zc;
-						_this28._entites.forEach(function (entity) {
+						var zc = _this30._zoom / 100;
+						var xc = _this30._x * zc;
+						var yc = _this30._y * zc;
+						_this30._entites.forEach(function (entity) {
 							var x = void 0;
 							var y = void 0;
 							switch (entity.id) {
 								case $anonymizer.ENTITES.CIRCLE.id:
 									var radius = Math.round(entity.value * zc);
-									x = Math.round(_this28._curWidth * entity.xRatio - xc);
-									y = Math.round(_this28._curHeight * entity.yRatio - yc);
-									_this28._drawCircle(_this28._ctx, x, y, radius);
+									x = Math.round(_this30._curWidth * entity.xRatio - xc);
+									y = Math.round(_this30._curHeight * entity.yRatio - yc);
+									_this30._drawCircle(_this30._ctx, x, y, radius);
 									break;
 								case $anonymizer.ENTITES.LINE.id:
 									var lineWidth = Math.round(entity.value * zc);
-									x = Math.round(_this28._curWidth * entity.xRatio - xc);
-									y = Math.round(_this28._curHeight * entity.yRatio - yc);
-									var x2 = Math.round(_this28._curWidth * entity.x2Ratio - xc);
-									var y2 = Math.round(_this28._curHeight * entity.y2Ratio - yc);
-									_this28._drawLine(_this28._ctx, x, y, x2, y2, lineWidth);
+									x = Math.round(_this30._curWidth * entity.xRatio - xc);
+									y = Math.round(_this30._curHeight * entity.yRatio - yc);
+									var x2 = Math.round(_this30._curWidth * entity.x2Ratio - xc);
+									var y2 = Math.round(_this30._curHeight * entity.y2Ratio - yc);
+									_this30._drawLine(_this30._ctx, x, y, x2, y2, lineWidth);
 									break;
 							}
 						});
@@ -6989,30 +7188,30 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		}, {
 			key: "loadImage",
 			value: function loadImage(url) {
-				var _this29 = this;
+				var _this31 = this;
 				return new $promise(function (resolve, reject) {
-					_this29._setWhiteCanvas();
-					_this29._spinner.classList.remove("hide");
+					_this31._setWhiteCanvas();
+					_this31._spinner.classList.remove("hide");
 					var img = new Image();
 					img.addEventListener("load", function () {
-						_this29._spinner.classList.add("hide");
-						_this29._img = img;
-						_this29._imgWidth = img.width;
-						_this29._imgHeight = img.height;
-						_this29._zoom = _this29._opts.zoom;
-						_this29.trigger("zoom", _this29._zoom);
-						_this29._postZoom();
-						_this29._setCenter();
-						_this29._alignImgToCanvas();
-						_this29._drawEntityPreview();
-						_this29._redraw();
+						_this31._spinner.classList.add("hide");
+						_this31._img = img;
+						_this31._imgWidth = img.width;
+						_this31._imgHeight = img.height;
+						_this31._zoom = _this31._opts.zoom;
+						_this31.trigger("zoom", _this31._zoom);
+						_this31._postZoom();
+						_this31._setCenter();
+						_this31._alignImgToCanvas();
+						_this31._drawEntityPreview();
+						_this31._redraw();
 						resolve();
 					});
 					img.addEventListener("error", function () {
-						_this29._spinner.classList.add("hide");
-						_this29._img = null;
-						_this29._imgWidth = 0;
-						_this29._imgHeight = 0;
+						_this31._spinner.classList.add("hide");
+						_this31._img = null;
+						_this31._imgWidth = 0;
+						_this31._imgHeight = 0;
 						reject();
 					});
 					img.src = url || "";
@@ -7073,14 +7272,14 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		}, {
 			key: "switchEntity",
 			value: function switchEntity() {
-				var _this30 = this;
+				var _this32 = this;
 				var variants = Object.keys($anonymizer.ENTITES);
 				var priority = this._opts.curEntity.priority;
 				var selVariant = null;
 				var lowestVariant = null;
 				variants.forEach(function (variant) {
 					var varObj = $anonymizer.ENTITES[variant];
-					if (!selVariant && varObj.priority > _this30._opts.curEntity.priority) {
+					if (!selVariant && varObj.priority > _this32._opts.curEntity.priority) {
 						selVariant = varObj;
 					}
 					if (!lowestVariant || varObj.priority < lowestVariant.priority) {
@@ -7185,7 +7384,7 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		}, {
 			key: "exportEntites",
 			value: function exportEntites() {
-				var _this31 = this;
+				var _this33 = this;
 				var output = {
 					actions: [],
 					image: {
@@ -7198,18 +7397,18 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 						case $anonymizer.ENTITES.CIRCLE.id:
 							output.actions.push({
 								type: entity.id.toLowerCase(),
-								x: $math.setRange(Math.round(_this31._imgWidth * entity.xRatio), 0, _this31._imgWidth),
-								y: $math.setRange(Math.round(_this31._imgHeight * entity.yRatio), 0, _this31._imgHeight),
+								x: $math.setRange(Math.round(_this33._imgWidth * entity.xRatio), 0, _this33._imgWidth),
+								y: $math.setRange(Math.round(_this33._imgHeight * entity.yRatio), 0, _this33._imgHeight),
 								r: entity.value
 							});
 							break;
 						case $anonymizer.ENTITES.LINE.id:
 							output.actions.push({
 								type: entity.id.toLowerCase(),
-								x1: $math.setRange(Math.round(_this31._imgWidth * entity.xRatio), 0, _this31._imgWidth),
-								y1: $math.setRange(Math.round(_this31._imgHeight * entity.yRatio), 0, _this31._imgHeight),
-								x2: $math.setRange(Math.round(_this31._imgWidth * entity.x2Ratio), 0, _this31._imgWidth),
-								y2: $math.setRange(Math.round(_this31._imgHeight * entity.y2Ratio), 0, _this31._imgHeight),
+								x1: $math.setRange(Math.round(_this33._imgWidth * entity.xRatio), 0, _this33._imgWidth),
+								y1: $math.setRange(Math.round(_this33._imgHeight * entity.yRatio), 0, _this33._imgHeight),
+								x2: $math.setRange(Math.round(_this33._imgWidth * entity.x2Ratio), 0, _this33._imgWidth),
+								y2: $math.setRange(Math.round(_this33._imgHeight * entity.y2Ratio), 0, _this33._imgHeight),
 								width: entity.value
 							});
 							break;
@@ -7324,14 +7523,14 @@ onix.factory("$loader", ["$dom", function ($dom) {
 		}, {
 			key: "end",
 			value: function end() {
-				var _this32 = this;
+				var _this34 = this;
 				this._el.classList.remove("start");
 				this._el.classList.add("end");
 				setTimeout(function () {
-					_this32._el.classList.remove("end");
-					_this32._el.classList.add("hide");
+					_this34._el.classList.remove("end");
+					_this34._el.classList.add("hide");
 					setTimeout(function () {
-						_this32._el.classList.remove("hide");
+						_this34._el.classList.remove("hide");
 					}, 350);
 				}, 150);
 			}
@@ -7413,9 +7612,9 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 		}, {
 			key: "reset",
 			value: function reset() {
-				var _this33 = this;
+				var _this35 = this;
 				Object.keys(this._options).forEach(function (key) {
-					_this33._el.classList.remove(_this33._options[key]);
+					_this35._el.classList.remove(_this35._options[key]);
 				});
 				return this;
 			}
@@ -7487,12 +7686,12 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 		}, {
 			key: "hide",
 			value: function hide(timeout) {
-				var _this34 = this;
+				var _this36 = this;
 				return new $promise(function (resolve) {
 					setTimeout(function () {
-						_this34.reset();
+						_this36.reset();
 						resolve();
-					}, timeout || _this34._HIDE_TIMEOUT);
+					}, timeout || _this36._HIDE_TIMEOUT);
 				});
 			}
 		}]);
@@ -7626,7 +7825,7 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
   * @member $previewImages
   */
 	this.show = function (el, files, optsArg) {
-		var _this35 = this;
+		var _this37 = this;
 		// clear previous
 		el.innerHTML = "";
 		// add class
@@ -7648,7 +7847,7 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 			var _ret18 = function () {
 				// create placeholder?
 				if (opts.createHolder) {
-					_this35._createPreviewHolders(el, count);
+					_this37._createPreviewHolders(el, count);
 				}
 				var jobsArray = [];
 				// sort by name, make previewID - only for 7 pictures
@@ -7656,8 +7855,8 @@ onix.service("$previewImages", ["$image", "$dom", "$job", "$loader", function ($
 					if (a.name < b.name) return -1;else if (a.name > b.name) return 1;else return 0;
 				}).forEach(function (pf, ind) {
 					jobsArray.push({
-						task: _this35._jobTask,
-						scope: _this35,
+						task: _this37._jobTask,
+						scope: _this37,
 						args: [{
 							file: pf,
 							previewID: "img_0" + ind
@@ -7689,14 +7888,14 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		_inherits($select, _$event3);
 		function $select(el, opts) {
 			_classCallCheck(this, $select);
-			var _this36 = _possibleConstructorReturn(this, Object.getPrototypeOf($select).call(this));
-			_this36._opts = {
+			var _this38 = _possibleConstructorReturn(this, Object.getPrototypeOf($select).call(this));
+			_this38._opts = {
 				addCaption: false
 			};
 			for (var key in opts) {
-				_this36._opts[key] = opts[key];
+				_this38._opts[key] = opts[key];
 			}
-			_this36._CONST = {
+			_this38._CONST = {
 				CAPTION_SEL: ".dropdown-toggle",
 				OPTIONS_SEL: ".dropdown-menu a",
 				CARET_SEL: ".caret",
@@ -7704,18 +7903,18 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 				OPEN_CLASS: "open",
 				ACTIVE_CLASS: "active"
 			};
-			_this36._el = el;
-			_this36._optinsRef = [];
-			_this36._captionEl = null;
-			_this36.captionTextEl = null;
-			_this36._binds = {
-				captionClick: _this36._captionClick.bind(_this36),
-				choiceClick: _this36._choiceClick.bind(_this36),
-				removeAllOpened: _this36._removeAllOpened.bind(_this36),
-				click: _this36._click.bind(_this36)
+			_this38._el = el;
+			_this38._optinsRef = [];
+			_this38._captionEl = null;
+			_this38.captionTextEl = null;
+			_this38._binds = {
+				captionClick: _this38._captionClick.bind(_this38),
+				choiceClick: _this38._choiceClick.bind(_this38),
+				removeAllOpened: _this38._removeAllOpened.bind(_this38),
+				click: _this38._click.bind(_this38)
 			};
-			_this36._bind();
-			return _this36;
+			_this38._bind();
+			return _this38;
 		}
 		/**
    * Bind clicks on the select.
@@ -7769,10 +7968,10 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		}, {
 			key: "_removeAllOpened",
 			value: function _removeAllOpened() {
-				var _this37 = this;
+				var _this39 = this;
 				// remove all
 				onix.element(this._CONST.OPEN_DROPDOWN_SEL).forEach(function (item) {
-					item.classList.remove(_this37._CONST.OPEN_CLASS);
+					item.classList.remove(_this39._CONST.OPEN_CLASS);
 				});
 			}
 			/**
@@ -7821,14 +8020,14 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		}, {
 			key: "_bindChoices",
 			value: function _bindChoices() {
-				var _this38 = this;
+				var _this40 = this;
 				onix.element(this._CONST.OPTIONS_SEL, this._el).forEach(function (option) {
-					option.addEventListener("click", _this38._binds.choiceClick);
+					option.addEventListener("click", _this40._binds.choiceClick);
 					// event ref
-					_this38._optinsRef.push({
+					_this40._optinsRef.push({
 						el: option,
 						event: "click",
-						fn: _this38._binds.choiceClick
+						fn: _this40._binds.choiceClick
 					});
 				});
 			}
@@ -7925,12 +8124,12 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		}, {
 			key: "setAddCaption",
 			value: function setAddCaption() {
-				var _this39 = this;
+				var _this41 = this;
 				if (!this._opts.addCaption) return;
 				this._optinsRef.every(function (item) {
 					var parent = item.el.parentNode;
-					if (parent.classList.contains(_this39._CONST.ACTIVE_CLASS)) {
-						_this39._captionTextEl.innerHTML = item.el.innerHTML;
+					if (parent.classList.contains(_this41._CONST.ACTIVE_CLASS)) {
+						_this41._captionTextEl.innerHTML = item.el.innerHTML;
 						return false;
 					} else {
 						return true;
@@ -7959,48 +8158,48 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
 		_inherits($slider, _$event4);
 		function $slider(parent, optsArg) {
 			_classCallCheck(this, $slider);
-			var _this40 = _possibleConstructorReturn(this, Object.getPrototypeOf($slider).call(this));
-			_this40._parent = parent;
-			_this40._root = _this40._create();
-			_this40._opts = {
+			var _this42 = _possibleConstructorReturn(this, Object.getPrototypeOf($slider).call(this));
+			_this42._parent = parent;
+			_this42._root = _this42._create();
+			_this42._opts = {
 				min: 0,
 				max: 100,
 				wheelStep: 1,
 				timeout: 333
 			};
 			for (var key in optsArg) {
-				_this40._opts[key] = optsArg[key];
+				_this42._opts[key] = optsArg[key];
 			}
 			// selected value
-			_this40._value = null;
+			_this42._value = null;
 			// signal change - helper
-			_this40._signalObj = {
+			_this42._signalObj = {
 				id: null,
 				lastValue: null
 			};
-			parent.appendChild(_this40._root);
-			_this40._binds = {
-				keyUp: _this40._keyUp.bind(_this40),
-				click: _this40._click.bind(_this40),
-				mouseDownCaret: _this40._mouseDownCaret.bind(_this40),
-				mouseMove: _this40._mouseMove.bind(_this40),
-				mouseWheel: _this40._mouseWheel.bind(_this40),
-				mouseUp: _this40._mouseUp.bind(_this40),
-				sendSignalInner: _this40._sendSignalInner.bind(_this40)
+			parent.appendChild(_this42._root);
+			_this42._binds = {
+				keyUp: _this42._keyUp.bind(_this42),
+				click: _this42._click.bind(_this42),
+				mouseDownCaret: _this42._mouseDownCaret.bind(_this42),
+				mouseMove: _this42._mouseMove.bind(_this42),
+				mouseWheel: _this42._mouseWheel.bind(_this42),
+				mouseUp: _this42._mouseUp.bind(_this42),
+				sendSignalInner: _this42._sendSignalInner.bind(_this42)
 			};
-			_this40._mouse = {
+			_this42._mouse = {
 				bcr: null
 			};
-			_this40._els.input.addEventListener("keyup", _this40._binds.keyUp);
-			_this40._els.tube.addEventListener("click", _this40._binds.click);
-			_this40._els.caret.addEventListener("mousedown", _this40._binds.mouseDownCaret);
+			_this42._els.input.addEventListener("keyup", _this42._binds.keyUp);
+			_this42._els.tube.addEventListener("click", _this42._binds.click);
+			_this42._els.caret.addEventListener("mousedown", _this42._binds.mouseDownCaret);
 			// firefox
-			_this40._els.lineHolder.addEventListener("DOMMouseScroll", _this40._binds.mouseWheel);
+			_this42._els.lineHolder.addEventListener("DOMMouseScroll", _this42._binds.mouseWheel);
 			// others
-			_this40._els.lineHolder.addEventListener("mousewheel", _this40._binds.mouseWheel);
+			_this42._els.lineHolder.addEventListener("mousewheel", _this42._binds.mouseWheel);
 			// def. max value
-			_this40.setValue(_this40._opts.max);
-			return _this40;
+			_this42.setValue(_this42._opts.max);
+			return _this42;
 		}
 		/**
    * Create slider and his children.
@@ -8577,15 +8776,15 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 		}, {
 			key: "_mouseMove",
 			value: function _mouseMove(e) {
-				var _this41 = this;
+				var _this43 = this;
 				$common.cancelEvents(e);
 				var diffX = e.clientX - this._mouse.startX;
 				var diffY = e.clientY - this._mouse.startY;
 				if (this._type == "crop-middle") {
 					// move
 					Object.keys(this._points).forEach(function (key) {
-						_this41._points[key].x += diffX;
-						_this41._points[key].y += diffY;
+						_this43._points[key].x += diffX;
+						_this43._points[key].y += diffY;
 					});
 					this._alignPoints();
 					this._redraw();
@@ -8597,7 +8796,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 					}
 					if (this._resizeTest(diffX, diffY, group)) {
 						group.forEach(function (i) {
-							var point = _this41._points[i.type];
+							var point = _this43._points[i.type];
 							// add diffx, diffy to all group members
 							point.x += i.x ? diffX : 0;
 							point.y += i.y ? diffY : 0;
@@ -8662,7 +8861,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 		}, {
 			key: "_resizeTest",
 			value: function _resizeTest(diffX, diffY, group) {
-				var _this42 = this;
+				var _this44 = this;
 				if (!this._options.aspectRatio) {
 					return false;
 				}
@@ -8687,8 +8886,8 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 				group.forEach(function (i) {
 					var point = points[i.type];
 					// add diffx, diffy to all group members
-					point.x = _this42._points[i.type].x + (i.x ? diffX : 0);
-					point.y = _this42._points[i.type].y + (i.y ? diffY : 0);
+					point.x = _this44._points[i.type].x + (i.x ? diffX : 0);
+					point.y = _this44._points[i.type].y + (i.y ? diffY : 0);
 				});
 				// min. and max. value
 				var size = this._getSize(points);
@@ -8904,4 +9103,1562 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 	}();
 	;
 	return $crop;
+}]);
+onix.factory("$jsonViewer", ["$dom", function ($dom) {
+	/**
+  * JSON object visualiser.
+  * 
+  * @class $jsonViewer
+  */
+	var $jsonViewer = function () {
+		function $jsonViewer() {
+			_classCallCheck(this, $jsonViewer);
+			this._const = {
+				HIDE_CLASS: "hide"
+			};
+			this._dom = {
+				container: $dom.create({
+					el: "pre",
+					"class": "json-viewer"
+				})
+			};
+		}
+		/**
+   * Process input JSON - throws exception for unrecognized input.
+   * 
+   * @param {Object|Array} json Input value
+   * @return {Object|Array}
+   * @member $jsonViewer
+   * @method _processInput
+   * @private
+   */
+		_createClass($jsonViewer, [{
+			key: "_processInput",
+			value: function _processInput(json) {
+				if (json && (typeof json === "undefined" ? "undefined" : _typeof(json)) === "object") {
+					return json;
+				} else {
+					throw "Input value is not object or array!";
+				}
+			}
+			/**
+    * Recursive walk for input value.
+    * 
+    * @param {Object|Array} value Input value
+    * @param {Number} maxLvl Process only to max level, where 0..n, -1 unlimited
+    * @param {Number} colAt Collapse at level, where 0..n, -1 unlimited
+    * @param {Number} lvl Current level
+    * @member $jsonViewer
+    * @method _walk
+    * @private
+    */
+		}, {
+			key: "_walk",
+			value: function _walk(value, maxLvl, colAt, lvl) {
+				var _this45 = this;
+				var frag = document.createDocumentFragment();
+				var isMaxLvl = maxLvl >= 0 && lvl >= maxLvl;
+				var isCollapse = colAt >= 0 && lvl >= colAt;
+				switch (typeof value === "undefined" ? "undefined" : _typeof(value)) {
+					case "object":
+						if (value) {
+							var _ret19 = function () {
+								var isArray = Array.isArray(value);
+								var items = isArray ? value : Object.keys(value);
+								if (lvl === 0) {
+									(function () {
+										// root level
+										var rootCount = _this45._createItemsCount(items.length);
+										// hide/show
+										var rootLink = _this45._createLink(isArray ? "[" : "{");
+										if (items.length) {
+											rootLink.addEventListener("click", function (e) {
+												if (isMaxLvl) return;
+												rootLink.classList.toggle("collapsed");
+												rootCount.classList.toggle("hide");
+												// main list
+												_this45._dom.container.querySelector("ul").classList.toggle("hide");
+											});
+											if (isCollapse) {
+												rootLink.classList.add("collapsed");
+												rootCount.classList.remove("hide");
+											}
+										} else {
+											rootLink.classList.add("empty");
+										}
+										rootLink.appendChild(rootCount);
+										frag.appendChild(rootLink);
+									})();
+								}
+								if (items.length && !isMaxLvl) {
+									(function () {
+										var len = items.length - 1;
+										var ulList = $dom.create({
+											el: "ul",
+											"class": "type-" + (isArray ? "array" : "object"),
+											attrs: {
+												"data-level": lvl
+											}
+										});
+										items.forEach(function (key, ind) {
+											var item = isArray ? key : value[key];
+											var li = $dom.create({
+												el: "li"
+											});
+											if ((typeof item === "undefined" ? "undefined" : _typeof(item)) === "object") {
+												var isEmpty = false;
+												// null && date
+												if (!item || item instanceof Date) {
+													li.appendChild(_this45._createText(isArray ? "" : key + ": "));
+													li.appendChild(_this45._createSimple(item ? item : null));
+												}
+												// array & object
+												else {
+														var itemIsArray = Array.isArray(item);
+														var itemLen = itemIsArray ? item.length : Object.keys(item).length;
+														// empty
+														if (!itemLen) {
+															li.appendChild(_this45._createText(key + ": " + (itemIsArray ? "[]" : "{}")));
+														} else {
+															(function () {
+																// 1+ items
+																var itemTitle = (typeof key === "string" ? key + ": " : "") + (itemIsArray ? "[" : "{");
+																var itemLink = _this45._createLink(itemTitle);
+																var itemsCount = _this45._createItemsCount(itemLen);
+																// maxLvl - only text, no link
+																if (maxLvl >= 0 && lvl + 1 >= maxLvl) {
+																	li.appendChild(_this45._createText(itemTitle));
+																} else {
+																	itemLink.appendChild(itemsCount);
+																	li.appendChild(itemLink);
+																}
+																li.appendChild(_this45._walk(item, maxLvl, colAt, lvl + 1));
+																li.appendChild(_this45._createText(itemIsArray ? "]" : "}"));
+																var list = li.querySelector("ul");
+																var itemLinkCb = function itemLinkCb() {
+																	itemLink.classList.toggle("collapsed");
+																	itemsCount.classList.toggle("hide");
+																	list.classList.toggle("hide");
+																};
+																// hide/show
+																itemLink.addEventListener("click", itemLinkCb);
+																// collapse lower level
+																if (colAt >= 0 && lvl + 1 >= colAt) {
+																	itemLinkCb();
+																}
+															})();
+														}
+													}
+											}
+											// simple values
+											else {
+													// object keys with key:
+													if (!isArray) {
+														li.appendChild(_this45._createText(key + ": "));
+													}
+													// recursive
+													li.appendChild(_this45._walk(item, maxLvl, colAt, lvl + 1));
+												}
+											// add comma to the end
+											if (ind < len) {
+												li.appendChild(_this45._createText(","));
+											}
+											ulList.appendChild(li);
+										}, _this45);
+										frag.appendChild(ulList);
+									})();
+								} else if (items.length && isMaxLvl) {
+									var itemsCount = _this45._createItemsCount(items.length);
+									itemsCount.classList.remove("hide");
+									frag.appendChild(itemsCount);
+								}
+								if (lvl === 0) {
+									// empty root
+									if (!items.length) {
+										var _itemsCount = _this45._createItemsCount(0);
+										_itemsCount.classList.remove("hide");
+										frag.appendChild(_itemsCount);
+									}
+									// root cover
+									frag.appendChild(_this45._createText(isArray ? "]" : "}"));
+									// collapse
+									if (isCollapse) {
+										frag.querySelector("ul").classList.add("hide");
+									}
+								}
+								return "break";
+							}();
+							if (_ret19 === "break") break;
+						}
+					default:
+						// simple values
+						frag.appendChild(this._createSimple(value));
+						break;
+				}
+				return frag;
+			}
+			/**
+    * Create text node.
+    * 
+    * @param  {String} value Text content
+    * @return {Element}
+    * @member $jsonViewer
+    * @method _createText
+    * @private
+    */
+		}, {
+			key: "_createText",
+			value: function _createText(value) {
+				return $dom.create({
+					el: "text",
+					textContent: value || ""
+				});
+			}
+			/**
+    * Create simple value (no object|array).
+    * 
+    * @param  {Number|String|null|undefined|Date} value Input value
+    * @return {Element}
+    * @member $jsonViewer
+    * @method _createSimple
+    * @private
+    */
+		}, {
+			key: "_createSimple",
+			value: function _createSimple(value) {
+				var type = typeof value === "undefined" ? "undefined" : _typeof(value);
+				var txt = value;
+				if (type === "string") {
+					txt = '"' + value + '"';
+				} else if (value === null) {
+					type = "null";
+					txt = "null";
+				} else if (value === undefined) {
+					txt = "undefined";
+				} else if (value instanceof Date) {
+					type = "date";
+					txt = value.toString();
+				}
+				return $dom.create({
+					el: "span",
+					"class": "type-" + type,
+					innerHTML: txt
+				});
+			}
+			/**
+    * Create items count element.
+    * 
+    * @param  {Number} count Items count
+    * @return {Element}
+    * @member $jsonViewer
+    * @method _createItemsCount
+    * @private
+    */
+		}, {
+			key: "_createItemsCount",
+			value: function _createItemsCount(count) {
+				return $dom.create({
+					el: "span",
+					"class": ["items-ph", this._const.HIDE_CLASS],
+					href: "javascript:void(0)",
+					innerHTML: this._getItemsTitle(count)
+				});
+			}
+			/**
+    * Create clickable link.
+    * 
+    * @param  {String} title Link title
+    * @return {Element}
+    * @member $jsonViewer
+    * @method _createLink
+    * @private
+    */
+		}, {
+			key: "_createLink",
+			value: function _createLink(title) {
+				return $dom.create({
+					el: "a",
+					"class": "list-link",
+					href: "javascript:void(0)",
+					innerHTML: title || ""
+				});
+			}
+			/**
+    * Get correct item|s title for count.
+    * 
+    * @param  {Number} count Items count
+    * @return {String}
+    * @member $jsonViewer
+    * @method _getItemsTitle
+    * @private
+    */
+		}, {
+			key: "_getItemsTitle",
+			value: function _getItemsTitle(count) {
+				var itemsTxt = count > 1 || count === 0 ? "items" : "item";
+				return count + " " + itemsTxt;
+			}
+			/**
+    * Visualise JSON object.
+    * 
+    * @param {Object|Array} json Input value
+    * @param {Number} [maxLvl] Process only to max level, where 0..n, -1 unlimited
+    * @param {Number} [colAt] Collapse at level, where 0..n, -1 unlimited
+    * @member $jsonViewer
+    * @method showJSON
+    * 
+    */
+		}, {
+			key: "showJSON",
+			value: function showJSON(json, maxLvl, colAt) {
+				maxLvl = typeof maxLvl === "number" ? maxLvl : -1; // max level
+				colAt = typeof colAt === "number" ? colAt : -1; // collapse at
+				var jsonData = this._processInput(json);
+				var walkEl = this._walk(jsonData, maxLvl, colAt, 0);
+				this._dom.container.innerHTML = "";
+				this._dom.container.appendChild(walkEl);
+			}
+			/**
+    * Get container with pre object - this container is used for visualise JSON data.
+    * 
+    * @return {Element}
+    * @member $jsonViewer
+    * @method getContainer
+    */
+		}, {
+			key: "getContainer",
+			value: function getContainer() {
+				return this._dom.container;
+			}
+		}]);
+		return $jsonViewer;
+	}();
+	;
+	return $jsonViewer;
+}]);
+onix.factory("$lightbox", ["$dom", "$common", "$resize", "$event", "$loader", function ($dom, $common, $resize, $event, $loader) {
+	/**
+  * Create $lightbox window.
+  * 
+  * @param {Object} [options] Configuration
+  * @param {Number} [options.fadeTime = 20] Fade time between image switch
+  * @param {Boolean} [options.loop = true] Loop all images
+  * @param {Object} [options.dict] Optional translations, keys: close, noDesc, prev, next
+  * @param {String} [options.hideClass = "hide"] hide class for CSS
+  * @param {Number} [options.firstRunClass = "first-run"] first run class for CSS
+  * @class $lightbox
+  */
+	var $lightbox = function (_$event5) {
+		_inherits($lightbox, _$event5);
+		function $lightbox(options) {
+			_classCallCheck(this, $lightbox);
+			var _this46 = _possibleConstructorReturn(this, Object.getPrototypeOf($lightbox).call(this));
+			_this46._opts = {
+				fadeTime: 20,
+				loop: true,
+				dict: {
+					close: "Close",
+					noDesc: "Empty description",
+					prev: "Prev",
+					next: "Next"
+				},
+				hideClass: "hide",
+				firstRunClass: "first-run"
+			};
+			for (var opt in options) {
+				_this46._opts[opt] = options[opt];
+			}
+			_this46._data = [];
+			_this46._ind = 0;
+			_this46._dom = {};
+			_this46._disableMouse = true;
+			_this46._binds = {
+				keyDown: _this46._keyDown.bind(_this46),
+				mouseMove: _this46._mouseMove.bind(_this46)
+			};
+			_this46._firstOpen = false;
+			_this46._wasMove = false;
+			_this46._opened = false;
+			_this46._fadeId = null;
+			_this46._firstRunId = null;
+			_this46._width = 0;
+			_this46._height = 0;
+			return _this46;
+		}
+		/**
+   * Show prev button.
+   *
+   * @private
+   * @member $lightbox
+   * @method _showPrevBtn
+   */
+		_createClass($lightbox, [{
+			key: "_showPrevBtn",
+			value: function _showPrevBtn() {
+				this._dom.prevBtn.classList.remove(this._opts.hideClass);
+				this._dom.nextBtn.classList.add(this._opts.hideClass);
+			}
+			/**
+    * Show next button.
+    *
+    * @private
+    * @member $lightbox
+    * @method _showNextBtn
+    */
+		}, {
+			key: "_showNextBtn",
+			value: function _showNextBtn() {
+				this._dom.prevBtn.classList.add(this._opts.hideClass);
+				this._dom.nextBtn.classList.remove(this._opts.hideClass);
+			}
+			/**
+    * Lightbox cover DOM create.
+    *
+    * @private
+    * @member $lightbox
+    * @method _createCover
+    */
+		}, {
+			key: "_createCover",
+			value: function _createCover() {
+				var _this47 = this;
+				this._dom.cover = $dom.create({
+					el: "div",
+					"class": "lightbox-cover",
+					events: [{
+						event: "click",
+						fn: function fn(e) {
+							_this47.close();
+						}
+					}, {
+						event: "DOMMouseScroll",
+						fn: function fn(e) {
+							_this47._mouseScroll(e);
+						}
+					}, {
+						event: "mousewheel",
+						fn: function fn(e) {
+							_this47._mouseScroll(e);
+						}
+					}]
+				});
+				document.body.appendChild(this._dom.cover);
+			}
+			/**
+    * Lightbox DOM create.
+    *
+    * @private
+    * @member $lightbox
+    * @method _create
+    */
+		}, {
+			key: "_create",
+			value: function _create() {
+				var _this48 = this;
+				var exported = {};
+				this._dom.container = $dom.create({
+					el: "div",
+					"class": ["lightbox", this._opts.firstRunClass],
+					events: [{
+						event: "DOMMouseScroll",
+						fn: function fn(e) {
+							_this48._mouseScroll(e);
+						}
+					}, {
+						event: "mousewheel",
+						fn: function fn(e) {
+							_this48._mouseScroll(e);
+						}
+					}],
+					child: [{
+						el: "div",
+						"class": "close-holder",
+						child: {
+							el: "button",
+							"class": "exit-btn",
+							attrs: {
+								type: "button",
+								title: this._opts.dict.close
+							},
+							events: {
+								event: "click",
+								fn: function fn(e) {
+									_this48.close();
+								}
+							}
+						},
+						_exported: "closeHolder"
+					}, {
+						el: "div",
+						"class": "img-holder",
+						child: [{
+							el: "div",
+							"class": "left-part",
+							events: [{
+								event: "click",
+								fn: function fn(e) {
+									_this48.prev();
+								}
+							}, {
+								event: "mouseenter",
+								fn: function fn(e) {
+									if (_this48._disableMouse) return;
+									_this48._dom.prevBtn.classList.remove(_this48._opts.hideClass);
+								}
+							}, {
+								event: "mouseleave",
+								fn: function fn(e) {
+									if (_this48._disableMouse) return;
+									_this48._dom.prevBtn.classList.add(_this48._opts.hideClass);
+								}
+							}],
+							child: {
+								el: "button",
+								attrs: {
+									type: "button"
+								},
+								"class": ["prev-btn", this._opts.hideClass],
+								innerHTML: this._opts.dict.prev,
+								_exported: "prevBtn"
+							},
+							_exported: "leftPart"
+						}, {
+							el: "div",
+							"class": "right-part",
+							events: [{
+								event: "click",
+								fn: function fn(e) {
+									_this48.next();
+								}
+							}, {
+								event: "mouseenter",
+								fn: function fn(e) {
+									if (_this48._disableMouse) return;
+									_this48._dom.nextBtn.classList.remove(_this48._opts.hideClass);
+								}
+							}, {
+								event: "mouseleave",
+								fn: function fn(e) {
+									if (_this48._disableMouse) return;
+									_this48._dom.nextBtn.classList.add(_this48._opts.hideClass);
+								}
+							}],
+							child: {
+								el: "button",
+								attrs: {
+									type: "button"
+								},
+								"class": ["next-btn", this._opts.hideClass],
+								innerHTML: this._opts.dict.next,
+								_exported: "nextBtn"
+							},
+							_exported: "rightPart"
+						}],
+						_exported: "imgHolder"
+					}, {
+						el: "div",
+						"class": "footer",
+						child: [{
+							el: "p",
+							"class": "desc",
+							_exported: "desc"
+						}, {
+							el: "p",
+							"class": "pos",
+							_exported: "pos"
+						}],
+						_exported: "footer"
+					}]
+				}, exported);
+				$common.extend(this._dom, exported);
+				document.body.appendChild(this._dom.container);
+			}
+			/**
+    * Show lightbox at index.
+    *
+    * @param {Number} [ind] Photo number
+    * @param {Number|String} [dir] View direction (-1 left, 1 right)
+    * @private
+    * @member $lightbox
+    * @method _show
+    */
+		}, {
+			key: "_show",
+			value: function _show(ind, dir) {
+				var _this49 = this;
+				if (typeof ind === "string") {
+					ind = parseFloat(ind);
+				}
+				var count = this._data.length;
+				if (!count) return;
+				dir = dir || 0;
+				ind = (ind || 0) + dir;
+				if (ind < 0) {
+					if (this._opts.loop) {
+						ind = count - 1;
+					} else {
+						return;
+					}
+				} else if (ind > count - 1) {
+					if (this._opts.loop) {
+						ind = 0;
+					} else {
+						return;
+					}
+				}
+				// save index
+				this._ind = ind;
+				var data = this._data[ind];
+				// cleart timeouts
+				this._clearFade();
+				this._clearFirstRun();
+				// img
+				var oldImg = this._dom.img;
+				if (oldImg) {
+					this._dom.imgHolder.removeChild(oldImg);
+					this._dom.img = null;
+				}
+				if (this._firstOpen) {
+					this._dom.loader = $loader.getSpinner();
+					this._dom.imgHolder.appendChild(this._dom.loader);
+				}
+				var start = Date.now();
+				var img = new Image();
+				var makeFade = this._opts.fadeTime > 0;
+				if (makeFade) {
+					img.setAttribute("data-src", "");
+				}
+				img.alt = data.desc;
+				img.onload = function (e) {
+					_this49._width = img.width;
+					_this49._height = img.height;
+					if (_this49._firstOpen) {
+						_this49._firstOpen = false;
+						if (_this49._dom.loader) {
+							_this49._dom.imgHolder.removeChild(_this49._dom.loader);
+						}
+						_this49._firstRunId = setTimeout(function () {
+							_this49._dom.container.classList.remove(_this49._opts.firstRunClass);
+						}, 200);
+					}
+					_this49._dom.imgHolder.appendChild(img);
+					_this49._dom.img = img;
+					_this49._resize();
+					if (makeFade) {
+						var diff = Date.now() - start;
+						var time = diff < _this49._opts.fadeTime ? _this49._opts.fadeTime - diff : 0;
+						_this49._fadeId = setTimeout(function () {
+							img.removeAttribute("data-src");
+							_this49._fadeId = null;
+						}, time);
+					}
+				};
+				img.src = data.url;
+				// desc
+				this._dom.desc.innerHTML = data.desc;
+				this._dom.pos.innerHTML = ind + 1 + " / " + count;
+			}
+			/**
+    * Mouse scroll event - disable scroll lightbox -> parent propagation.
+    *
+    * @param {Event} e Mouse scroll event
+    * @private
+    * @member $lightbox
+    * @method _mouseScroll
+    */
+		}, {
+			key: "_mouseScroll",
+			value: function _mouseScroll(e) {
+				e.preventDefault();
+			}
+			/**
+    * Key down event - image switch, close lightbox.
+    *
+    * @param {Event} e Keyboard event
+    * @private
+    * @member $lightbox
+    * @method _keyDown
+    */
+		}, {
+			key: "_keyDown",
+			value: function _keyDown(e) {
+				var keyCode = e.which || e.keyCode;
+				// left, up
+				if (keyCode == 37 || keyCode == 38) {
+					this.prev(true);
+					if (keyCode == 38) {
+						e.preventDefault();
+					}
+				}
+				// right, down
+				else if (keyCode == 39 || keyCode == 40) {
+						this.next(true);
+						if (keyCode == 40) {
+							e.preventDefault();
+						}
+					} else if (keyCode == 27) {
+						// esc
+						this.close();
+					}
+			}
+			/**
+    * Mouse move event - hide prev/next buttons.
+    *
+    * @param {Event} e Mouse event
+    * @private
+    * @member $lightbox
+    * @method _mouseMove
+    */
+		}, {
+			key: "_mouseMove",
+			value: function _mouseMove(e) {
+				if (!this._wasMove) {
+					this._wasMove = true;
+					return;
+				}
+				this._disableMouse = false;
+				var target = e.target || e.srcElement;
+				if (target == this._dom.leftPart) {
+					this._showPrevBtn();
+				} else if (target == this._dom.rightPart) {
+					this._showNextBtn();
+				}
+				document.removeEventListener("mousemove", this._binds.mouseMove);
+			}
+			/**
+    * Resize event - resize lightbox.
+    * 
+    * @private
+    * @member $lightbox
+    * @method _resize
+    */
+		}, {
+			key: "_resize",
+			value: function _resize() {
+				if (!this._width || !this._height) return;
+				var top = this._dom.container.offsetTop;
+				var availWidth = document.body.offsetWidth - 2 * top;
+				var availHeight = window.innerHeight - 2 * top - this._dom.closeHolder.offsetHeight - this._dom.footer.offsetHeight;
+				var width = 0;
+				var height = 0;
+				var ratio = this._width / this._height;
+				if (this._width > this._height) {
+					// landscape
+					width = Math.min(this._width, availWidth);
+					height = width / ratio;
+					if (height > availHeight) {
+						height = availHeight;
+						width = height * ratio;
+					}
+				} else {
+					// portrait
+					height = Math.min(this._height, availHeight);
+					width = height * ratio;
+					if (width > availWidth) {
+						width = availWidth;
+						height = width / ratio;
+					}
+				}
+				this._dom.imgHolder.style.width = width + "px";
+				this._dom.imgHolder.style.height = height + "px";
+			}
+			/**
+    * Clear fade timeout.
+    *
+    * @member $lightbox
+    * @method _clearFade
+    */
+		}, {
+			key: "_clearFade",
+			value: function _clearFade() {
+				if (this._fadeId) {
+					clearTimeout(this._fadeId);
+					this._fadeId = null;
+				}
+			}
+			/**
+    * Clear first run timeout.
+    *
+    * @member $lightbox
+    * @method _clearFirstRun
+    */
+		}, {
+			key: "_clearFirstRun",
+			value: function _clearFirstRun() {
+				if (this._firstRunId) {
+					clearTimeout(this._firstRunId);
+					this._firstRunId = null;
+				}
+			}
+			/**
+    * Add image to the lightbox.
+    *
+    * @param {String} url Image path
+    * @param {String} preview Preview image path
+    * @param {String} [desc] Image description
+    * @member $lightbox
+    * @method add
+    */
+		}, {
+			key: "add",
+			value: function add(url, preview, desc) {
+				if (!url || !preview) return;
+				this._data.push({
+					url: url,
+					preview: preview,
+					desc: desc || this._opts.dict.noDesc
+				});
+			}
+			/**
+    * Open lightbox, you can also choose open index.
+    *
+    * @param {Number} [ind] Open index
+    * @member $lightbox
+    * @method open
+    */
+		}, {
+			key: "open",
+			value: function open(ind) {
+				if (this._opened) {
+					this._show(ind);
+					return;
+				}
+				this._opened = true;
+				this._firstOpen = true;
+				this._createCover();
+				this._create();
+				this._show(ind);
+				document.addEventListener("keydown", this._binds.keyDown);
+				document.addEventListener("mousemove", this._binds.mouseMove);
+				$resize.on("resize", this._resize, this);
+				this.trigger("open");
+			}
+			/**
+    * Close lightbox window.
+    *
+    * @param {Number} [ind] Open index
+    * @member $lightbox
+    * @method close
+    */
+		}, {
+			key: "close",
+			value: function close() {
+				if (!this._opened) {
+					return;
+				}
+				this._opened = false;
+				this._firstOpen = false;
+				// remove
+				if (this._dom.cover) {
+					document.body.removeChild(this._dom.cover);
+				}
+				if (this._dom.container) {
+					document.body.removeChild(this._dom.container);
+				}
+				if (!this._wasMove) {
+					document.removeEventListener("mousemove", this._binds.mouseMove);
+				}
+				// clear
+				this._dom = {};
+				this._ind = 0;
+				this._disableMouse = true;
+				this._wasMove = false;
+				document.removeEventListener("keydown", this._binds.keyDown);
+				$resize.off("resize", this._resize, this);
+				this._clearFade();
+				this._clearFirstRun();
+				this.trigger("close");
+			}
+			/**
+    * Jump to prev photo, you can also set visibility for step button.
+    *
+    * @param {Boolean} [showBtn] Show prev button
+    * @member $lightbox
+    * @method prev
+    */
+		}, {
+			key: "prev",
+			value: function prev(showBtn) {
+				this._show(this._ind, -1);
+				if (showBtn) {
+					this._showPrevBtn();
+				}
+			}
+			/**
+    * Jump to next photo, you can also set visibility for step button.
+    *
+    * @param {Boolean} [showBtn] Show next button
+    * @member $lightbox
+    * @method next
+    */
+		}, {
+			key: "next",
+			value: function next(showBtn) {
+				this._show(this._ind, 1);
+				if (showBtn) {
+					this._showNextBtn();
+				}
+			}
+			/**
+    * Set language object.
+    *
+    * @param {Object} obj Object with translations
+    * @member $lightbox
+    * @method setDict
+    */
+		}, {
+			key: "setDict",
+			value: function setDict(obj) {
+				for (var key in obj) {
+					this._opts.dict[key] = obj[key];
+				}
+			}
+		}]);
+		return $lightbox;
+	}($event);
+	;
+	return $lightbox;
+}]);
+onix.factory("$popup", ["$dom", "$event", "$resize", function ($dom, $event, $resize) {
+	/**
+  * Create $popup window.
+  * Signals:
+  * popup-close - popup is closed
+  *
+  * Signal listeners:
+  * window-resize - window was resized
+  * 
+  * @param {Object} [opts] Configuration
+  * @param {Number} [opt.maxWidth] max. width [px]
+  * @param {Boolean} [opt.draggable] can be popup moved on the screen?
+  * @param {String} [opt.className] optinal css class name
+  * @param {$popup.POSITIONS} [opt.position] default popup position on the screen
+  * @param {Number} [opt.padding] except all centers, add padding to position
+  * @class $popup
+  */
+	var $popup = function (_$event6) {
+		_inherits($popup, _$event6);
+		function $popup(opts) {
+			_classCallCheck(this, $popup);
+			var _this50 = _possibleConstructorReturn(this, Object.getPrototypeOf($popup).call(this));
+			_this50._const = {
+				ROOT_CLASS: "popup",
+				CONTENT_CLASS: "content",
+				CLOSE_BTN_CLASS: "close-btn",
+				MOVE_COVER_CLASS: "popup-move-cover",
+				DRAGGABLE_CLASS: "draggable",
+				// responsive mode - popup width is smaller than screen width
+				RESPONSIVE_CLASS: "responsive-mode",
+				// popup height is smaller the screen height
+				OVERFLOW_Y_CLASS: "overflow-y"
+			};
+			_this50._opts = {
+				maxWidth: null,
+				draggable: true,
+				className: "",
+				position: $popup.POSITIONS.CENTER_CENTER,
+				padding: 0
+			};
+			for (var opt in opts) {
+				_this50._opts[opt] = opts[opt];
+			}
+			_this50._binds = {};
+			_this50._binds.mouseDown = _this50._mouseDown.bind(_this50);
+			_this50._binds.mouseUp = _this50._mouseUp.bind(_this50);
+			_this50._binds.mouseMove = _this50._mouseMove.bind(_this50);
+			_this50._binds.click = _this50._click.bind(_this50);
+			_this50._dom = _this50._create();
+			_this50._appendNode = document.body;
+			_this50._isDraggedOut = false;
+			_this50._saved = {
+				width: 0,
+				height: 0,
+				x: 0,
+				y: 0
+			};
+			_this50._screen = {
+				width: 0,
+				height: 0
+			};
+			_this50._setScreenSize();
+			// signals
+			_this50.on("window-resize", _this50._resize, _this50);
+			// append - open popup
+			_this50._appendNode.appendChild(_this50._dom.root);
+			_this50.setPosition();
+			return _this50;
+		}
+		/**
+   * Window resize event.
+   * 
+   * @member $popup
+   * @method _resize
+   * @private
+   */
+		_createClass($popup, [{
+			key: "_resize",
+			value: function _resize() {
+				this._setScreenSize();
+				this.setPosition();
+			}
+			/**
+    * Save screen dimensions.
+    * 
+    * @member $popup
+    * @method _setScreenSize
+    * @private
+    */
+		}, {
+			key: "_setScreenSize",
+			value: function _setScreenSize() {
+				this._screen.width = Math.min(window.innerWidth, document.body.offsetWidth);
+				this._screen.height = window.innerHeight;
+			}
+			/**
+    * Calculate position according to the selected position from the enum $popup.POSITIONS.
+    * 
+    * @param {Object} pos Position
+    * @member $popup
+    * @method _calculatePosition
+    * @private
+    */
+		}, {
+			key: "_calculatePosition",
+			value: function _calculatePosition(pos) {
+				var width = this._dom.root.offsetWidth;
+				var height = this._dom.root.offsetHeight;
+				// default center - center
+				var left = Math.floor((this._screen.width - width) / 2);
+				var top = Math.floor((this._screen.height - height) / 2);
+				switch (pos) {
+					case $popup.POSITIONS.TOP_LEFT:
+						left = 0 + this._opts.padding;
+						top = 0 + this._opts.padding;
+						break;
+					case $popup.POSITIONS.TOP_CENTER:
+						left = Math.floor((this._screen.width - width) / 2);
+						top = 0 + this._opts.padding;
+						break;
+					case $popup.POSITIONS.TOP_RIGHT:
+						left = this._screen.width - width - this._opts.padding;
+						top = 0 + this._opts.padding;
+						break;
+					case $popup.POSITIONS.CENTER_LEFT:
+						left = 0 + this._opts.padding;
+						top = Math.floor((this._screen.height - height) / 2);
+						break;
+					case $popup.POSITIONS.CENTER_RIGHT:
+						left = this._screen.width - width - this._opts.padding;
+						top = Math.floor((this._screen.height - height) / 2);
+						break;
+					case $popup.POSITIONS.BOTTOM_LEFT:
+						left = 0 + this._opts.padding;
+						top = this._screen.height - height - this._opts.padding;
+						break;
+					case $popup.POSITIONS.BOTTOM_CENTER:
+						left = Math.floor((this._screen.width - width) / 2);
+						top = this._screen.height - height - this._opts.padding;
+						break;
+					case $popup.POSITIONS.BOTTOM_RIGHT:
+						left = this._screen.width - width - this._opts.padding;
+						top = this._screen.height - height - this._opts.padding;
+						break;
+				}
+				return {
+					left: left,
+					top: top
+				};
+			}
+			/**
+    * Set position.
+    * 
+    * @param {Object} [pos] optinal position; otherwise startup position is used
+    * @member $popup
+    * @method _setPosition
+    * @private
+    */
+		}, {
+			key: "_setPosition",
+			value: function _setPosition(pos) {
+				var left = 0;
+				var top = 0;
+				if (!pos) {
+					pos = this._opts.position;
+				}
+				if (typeof pos === "number") {
+					var cp = this._calculatePosition(pos);
+					left = cp.left;
+					top = cp.top;
+				} else if ((typeof pos === "undefined" ? "undefined" : _typeof(pos)) === "object") {
+					left = pos.left || 0;
+					top = pos.top || 0;
+				}
+				this._setRootPosition(left, top);
+			}
+			/**
+    * Set position after $popup was dragged.
+    *
+    * @member $popup
+    * @method _setPositionAfterDragged
+    * @private
+    */
+		}, {
+			key: "_setPositionAfterDragged",
+			value: function _setPositionAfterDragged() {
+				// dragged popup - is visible in the viewport?
+				var width = this._dom.root.offsetWidth;
+				var height = this._dom.root.offsetHeight;
+				var left = this._dom.root.offsetLeft;
+				var top = this._dom.root.offsetTop;
+				if (width + left > this._screen.width || height + top > this._screen.height) {
+					// center
+					var cp = this._calculatePosition();
+					// def.
+					var def = this._calculatePosition(this._opts.position);
+					// set
+					if (cp.left != def.left && cp.top != def.top) {
+						this._setRootPosition(def.left, def.top);
+					} else {
+						this._setRootPosition(cp.left, cp.top);
+					}
+					this._isDraggedOut = false;
+				}
+			}
+			/**
+    * Set root position.
+    *
+    * @param {Number} x Axe X
+    * @param {Number} y Axe Y
+    * @member $popup
+    * @method _setRootPosition
+    * @private
+    */
+		}, {
+			key: "_setRootPosition",
+			value: function _setRootPosition(x, y) {
+				var left = x || 0;
+				var top = y || 0;
+				var width = this._dom.root.offsetWidth;
+				var height = this._dom.root.offsetHeight;
+				// x, y modifications
+				if (left < 0) {
+					left = 0;
+				} else if (left + width > this._screen.width) {
+					left = this._screen.width - width;
+				}
+				if (top < 0) {
+					top = 0;
+				} else if (top + height > this._screen.height) {
+					top = this._screen.height - height;
+				}
+				// height overflow
+				if (!this._saved.height && height > this._screen.height) {
+					this._dom.root.classList.add(this._const.OVERFLOW_Y_CLASS);
+					this._saved.height = height;
+				} else if (this._saved.height && this._saved.height < this._screen.height) {
+					this._saved.height = 0;
+					// ok
+					this._dom.root.classList.remove(this._const.OVERFLOW_Y_CLASS);
+				}
+				// width modification
+				if (!this._saved.width && width > this._screen.width) {
+					if ("getComputedStyle" in window) {
+						var style = window.getComputedStyle(this._dom.root);
+						width = parseFloat(style.width);
+					}
+					this._saved.width = this._opts.maxWidth ? Math.min(width, this._opts.maxWidth) : width;
+					this._dom.root.style.width = (this._opts.maxWidth ? Math.min(this._screen.width, this._opts.maxWidth) : this._screen.width) + "px";
+					// responsive mode
+					this._dom.root.classList.add(this._const.RESPONSIVE_CLASS);
+				} else if (this._saved.width) {
+					if (this._saved.width < this._screen.width) {
+						// leave responsive mode
+						this._dom.root.classList.remove(this._const.RESPONSIVE_CLASS);
+						this._dom.root.style.width = this._saved.width + "px";
+						this._saved.width = 0;
+					} else {
+						// smaller - we are still in responsive mode
+						this._dom.root.style.width = this._screen.width + "px";
+					}
+					var cp = this._calculatePosition();
+					left = cp.left >= 0 ? cp.left : 0;
+					top = cp.top >= 0 ? cp.top : 0;
+				}
+				// position
+				this._dom.root.style.left = left + "px";
+				this._dom.root.style.top = top + "px";
+			}
+			/**
+    * Mouse down event - only for draggable.
+    *
+    * @param {Event} e
+    * @member $popup
+    * @method _mouseDown
+    * @private
+    */
+		}, {
+			key: "_mouseDown",
+			value: function _mouseDown(e) {
+				if (e.target.classList.contains(this._const.ROOT_CLASS)) {
+					e.preventDefault();
+					e.stopPropagation();
+					this._saved.x = parseFloat(this._dom.root.style.left) - e.clientX;
+					this._saved.y = parseFloat(this._dom.root.style.top) - e.clientY;
+					this._dom.moveCover = this._createMoveCover();
+					this._dom.moveCover.addEventListener("mousemove", this._binds.mouseMove);
+					this._dom.moveCover.addEventListener("mouseup", this._binds.mouseUp);
+					this._appendNode.appendChild(this._dom.moveCover);
+				}
+			}
+			/**
+    * Mouse move event - draggable.
+    *
+    * @param {Event} e
+    * @member $popup
+    * @method _mouseMove
+    * @private
+    */
+		}, {
+			key: "_mouseMove",
+			value: function _mouseMove(e) {
+				this._isDraggedOut = true;
+				var left = e.clientX + this._saved.x;
+				var top = e.clientY + this._saved.y;
+				this._setRootPosition(left, top);
+			}
+			/**
+    * Mouse up event.
+    *
+    * @param {Event} e
+    * @member $popup
+    * @method _mouseUp
+    * @private
+    */
+		}, {
+			key: "_mouseUp",
+			value: function _mouseUp(e) {
+				this._dom.moveCover.removeEventListener("mousemove", this._binds.mouseMove);
+				this._dom.moveCover.removeEventListener("mouseup", this._binds.mouseUp);
+				this._appendNode.removeChild(this._dom.moveCover);
+				this._dom.moveCover = null;
+			}
+			/**
+    * Close button click event.
+    *
+    * @param {Event} e
+    * @member $popup
+    * @method _click
+    * @private
+    */
+		}, {
+			key: "_click",
+			value: function _click(e) {
+				this.close();
+			}
+			/**
+    * Create whole $popup.
+    *
+    * @return {Element}
+    * @member $popup
+    * @method _create
+    * @private
+    */
+		}, {
+			key: "_create",
+			value: function _create() {
+				var _this51 = this;
+				var exported = {};
+				var events = [];
+				var className = [this._const.ROOT_CLASS];
+				if (this._opts.className) {
+					className.push(this._opts.className);
+				}
+				if (this._opts.draggable) {
+					className.push(this._const.DRAGGABLE_CLASS);
+					events = {
+						event: "mousedown",
+						fn: this._binds.mouseDown
+					};
+				}
+				$dom.create({
+					el: "div",
+					"class": className,
+					events: events,
+					_exported: "root",
+					child: [{
+						el: "button",
+						attrs: {
+							type: "button"
+						},
+						"class": [this._const.CLOSE_BTN_CLASS, "notranslate"],
+						innerHTML: "x",
+						events: {
+							event: "click",
+							fn: function fn(e) {
+								_this51._click(e);
+							}
+						}
+					}, {
+						el: "div",
+						"class": this._const.CONTENT_CLASS,
+						_exported: "content"
+					}]
+				}, exported);
+				return exported;
+			}
+			/**
+    * Create move cover - iframe fix.
+    *
+    * @return {Element}
+    * @member $popup
+    * @method _createMoveCover
+    * @private
+    */
+		}, {
+			key: "_createMoveCover",
+			value: function _createMoveCover() {
+				return $dom.create({
+					el: "div",
+					"class": this._const.MOVE_COVER_CLASS
+				});
+			}
+			/**
+    * Get $popup root element.
+    *
+    * @return {Element}
+    * @member $popup
+    * @method getContainer
+    */
+		}, {
+			key: "getContainer",
+			value: function getContainer() {
+				return this._dom.root;
+			}
+			/**
+    * Get $popup content.
+    *
+    * @return {Element}
+    * @member $popup
+    * @method getContent
+    */
+		}, {
+			key: "getContent",
+			value: function getContent() {
+				return this._dom.content;
+			}
+			/**
+    * Close popup.
+    *
+    * @member $popup
+    * @method close
+    */
+		}, {
+			key: "close",
+			value: function close() {
+				if (this._dom.root) {
+					this._dom.root.parentNode.removeChild(this._dom.root);
+					this._isDraggedOut = false;
+					this._dom.root = null;
+					this.trigger("popup-close");
+				}
+			}
+			/**
+    * Set position.
+    * 
+    * @param {Object} [pos] optinal position; otherwise startup position is used
+    * @member $popup
+    * @method setPosition
+    */
+		}, {
+			key: "setPosition",
+			value: function setPosition(pos) {
+				if (!this._isDraggedOut) {
+					this._setPosition(pos);
+				} else {
+					this._setPositionAfterDragged();
+				}
+			}
+		}]);
+		return $popup;
+	}($event);
+	;
+	/**
+  * $popup available positions.
+  * 
+  * @type {Object}
+  * @member $popup
+  * @static
+  */
+	$popup.POSITIONS = {
+		TOP_LEFT: 0,
+		TOP_CENTER: 1,
+		TOP_RIGHT: 2,
+		CENTER_LEFT: 3,
+		CENTER_CENTER: 4,
+		CENTER_RIGHT: 5,
+		BOTTOM_LEFT: 6,
+		BOTTOM_CENTER: 7,
+		BOTTOM_RIGHT: 8
+	};
+	/**
+  * Cover class for manage $popup - esc bindings, window resize events.
+  * @class $popupManager
+  */
+	var $popupManager = function () {
+		function $popupManager() {
+			_classCallCheck(this, $popupManager);
+			this._popupList = [];
+			this._binds = {};
+			this._binds.keyDown = this._keyDown.bind(this);
+			this.captureResize();
+			$resize.on("resize", this._resize, this);
+		}
+		/**
+   * Resize event for all $popups.
+   *
+   * @member $popupManager
+   * @method _resize
+   * @private
+   */
+		_createClass($popupManager, [{
+			key: "_resize",
+			value: function _resize() {
+				this._popupList.forEach(function (popup) {
+					popup.trigger("window-resize");
+				});
+			}
+			/**
+    * Keydown - ESC for $popup close.
+    *
+    * @param {Event} e
+    * @member $popupManager
+    * @method _keyDown
+    * @private
+    */
+		}, {
+			key: "_keyDown",
+			value: function _keyDown(e) {
+				var keyCode = e.which || e.keyCode;
+				if (keyCode == 27) {
+					e.preventDefault();
+					e.stopPropagation();
+					var last = this._popupList[this._popupList.length - 1];
+					last.close();
+				}
+			}
+			/**
+    * Register new $popup. If $popup length is equal == 1, bind keydown
+    *
+    * @param {$popup} inst Instance of the new $popup
+    * @member $popupManager
+    * @method _register
+    * @private
+    */
+		}, {
+			key: "_register",
+			value: function _register(inst) {
+				var _this52 = this;
+				this._popupList.push(inst);
+				inst.on("popup-close", function () {
+					_this52._unRegister(inst);
+				});
+				if (this._popupList.length == 1) {
+					document.addEventListener("keydown", this._binds.keyDown);
+				}
+			}
+			/**
+    * Unregister $popup. If there is no $popup, unbind keydown.
+    * This method is automatically called after $popup window is closed.
+    *
+    * @param {$popup} inst Instance of the new $popup
+    * @member $popupManager
+    * @method _register
+    * @private
+    */
+		}, {
+			key: "_unRegister",
+			value: function _unRegister(inst) {
+				var _this53 = this;
+				this._popupList.every(function (popup, ind) {
+					if (popup == inst) {
+						_this53._popupList.splice(ind, 1);
+						return false;
+					} else {
+						return true;
+					}
+				});
+				if (!this._popupList.length) {
+					document.removeEventListener("keydown", this._binds.keyDown);
+				}
+			}
+			/**
+    * Capture resize event for all $popup windows.
+    *
+    * @member $popupManager
+    * @method captureResize
+    */
+		}, {
+			key: "captureResize",
+			value: function captureResize() {
+				$resize.start();
+			}
+			/**
+    * Create $popup window.
+    * Signals:
+    * popup-close - popup is closed
+    * 
+    * @param {Object} [opts] Configuration
+    * @param {Number} [opt.maxWidth] max. width [px]
+    * @param {Boolean} [opt.draggable] can be popup moved on the screen?
+    * @param {String} [opt.className] optinal css class name
+    * @param {$popup.POSITIONS} [opt.position] default popup position on the screen
+    * @param {Number} [opt.padding] except all centers, add padding to position
+    * @method create
+    * @member $popupManager
+    */
+		}, {
+			key: "create",
+			value: function create(opts) {
+				var inst = new $popup(opts);
+				this._register(inst);
+				return inst;
+			}
+			/**
+    * Alert message - not draggable.
+    * 
+    * @param  {String} msg Alert message
+    * @return {$popup} instance of the $popup
+    * @member $popupManager
+    * @method alert
+    */
+		}, {
+			key: "alert",
+			value: function alert(msg) {
+				var inst = new $popup({
+					className: "alert",
+					draggable: false
+				});
+				var cont = inst.getContent();
+				cont.appendChild($dom.create({
+					el: "p",
+					innerHTML: msg || ""
+				}));
+				this._register(inst);
+				return inst;
+			}
+		}]);
+		return $popupManager;
+	}();
+	;
+	// new instance
+	var inst = new $popupManager();
+	/**
+  * $popup available positions.
+  * 
+  * @type {Object}
+  * @member $popupManager
+  * @static
+  */
+	inst.POSITIONS = $popup.POSITIONS;
+	return inst;
 }]);
