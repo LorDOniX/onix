@@ -7,7 +7,7 @@ onix = (function() {
 	 * 
 	 * @class $module
 	 */
-	class $module {
+	class $module { 
 		/**
 		 * New module.
 		 * 
@@ -920,8 +920,6 @@ onix = (function() {
 	/**
 	 * Framework info.
 	 *
-	 * version: 3.0.0
-	 * date: 3. 11. 2016
 	 * @member onix
 	 * @static
 	 */

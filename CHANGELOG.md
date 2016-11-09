@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.0.1 (9. 11. 2016)
+
+* new bundler system
+* change directory hierarchy: core (onix.js), core -> common
+* onix.min.css new file (2 css files instead of one)
+
 ## 3.0.0 (3. 11. 2016)
 
 * add $jsonViewer for visualise JSON objects

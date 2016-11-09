@@ -1,6 +1,5 @@
 {
 	"ES6": {
-		"cache": "cache.json",
 		"presets": [
 			"babel-preset-es2015"
 		],
@@ -9,32 +8,35 @@
 			"babel-plugin-transform-es3-property-literals"
 		]
 	},
-	"header": {
-		"file": "HEADER",
-		"source": "src/onix/onix.js",
-		"version": "version: ",
-		"date": "date: ",
-		"minimal": " * minimal version: contains [{MINIMAL}]",
-		"minimalPH": "{MINIMAL}",
-		"versionPH": "{VERSION}",
-		"datePH": "{DATE}",
-		"onixPH": "\"{ONIX_INFO}\""
-	},
+	"cacheFile": "cache.json",
+	"headerFile": "others/HEADER",
 	"reload": {
-		"file": "bundler/reload-server.js",
+		"file": "others/reload-server.js",
 		"server": "localhost",
 		"port": 8200,
 		"serverPH": "{SERVER}",
 		"portPH": "{PORT_NUMBER}"
 	},
+	"doc": {
+		"args": "jsduck dist/onix-js-framework.js --output docs --warnings=-nodoc,-dup_member,-link_ambiguous --external=XMLHttpRequest,$q",
+		"log": "jsduck.log"
+	},
 	"bundles": [{
 		"id": "minimal",
-		"run": ["dist"],
 		"type": "js",
-		"minimal": true,
-		"header": true,
-		"output": "dist/onix-js-minimal-framework.js",
-		"outputMin": "dist/onix-js-minimal-framework.min.js",
+		"dev": {
+			"header": true,
+			"postProcess": "./others/header",
+			"postProcessMethod": "updateMinimal",
+			"output": "dist/onix-js-minimal-framework.js"
+		},
+		"dist": {
+			"compress": true,
+			"header": true,
+			"postProcess": "./others/header",
+			"postProcessMethod": "updateMinimal",
+			"output": "dist/onix-js-minimal-framework.min.js"
+		},
 		"data": [{
 			"files": [
 				"src/libs/polyfills.js"
@@ -42,19 +44,28 @@
 		}, {
 			"ES6": true,
 			"files": [
-				"src/onix/onix.js",
-				"src/onix/filter.js"
+				"src/core/onix.js",
+				"src/core/filter.js"
 			]
 		}]
 	}, {
 		"id": "onix",
-		"run": ["dev", "dist"],
 		"type": "js",
-		"header": true,
-		"reload": true,
-		"watchPath": "src/",
-		"output": "dist/onix-js-framework.js",
-		"outputMin": "dist/onix-js-framework.min.js",
+		"dev": {
+			"watchPath": "src/",
+			"output": "dist/onix-js-framework.js",
+			"reload": true,
+			"header": true,
+			"postProcess": "./others/header",
+			"postProcessMethod": "update"
+		},
+		"dist": {
+			"compress": true,
+			"header": true,
+			"postProcess": "./others/header",
+			"postProcessMethod": "update",
+			"output": "dist/onix-js-framework.min.js"
+		},
 		"data": [{
 			"files": [
 				"src/libs/polyfills.js",
@@ -63,29 +74,29 @@
 		}, {
 			"ES6": true,
 			"files": [
-				"src/onix/onix.js",
-				"src/onix/filter.js",
+				"src/core/onix.js",
+				"src/core/filter.js",
 
-				"src/core/common.js",
-				"src/core/cookie.js",
-				"src/core/date.js",
-				"src/core/dom.js",
-				"src/core/event.js",
-				"src/core/resize.js",
-				"src/core/filters.js",
-				"src/core/http.js",
-				"src/core/i18n.js",
-				"src/core/image.js",
-				"src/core/job.js",
-				"src/core/local-storage.js",
-				"src/core/location.js",
-				"src/core/math.js",
-				"src/core/my-query.js",
-				"src/core/promise.js",
-				"src/core/route.js",
-				"src/core/routeParams.js",
-				"src/core/template.js",
-				"src/core/features.js",
+				"src/common/common.js",
+				"src/common/cookie.js",
+				"src/common/date.js",
+				"src/common/dom.js",
+				"src/common/event.js",
+				"src/common/resize.js",
+				"src/common/filters.js",
+				"src/common/http.js",
+				"src/common/i18n.js",
+				"src/common/image.js",
+				"src/common/job.js",
+				"src/common/local-storage.js",
+				"src/common/location.js",
+				"src/common/math.js",
+				"src/common/my-query.js",
+				"src/common/promise.js",
+				"src/common/route.js",
+				"src/common/routeParams.js",
+				"src/common/template.js",
+				"src/common/features.js",
 				
 				"src/utils/anonymizer.js",
 				"src/utils/loader.js",
@@ -101,17 +112,23 @@
 		}]
 	}, {
 		"id": "less",
-		"run": ["dev", "dist"],
 		"type": "less",
-		"watchPath": "less/",
 		"source": "less/onix.less",
-		"output": "dist/onix.css"
+		"dev": {
+			"watchPath": "less/",
+			"output": "dist/onix.css"
+		},
+		"dist": {
+			"compress": true,
+			"output": "dist/onix.min.css"
+		}
 	}, {
 		"id": "homejs",
-		"run": ["dev"],
 		"type": "js",
-		"watchPath": "test/js/home/",
-		"output": "test/js/home.js",
+		"dev": {
+			"watchPath": "test/js/home/",
+			"output": "test/js/home.js"
+		},
 		"data": [{
 			"ES6": true,
 			"files": [
@@ -127,10 +144,15 @@
 		}]
 	}, {
 		"id": "testless",
-		"run": ["dev", "dist"],
 		"type": "less",
-		"watchPath": "test/less/",
 		"source": "test/less/main.less",
-		"output": "test/css/main.css"
+		"dev": {
+			"watchPath": "test/less/",
+			"output": "test/css/main.css"
+		},
+		"dist": {
+			"compress": true,
+			"output": "test/css/main.min.css"
+		}
 	}]
 }

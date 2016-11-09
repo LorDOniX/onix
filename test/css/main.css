@@ -1,1 +1,103 @@
-.center{text-align:center}.align-right{text-align:right}.align-middle{vertical-align:middle !important}.float-right{float:right}.float-left{float:left}.my-dropdown{display:inline-block}.main-cont{margin:0 auto;margin-top:25px;width:1024px}.main-cont .canvas-holder{width:1024px;height:512px;float:left;position:relative;background:#eee;margin-bottom:15px}.main-cont.detail{padding-bottom:100px}.upload-previews{text-align:center;padding:10px}.crop-area{position:relative;width:1024px;height:583px}.crop-area img{max-width:100%}.test-area{width:1024px;height:768px;border:1px solid black;cursor:pointer}.no-media-query .navbar-header{display:inline-block;vertical-align:top}.no-media-query .navbar-collapse{width:auto;display:inline-block;vertical-align:top;border-top:0;box-shadow:none}.no-media-query .navbar-collapse.collapse{height:auto !important;padding-bottom:0;overflow:visible !important;margin-right:0;margin-left:0;margin-top:5px}.no-media-query .navbar-nav{float:left;margin:0}.no-media-query .navbar-nav>li{float:left}#utils{padding:25px;padding-top:0}#utils .json-viewer-btn{margin:15px 0}
+/**
+ * Home page
+ */
+.center {
+  text-align: center;
+}
+.align-right {
+  text-align: right;
+}
+.align-middle {
+  vertical-align: middle !important;
+}
+.float-right {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+.my-dropdown {
+  display: inline-block;
+}
+/**
+ * Anonymizer
+ */
+.main-cont {
+  margin: 0 auto;
+  margin-top: 25px;
+  width: 1024px;
+}
+.main-cont .canvas-holder {
+  width: 1024px;
+  height: 512px;
+  float: left;
+  position: relative;
+  background: #eee;
+  margin-bottom: 15px;
+}
+.main-cont.detail {
+  padding-bottom: 100px;
+}
+.upload-previews {
+  text-align: center;
+  padding: 10px;
+}
+/**
+ * Crop
+ */
+.crop-area {
+  position: relative;
+  width: 1024px;
+  height: 583px;
+}
+.crop-area img {
+  max-width: 100%;
+}
+/**
+ * Test
+ */
+.test-area {
+  width: 1024px;
+  height: 768px;
+  border: 1px solid black;
+  cursor: pointer;
+}
+/**
+ * No media queries fix
+ */
+.no-media-query .navbar-header {
+  display: inline-block;
+  vertical-align: top;
+}
+.no-media-query .navbar-collapse {
+  width: auto;
+  display: inline-block;
+  vertical-align: top;
+  border-top: 0;
+  box-shadow: none;
+}
+.no-media-query .navbar-collapse.collapse {
+  height: auto!important;
+  padding-bottom: 0;
+  overflow: visible!important;
+  margin-right: 0;
+  margin-left: 0;
+  margin-top: 5px;
+}
+.no-media-query .navbar-nav {
+  float: left;
+  margin: 0;
+}
+.no-media-query .navbar-nav > li {
+  float: left;
+}
+/**
+ * Utils
+ */
+#utils {
+  padding: 25px;
+  padding-top: 0;
+}
+#utils .json-viewer-btn {
+  margin: 15px 0;
+}
