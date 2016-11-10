@@ -1218,7 +1218,8 @@ class Bundler {
 						data: data
 					});
 
-					if (!re.error) {
+					// skip undefined
+					if (!re.error && typeof re.output === "string") {
 						writeData = re.output;
 					}
 
