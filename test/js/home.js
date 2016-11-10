@@ -1,7 +1,5 @@
 "use strict";
-
 menuModule = onix.module("menu");
-
 menuModule.service("MainMenu", ["$features", function ($features) {
 	this.PAGES = {
 		HOME: {
@@ -33,32 +31,24 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 			url: "/docs"
 		}
 	};
-
 	this._createFromObj = function (config) {
 		var el = document.createElement(config.el);
-
 		Object.keys(config).forEach(function (key) {
 			var value;
-
 			switch (key) {
 				case "el":
 					break;
-
 				case "child":
 					value = config.child;
-
 					if (!Array.isArray(value)) {
 						value = [value];
 					}
-
 					value.forEach(function (child) {
 						el.appendChild(this._createFromObj(child));
 					}, this);
 					break;
-
 				case "class":
 					value = config["class"];
-
 					if (typeof value === "string") {
 						el.classList.add(value);
 					} else if (Array.isArray(value)) {
@@ -67,18 +57,14 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 						});
 					}
 					break;
-
 				default:
 					el[key] = config[key];
 			}
 		}, this);
-
 		return el;
 	};
-
 	this.create = function (activePage) {
 		var pagesLi = [];
-
 		// pages order
 		[this.PAGES.HOME, this.PAGES.MINIMAL, this.PAGES.ANONYMIZER, this.PAGES.CROPPER, this.PAGES.UTILS, this.PAGES.TEST, this.PAGES.DOCS].forEach(function (page, ind) {
 			var pageObj = {
@@ -89,15 +75,12 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 					innerHTML: page.name
 				}]
 			};
-
 			if (!activePage && !ind || page == activePage) {
 				pageObj["class"] = "active";
 				pageObj.child[0].href = "javascript:void(0)";
 			}
-
 			pagesLi.push(pageObj);
 		});
-
 		var menuEl = this._createFromObj({
 			el: "div",
 			"class": ["navbar", "navbar-default"],
@@ -125,47 +108,37 @@ menuModule.service("MainMenu", ["$features", function ($features) {
 				}]
 			}]
 		});
-
 		document.body.insertBefore(menuEl, document.body.firstChild);
-
 		// old browsers menu fix
 		var hasMediaQuery = $features ? $features.MEDIA_QUERY : "matchMedia" in window && "matches" in window.matchMedia("(min-width: 500px)");
-
 		if (!hasMediaQuery) {
 			document.body.classList.add("no-media-query");
 		}
 	};
 }]);
 "use strict";
-
 myModule = onix.module("myModule", []);
-
 myModule.service("TestFromModule", function () {
 	this.test = function () {
 		console.log("TestFromModule - test function");
 	};
 });
 "use strict";
-
 homeApp = onix.module("homeApp", ["myModule", "menu"]);
-
 homeApp.value("Config", {
 	// homeApp localization
 	LOCALIZATION: {
 		LANG: "en",
 		PATH: "/locale/en.json"
 	},
-
 	// homeApp resource URLs
 	URLS: {
 		HOME: "/api/home/"
 	}
 });
-
 homeApp.config(["$i18nProvider", function ($i18nProvider) {
 	// if you are using underscore -> uncomment line below
 	//$i18nProvider.disableGlobalTranslation();
-
 	// add language during config phase
 	$i18nProvider.addLanguage("cs", {
 		"home_page": {
@@ -173,13 +146,10 @@ homeApp.config(["$i18nProvider", function ($i18nProvider) {
 		}
 	});
 }]);
-
 homeApp.run(["$route", "$template", "Config", "$promise", "$i18n", "$i18nProvider", "$filterUppercase", function ($route, $template, Config, $promise, $i18n, $i18nProvider, $filterUppercase) {
 	$i18n.setLanguage("en");
-
 	console.log("app run - test for provider during run");
 	console.log($i18nProvider);
-
 	// route for home page
 	var HomePage = {
 		controller: ["HomePage", function (HomePage) {
@@ -191,10 +161,8 @@ homeApp.run(["$route", "$template", "Config", "$promise", "$i18n", "$i18nProvide
 		templateUrl: "/templ/detail.html",
 		id: "HomePage"
 	};
-
 	// application routes
 	$route.when("/", HomePage).otherwise(HomePage);
-
 	// all dependencies before start
 	$promise.all([$template.load("testTempl", "/templ/test-templ.html"), $i18n.loadLanguage(Config.LOCALIZATION.LANG, Config.LOCALIZATION.PATH)]).then(function () {
 		$route.go();
@@ -203,18 +171,14 @@ homeApp.run(["$route", "$template", "Config", "$promise", "$i18n", "$i18nProvide
 	});
 }]);
 "use strict";
-
 homeApp.service("HomeResource", ["$http", "Config", function ($http, Config) {
-
 	// ------------------------ private ---------------------------------------
 	/**
   * Base URL.
   * @type {String}
   */
 	this._baseURL = Config.URLS.HOME;
-
 	// ------------------------ public ----------------------------------------
-
 	/**
   * Get test data.
   * @return {$promise}
@@ -226,62 +190,44 @@ homeApp.service("HomeResource", ["$http", "Config", function ($http, Config) {
 	};
 }]);
 "use strict";
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "$image", "$loader", "$math", "$previewImages", "$promise", "$resize", "$routeParams", "$select", "$template", "$localStorage", "$dom", "HomeResource", "HomeSnippet", "MainMenu", "Page", "myModule::TestFromModule", function ($common, $date, $event, $filter, $i18n, $image, $loader, $math, $previewImages, $promise, $resize, $routeParams, $select, $template, $localStorage, $dom, HomeResource, HomeSnippet, MainMenu, Page, TestFromModule) {
 	var HomePage = function (_Page) {
 		_inherits(HomePage, _Page);
-
 		function HomePage(config) {
 			_classCallCheck(this, HomePage);
-
 			return _possibleConstructorReturn(this, Object.getPrototypeOf(HomePage).call(this, config));
 		}
-
 		// ------------------------ private ---------------------------------------
-
-
 		_createClass(HomePage, [{
 			key: "_show",
 			value: function _show() {
 				// set title - using i18n get text _ function
 				this._getEl("title").innerHTML = _("home_page.title");
-
 				$resize.start();
 				$resize.on("resize", function () {
 					console.log("resize event");
 				});
-
 				this._loadTemplate();
-
 				MainMenu.create(MainMenu.PAGES.HOME);
-
 				// dropdowns
 				var dropdown = new $select(this._getEl("dropdown"));
 				var dropdown2 = new $select(this._getEl("dropdown2"), {
 					addCaption: true
 				});
-
 				dropdown.on("change", function (value) {
 					console.log("dropdown change - " + value);
 				}, this);
-
 				// events
 				this.once("onceEvent", function () {
 					console.log("onceEvent");
 				});
-
 				this.on("anotherEvent", function () {
 					console.log("anotherEvent");
 				});
-
 				this.once("onceEvent", function () {
 					console.log("onceEvent - another function");
 				});

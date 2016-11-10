@@ -2,7 +2,7 @@
 
 const EOL = require("os").EOL;
 
-class Header {
+class EventHandler {
 	constructor() {
 		this._data = this._parseChangelog("CHANGELOG.md");
 	}
@@ -47,14 +47,14 @@ class Header {
 		return output;
 	}
 
-	_updateData(scope, data, minimal) {
+	_updateData(data, header, minimal) {
 		// print
 		console.log("- Changelog: version " + this._data.version + ", date " + this._data.date);
 
 		// update
 		data = data
 			// first
-			.replace("\"{ONIX_INFO}\"", scope.getHeader())
+			.replace("\"{ONIX_INFO}\"", header || "")
 			.replace(/\{VERSION\}/g, this._data.version)
 			.replace(/\{DATE\}/g, this._data.date)
 			.replace(/\{MINIMAL\}/g, minimal || "")
@@ -63,15 +63,27 @@ class Header {
 		return data;
 	}
 
-	update(scope, data) {
-		return this._updateData(scope, data);
-	}
+	on(event) {
+		switch (event.name) {
+			case "before-save-js":
+				let data = event.args.writeData;
+				let id = event.args.bundle.id;
+				let header = event.bundlerScope.getHeader();
 
-	updateMinimal(scope, data, filesPath) {
-		let minimal = "minimal version: contains [" + filesPath.join(", ") + "]"
+				if (id == "minimal") {
+					let files = event.args.data.procFiles;
+					let minimal = "minimal version: contains [" + files.join(", ") + "]";
 
-		return this._updateData(scope, data, minimal);
+					data = this._updateData(data, header, minimal);
+				}
+				else {
+					data = this._updateData(data, header);
+				}
+
+				return data;
+				break;
+		}
 	}
 };
 
-module.exports = new Header();
+module.exports = new EventHandler();

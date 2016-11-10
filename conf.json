@@ -10,6 +10,7 @@
 	},
 	"cacheFile": "cache.json",
 	"headerFile": "others/HEADER",
+	"eventHandler": "./others/event-handler",
 	"reload": {
 		"file": "others/reload-server.js",
 		"server": "localhost",
@@ -28,8 +29,6 @@
 			"header": true,
 			"clearRemoveStrict": true,
 			"clearBlankLines": true,
-			"postProcess": "./others/header",
-			"postProcessMethod": "updateMinimal",
 			"output": "dist/onix-js-minimal-framework.js"
 		},
 		"dist": {
@@ -37,8 +36,6 @@
 			"header": true,
 			"clearRemoveStrict": true,
 			"clearBlankLines": true,
-			"postProcess": "./others/header",
-			"postProcessMethod": "updateMinimal",
 			"output": "dist/onix-js-minimal-framework.min.js"
 		},
 		"data": [{
@@ -61,17 +58,13 @@
 			"reload": true,
 			"header": true,
 			"clearRemoveStrict": true,
-			"clearBlankLines": true,
-			"postProcess": "./others/header",
-			"postProcessMethod": "update"
+			"clearBlankLines": true
 		},
 		"dist": {
 			"compress": true,
 			"header": true,
 			"clearRemoveStrict": true,
 			"clearBlankLines": true,
-			"postProcess": "./others/header",
-			"postProcessMethod": "update",
 			"output": "dist/onix-js-framework.min.js"
 		},
 		"data": [{

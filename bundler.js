@@ -4,6 +4,31 @@
 /**
  * Bundler version 1.0.2
  * Date: 10. 11. 2016
+ *
+ * event signals, on(arg):
+ *
+ * arg: {
+ * 	{String} name - event name
+ * 	{Object} bundlerScope - bundler.js scope
+ * 	{Object} args - additional parameters
+ * }
+ *
+ * before-save-js - before js is saved to the file; @return {String} you must return processed output
+ * arg.args: {
+ * 	{Object} bundleConf - current runtype conf
+ * 	{Object} bundle - all bundle config
+ * 	{String} writeData - data to write
+ * 	{Object} data - ES6 process object
+ * }
+ *
+ * bundles-done - all bundles are done
+ * 
+ * watch-bundle-update - watch event and bundle update
+ * arg.args: {
+ *  {Object} file - changed file
+ *  {Object} bundleConf - current runtype conf
+ *  {Object} bundle - all bundle config
+ * }
  */
 var fs = require("fs");
 var exec = require('child_process').exec;
@@ -477,7 +502,7 @@ class ES6 {
 				dist: false,
 				useCache: true,
 				compress: false,
-				clearRemoveStrict: false,
+				clearUseStrict: false,
 				clearBlankLines: false
 			};
 
@@ -579,7 +604,7 @@ class ES6 {
 			if (!errors.length) {
 				let outputData = allData.join(EOL);
 
-				if (opts.clearRemoveStrict) {
+				if (opts.clearUseStrict) {
 					outputData = outputData.replace(/"use strict";/g, "");
 				}
 
@@ -873,8 +898,12 @@ class Bundler {
 		this._es6 = new ES6(CONF.ES6 || {});
 		this._less = new Less();
 		this._websocket = null;
-		this._separator = "* ";
-		this._separatorOther = "- ";
+
+		this._const = {
+			separator: "* ",
+			separatorOther: "- ",
+			eventHandlerMethod: "on"
+		};
 
 		this._conf = {
 			doc: "doc" in CONF ? CONF.doc : null,
@@ -884,7 +913,8 @@ class Bundler {
 
 		this._data = {
 			reload: null,
-			header: null
+			header: null,
+			eventHandler: this._getEventHandler()
 		};
 
 		this._isWatch = false;
@@ -895,6 +925,10 @@ class Bundler {
 		let firstArg = this._args.length ? this._args[0] : "";
 
 		this._printHelp();
+
+		if (this._data.eventHandler) {
+			this._log(this._const.separator + "Event handler is used");
+		}
 
 		switch (firstArg) {
 			case this._runTypes.DEV:
@@ -1010,7 +1044,8 @@ class Bundler {
 		});
 
 		Common.chainPromises(all).then(() => {
-			this._log(this._separator + (this._isDist ? "Dist is done" : "Dev is done"));
+			this._log(this._const.separator + (this._isDist ? "Dist is done" : "Dev is done"));
+			this._runEvent("bundles-done");
 
 			if (!this._isDist && this._isWatch && this._watchPaths.length) {
 				// sort - max len -> small len
@@ -1023,7 +1058,7 @@ class Bundler {
 					let websocketState = this._websocket.start();
 
 					if (websocketState) {
-						this._log(this._separator + Common.str("Websocket on {0} is starting...", this._websocket.getPort()));
+						this._log(this._const.separator + Common.str("Websocket on {0} is starting...", this._websocket.getPort()));
 					}
 				}
 
@@ -1050,22 +1085,34 @@ class Bundler {
 									sendObj.operation = "refresh-css";
 									sendObj.data.file = require("path").basename(watchBundle.output);
 									break;
+
+								case "watch":
+									sendObj = null;
+									break;
 							}
 
-							this._log(Common.str("Run websocket operation {0}", sendObj.operation));
-
-							this._websocket.send(sendObj);
+							if (sendObj) {
+								this._log(Common.str("Run websocket operation {0}", sendObj.operation));
+								
+								this._websocket.send(sendObj);
+							}
 
 							if (watchBundle.type == "js" && data.change) {
 								// update cache
 								this._saveCache();
 							}
+
+							this._runEvent("watch-bundle-update", {
+								file: file,
+								bundleConf: watchBundle[this._runType],
+								watchBundle: watchBundle
+							});
 						});
 					}
 				});
 
 				if (watcherState) {
-					this._log(this._separator + "Watcher is starting...");
+					this._log(this._const.separator + "Watcher is starting...");
 				}
 			}
 		});
@@ -1100,7 +1147,7 @@ class Bundler {
 	}
 
 	_runBundle(bundle) {
-		this._log(this._separator + Common.str("Run bundle {0}", bundle.id));
+		this._log(this._const.separator + Common.str("Run bundle {0}", bundle.id));
 
 		let bundleConf = bundle[this._runType] || {};
 
@@ -1116,6 +1163,10 @@ class Bundler {
 				
 			case "less":
 				return this._makeLESS(bundle);
+				break;
+
+			case "watch":
+				return Promise.resolve();
 				break;
 
 			default:
@@ -1138,7 +1189,7 @@ class Bundler {
 			let opts = {
 				dist: this._isDist,
 				compress: bundleConf.compress,
-				clearRemoveStrict: bundleConf.clearRemoveStrict,
+				clearUseStrict: bundleConf.clearUseStrict,
 				clearBlankLines: bundleConf.clearBlankLines
 			};
 
@@ -1159,24 +1210,41 @@ class Bundler {
 						writeData += EOL + this._data.reload;
 					}
 
-					// post process
-					if (bundleConf.postProcess) {
-						try {
-							let ppObj = require(bundleConf.postProcess);
-							let method = bundleConf.postProcessMethod || "get";
-							this._log(Common.str("Post process using script {0}", bundleConf.postProcess));
-							writeData = ppObj[method](this, writeData, data.procFiles);
-						}
-						catch (err) {
-							this._log(Common.str("Post process error {0}", err.message));
-						}
+					// event
+					let re = this._runEvent("before-save-js", {
+						bundleConf: bundleConf,
+						bundle: bundle,
+						writeData: writeData,
+						data: data
+					});
+
+					if (!re.error) {
+						writeData = re.output;
 					}
 
-					this._log(Common.str("Summary: files {0}, transpiled {1}, standard {2}, cached {3}", data.allFiles, data.transpiled, data.noTranspiled, data.cached));
+					let summaryInfo = [];
+					let summary = "";
+
+					if (bundleConf.compress) {
+						summaryInfo.push("compressed");
+					}
+
+					if (opts.clearUseStrict) {
+						summaryInfo.push("remove strict");
+					}
+
+					if (opts.clearBlankLines) {
+						summaryInfo.push("clear blank lines");
+					}
+
+					summary = summaryInfo.join(", ");
+					summary = summary.length ? ", " + summary : "";
+
+					this._log(Common.str("Summary: files {0}, transpiled {1}, standard {2}, cached {3}{4}", data.allFiles, data.transpiled, data.noTranspiled, data.cached, summary));
 
 					// js data
 					if (!Common.writeFile(file, writeData).error) {
-						this._log(Common.str("Write JS {0} {1}, time {2}{3}", file, Common.formatSize(writeData.length), end, bundleConf.compress ? ", compressed" : ""));
+						this._log(Common.str("Write JS {0} {1}, time {2}", file, Common.formatSize(writeData.length), end));
 						resolve({
 							change: true
 						});
@@ -1234,22 +1302,22 @@ class Bundler {
 
 	_saveCache() {
 		return Cache.saveCache().then(ok => {
-			this._log(this._separator + ok);
+			this._log(this._const.separator + ok);
 		}, err => {
-			this._log(this._separator + err);
+			this._log(this._const.separator + err);
 		});
 	}
 
 	_doc() {
 		return new Promise((resolve, reject) => {
 			if (!this._conf.doc) {
-				reject(this._separator + "Missing doc confing!");
+				reject(this._const.separator + "Missing doc confing!");
 				return;
 			}
 
 			let conf = this._conf.doc;
 
-			this._log(this._separator + "Run documentation...");
+			this._log(this._const.separator + "Run documentation...");
 
 			exec(conf.args || "", (error, stdout, stderr) => {
 				this._log("Documentation is done.");
@@ -1286,11 +1354,11 @@ class Bundler {
 
 				if (!readedFile.error) {
 					this._data.header = readedFile.data;
-					this._log(this._separator + "Header file was set!");
+					this._log(this._const.separator + "Header file was set!");
 					resolve();
 				}
 				else {
-					this._log(this._separator + "Error reading header file!");
+					this._log(this._const.separator + "Error reading header file!");
 					reject("Error reading header file!");
 				}
 			}
@@ -1307,7 +1375,7 @@ class Bundler {
 			}
 
 			if (!conf.file) {
-				this._log(this._separator + "No reload file present!");
+				this._log(this._const.separator + "No reload file present!");
 				reject("No reload file present!");
 			}
 			else {
@@ -1317,16 +1385,61 @@ class Bundler {
 				let readedFile = Common.readFile(conf.file);
 
 				if (!readedFile.error) {
-					this._log(this._separator + "Reload file was set!");
+					this._log(this._const.separator + "Reload file was set!");
 					this._data.reload = readedFile.data.replace(conf.serverPH, conf.server || "").replace(conf.portPH, conf.port || "");
 					resolve();
 				}
 				else {
-					this._log(this._separator + "Error reading reload file!");
+					this._log(this._const.separator + "Error reading reload file!");
 					reject("Error reading reload file!");
 				}
 			}
 		});
+	}
+
+	_runEvent(name, args) {
+		let outputData = {
+			error: true,
+			output: null
+		};
+
+		// post process
+		if (name && this._data.eventHandler) {
+			this._log(Common.str("Run event {0}", name));
+
+			let eh = this._data.eventHandler;
+
+			outputData.error = false;
+			outputData.output = eh[this._const.eventHandlerMethod].apply(eh, [{
+				name: name,
+				bundlerScope: this,
+				args: args || {}
+			}]);
+		}
+
+		return outputData;
+	}
+
+	_getEventHandler() {
+		let eventHandler = null;
+
+		if ("eventHandler" in CONF) {
+			try {
+				let obj = require(CONF.eventHandler);
+
+				if (typeof obj[this._const.eventHandlerMethod] === "function") {
+					eventHandler = obj;
+				}
+				else {
+					this._log(Common.str("Missing event handler \"{0}\" method!", this._const.eventHandlerMethod));
+				}
+			}
+			catch (err) {
+				this._log(Common.str("Error reading event handler file! {0}", err.message));
+			}
+		}
+
+		return eventHandler;
 	}
 
 	_log(str, noNewLine) {
@@ -1336,8 +1449,8 @@ class Bundler {
 			process.stdout.write(str);
 		}
 		else {
-			if (str.indexOf(this._separator) == -1) {
-				str = this._separatorOther + str;
+			if (str.indexOf(this._const.separator) == -1) {
+				str = this._const.separatorOther + str;
 			}
 
 			console.log(str);
