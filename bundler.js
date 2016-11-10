@@ -2,8 +2,8 @@
 "use strict";
 
 /**
- * Bundler version 1.0.1
- * Date: 9. 11. 2016
+ * Bundler version 1.0.2
+ * Date: 10. 11. 2016
  */
 var fs = require("fs");
 var exec = require('child_process').exec;
@@ -476,7 +476,9 @@ class ES6 {
 			let opts = {
 				dist: false,
 				useCache: true,
-				compress: false
+				compress: false,
+				clearRemoveStrict: false,
+				clearBlankLines: false
 			};
 
 			for (let key in optsArg) {
@@ -508,7 +510,7 @@ class ES6 {
 
 					if (readedFile.error) {
 						everyCycle = false;
-						errors.push(Common.str("Error reading file", path));
+						errors.push(Common.str("Error reading file {0}", path));
 						return false;
 					}
 
@@ -575,11 +577,21 @@ class ES6 {
 			});
 
 			if (!errors.length) {
-				output.data = allData.join(EOL);
+				let outputData = allData.join(EOL);
+
+				if (opts.clearRemoveStrict) {
+					outputData = outputData.replace(/"use strict";/g, "");
+				}
+
+				if (opts.clearBlankLines) {
+					outputData = outputData.replace(/(^[ \t]*\n)/gm, "");
+				}
+
+				output.data = outputData;
 
 				// compress
 				if (opts.compress) {
-					let compressData = this._compressData(output.data);
+					let compressData = this._compressData(outputData);
 
 					if (!compressData.error) {
 						output.data = compressData.compress;
@@ -1125,7 +1137,9 @@ class Bundler {
 			let start = this._timeStop.start(bundle.id);
 			let opts = {
 				dist: this._isDist,
-				compress: bundleConf.compress
+				compress: bundleConf.compress,
+				clearRemoveStrict: bundleConf.clearRemoveStrict,
+				clearBlankLines: bundleConf.clearBlankLines
 			};
 
 			this._es6.make(bundle, opts).then(data => {
@@ -1262,7 +1276,6 @@ class Bundler {
 	_setHeader() {
 		return new Promise((resolve, reject) => {
 			if (!this._conf.headerFile) {
-				this._log(this._separator + "No header file present!");
 				reject("No header file present!");
 			}
 			else if (this._data.header) {

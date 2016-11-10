@@ -26,6 +26,8 @@
 		"type": "js",
 		"dev": {
 			"header": true,
+			"clearRemoveStrict": true,
+			"clearBlankLines": true,
 			"postProcess": "./others/header",
 			"postProcessMethod": "updateMinimal",
 			"output": "dist/onix-js-minimal-framework.js"
@@ -33,6 +35,8 @@
 		"dist": {
 			"compress": true,
 			"header": true,
+			"clearRemoveStrict": true,
+			"clearBlankLines": true,
 			"postProcess": "./others/header",
 			"postProcessMethod": "updateMinimal",
 			"output": "dist/onix-js-minimal-framework.min.js"
@@ -56,12 +60,16 @@
 			"output": "dist/onix-js-framework.js",
 			"reload": true,
 			"header": true,
+			"clearRemoveStrict": true,
+			"clearBlankLines": true,
 			"postProcess": "./others/header",
 			"postProcessMethod": "update"
 		},
 		"dist": {
 			"compress": true,
 			"header": true,
+			"clearRemoveStrict": true,
+			"clearBlankLines": true,
 			"postProcess": "./others/header",
 			"postProcessMethod": "update",
 			"output": "dist/onix-js-framework.min.js"
@@ -126,6 +134,8 @@
 		"id": "homejs",
 		"type": "js",
 		"dev": {
+			"clearRemoveStrict": true,
+			"clearBlankLines": true,
 			"watchPath": "test/js/home/",
 			"output": "test/js/home.js"
 		},
