@@ -2,14 +2,15 @@
 "use strict";
 
 /**
- * Bundler version 1.0.2
- * Date: 10. 11. 2016
+ * Bundler version 1.0.5
+ * Date: 11. 11. 2016
  *
  * event signals, on(arg):
  *
  * arg: {
  * 	{String} name - event name
  * 	{Object} bundlerScope - bundler.js scope
+ * 	{String} runType - dev, dist
  * 	{Object} args - additional parameters
  * }
  *
@@ -902,7 +903,12 @@ class Bundler {
 		this._const = {
 			separator: "* ",
 			separatorOther: "- ",
-			eventHandlerMethod: "on"
+			eventHandlerMethod: "on",
+			bundleTypes: {
+				JS: "js",
+				LESS: "less",
+				WATCH: "watch"
+			}
 		};
 
 		this._conf = {
@@ -1068,36 +1074,29 @@ class Bundler {
 
 					if (watchBundle) {
 						this._runBundle(watchBundle).then(data => {
-							if (!this._websocket) return;
-
-							let sendObj = {
-								id: watchBundle.id,
-								operation: "",
-								data: {}
-							};
-							
-							switch (watchBundle.type) {
-								case "js":
-									sendObj.operation = "refresh-page";
-									break;
-
-								case "less":
-									sendObj.operation = "refresh-css";
-									sendObj.data.file = require("path").basename(watchBundle.output);
-									break;
-
-								case "watch":
-									sendObj = null;
-									break;
-							}
-
-							if (sendObj) {
-								this._log(Common.str("Run websocket operation {0}", sendObj.operation));
+							if (this._websocket && watchBundle.type != this._const.bundleTypes.WATCH) {
+								let sendObj = {
+									id: watchBundle.id,
+									operation: "",
+									data: {}
+								};
 								
+								switch (watchBundle.type) {
+									case this._const.bundleTypes.JS:
+										sendObj.operation = "refresh-page";
+										break;
+
+									case this._const.bundleTypes.LESS:
+										sendObj.operation = "refresh-css";
+										sendObj.data.file = require("path").basename(watchBundle.output);
+										break;
+								}
+
+								this._log(Common.str("Run websocket operation {0}", sendObj.operation));
 								this._websocket.send(sendObj);
 							}
 
-							if (watchBundle.type == "js" && data.change) {
+							if (watchBundle.type == this._const.bundleTypes.JS && data.change) {
 								// update cache
 								this._saveCache();
 							}
@@ -1105,7 +1104,7 @@ class Bundler {
 							this._runEvent("watch-bundle-update", {
 								file: file,
 								bundleConf: watchBundle[this._runType],
-								watchBundle: watchBundle
+								bundle: watchBundle
 							});
 						});
 					}
@@ -1157,15 +1156,15 @@ class Bundler {
 		}
 
 		switch (bundle.type) {
-			case "js":
+			case this._const.bundleTypes.JS:
 				return this._makeJS(bundle);
 				break;
 				
-			case "less":
+			case this._const.bundleTypes.LESS:
 				return this._makeLESS(bundle);
 				break;
 
-			case "watch":
+			case this._const.bundleTypes.WATCH:
 				return Promise.resolve();
 				break;
 
@@ -1323,11 +1322,7 @@ class Bundler {
 			exec(conf.args || "", (error, stdout, stderr) => {
 				this._log("Documentation is done.");
 
-				if (stdout) {
-					this._log(stdout);
-					resolve();
-				}
-				else if (stderr) {
+				if (error) {
 					if (conf.log) {
 						this._log(Common.str("Documentation log file {0} has been written!", conf.log));
 						Common.writeFile(conf.log, stderr);
@@ -1337,6 +1332,10 @@ class Bundler {
 					}
 
 					reject();
+				}
+				else {
+					this._log(stdout);
+					resolve();
 				}
 			});
 		});
@@ -1406,7 +1405,7 @@ class Bundler {
 
 		// post process
 		if (name && this._data.eventHandler) {
-			this._log(Common.str("Run event {0}", name));
+			this._log(Common.str("Run event \"{0}\"", name));
 
 			let eh = this._data.eventHandler;
 
@@ -1414,6 +1413,7 @@ class Bundler {
 			outputData.output = eh[this._const.eventHandlerMethod].apply(eh, [{
 				name: name,
 				bundlerScope: this,
+				runType: this._runType,
 				args: args || {}
 			}]);
 		}
