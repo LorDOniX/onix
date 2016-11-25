@@ -12,7 +12,7 @@
 	"headerFile": "others/HEADER",
 	"eventHandler": "./others/event-handler",
 	"reload": {
-		"file": "others/reload-server.js",
+		"file": "reload-server.js",
 		"server": "localhost",
 		"port": 8200,
 		"serverPH": "{SERVER}",
@@ -27,14 +27,14 @@
 		"type": "js",
 		"dev": {
 			"header": true,
-			"clearRemoveStrict": true,
+			"clearUseStrict": true,
 			"clearBlankLines": true,
 			"output": "dist/onix-js-minimal-framework.js"
 		},
 		"dist": {
 			"compress": true,
 			"header": true,
-			"clearRemoveStrict": true,
+			"clearUseStrict": true,
 			"clearBlankLines": true,
 			"output": "dist/onix-js-minimal-framework.min.js"
 		},
@@ -57,13 +57,13 @@
 			"output": "dist/onix-js-framework.js",
 			"reload": true,
 			"header": true,
-			"clearRemoveStrict": true,
+			"clearUseStrict": true,
 			"clearBlankLines": true
 		},
 		"dist": {
 			"compress": true,
 			"header": true,
-			"clearRemoveStrict": true,
+			"clearUseStrict": true,
 			"clearBlankLines": true,
 			"output": "dist/onix-js-framework.min.js"
 		},
@@ -127,7 +127,7 @@
 		"id": "homejs",
 		"type": "js",
 		"dev": {
-			"clearRemoveStrict": true,
+			"clearUseStrict": true,
 			"clearBlankLines": true,
 			"watchPath": "test/js/home/",
 			"output": "test/js/home.js"

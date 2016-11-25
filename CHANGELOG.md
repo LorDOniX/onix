@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.2 (25. 11. 2016)
+
+* bundler update
+
 ## 3.0.1 (9. 11. 2016)
 
 * new bundler system
