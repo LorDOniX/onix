@@ -51,7 +51,7 @@ function(
 		 * @method _walk
 		 * @private
 		 */
-		_walk(value, maxLvl, colAt, lvl) {
+		_walk(value, maxLvl, colAt, lvl, cutArray) {
 			let frag = document.createDocumentFragment();
 			let isMaxLvl = maxLvl >= 0 && lvl >= maxLvl;
 			let isCollapse = colAt >= 0 && lvl >= colAt;
@@ -123,13 +123,27 @@ function(
 
 										// empty
 										if (!itemLen) {
-											li.appendChild(this._createText(key + ": " + (itemIsArray ? "[]" : "{}")));
+											li.appendChild(this._createText((typeof key === "string"? key + ": " : "") + (itemIsArray ? "[]" : "{}")));
 										}
 										else {
 											// 1+ items
 											let itemTitle = (typeof key === "string" ? key + ": " : "") + (itemIsArray ? "[" : "{");
 											let itemLink = this._createLink(itemTitle);
-											let itemsCount = this._createItemsCount(itemLen);
+											let origCount = null;
+
+											if (itemIsArray) {
+												cutArray.every(cutItem => {
+													if (cutItem.array == item) {
+														origCount = cutItem.len;
+														return false;
+													}
+													else {
+														return true;
+													}
+												});
+											}
+
+											let itemsCount = this._createItemsCount(itemLen, origCount);
 
 											// maxLvl - only text, no link
 											if (maxLvl >= 0 && lvl + 1 >= maxLvl) {
@@ -140,7 +154,7 @@ function(
 												li.appendChild(itemLink);
 											}
 
-											li.appendChild(this._walk(item, maxLvl, colAt, lvl + 1));
+											li.appendChild(this._walk(item, maxLvl, colAt, lvl + 1, cutArray));
 											li.appendChild(this._createText(itemIsArray ? "]" : "}"));
 											
 											let list = li.querySelector("ul");
@@ -168,7 +182,7 @@ function(
 									}
 
 									// recursive
-									li.appendChild(this._walk(item, maxLvl, colAt, lvl + 1));
+									li.appendChild(this._walk(item, maxLvl, colAt, lvl + 1, cutArray));
 								}
 
 								// add comma to the end
@@ -272,17 +286,18 @@ function(
 		 * Create items count element.
 		 * 
 		 * @param  {Number} count Items count
+		 * @param  {Number} [origCount] Original count
 		 * @return {Element}
 		 * @member $jsonViewer
 		 * @method _createItemsCount
 		 * @private
 		 */
-		_createItemsCount(count) {
+		_createItemsCount(count, origCount) {
 			return $dom.create({
 				el: "span",
 				class: ["items-ph", this._const.HIDE_CLASS],
 				href: "javascript:void(0)",
-				innerHTML: this._getItemsTitle(count)
+				innerHTML: this._getItemsTitle(count, origCount)
 			});
 		}
 
@@ -308,15 +323,17 @@ function(
 		 * Get correct item|s title for count.
 		 * 
 		 * @param  {Number} count Items count
+		 * @param  {Number} [origCount] Original count
 		 * @return {String}
 		 * @member $jsonViewer
 		 * @method _getItemsTitle
 		 * @private
 		 */
-		_getItemsTitle(count) {
+		_getItemsTitle(count, origCount) {
 			let itemsTxt = count > 1 || count === 0 ? "items" : "item";
+			var orig = typeof origCount === "number" ? "/" + origCount : "";
 
-			return (count + " " + itemsTxt);
+			return (count + orig + " " + itemsTxt);
 		}
 
 		/**
@@ -325,16 +342,18 @@ function(
 		 * @param {Object|Array} json Input value
 		 * @param {Number} [maxLvl] Process only to max level, where 0..n, -1 unlimited
 		 * @param {Number} [colAt] Collapse at level, where 0..n, -1 unlimited
+		 * @param {Array} [cutArray] Cuted arrays list
 		 * @member $jsonViewer
 		 * @method showJSON
 		 * 
 		 */
-		showJSON (json, maxLvl, colAt) {
+		showJSON (json, maxLvl, colAt, cutArray) {
 			maxLvl = typeof maxLvl === "number" ? maxLvl : -1; // max level
 			colAt = typeof colAt === "number" ? colAt : -1; // collapse at
+			cutArray = cutArray || [];
 
 			let jsonData = this._processInput(json);
-			let walkEl = this._walk(jsonData, maxLvl, colAt, 0);
+			let walkEl = this._walk(jsonData, maxLvl, colAt, 0, cutArray);
 
 			this._dom.container.innerHTML = "";
 			this._dom.container.appendChild(walkEl);

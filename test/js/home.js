@@ -194,7 +194,7 @@ homeApp.factory("HomePage", ["$common", "$date", "$event", "$filter", "$i18n", "
 		_inherits(HomePage, _Page);
 		function HomePage(config) {
 			_classCallCheck(this, HomePage);
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(HomePage).call(this, config));
+			return _possibleConstructorReturn(this, (HomePage.__proto__ || Object.getPrototypeOf(HomePage)).call(this, config));
 		}
 		// ------------------------ private ---------------------------------------
 		_createClass(HomePage, [{
@@ -614,7 +614,7 @@ homeApp.factory("HomeSnippet", ["$common", "Snippet", "TestFromModule", function
 		_inherits(HomeSnippet, _Snippet);
 		function HomeSnippet(config, parent) {
 			_classCallCheck(this, HomeSnippet);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeSnippet).call(this, config, parent));
+			var _this = _possibleConstructorReturn(this, (HomeSnippet.__proto__ || Object.getPrototypeOf(HomeSnippet)).call(this, config, parent));
 			TestFromModule.test();
 			return _this;
 		}
@@ -645,7 +645,7 @@ homeApp.factory("Page", ["$template", "$common", "$event", function ($template, 
    */
 		function Page(config) {
 			_classCallCheck(this, Page);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Page).call(this));
+			var _this = _possibleConstructorReturn(this, (Page.__proto__ || Object.getPrototypeOf(Page)).call(this));
 			var root = onix.element("body").html($template.compile(config.templ || "", _this));
 			// Object for data-bind elements references
 			_this._els = {};
@@ -716,7 +716,7 @@ homeApp.factory("Snippet", ["$template", "$common", "$event", function ($templat
 		function Snippet(config, parent) {
 			_classCallCheck(this, Snippet);
 			// Object for data-bind elements references
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Snippet).call(this));
+			var _this = _possibleConstructorReturn(this, (Snippet.__proto__ || Object.getPrototypeOf(Snippet)).call(this));
 			_this._els = {};
 			_this._config = config || {};
 			_this._parent = parent;

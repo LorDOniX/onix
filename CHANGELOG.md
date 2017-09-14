@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.3 (14. 9. 2017)
+
+* json viewer fix
+
 ## 3.0.2 (25. 11. 2016)
 
 * bundler update

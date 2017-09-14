@@ -53,7 +53,7 @@ function(
 		this._dom.jsonOutput.innerHTML = "";
 		this._dom.jsonOutput.appendChild(jsonViewer.getContainer());
 
-		jsonViewer.showJSON(parsedUrl);
+		jsonViewer.showJSON({"connection":"@osm","handler":["OsmTurboHandler",{},[],["a"],{v:[]}],"workers":8});
 	};
 
 	new Utils();

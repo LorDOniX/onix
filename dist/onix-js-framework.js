@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 3.0.2/25. 11. 2016
+ * 3.0.3/14. 9. 2017
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * 
@@ -1068,7 +1068,7 @@
 		});
 	}
 }.call(this));
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
@@ -1909,7 +1909,7 @@ onix = function () {
   * @static
   */
 	onix.info = function () {
-		console.log('OnixJS framework\n'+'3.0.2/25. 11. 2016\n'+'source: https://gitlab.com/LorDOniX/onix\n'+'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+'\n'+'@license MIT\n'+'- Free for use in both personal and commercial projects\n');
+		console.log('OnixJS framework\n'+'3.0.3/14. 9. 2017\n'+'source: https://gitlab.com/LorDOniX/onix\n'+'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+'\n'+'@license MIT\n'+'- Free for use in both personal and commercial projects\n');
 	};
 	/* ************************************* $di **************************** */
 	onix.factory("$di", function () {
@@ -1987,7 +1987,7 @@ onix.factory("$filter", ["$di", function ($di) {
 		});
 	};
 }]);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 /**
  * Commom functions used in whole application.
  *
@@ -2733,7 +2733,7 @@ onix.service("$date", function () {
 		return format;
 	};
 });
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 /**
  * Class for creating DOM elements and getting their references.
  * 
@@ -2984,7 +2984,7 @@ onix.factory("$resize", ["$event", function ($event) {
     * @member $resize
     * @private
     */
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($resize).call(this));
+			var _this = _possibleConstructorReturn(this, ($resize.__proto__ || Object.getPrototypeOf($resize)).call(this));
 			_this._active = false;
 			/**
     * Resize object.
@@ -3081,7 +3081,7 @@ onix.factory("$resize", ["$event", function ($event) {
 	;
 	return new $resize();
 }]);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 /**
  * Filter - lowercase functionality.
  *
@@ -4115,7 +4115,7 @@ onix.factory("$localStorage", ["$features", function ($features) {
 		}
 	};
 }]);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 /**
  * Support class for location operations.
  * 
@@ -4587,7 +4587,7 @@ onix.service("$math", function () {
 		return value < 0 ? 360 + value : value;
 	};
 });
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix.factory("$myQuery", ["$common", function ($common) {
@@ -5865,7 +5865,7 @@ onix.service("$route", ["$location", "$template", "$di", "$routeParams", functio
 onix.factory("$routeParams", function () {
   return {};
 });
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix.provider("$template", function () {
@@ -6363,7 +6363,7 @@ onix.factory("$anonymizer", ["$math", "$event", "$loader", "$promise", "$common"
 		function $anonymizer(parent, optsArg) {
 			_classCallCheck(this, $anonymizer);
 			// is canvas available?
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($anonymizer).call(this));
+			var _this = _possibleConstructorReturn(this, ($anonymizer.__proto__ || Object.getPrototypeOf($anonymizer)).call(this));
 			if (!$features.CANVAS) {
 				console.error("Canvas is not available!");
 				return _possibleConstructorReturn(_this);
@@ -7732,7 +7732,7 @@ onix.service("$notify", ["$common", "$promise", function ($common, $promise) {
 		return new $notify(el);
 	};
 }]);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 /**
  * Class for creating img previews from File[] variable.
  * 
@@ -7916,7 +7916,7 @@ onix.factory("$select", ["$common", "$event", "$dom", function ($common, $event,
 		_inherits($select, _$event);
 		function $select(el, opts) {
 			_classCallCheck(this, $select);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($select).call(this));
+			var _this = _possibleConstructorReturn(this, ($select.__proto__ || Object.getPrototypeOf($select)).call(this));
 			_this._opts = {
 				addCaption: false
 			};
@@ -8190,7 +8190,7 @@ onix.factory("$slider", ["$dom", "$event", "$common", "$math", function ($dom, $
 		_inherits($slider, _$event);
 		function $slider(parent, optsArg) {
 			_classCallCheck(this, $slider);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($slider).call(this));
+			var _this = _possibleConstructorReturn(this, ($slider.__proto__ || Object.getPrototypeOf($slider)).call(this));
 			_this._parent = parent;
 			_this._root = _this._create();
 			_this._opts = {
@@ -9138,7 +9138,7 @@ onix.factory("$crop", ["$dom", "$math", "$common", function ($dom, $math, $commo
 	;
 	return $crop;
 }]);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix.factory("$jsonViewer", ["$dom", function ($dom) {
@@ -9191,7 +9191,7 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
     */
 		}, {
 			key: "_walk",
-			value: function _walk(value, maxLvl, colAt, lvl) {
+			value: function _walk(value, maxLvl, colAt, lvl, cutArray) {
 				var _this = this;
 				var frag = document.createDocumentFragment();
 				var isMaxLvl = maxLvl >= 0 && lvl >= maxLvl;
@@ -9255,13 +9255,24 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
 														var itemLen = itemIsArray ? item.length : Object.keys(item).length;
 														// empty
 														if (!itemLen) {
-															li.appendChild(_this._createText(key + ": " + (itemIsArray ? "[]" : "{}")));
+															li.appendChild(_this._createText((typeof key === "string" ? key + ": " : "") + (itemIsArray ? "[]" : "{}")));
 														} else {
 															(function () {
 																// 1+ items
 																var itemTitle = (typeof key === "string" ? key + ": " : "") + (itemIsArray ? "[" : "{");
 																var itemLink = _this._createLink(itemTitle);
-																var itemsCount = _this._createItemsCount(itemLen);
+																var origCount = null;
+																if (itemIsArray) {
+																	cutArray.every(function (cutItem) {
+																		if (cutItem.array == item) {
+																			origCount = cutItem.len;
+																			return false;
+																		} else {
+																			return true;
+																		}
+																	});
+																}
+																var itemsCount = _this._createItemsCount(itemLen, origCount);
 																// maxLvl - only text, no link
 																if (maxLvl >= 0 && lvl + 1 >= maxLvl) {
 																	li.appendChild(_this._createText(itemTitle));
@@ -9269,7 +9280,7 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
 																	itemLink.appendChild(itemsCount);
 																	li.appendChild(itemLink);
 																}
-																li.appendChild(_this._walk(item, maxLvl, colAt, lvl + 1));
+																li.appendChild(_this._walk(item, maxLvl, colAt, lvl + 1, cutArray));
 																li.appendChild(_this._createText(itemIsArray ? "]" : "}"));
 																var list = li.querySelector("ul");
 																var itemLinkCb = function itemLinkCb() {
@@ -9294,7 +9305,7 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
 														li.appendChild(_this._createText(key + ": "));
 													}
 													// recursive
-													li.appendChild(_this._walk(item, maxLvl, colAt, lvl + 1));
+													li.appendChild(_this._walk(item, maxLvl, colAt, lvl + 1, cutArray));
 												}
 											// add comma to the end
 											if (ind < len) {
@@ -9386,6 +9397,7 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
     * Create items count element.
     * 
     * @param  {Number} count Items count
+    * @param  {Number} [origCount] Original count
     * @return {Element}
     * @member $jsonViewer
     * @method _createItemsCount
@@ -9393,12 +9405,12 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
     */
 		}, {
 			key: "_createItemsCount",
-			value: function _createItemsCount(count) {
+			value: function _createItemsCount(count, origCount) {
 				return $dom.create({
 					el: "span",
 					"class": ["items-ph", this._const.HIDE_CLASS],
 					href: "javascript:void(0)",
-					innerHTML: this._getItemsTitle(count)
+					innerHTML: this._getItemsTitle(count, origCount)
 				});
 			}
 			/**
@@ -9424,6 +9436,7 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
     * Get correct item|s title for count.
     * 
     * @param  {Number} count Items count
+    * @param  {Number} [origCount] Original count
     * @return {String}
     * @member $jsonViewer
     * @method _getItemsTitle
@@ -9431,9 +9444,10 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
     */
 		}, {
 			key: "_getItemsTitle",
-			value: function _getItemsTitle(count) {
+			value: function _getItemsTitle(count, origCount) {
 				var itemsTxt = count > 1 || count === 0 ? "items" : "item";
-				return count + " " + itemsTxt;
+				var orig = typeof origCount === "number" ? "/" + origCount : "";
+				return count + orig + " " + itemsTxt;
 			}
 			/**
     * Visualise JSON object.
@@ -9441,17 +9455,19 @@ onix.factory("$jsonViewer", ["$dom", function ($dom) {
     * @param {Object|Array} json Input value
     * @param {Number} [maxLvl] Process only to max level, where 0..n, -1 unlimited
     * @param {Number} [colAt] Collapse at level, where 0..n, -1 unlimited
+    * @param {Array} [cutArray] Cuted arrays list
     * @member $jsonViewer
     * @method showJSON
     * 
     */
 		}, {
 			key: "showJSON",
-			value: function showJSON(json, maxLvl, colAt) {
+			value: function showJSON(json, maxLvl, colAt, cutArray) {
 				maxLvl = typeof maxLvl === "number" ? maxLvl : -1; // max level
 				colAt = typeof colAt === "number" ? colAt : -1; // collapse at
+				cutArray = cutArray || [];
 				var jsonData = this._processInput(json);
-				var walkEl = this._walk(jsonData, maxLvl, colAt, 0);
+				var walkEl = this._walk(jsonData, maxLvl, colAt, 0, cutArray);
 				this._dom.container.innerHTML = "";
 				this._dom.container.appendChild(walkEl);
 			}
@@ -9493,7 +9509,7 @@ onix.factory("$lightbox", ["$dom", "$common", "$resize", "$event", "$loader", fu
 		_inherits($lightbox, _$event);
 		function $lightbox(options) {
 			_classCallCheck(this, $lightbox);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($lightbox).call(this));
+			var _this = _possibleConstructorReturn(this, ($lightbox.__proto__ || Object.getPrototypeOf($lightbox)).call(this));
 			_this._opts = {
 				fadeTime: 20,
 				loop: true,
@@ -10060,7 +10076,7 @@ onix.factory("$lightbox", ["$dom", "$common", "$resize", "$event", "$loader", fu
 	;
 	return $lightbox;
 }]);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -10086,7 +10102,7 @@ onix.factory("$popup", ["$dom", "$event", "$resize", function ($dom, $event, $re
 		_inherits($popup, _$event);
 		function $popup(opts) {
 			_classCallCheck(this, $popup);
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf($popup).call(this));
+			var _this = _possibleConstructorReturn(this, ($popup.__proto__ || Object.getPrototypeOf($popup)).call(this));
 			_this._const = {
 				ROOT_CLASS: "popup",
 				CONTENT_CLASS: "content",

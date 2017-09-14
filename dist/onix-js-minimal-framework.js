@@ -1,6 +1,6 @@
 /**
  * OnixJS framework
- * 3.0.2/25. 11. 2016
+ * 3.0.3/14. 9. 2017
  * source: https://gitlab.com/LorDOniX/onix
  * documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
  * minimal version: contains [src/libs/polyfills.js, src/core/onix.js, src/core/filter.js]
@@ -352,7 +352,7 @@
 		})();
 	}
 })();
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 onix = function () {
@@ -1193,7 +1193,7 @@ onix = function () {
   * @static
   */
 	onix.info = function () {
-		console.log('OnixJS framework\n'+'3.0.2/25. 11. 2016\n'+'source: https://gitlab.com/LorDOniX/onix\n'+'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+'minimal version: contains [src/libs/polyfills.js, src/core/onix.js, src/core/filter.js]\n'+'@license MIT\n'+'- Free for use in both personal and commercial projects\n');
+		console.log('OnixJS framework\n'+'3.0.3/14. 9. 2017\n'+'source: https://gitlab.com/LorDOniX/onix\n'+'documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs\n'+'minimal version: contains [src/libs/polyfills.js, src/core/onix.js, src/core/filter.js]\n'+'@license MIT\n'+'- Free for use in both personal and commercial projects\n');
 	};
 	/* ************************************* $di **************************** */
 	onix.factory("$di", function () {
