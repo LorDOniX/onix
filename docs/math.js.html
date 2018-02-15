@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: math.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: math.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Many useful alghoritms.
+ * 
+ * @module $math
+ */
+
+/**
+ * Math constants.
+ *
+ * @private
+ * @type {Object}
+ */
+const _CONST = {
+	ZOOM: 156543.034
+};
+
+/**
+ * Is there two bounding box intersection?
+ * 
+ * @param  {Object} bbox1
+ * @param  {Number} bbox1.x Left top coordinates - axe x
+ * @param  {Number} bbox1.y Left top coordinates - axe y
+ * @param  {Number} bbox1.width Width of the bbox
+ * @param  {Number} bbox1.height Height of the bbox
+ * @param  {Object} bbox2
+ * @param  {Number} bbox2.x Left top coordinates - axe x
+ * @param  {Number} bbox2.y Left top coordinates - axe y
+ * @param  {Number} bbox2.width Width of the bbox
+ * @param  {Number} bbox2.height Height of the bbox
+ * @return {Boolean}
+ */
+export function isBBoxIntersection(bbox1, bbox2) {
+	let ltx = Math.max(bbox1.x, bbox2.x);
+	let lty = Math.max(bbox1.y, bbox2.y);
+	let rbx = Math.min(bbox1.x + bbox1.width, bbox2.x + bbox2.width);
+	let rby = Math.min(bbox1.y + bbox1.height, bbox2.y + bbox2.height);
+
+	// width and height of intesection has to be higher than 0
+	let width = Math.abs(rbx - ltx);
+	let height = Math.abs(rby - lty);
+
+	if (ltx &lt;= rbx &amp;&amp; lty &lt;= rby &amp;&amp; width * height > 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
+};
+
+/**
+ * Get BBox from points.
+ * 
+ * @param  {Object[]} points
+ * @param  {Number} points.x Coordinate on axe x
+ * @param  {Number} points.y Coordinate on axe y
+ * @return {Object} Output bbox with x, y, width and height variables
+ */
+export function getBBox(points) {
+	let minX = Infinity;
+	let minY = Infinity;
+	let maxX = -Infinity;
+	let maxY = -Infinity;
+
+	// for each point
+	for (let i = 0; i &lt; points.length; i++) {
+		minX = Math.min(points[i].x, minX);
+		minY = Math.min(points[i].y, minY);
+		maxX = Math.max(points[i].x, maxX);
+		maxY = Math.max(points[i].y, maxY);
+	}
+
+	return {
+		x: minX,
+		y: minY,
+		width: Math.abs(maxX - minX),
+		height: Math.abs(maxY - minY)
+	};
+};
+
+/**
+ * Determinant 2x2 count.
+ * 
+ * @param {Number} x1
+ * @param {Number} x2
+ * @param {Number} y1
+ * @param {Number} y2
+ * @returns {Number}
+ */
+export function det2(x1, x2, y1, y2) {
+	return (x1 * y2 - y1 * x2);
+};
+
+/**
+ * Intersection of two lines.
+ * 
+ * @param  {Object} firstLine
+ * @param  {Object} firstLine.x1 Line start axe x
+ * @param  {Object} firstLine.y1 Line start axe y
+ * @param  {Object} firstLine.x2 Line end axe x
+ * @param  {Object} firstLine.y2 Line end axe y
+ * @param  {Object} secondLine
+ * @param  {Object} secondLine.x1 Line start axe x
+ * @param  {Object} secondLine.y1 Line start axe y
+ * @param  {Object} secondLine.x2 Line end axe x
+ * @param  {Object} secondLine.y2 Line end axe y
+ * @returns {Object} Intersection point x, y
+ */
+export function linesIntersection(firstLine, secondLine) {
+	let TOLERANCE = 0.000001;
+
+	let a = det2(firstLine.x1 - firstLine.x2, firstLine.y1 - firstLine.y2, secondLine.x1 - secondLine.x2, secondLine.y1 - secondLine.y2);
+	
+	// lines are parallel
+	if (Math.abs(a) &lt; TOLERANCE) { return null; }
+
+	let d1 = det2(firstLine.x1, firstLine.y1, firstLine.x2, firstLine.y2);
+	let d2 = det2(secondLine.x1, secondLine.y1, secondLine.x2, secondLine.y2);
+	let x = det2(d1, firstLine.x1 - firstLine.x2, d2, secondLine.x1 - secondLine.x2) / a;
+	let y = det2(d1, firstLine.y1 - firstLine.y2, d2, secondLine.y1 - secondLine.y2) / a;
+
+	if (x &lt; Math.min(firstLine.x1, firstLine.x2) - TOLERANCE || x > Math.max(firstLine.x1, firstLine.x2) + TOLERANCE) { return null; }
+	if (y &lt; Math.min(firstLine.y1, firstLine.y2) - TOLERANCE || y > Math.max(firstLine.y1, firstLine.y2) + TOLERANCE) { return null; }
+	if (x &lt; Math.min(secondLine.x1, secondLine.x2) - TOLERANCE || x > Math.max(secondLine.x1, secondLine.x2) + TOLERANCE) { return null; }
+	if (y &lt; Math.min(secondLine.y1, secondLine.y2) - TOLERANCE || y > Math.max(secondLine.y1, secondLine.y2) + TOLERANCE) { return null; }
+
+	return {
+		x: Math.round(x),
+		y: Math.round(y)
+	};
+};
+
+/**
+ * Is there point and bounding box intersection?
+ * 
+ * @param  {Object} point
+ * @param  {Number} point.x Point coordinates - axe x
+ * @param  {Number} point.y Point coordinates - axe y
+ * @param  {Object} bbox
+ * @param  {Number} bbox.x Left top coordinates - axe x
+ * @param  {Number} bbox.y Left top coordinates - axe y
+ * @param  {Number} bbox.width Width of the bbox
+ * @param  {Number} bbox.height Height of the bbox
+ * @return {Boolean}
+ */
+export function pointBBoxIntersection(point, bbox) {
+	return point.x >= bbox.x &amp;&amp; point.x &lt;= (bbox.x + bbox.width) &amp;&amp; point.y >= bbox.y &amp;&amp; point.y &lt;= (bbox.y + bbox.height);
+};
+
+/**
+ * Logarithm - base 2.
+ * 
+ * @param  {Number} val Input value
+ * @return {Number}
+ */
+export function log2(val) {
+	return Math.log(val) / Math.log(2);
+};
+
+/**
+ * Map zoom in mercator projection to distance in meters.
+ * 
+ * @param  {Number} zoom   Mercator zoom - 2..n
+ * @param  {Number} horFOV Horizontal field of view
+ * @param  {Number} height Screen height size
+ * @return {Number} Distance in meters
+ */
+export function zoomToDistance(zoom, horFOV, height) {
+	let resolution = _CONST.ZOOM / Math.pow(2, zoom); // m/px
+	let halfHeight = height / 2;
+	let y = Math.floor(resolution * halfHeight);
+
+	// we need a half - its in degrees - thats why / 2 * / 180 for radians [rad]; vertical fov -> we need height
+	let alfa = horFOV / 360 * Math.PI;
+
+	return Math.floor(y / Math.tan(alfa));
+};
+
+/**
+ * Reverse function for zoomToDistance - distance in meters to zoom in mercator projection.
+ * 
+ * @param  {Number} distance Distance in meters
+ * @param  {Number} horFOV Horizontal field of view
+ * @param  {Number} height Screen height size
+ * @return {Number} Mercator zoom
+ */
+export function distanceToZoom(distance, horFOV, height) {
+	let alfa = horFOV / 360 * Math.PI;
+	let y = Math.tan(alfa) * distance;
+	let mPPx = 2 * y / height; // distance / half of height; meters per pixel
+
+	return Math.floor(log2(_CONST.ZOOM / mPPx));
+};
+
+/**
+ * Move point coordinates by angle in degrees.
+ * 
+ * @param  {Object} point
+ * @param  {Number} point.x Point coordinates - axe x
+ * @param  {Number} point.y Point coordinates - axe y
+ * @param  {Number} angle Angle in degrees CW
+ */
+export function movePointByAngle(point, angle) {
+	let rad = (360 - angle) / 180 * Math.PI;
+	let x = point.x;
+	let y = point.y;
+
+	point.x = x * Math.cos(rad) - y * Math.sin(rad);
+	point.y = x * Math.sin(rad) + y * Math.cos(rad)
+};
+
+/**
+ * Move point by vector, you can also rotate vector by angle in degrees.
+ * 
+ * @param  {Object} point
+ * @param  {Number} point.x Point coordinates - axe x
+ * @param  {Number} point.y Point coordinates - axe y
+ * @param  {Object} vector
+ * @param  {Number} vector.x Point coordinates - axe x
+ * @param  {Number} vector.y Point coordinates - axe y
+ * @param  {Number} [angle] Angle in degrees for vector rotation CW
+ */
+export function movePointByVector(point, vector, angle) {
+	// because overwrite reference object
+	let vectorSave = {
+		x: vector.x,
+		y: vector.y
+	};
+
+	movePointByAngle(vectorSave, angle || 0);
+
+	point.x += vectorSave.x;
+	point.y += vectorSave.y;
+};
+
+/**
+ * Set value in selected range.
+ * 
+ * @param {Number} value Input value
+ * @param {Number} min Min value
+ * @param {Number} max Max value
+ * @return {Number}
+ */
+export function setRange(value, min, max) {
+	if (value &lt; min) {
+		return min;
+	}
+	else if (value > max) {
+		return max;
+	}
+	else {
+		return value;
+	}
+};
+
+/**
+ * Get middle angle between start and end angle.
+ * Negative angle is computed like 360 + negative angle.
+ * 
+ * @param {Number} startAngle
+ * @param {Number} endAngle
+ * @return {Number}
+ */
+export function getMiddleAngle(startAngle, endAngle) {
+	startAngle = startAngle || 0;
+	endAngle = endAngle || 0;
+
+	let value = ((startAngle + endAngle) / 2) % 180;
+
+	return (value &lt; 0 ? 360 + value : value);
+};
+
+/**
+ * Get angle between center &lt;0;0> and point &lt;x;y>.
+ * 
+ * @param {Number} x Position on axe X
+ * @param {Number} y Position on axe Y
+ * @return {Number}
+ */
+export function getAngle(x, y) {
+	let angle = Math.round(Math.atan2(y, x) / Math.PI * 180);
+	angle = angle >= 90 &amp;&amp; angle &lt;= 180 ? 270 + Math.abs(angle - 180) : Math.abs(angle - 90);
+
+	return angle;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-$common.html">$common</a></li><li><a href="module-$cookie.html">$cookie</a></li><li><a href="module-$date.html">$date</a></li><li><a href="module-$dom.html">$dom</a></li><li><a href="module-$features.html">$features</a></li><li><a href="module-$http.html">$http</a></li><li><a href="module-$image.html">$image</a></li><li><a href="module-$localStorage.html">$localStorage</a></li><li><a href="module-$location.html">$location</a></li><li><a href="module-$math.html">$math</a></li><li><a href="module-$previewImages.html">$previewImages</a></li></ul><h3>Classes</h3><ul><li><a href="$anonymizer.html">$anonymizer</a></li><li><a href="$crop.html">$crop</a></li><li><a href="$event.html">$event</a></li><li><a href="$filter.html">$filter</a></li><li><a href="$filterJson.html">$filterJson</a></li><li><a href="$i18n.html">$i18n</a></li><li><a href="$job.html">$job</a></li><li><a href="$jsonViewer.html">$jsonViewer</a></li><li><a href="$lightbox.html">$lightbox</a></li><li><a href="$loader.html">$loader</a></li><li><a href="$myQuery.html">$myQuery</a></li><li><a href="$notify.html">$notify</a></li><li><a href="$popup.html">$popup</a></li><li><a href="$popupManager.html">$popupManager</a></li><li><a href="$resize.html">$resize</a></li><li><a href="$route.html">$route</a></li><li><a href="$select.html">$select</a></li><li><a href="$slider.html">$slider</a></li><li><a href="$template.html">$template</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 15 2018 10:28:05 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

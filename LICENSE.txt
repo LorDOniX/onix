@@ -1,0 +1,5 @@
+OnixJS framework
+source: https://gitlab.com/LorDOniX/onix
+documentation: https://gitlab.com/LorDOniX/onix/tree/master/docs
+@license MIT
+- Free for use in both personal and commercial projects

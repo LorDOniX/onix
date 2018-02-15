@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: date.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: date.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Date operations.
+ * 
+ * @module $date
+ */
+
+/**
+ * Parse EN date to CS format.
+ * year-month-day -> day. month. year
+ * 2016-06-31 -> 31. 6. 2016
+ * 
+ * @param {String} enDate
+ * @return {String}
+ */
+export function dateENtoCS(enDate) {
+	enDate = enDate || "";
+
+	let parts = enDate.split("-");
+
+	if (parts.length == 3) {
+		// delete first 0
+		return [parts[2].replace(/^0/, ""), parts[1].replace(/^0/, ""), parts[0]].join(". ");
+	}
+	else {
+		return "";
+	}
+};
+
+/**
+ * Parse CS date to EN format.
+ * day. month. year -> year-month-day
+ * 31. 6. 2016 -> 2016-06-31
+ * 
+ * @param {String} csDate
+ * @return {String}
+ */
+export function dateCStoEN(csDate) {
+	// day. month. year 31. 12. 2015
+	csDate = csDate || "";
+
+	let parts = csDate.split(".");
+
+	if (parts.length == 3) {
+		let year = parts[2].trim();
+		let month = parts[1].trim();
+		let date = parts[0].trim();
+
+		// add 0 from left
+		date = date.length == 1 ? "0" + date : date;
+		month = month.length == 1 ? "0" + month : month;
+
+		return [year, month, date].join("-");
+	}
+	else {
+		return "";
+	}
+};
+
+
+/**
+ * Is string contains CS date format?
+ * 
+ * @param  {String} csDate
+ * @return {Boolean}
+ */
+export function isCSdate(csDate) {
+	csDate = csDate || "";
+
+	return !!(csDate.match(/([1-9]|[1-3][0-9])\.[ ]*([1-9]|1[0-2])\.[ ]*[1-9][0-9]{3}/));
+};
+
+/**
+ * Add days to date.
+ * 
+ * @param  {Date} date
+ * @param  {Number} days
+ * @return {Date}
+ */
+export function addDays(date, days) {
+	days = days || 0;
+
+	let addTime = 1000 * 60 * 60 * 24 * days;
+
+	return new Date(date.getTime() + addTime);
+};
+
+/**
+ * Date - string format.
+ * yyyy - full year; m - month; d - day; s - secods; M - minutes; h - hours;
+ * double: dd, ss, MM, hh - left pad with zero.
+ * 
+ * @param  {Date} date Input date
+ * @param  {String} format Format string
+ * @return {String}
+ */
+export function format(date, format) {
+	format = format || "d. m. yyyy hh:MM:ss";
+
+	let day = date.getDate();
+	let month = date.getMonth() + 1;
+	let year = date.getFullYear();
+
+	let seconds = date.getSeconds();
+	let minutes = date.getMinutes();
+	let hours = date.getHours();
+
+	let dateObj = {
+		"yyyy": year,
+		"m": month,
+		"mm": month &lt; 10 ? "0" + month : month,
+		"d": day,
+		"dd": day &lt; 10 ? "0" + day : day,
+		"s": seconds,
+		"ss": seconds &lt; 10 ? "0" + seconds : seconds,
+		"M": minutes,
+		"MM": minutes &lt; 10 ? "0" + minutes : minutes,
+		"h": hours,
+		"hh": hours &lt; 10 ? "0" + hours : hours,
+	};
+
+	let keys = Object.keys(dateObj).sort((a, b) => {
+		return b.length - a.length;
+	});
+
+	keys.forEach(key => {
+		format = format.replace(new RegExp(key, "g"), dateObj[key]);
+	});
+
+	return format;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-$common.html">$common</a></li><li><a href="module-$cookie.html">$cookie</a></li><li><a href="module-$date.html">$date</a></li><li><a href="module-$dom.html">$dom</a></li><li><a href="module-$features.html">$features</a></li><li><a href="module-$http.html">$http</a></li><li><a href="module-$image.html">$image</a></li><li><a href="module-$localStorage.html">$localStorage</a></li><li><a href="module-$location.html">$location</a></li><li><a href="module-$math.html">$math</a></li><li><a href="module-$previewImages.html">$previewImages</a></li></ul><h3>Classes</h3><ul><li><a href="$anonymizer.html">$anonymizer</a></li><li><a href="$crop.html">$crop</a></li><li><a href="$event.html">$event</a></li><li><a href="$filter.html">$filter</a></li><li><a href="$filterJson.html">$filterJson</a></li><li><a href="$i18n.html">$i18n</a></li><li><a href="$job.html">$job</a></li><li><a href="$jsonViewer.html">$jsonViewer</a></li><li><a href="$lightbox.html">$lightbox</a></li><li><a href="$loader.html">$loader</a></li><li><a href="$myQuery.html">$myQuery</a></li><li><a href="$notify.html">$notify</a></li><li><a href="$popup.html">$popup</a></li><li><a href="$popupManager.html">$popupManager</a></li><li><a href="$resize.html">$resize</a></li><li><a href="$route.html">$route</a></li><li><a href="$select.html">$select</a></li><li><a href="$slider.html">$slider</a></li><li><a href="$template.html">$template</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 15 2018 10:28:05 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

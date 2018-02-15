@@ -2,14 +2,169 @@ TODO:
 -----
 - none
 
-WIN TODO:
-- uglify EOF windows ERROR
-
-OTHERS:
-- uglify - some version add default screw-ie8 > "class" -> uglify -> class
-
-JSDUCK:
-- https://github.com/senchalabs/jsduck/wiki
-
 SHADOW DOM COMMIT:
 - 6c6af59d43aaa0fc1f074a4f7374eb1ec1dee577
+
+- prepis
+
+{
+	"ES6": {
+		"presets": [
+			"babel-preset-es2015"
+		],
+		"plugins": [
+			"babel-plugin-transform-es3-member-expression-literals",
+			"babel-plugin-transform-es3-property-literals"
+		]
+	},
+	"cacheFile": "cache.json",
+	"headerFile": "others/HEADER",
+	"eventHandler": "./others/event-handler",
+	"reload": {
+		"file": "reload-server.js",
+		"server": "localhost",
+		"port": 8200,
+		"serverPH": "{SERVER}",
+		"portPH": "{PORT_NUMBER}"
+	},
+	"doc": {
+		"args": "jsduck dist/onix-js-framework.js --output docs --warnings=-nodoc,-dup_member,-link_ambiguous --external=XMLHttpRequest,$q",
+		"log": "jsduck.log"
+	},
+	"bundles": [{
+		"id": "minimal",
+		"type": "js",
+		"dev": {
+			"header": true,
+			"clearUseStrict": true,
+			"clearBlankLines": true,
+			"output": "dist/onix-js-minimal-framework.js"
+		},
+		"dist": {
+			"compress": true,
+			"header": true,
+			"clearUseStrict": true,
+			"clearBlankLines": true,
+			"output": "dist/onix-js-minimal-framework.min.js"
+		},
+		"data": [{
+			"files": [
+				"src/libs/polyfills.js"
+			]
+		}, {
+			"ES6": true,
+			"files": [
+				"src/core/onix.js",
+				"src/core/filter.js"
+			]
+		}]
+	}, {
+		"id": "onix",
+		"type": "js",
+		"dev": {
+			"watchPath": "src/",
+			"output": "dist/onix-js-framework.js",
+			"reload": true,
+			"header": true,
+			"clearUseStrict": true,
+			"clearBlankLines": true
+		},
+		"dist": {
+			"compress": true,
+			"header": true,
+			"clearUseStrict": true,
+			"clearBlankLines": true,
+			"output": "dist/onix-js-framework.min.js"
+		},
+		"data": [{
+			"files": [
+				"src/libs/polyfills.js",
+				"src/libs/exif.js"
+			]
+		}, {
+			"ES6": true,
+			"files": [
+				"src/core/onix.js",
+				"src/core/filter.js",
+
+				"src/common/common.js",
+				"src/common/cookie.js",
+				"src/common/date.js",
+				"src/common/dom.js",
+				"src/common/event.js",
+				"src/common/resize.js",
+				"src/common/filters.js",
+				"src/common/http.js",
+				"src/common/i18n.js",
+				"src/common/image.js",
+				"src/common/job.js",
+				"src/common/local-storage.js",
+				"src/common/location.js",
+				"src/common/math.js",
+				"src/common/my-query.js",
+				"src/common/promise.js",
+				"src/common/route.js",
+				"src/common/routeParams.js",
+				"src/common/template.js",
+				"src/common/features.js",
+				
+				"src/utils/anonymizer.js",
+				"src/utils/loader.js",
+				"src/utils/notify.js",
+				"src/utils/preview-images.js",
+				"src/utils/select.js",
+				"src/utils/slider.js",
+				"src/utils/crop.js",
+				"src/utils/json-viewer.js",
+				"src/utils/lightbox.js",
+				"src/utils/popup.js"
+			]
+		}]
+	}, {
+		"id": "less",
+		"type": "less",
+		"source": "less/onix.less",
+		"dev": {
+			"watchPath": "less/",
+			"output": "dist/onix.css"
+		},
+		"dist": {
+			"compress": true,
+			"output": "dist/onix.min.css"
+		}
+	}, {
+		"id": "homejs",
+		"type": "js",
+		"dev": {
+			"clearUseStrict": true,
+			"clearBlankLines": true,
+			"watchPath": "test/js/home/",
+			"output": "test/js/home.js"
+		},
+		"data": [{
+			"ES6": true,
+			"files": [
+				"test/js/common/menu.js",
+				"test/js/home/my-module.js",
+				"test/js/home/home.js",
+				"test/js/home/home-resource.js",
+				"test/js/home/home-page.js",
+				"test/js/home/home-snippet.js",
+				"test/js/home/page.js",
+				"test/js/home/snippet.js"
+			]
+		}]
+	}, {
+		"id": "testless",
+		"type": "less",
+		"source": "test/less/main.less",
+		"dev": {
+			"watchPath": "test/less/",
+			"output": "test/css/main.css"
+		},
+		"dist": {
+			"compress": true,
+			"output": "test/css/main.min.css"
+		}
+	}]
+}

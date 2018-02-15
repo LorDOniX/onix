@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0 (15. 2. 2018)
+
+* new import version
+* new documentation via jsdoc
+* no dist - see test folders, which have src files used in them
+
 ## 3.0.3 (14. 9. 2017)
 
 * json viewer fix

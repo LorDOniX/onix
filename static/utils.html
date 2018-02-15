@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="cs">
+<head>
+	<title>Onix</title>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, minimal-ui">
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css?1">
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css?1">
+	<link rel="stylesheet" type="text/css" href="/css/main.css?1">
+	
+	<script src="/js/polyfills.js"></script>
+	<script src="/js/main.js"></script>
+	<script>
+		Page.utils();
+	</script>
+</head>
+<body>
+	<div id="utils">
+		<h2>Popup and lightbox</h2>
+		<div>
+			<button type="button" class="btn btn-default" data-event-click="popup()">Popup</button>
+			<button type="button" class="btn btn-default" data-event-click="lightbox()">Lightbox</button>
+			
+		</div>
+		<div>
+			<h2>JSON viewer</h2>
+			<div>
+				<input type="text" class="form-control" data-bind="urlInput" />
+			</div>
+			<div class="json-viewer-btn">
+				<button type="button" class="btn btn-default" data-event-click="jsonViewer()">JSON viewer</button>
+			</div>
+			<div data-bind="jsonOutput"></div>
+		</div>
+	</div>
+</body>
+</html>

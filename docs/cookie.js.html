@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: cookie.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: cookie.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Functionality over browser cookies.
+ *
+ * @module $cookie
+ */
+
+import * as $date from "./date";
+
+/**
+ * $cookie constants.
+ * 
+ * @private
+ */
+const _CONST = {
+	EXPIRES: {
+		MAX: "Fri, 31 Dec 9999 23:59:59 GMT",
+		MIN: "Thu, 01 Jan 1970 00:00:00 GMT"
+	}
+};
+
+/**
+ * Set cookie. Default expiration is 30 days from creation.
+ *
+ * @param  {String} name
+ * @param  {String} value
+ * @param  {Object} [optsArg]
+ * @param  {Number|String|Date} [optsArg.expiration=null] Cookie expiration
+ * @param  {String} [optsArg.path=""] Cookie path
+ * @param  {String} [optsArg.domain=""] Cookie domain
+ * @param  {String} [optsArg.secure=""] Cookie secure
+ * @return {Boolean}
+ */
+export function set(name, value, optsArg) {
+	if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
+
+	let opts = {
+		expiration: $date.addDays(new Date(), 30),
+		path: "",
+		domain: "",
+		secure: ""
+	};
+
+	let expires = "";
+	
+	if (opts.expiration) {
+		switch (opts.expiration.constructor) {
+			case Number:
+				expires = opts.expiration === Infinity ? "; expires=" + _CONST.EXPIRES.MAX : "; max-age=" + opts.expiration;
+				break;
+
+			case String:
+				expires = "; expires=" + opts.expiration;
+				break;
+
+			case Date:
+				expires = "; expires=" + opts.expiration.toUTCString();
+				break;
+		}
+	}
+
+	document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (opts.domain ? "; domain=" + opts.domain : "") 
+					+ (opts.path ? "; path=" + opts.path : "") + (opts.secure ? "; secure" : "");
+	return true;
+};
+
+/**
+ * Get cookies by her name.
+ *
+ * @param  {String} name
+ * @return {String}
+ */
+export function get(name) {
+	name = name || "";
+
+	let cookieValue = null;
+
+	if (document.cookie &amp;&amp; document.cookie != '') {
+		let cookies = document.cookie.split(';');
+
+		cookies.every(cookie => {
+			cookie = cookie.trim();
+
+			if (cookie.substring(0, name.length + 1) == (name + '=')) {
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+
+				return false;
+			}
+			else return true;
+		});
+	}
+
+	return cookieValue;
+};
+
+/**
+ * Remove cookie.
+ *
+ * @param  {String} name Cookie name
+ * @param  {String} [domain] Cookie domain
+ * @param  {String} [path] Cookie path
+ * @return {Boolean}
+ */
+export function remove(name, domain, path) {
+	if (!contains(name)) {
+		return false;
+	}
+
+	document.cookie = encodeURIComponent(name) + "=; expires=" + _CONST.EXPIRES.MIN + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+
+	return true;
+};
+
+/**
+ * Document contains cookie?
+ *
+ * @param  {String} name Cookie name
+ * @return {Boolean}
+ */
+export function contains(name) {
+	if (!name) return false;
+
+	return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&amp;") + "\\s*\\=")).test(document.cookie);
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-$common.html">$common</a></li><li><a href="module-$cookie.html">$cookie</a></li><li><a href="module-$date.html">$date</a></li><li><a href="module-$dom.html">$dom</a></li><li><a href="module-$features.html">$features</a></li><li><a href="module-$http.html">$http</a></li><li><a href="module-$image.html">$image</a></li><li><a href="module-$localStorage.html">$localStorage</a></li><li><a href="module-$location.html">$location</a></li><li><a href="module-$math.html">$math</a></li><li><a href="module-$previewImages.html">$previewImages</a></li></ul><h3>Classes</h3><ul><li><a href="$anonymizer.html">$anonymizer</a></li><li><a href="$crop.html">$crop</a></li><li><a href="$event.html">$event</a></li><li><a href="$filter.html">$filter</a></li><li><a href="$filterJson.html">$filterJson</a></li><li><a href="$i18n.html">$i18n</a></li><li><a href="$job.html">$job</a></li><li><a href="$jsonViewer.html">$jsonViewer</a></li><li><a href="$lightbox.html">$lightbox</a></li><li><a href="$loader.html">$loader</a></li><li><a href="$myQuery.html">$myQuery</a></li><li><a href="$notify.html">$notify</a></li><li><a href="$popup.html">$popup</a></li><li><a href="$popupManager.html">$popupManager</a></li><li><a href="$resize.html">$resize</a></li><li><a href="$route.html">$route</a></li><li><a href="$select.html">$select</a></li><li><a href="$slider.html">$slider</a></li><li><a href="$template.html">$template</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 15 2018 10:28:05 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

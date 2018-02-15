@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="cs">
+<head>
+	<title>Onix</title>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, minimal-ui">
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css?1">
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css?1">
+	<link rel="stylesheet" type="text/css" href="/css/main.css?1">
+	
+	<script src="/js/polyfills.js"></script>
+	<script src="/js/main.js"></script>
+	<script>
+		Page.crop();
+	</script>
+</head>
+<body>
+	<div class="main-cont">
+		<h1>Crop</h1>
+
+		<div class="crop-area">
+			<img src="/img-test/test-photo.jpg" alt="" />
+		</div>
+
+		<div>
+			<button type="button" data-event-click="setCenter()">Set center</button>
+			<button type="button" data-event-click="fitToArea()">Fit to area</button>
+			<button type="button" data-event-click="backup()">Backup</button>
+			<button type="button" data-event-click="restore()">Restore</button>
+			<button type="button" data-event-click="aabb()">Get AABB</button>
+		</div>
+	</div>
+</body>
+</html>
