@@ -10,9 +10,8 @@
  * @private
  * @type {Object}
  */
-const _CONST = {
-	ZOOM: 156543.034
-};
+const ZOOM = 156543.034;
+const ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /**
  * Is there two bounding box intersection?
@@ -165,7 +164,7 @@ export function log2(val) {
  * @return {Number} Distance in meters
  */
 export function zoomToDistance(zoom, horFOV, height) {
-	let resolution = _CONST.ZOOM / Math.pow(2, zoom); // m/px
+	let resolution = ZOOM / Math.pow(2, zoom); // m/px
 	let halfHeight = height / 2;
 	let y = Math.floor(resolution * halfHeight);
 
@@ -188,7 +187,7 @@ export function distanceToZoom(distance, horFOV, height) {
 	let y = Math.tan(alfa) * distance;
 	let mPPx = 2 * y / height; // distance / half of height; meters per pixel
 
-	return Math.floor(log2(_CONST.ZOOM / mPPx));
+	return Math.floor(log2(ZOOM / mPPx));
 };
 
 /**
@@ -282,3 +281,122 @@ export function getAngle(x, y) {
 
 	return angle;
 };
+
+/**
+ * Code value to alphabet, base 10 = "0123456789".
+ * 
+ * @param  {String} value Value to code
+ * @param  {String} [alphabet] Own alphabet
+ * @return {String} coded value
+ */
+export function alphabetCode(value, alphabet = ALPHABET) {
+	let cur = value;
+
+	if (value >= 0 && value <= 1) return alphabet[value];
+
+	let exp = Math.ceil(Math.log(value) / Math.log(alphabet.length));
+	let output = [];
+
+	for (let i = exp - 1; i >= 0; i--) {
+		let curExp = Math.pow(alphabet.length, i);
+		let diff = Math.floor(cur / curExp);
+		cur -= diff * curExp;
+
+		output.push(alphabet[diff]);
+	}
+
+	return output.join("");
+};
+
+/**
+ * Decode value in alphabet, base 10 = "0123456789".
+ * 
+ * @param  {String} value Coded value
+ * @param  {String} [alphabet] Own alphabet
+ * @return {String} decoded value
+ */
+export function alphabetDecode(value, alphabet = ALPHABET) {
+	let len = value.length - 1;
+	let output = 0;
+
+	for (let i = 0; i <= len; i++) {
+		let curExp = Math.pow(alphabet.length, len - i);
+		let cur = alphabet.indexOf(value[i]);
+
+		if (cur == -1) {
+			throw new Error("Unknown sign!");
+		}
+
+		output += cur * curExp;
+	}
+
+	return output;
+};
+
+/**
+ * Rotate 3d point by yaw angle.
+ * 
+ * @param  {Array} point [x, y, z]
+ * @param  {Number} deg angle
+ * @return {Array} [x, y, z]
+ */
+export function rotateYaw(point, deg) {
+	if (deg < 0) {
+		deg += 360;
+	}
+
+	// z
+	let degRad = deg / 180 * Math.PI;
+
+	let x = Math.cos(degRad) * point[0] + Math.sin(degRad) * point[1] + 0 * point[2];
+	let y = -Math.sin(degRad) * point[0] + Math.cos(degRad) * point[1] + 0 * point[2];
+	let z = 0 * point[0] + 0 * point[1] + 1 * point[2];
+
+	return [x, y, z];
+}
+
+/**
+ * Rotate 3d point by pitch angle.
+ * 
+ * @param  {Array} point [x, y, z]
+ * @param  {Number} deg angle
+ * @return {Array} [x, y, z]
+ */
+export function rotatePitch(point, deg) {
+	if (deg < 0) {
+		deg += 360;
+	}
+
+	// y
+	let degRad = deg / 180 * Math.PI;
+
+	let x = Math.cos(degRad) * point[0] + 0 * point[1] - Math.sin(degRad) * point[2];
+	let y = 0 * point[0] + 1 * point[1] + 0 * point[2];
+	let z = Math.sin(degRad) * point[0] + 0 * point[1] + Math.cos(degRad) * point[2];
+
+	return [x, y, z];
+}
+
+/**
+ * How many percent test area covers viewport?
+ * 
+ * @param  {Object} viewport   { left, right, width, height }
+ * @param  {Object} testObject { left, right, width, height }
+ * @return {Number} <0; 100>
+ */
+export function viewportCover(viewport, testArea) {
+	let leftEdge = testArea.left >= viewport.left ? testArea.left : 0;
+	let rightEdge = testArea.left + testArea.width <= viewport.left + viewport.width ? testArea.left + testArea.width : 0;
+
+	let width = rightEdge - leftEdge < 0 ? 0 : rightEdge - leftEdge;
+
+	let topEdge = testArea.top >= viewport.top ? testArea.top : 0;
+	let bottomEdge = testArea.top + testArea.height <= viewport.top + viewport.height ? testArea.top + testArea.height : 0;
+
+	let height = bottomEdge - topEdge < 0 ? 0 : bottomEdge - topEdge;
+
+	let testArea = width * height;
+	let wholeArea = testArea.width * testArea.height;
+
+	return Math.floor((testArea / wholeArea) * 100);
+}

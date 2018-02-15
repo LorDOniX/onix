@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.0.1 (15. 2. 2018)
+
+* add new methods
+
 ## 4.0.0 (15. 2. 2018)
 
 * new import version
