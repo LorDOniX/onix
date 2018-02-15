@@ -395,8 +395,8 @@ export function viewportCover(viewport, testArea) {
 
 	let height = bottomEdge - topEdge < 0 ? 0 : bottomEdge - topEdge;
 
-	let testArea = width * height;
-	let wholeArea = testArea.width * testArea.height;
+	let testAreaCover = width * height;
+	let wholeAreaCover = testArea.width * testArea.height;
 
-	return Math.floor((testArea / wholeArea) * 100);
+	return Math.floor((testAreaCover / wholeAreaCover) * 100);
 }
