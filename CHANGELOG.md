@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.2 (19. 2. 2018)
+
+* sortable - drag & drop
+* repositioner-x
+
 ## 4.0.1 (15. 2. 2018)
 
 * add new methods

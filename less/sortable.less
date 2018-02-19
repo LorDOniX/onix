@@ -1,0 +1,44 @@
+.sortable {
+	position: relative;
+	user-select: none;
+	touch-action: none;
+	
+	.placeholder {
+		background: transparent;
+		transition: none;
+	}
+
+	.sortable-item {
+		top: 0;
+		left: 0;
+		position: absolute;
+		transition: top .2s ease-out;
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		display: block;
+		width: 100%;
+		
+		&.dragged {
+			z-index: 100;
+			transition: none;
+			opacity: 0.5;
+		}
+	}
+
+	&.use-translate3d {
+		.sortable-item {
+			transition: transform .2s ease-out;
+
+			&.dragged {
+				transition: none;
+			}
+		}
+	}
+
+	&.no-anim {
+		.sortable-item {
+			transition: none;
+		}
+	}
+}
