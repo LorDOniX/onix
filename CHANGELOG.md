@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.3 (25. 2. 2018)
+
+* remove async polyfill
+* update str format, replaceAll
+* new method for $i18n addStructuredLang
+
 ## 4.0.2 (19. 2. 2018)
 
 * sortable - drag & drop
