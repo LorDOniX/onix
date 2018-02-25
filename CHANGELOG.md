@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.0.4 (25. 2. 2018)
+
+* all source files are in the separate repository https://gitlab.com/LorDOniX/onix-js
+
 ## 4.0.3 (25. 2. 2018)
 
 * remove async polyfill
